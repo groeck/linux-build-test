@@ -23,11 +23,11 @@ do_import()
 
 	cd ${LINUX}
 
-	git rebase --abort
-	git clean -f -d -q
+	git rebase --abort >/dev/null 2>&1
+	git clean -f -d -q -x
 	git checkout master
-	git reset --hard HEAD
-	git clean -f -d -q
+
+	git fetch --all
 
 	git show-branch ${branch}
 	if [ $? -ne 0 ]
@@ -35,7 +35,7 @@ do_import()
 		git checkout -b ${branch} ${ref}
 	else
 		git checkout ${branch}
-		git pull origin ${branch}
+		git reset --hard origin/${branch}
 	fi
 
 	# reference branch exists locally and is up to date
@@ -112,8 +112,6 @@ do_clone()
 }
 
 # First update tracking branch from origin
-
-(cd /var/cache/git/linux-stable.git; git fetch)
 
 do_clone linux-stable git://server.roeck-us.net/git/linux-stable.git
 
