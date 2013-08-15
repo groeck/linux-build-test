@@ -30,7 +30,7 @@ then
 fi
 
 echo "Building kernel ..."
-make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
+make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
 if [ $? -ne 0 ]
 then
 	echo "Build failed - aborting"
