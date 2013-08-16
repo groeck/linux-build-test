@@ -161,7 +161,6 @@ doit()
 	cmd=(${cmd_x86_64[*]})
 	PREFIX="x86_64-poky-linux-"
 	PATH=${PATH_X86}:${PATH}
-	OPTIONS="W=1"
 	;;
     xtensa)
 	cmd=(${cmd_xtensa[*]})
@@ -197,7 +196,7 @@ doit()
     	builds=$(expr ${builds} + 1)
 	# can't have slashes in file names
 	l=$(echo ${cmd[$i]} | sed -e 's/\//_/g')
-	make ${CROSS} -j10 ARCH=${ARCH} >/dev/null 2>/tmp/buildlog.${ref}.${ARCH}.${l}
+	make ${CROSS} -j12 ARCH=${ARCH} >/dev/null 2>/tmp/buildlog.${ref}.${ARCH}.${l}
 	if [ $? -ne 0 ]; then
 	    echo "Build ${ARCH}:${cmd[$i]} failed" >> ${LOG}
 	    echo "failed"
