@@ -30,6 +30,32 @@
 </table>
 
 <br>
+<h1> stable queue: </h1>
+
+<table border=1>
+{% for b in builders if 'stable-queue' in b.name %}
+  <tr>
+  <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
+  <td>
+  <table>
+  <tr>
+  {% if b.build_url %}
+    <td class="LastBuild box {{ b.build_css_class }}">
+        <a href="{{ b.build_url }}">{{ b.build_label }}</a>
+        <br/>{{ b.build_text }}
+    </td>
+  {% else %}
+    <td class="LastBuild box">no build</td>
+  {% endif %}  
+  </tr>
+  <tr> {{ box(**b.current_box) }}</tr>
+  </table>
+  </td>
+  </tr>
+{% endfor %}
+</table>
+
+<br>
 <h1>qemu:</h1>
 
 <table border=1>
@@ -58,7 +84,7 @@
         {{ box(**b.current_box) }}  
       </tr>
     {% else %}
-        <tr><td>skipped</td></tr>
+        <tr><td class="LastBuild box skipped">skipped</td></tr>
     {% endfor %}
     </table>
     </td>
@@ -66,32 +92,6 @@
   </tr>
 {% endfor %}
 
-</table>
-
-<br>
-<h1> stable queue: </h1>
-
-<table border=1>
-{% for b in builders if 'stable-queue' in b.name %}
-  <tr>
-  <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
-  <td>
-  <table>
-  <tr>
-  {% if b.build_url %}
-    <td class="LastBuild box {{ b.build_css_class }}">
-        <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-        <br/>{{ b.build_text }}
-    </td>
-  {% else %}
-    <td class="LastBuild box">no build</td>
-  {% endif %}  
-  </tr>
-  <tr> {{ box(**b.current_box) }}</tr>
-  </table>
-  </td>
-  </tr>
-{% endfor %}
 </table>
 
 {% if num_building > 0 %}
