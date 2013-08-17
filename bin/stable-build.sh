@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. /opt/buildbot/bin/stable-build-targets.sh
+basedir=$(cd $(dirname $0); pwd)
+. ${basedir}/stable-build-targets.sh
 
 LOG=/tmp/log.$$
 MAIL_FILE=/tmp/mail.$$
