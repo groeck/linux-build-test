@@ -46,8 +46,8 @@
   {% for rel in ["3.0", "3.4", "3.10" ] %}
     {% set bname = "qemu-" ~ target ~ "-" ~ rel %}
     <td class="LastBuild box">
+    <table align=center>
     {% for b in builders if b.name == bname %}
-      <table align=center>
       <tr>
       <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
@@ -57,10 +57,10 @@
       <tr>
         {{ box(**b.current_box) }}  
       </tr>
-      </table>
     {% else %}
-        skipped
+        <tr><td>skipped</td></tr>
     {% endfor %}
+    </table>
     </td>
   {% endfor %}
   </tr>
