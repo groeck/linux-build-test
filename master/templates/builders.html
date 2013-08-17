@@ -6,10 +6,13 @@
 
 <h1>hwmon:</h1>
 
-<table>
+<table border=1>
 {% for b in builders if 'hwmon' in b.name %}
   <tr>
-  <td class="box"><a href="{{ b.link }}">{{ b.name|e }}</a></td>
+  <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
+  <td>
+  <table>
+  <tr>
   {% if b.build_url %}
     <td class="LastBuild box {{ b.build_css_class }}">
         <a href="{{ b.build_url }}">{{ b.build_label }}</a>
@@ -18,7 +21,10 @@
   {% else %}
     <td class="LastBuild box">no build</td>
   {% endif %}  
-  {{ box(**b.current_box) }}  
+  </tr>
+  <tr> {{ box(**b.current_box) }}</tr>
+  </table>
+  </td>
   </tr>
 {% endfor %}
 </table>
@@ -26,22 +32,22 @@
 <br>
 <h1>qemu:</h1>
 
-<table>
+<table border=1>
 <tr>
-<td></td>
+<th></th>
 {% for rel in ["3.0", "3.4", "3.10" ] %}
-    <td class="box">{{ rel }}</a></td>
+    <th class="box">{{ rel }}</a></th>
 {% endfor %}
 </tr>
 
 {% for target in [ "arm", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
   <tr>
-  <td class="box">{{ target }}</a></td>
+  <td class="box"><b>{{ target }}</b></a></td>
   {% for rel in ["3.0", "3.4", "3.10" ] %}
     {% set bname = "qemu-" ~ target ~ "-" ~ rel %}
+    <td class="LastBuild box">
     {% for b in builders if b.name == bname %}
-      <td class="LastBuild box">
-      <table>
+      <table align=center>
       <tr>
       <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
@@ -52,10 +58,10 @@
         {{ box(**b.current_box) }}  
       </tr>
       </table>
-      </td>
     {% else %}
-        <td class="LastBuild box"> skipped </td>
+        skipped
     {% endfor %}
+    </td>
   {% endfor %}
   </tr>
 {% endfor %}
@@ -65,10 +71,13 @@
 <br>
 <h1> stable queue: </h1>
 
-<table>
+<table border=1>
 {% for b in builders if 'stable-queue' in b.name %}
   <tr>
-  <td class="box"><a href="{{ b.link }}">{{ b.name|e }}</a></td>
+  <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
+  <td>
+  <table>
+  <tr>
   {% if b.build_url %}
     <td class="LastBuild box {{ b.build_css_class }}">
         <a href="{{ b.build_url }}">{{ b.build_label }}</a>
@@ -77,7 +86,10 @@
   {% else %}
     <td class="LastBuild box">no build</td>
   {% endif %}  
-  {{ box(**b.current_box) }}  
+  </tr>
+  <tr> {{ box(**b.current_box) }}</tr>
+  </table>
+  </td>
   </tr>
 {% endfor %}
 </table>
