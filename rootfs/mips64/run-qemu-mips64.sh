@@ -16,7 +16,7 @@ looptime=5
 
 PATH=${PATH_MIPS}:${PATH}
 logfile=/tmp/qemu.$$.log
-dir=$(dirname $0)
+dir=$(cd $(dirname $0); pwd)
 tmprootfs=/tmp/$$.${rootfs}
 
 cp ${dir}/${defconfig} arch/${ARCH}/configs

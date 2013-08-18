@@ -14,7 +14,7 @@ tmprootfs=/tmp/$$.${rootfs}
 
 PATH=${PATH_ARM}:${PATH}
 
-dir=$(dirname $0)
+dir=$(cd $(dirname $0); pwd)
 
 cp ${dir}/${defconfig} arch/${ARCH}/configs
 make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
