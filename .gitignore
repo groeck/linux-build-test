@@ -1,0 +1,14 @@
+slave/qemu*
+slave/hwmon*
+slave/stable*
+slave/twistd.*
+master/qemu*
+master/hwmon*
+master/stable*
+master/gitpoller-workdir/
+master/*.log
+master/queue-workdir/
+master/staging-workdir/
+master/state.sqlite
+master/templates/README.txt
+master/twistd.pid
