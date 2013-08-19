@@ -61,7 +61,7 @@
 <table border=1>
 <tr>
 <th></th>
-{% for rel in ["3.0", "3.4", "3.10" ] %}
+{% for rel in ["3.0", "3.4", "3.10", "master" ] %}
     <th class="box">{{ rel }}</a></th>
 {% endfor %}
 </tr>
@@ -69,7 +69,7 @@
 {% for target in [ "arm", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
   <tr>
   <td class="box"><b>{{ target }}</b></a></td>
-  {% for rel in ["3.0", "3.4", "3.10" ] %}
+  {% for rel in ["3.0", "3.4", "3.10", "master" ] %}
     {% set bname = "qemu-" ~ target ~ "-" ~ rel %}
     <td class="LastBuild box">
     <table align=center>
@@ -81,7 +81,7 @@
       </td>
       </tr>
       <tr>
-        {{ box(**b.current_box) }}  
+          {{ box(**b.current_box) }}
       </tr>
     {% else %}
         <tr><td class="LastBuild box skipped">skipped</td></tr>
