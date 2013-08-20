@@ -9,7 +9,7 @@ fi
 
 base=/opt/buildbot
 
-for system in saturn desktop jupiter
+for system in saturn.roeck-us.net desktop jupiter
 do
 	echo -n "${system}: "
 	rsync -r ${base}/bin ${base}/rootfs ${system}:${base}
