@@ -13,7 +13,7 @@
   <td>
   <table>
   <tr>
-  {% if b.build_url %}
+  {% if b.build_url and b.build_css_class %}
     <td class="LastBuild box {{ b.build_css_class }}">
         <a href="{{ b.build_url }}">{{ b.build_label }}</a>
         <br/>{{ b.build_text }}
@@ -32,52 +32,81 @@
 <br>
 <h1> stable queue: </h1>
 
+{% set arches = [ "alpha", "arm", "blackfin", "cris", "frv", "i386", "ia64",
+                  "m68k", "m68k_nommu", "microblaze", "mips", "parisc",
+		  "parisc64", "powerpc", "s390", "sh", "sparc32", "sparc64",
+		  "tile", "x86_64", "xtensa" ] %}
+
+{% set qemu_arches = [ "arm", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
+
+{% set releases = ["3.0", "3.4", "3.10", "master" ] %}
+
 <table border=1>
-{% for b in builders if 'stable-queue' in b.name %}
+<tr>
+<th></th>
+{% for rel in releases %}
+    <th class="box">{{ rel }}</a></th>
+{% endfor %}
+</tr>
+
+{% for arch in arches %}
   <tr>
-  <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
-  <td>
-  <table>
-  <tr>
-  {% if b.build_url %}
-    <td class="LastBuild box {{ b.build_css_class }}">
-        <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-        <br/>{{ b.build_text }}
+  <td class="box"><b>{{ arch }}</b></a></td>
+  {% for rel in releases %}
+    {% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    <td class="LastBuild box">
+    <table align=center>
+    {% for b in builders if b.name == bname %}
+      <tr>
+      {% if b.build_url and b.build_css_class %}
+        <td class="LastBuild box {{ b.build_css_class }}">
+          <a href="{{ b.build_url }}">{{ b.build_label }}</a>
+          <br>{{ b.build_text }}
+        </td>
+      {% else %}
+        <td class="LastBuild box skipped">no build</td>
+      {% endif %}
+      </tr>
+      <tr>
+          {{ box(**b.current_box) }}
+      </tr>
+    {% else %}
+        <tr><td class="LastBuild box skipped">skipped</td></tr>
+    {% endfor %}
+    </table>
     </td>
-  {% else %}
-    <td class="LastBuild box">no build</td>
-  {% endif %}  
-  </tr>
-  <tr> {{ box(**b.current_box) }}</tr>
-  </table>
-  </td>
+  {% endfor %}
   </tr>
 {% endfor %}
 </table>
 
 <br>
-<h1>qemu:</h1>
+<h1>qemu test results:</h1>
 
 <table border=1>
 <tr>
 <th></th>
-{% for rel in ["3.0", "3.4", "3.10", "master" ] %}
+{% for rel in releases %}
     <th class="box">{{ rel }}</a></th>
 {% endfor %}
 </tr>
 
-{% for target in [ "arm", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
+{% for arch in qemu_arches %}
   <tr>
-  <td class="box"><b>{{ target }}</b></a></td>
-  {% for rel in ["3.0", "3.4", "3.10", "master" ] %}
-    {% set bname = "qemu-" ~ target ~ "-" ~ rel %}
+  <td class="box"><b>{{ arch }}</b></a></td>
+  {% for rel in releases %}
+    {% set bname = "qemu-" ~ arch ~ "-" ~ rel %}
     <td class="LastBuild box">
     <table align=center>
     {% for b in builders if b.name == bname %}
       <tr>
-      <td class="LastBuild box {{ b.build_css_class }}">
+      {% if b.build_url and b.build_css_class %}
+        <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-          <br/>{{ b.build_text }}
+          <br>{{ b.build_text }}
+      {% else %}
+        <td class="LastBuild box skipped">no build</td>
+      {% endif %}
       </td>
       </tr>
       <tr>
@@ -93,6 +122,54 @@
 {% endfor %}
 
 </table>
+
+<br>
+<h1> stable repository import: </h1>
+
+<table>
+{% for b in builders if b.name == "stable-updates" %}
+  <tr>
+  {% if b.build_url and b.build_css_class %}
+    <td class="LastBuild box {{ b.build_css_class }}">
+          <a href="{{ b.build_url }}">{{ b.build_label }}</a>
+          <br/>{{ b.build_text }}
+    </td>
+  {% else %}
+    <td class="LastBuild box skipped">no build</td>
+  {% endif %}
+  </tr>
+  <tr>
+          {{ box(**b.current_box) }}
+  </tr>
+{% else %}
+  <tr><td class="LastBuild box skipped">no build</td></tr>
+{% endfor %}
+</table>
+
+<br>
+<h1> stable queue import: </h1>
+
+<table>
+{% for b in builders if b.name == "stable-queue-import" %}
+  <tr>
+  {% if b.build_css_class %}
+    <td class="LastBuild box {{ b.build_css_class }}">
+          <a href="{{ b.build_url }}">{{ b.build_label }}</a>
+          <br/>{{ b.build_text }}
+    </td>
+  {% else %}
+    <td class="LastBuild box skipped">no build</td>
+  {% endif %}
+  </tr>
+  <tr>
+          {{ box(**b.current_box) }}
+  </tr>
+{% else %}
+  <tr><td class="LastBuild box skipped">no build</td></tr>
+{% endfor %}
+</table>
+
+<br>
 
 {% if num_building > 0 %}
   {% if authz.advertiseAction('stopAllBuilds', request) or authz.advertiseAction('stopBuild', request) %}
