@@ -29,6 +29,7 @@ then
 	exit 1
 fi
 
+echo "Build reference: $(git describe)"
 echo "Building kernel ..."
 make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
 if [ $? -ne 0 ]
