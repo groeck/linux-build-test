@@ -28,6 +28,7 @@ do_import()
 	git checkout master
 
 	git fetch --all
+	git pull
 
 	git show-branch ${branch}
 	if [ $? -ne 0 ]
