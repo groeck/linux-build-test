@@ -1,8 +1,9 @@
-buildarch=(alpha arm blackfin cris frv i386 ia64 m68k m68k_nommu microblaze mips \
+buildarch=(alpha arm arm64 blackfin cris frv i386 ia64 m68k m68k_nommu microblaze mips \
 	   parisc parisc64 powerpc s390 sh sparc32 sparc64 tile x86_64 xtensa)
 
 cmd_alpha=(defconfig)
 cmd_arm=(defconfig allmodconfig exynos4_defconfig multi_v7_defconfig kirkwood_defconfig omap2plus_defconfig tegra_defconfig u8500_defconfig at91sam9rl_defconfig ap4evb_defconfig bcm_defconfig bonito_defconfig pxa910_defconfig mvebu_defconfig armadillo800eva_defconfig mackerel_defconfig)
+cmd_arm64=(defconfig)
 cmd_blackfin=(defconfig)
 cmd_cris=(defconfig etrax-100lx_defconfig allnoconfig)
 cmd_frv=(defconfig)

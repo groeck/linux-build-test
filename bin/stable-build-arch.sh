@@ -53,6 +53,11 @@ case ${ARCH} in
 	PREFIX="arm-poky-linux-gnueabi-"
 	PATH=${PATH_ARM}:${PATH}
 	;;
+    arm64)
+	cmd=(${cmd_arm64[*]})
+	PREFIX="aarch64-linux-gnu-"
+	# PATH=${PATH_ARM}:${PATH}
+	;;
     blackfin)
 	cmd=(${cmd_blackfin[*]})
 	PREFIX="bfin-uclinux-"
