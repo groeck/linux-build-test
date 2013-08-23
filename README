@@ -1,0 +1,35 @@
+Repositories and packages
+-------------------------
+
+sudo apt-add-repository 'deb http://people.debian.org/~wookey/bootstrap/ubunturepo/ raring-bootstrap main universe'
+sudo aptitude update
+sudo apt-get install gcc-aarch64-linux-gnu
+
+qemu 1.5.2 (from qemu subdirectory)
+
+automake
+autoconf
+autotools-dev
+build-essential
+buildbot
+buildbot-slave
+coccinelle
+nfs-client
+fakeroot
+git
+git-email
+initramfs-tools
+libglib2.0-dev
+libssh2-1-dev
+libcurl4-openssl-dev
+libiscsi-dev
+libpixman-1-dev
+module-init-tools
+nfs-client
+qemu-system
+qemu-user
+qemu-utils
+u-boot-tools
+
+xubuntu-desktop
+
