@@ -35,11 +35,44 @@
 {% set arches = [ "alpha", "arm", "arm64", "blackfin", "cris", "frv", "i386", "ia64",
                   "m68k", "m68k_nommu", "microblaze", "mips", "parisc",
 		  "parisc64", "powerpc", "s390", "sh", "sparc32", "sparc64",
-		  "tile", "x86_64", "xtensa" ] %}
+		  "tile", "um", "x86_64", "xtensa" ] %}
 
 {% set qemu_arches = [ "arm", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
 
 {% set releases = ["3.0", "3.4", "3.10", "master" ] %}
+
+{% set exists = [] %}
+
+<script type='text/javascript'>
+{% for rel in releases %}
+  {% set exists = [] %}
+  var buildText_{{rel|replace('.','')}} = [
+  {% for arch in arches %}
+    {% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    {% for b in builders if b.name == bname %}
+      {% if b.build_url and b.build_css_class %}
+          {% if exists %} , {% endif %} "{{ b.build_text }}"
+          {% if exists.append("1") %} {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %} ];
+
+  function getResults{{rel|replace('.','')}} (match_string)
+  {
+    var num = 0;
+    for (var i=0; i < buildText_{{rel|replace('.','')}}.length; i++)
+    {
+        var elem = buildText_{{rel|replace('.','')}}[i];
+	var m = match_string.exec(elem);
+	if (m) {
+	    var match = /\d+/;
+	    num += parseInt(match.exec(m));
+	}
+    }
+    return num;
+  }
+{% endfor %}
+</script>
 
 <table border=1>
 <tr>
@@ -78,6 +111,35 @@
   {% endfor %}
   </tr>
 {% endfor %}
+
+  <tr>
+  <td class="box"><b>Total</b></a></td>
+  {% for rel in releases %}
+	<script type='text/javascript'>
+	    var total = getResults{{rel|replace('.','')}} (/total: \d+/);
+	    var passed = getResults{{rel|replace('.','')}} (/pass: \d+/);
+	    var skipped = getResults{{rel|replace('.','')}} (/skipped: \d+/);
+	    var fail = getResults{{rel|replace('.','')}} (/fail: \d+/);
+
+	    var box = "success";
+
+	    if (total == 0) {
+	    	box = "skipped";
+	    } else if (passed == 0) {
+	    	box = "failure";
+	    } else if (fail > 0) {
+	    	box = "warnings";
+	    }
+    	document.write('<td class="LastBuild box ' + box + '">\n');
+	document.write
+        document.write(' total: ' + total +
+			' pass: ' + passed +
+			' skipped: ' + skipped +
+			' fail: ' + fail + ' ');
+        document.write('</td>\n');
+	</script>
+  {% endfor %}
+  </tr>
 </table>
 
 <br>
