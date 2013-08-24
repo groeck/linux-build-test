@@ -42,6 +42,7 @@ ARCH=$1
 # Do it again to be able to call script directly.
 git clean -x -f -d -q
 
+SUBARCH=""
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
@@ -162,6 +163,12 @@ case ${ARCH} in
 	PREFIX="xtensa-linux-"
 	PATH=${PATH_XTENSA}:${PATH}
 	;;
+    um)
+	cmd=(${cmd_um[*]})
+	PREFIX="x86_64-poky-linux-"
+	PATH=${PATH_X86}:${PATH}
+	SUBARCH="x86_64"
+	;;
     *)
 	echo "Unsupported or unspecified architecture ${ARCH}"
 	exit 1
@@ -173,19 +180,25 @@ if [ "${PREFIX}" != "" ]; then
 	CROSS="CROSS_COMPILE=${PREFIX}"
 fi
 
+SUBARCH_CMD=""
+if [ -n "${SUBARCH}" ]
+then
+	SUBARCH_CMD="SUBARCH=${SUBARCH}"
+fi
+
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
 do
     	echo -n "Building ${ARCH}:${cmd[$i]} ... "
 	rm -f .config
-	make ${CROSS} ARCH=${ARCH} ${cmd[$i]} >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} ${SUBARCH_CMD} ${cmd[$i]} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (config) - skipping"
 	 	i=$(expr $i + 1)
 	 	continue
 	fi
-	make ${CROSS} ARCH=${ARCH} oldnoconfig >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} ${SUBARCH_CMD} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (oldnoconfig) - skipping"
@@ -193,9 +206,7 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	# can't have slashes in file names
-	l=$(echo ${cmd[$i]} | sed -e 's/\//_/g')
-	make ${CROSS} -j12 ARCH=${ARCH} >/dev/null 2>/tmp/buildlog.$$
+	make ${CROSS} -j12 ARCH=${ARCH} ${SUBARCH_CMD} >/dev/null 2>/tmp/buildlog.$$
 	if [ $? -ne 0 ]; then
 	    echo "failed"
 	    echo "--------------"
