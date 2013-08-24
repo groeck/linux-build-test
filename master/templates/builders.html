@@ -51,7 +51,7 @@
     {% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
     {% for b in builders if b.name == bname %}
       {% if b.build_url and b.build_css_class %}
-          {% if exists %} , {% endif %} "{{ b.build_text }}"
+          {% if exists %} , {% endif %} "{{ b.build_text|replace('<br> ', '') }}"
           {% if exists.append("1") %} {% endif %}
       {% endif %}
     {% endfor %}
@@ -111,31 +111,32 @@
   {% endfor %}
   </tr>
 {% endfor %}
-
   <tr>
-  <td class="box"><b>Total</b></a></td>
+  <td class="box"><b>Summary</b></a></td>
   {% for rel in releases %}
 	<script type='text/javascript'>
 	    var total = getResults{{rel|replace('.','')}} (/total: \d+/);
 	    var passed = getResults{{rel|replace('.','')}} (/pass: \d+/);
 	    var skipped = getResults{{rel|replace('.','')}} (/skipped: \d+/);
 	    var fail = getResults{{rel|replace('.','')}} (/fail: \d+/);
-
 	    var box = "success";
-
-	    if (total == 0) {
+	    var build = "build successful";
+	    if (total == 0 || total == skipped) {
 	    	box = "skipped";
+	    	build = "skipped";
 	    } else if (passed == 0) {
 	    	box = "failure";
+	    	build = "failed";
 	    } else if (fail > 0) {
 	    	box = "warnings";
+	    	build = "warnings";
 	    }
     	document.write('<td class="LastBuild box ' + box + '">\n');
-	document.write
-        document.write(' total: ' + total +
+	document.write(build + "<br>");
+        document.write('total: ' + total +
 			' pass: ' + passed +
 			' skipped: ' + skipped +
-			' fail: ' + fail + ' ');
+			' fail: ' + fail);
         document.write('</td>\n');
 	</script>
   {% endfor %}
