@@ -5,6 +5,8 @@ sudo apt-add-repository 'deb http://people.debian.org/~wookey/bootstrap/ubunture
 sudo aptitude update
 sudo apt-get install gcc-aarch64-linux-gnu
 
+Then remove repository from /etc/apt/sources.list.
+
 qemu 1.5.2 (from qemu subdirectory)
 
 automake
