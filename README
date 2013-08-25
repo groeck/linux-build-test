@@ -33,5 +33,22 @@ qemu-user
 qemu-utils
 u-boot-tools
 
-xubuntu-desktop
+---
+arc:
+
+get buildroot from http://buildroot.uclibc.org/download.html.
+
+configure for ARC little endian (big endian is broken, at least with 2013.05).
+
+Commands to run (assuming gcc 4.4.7):
+	make toolchain
+	cd output
+	mkdir -p arc/gcc-4.4.7
+	mv host arc/gcc-4.4.7
+	tar czf /tmp/x86_64-gcc-4.4.7-uclibc_arc-linux.tar.gz arc
+
+The result can be installed in /opt/kernel as usual.
+Path and prefix to use:
+	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
+	CROSS_COMPILE=arc-buildroot-linux-uclibc-
 
