@@ -12,3 +12,5 @@ master/staging-workdir/
 master/state.sqlite
 master/templates/README.txt
 master/twistd.pid
+buildroot
+smatch
