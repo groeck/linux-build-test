@@ -163,6 +163,11 @@ case ${ARCH} in
 	;;
     tile)
 	cmd=(${cmd_tile[*]})
+	fmax=$(expr ${#fixup_tile[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_tile[$f]}
+	done
 	PREFIX="tilegx-linux-"
 	PATH=${PATH_TILE}:${PATH}
 	;;

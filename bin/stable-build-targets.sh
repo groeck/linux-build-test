@@ -41,5 +41,8 @@ cmd_um=(defconfig)
 
 # fixups
 
+fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD is not set/"
+	"/CONFIG_INITRAMFS_SOURCE/d")
+
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
