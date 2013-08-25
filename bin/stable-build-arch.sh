@@ -7,6 +7,8 @@ LOG=/tmp/log.$$
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
+PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
+PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
@@ -43,11 +45,22 @@ ARCH=$1
 git clean -x -f -d -q
 
 SUBARCH=""
+declare -a fixup
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
 	PREFIX="alpha-linux-"
 	PATH=${PATH_ALPHA}:${PATH}
+	;;
+    arc)
+	cmd=(${cmd_arc[*]})
+	fmax=$(expr ${#fixup_arc[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_arc[$f]}
+	done
+	PREFIX="arc-buildroot-linux-uclibc-"
+	PATH=${PATH_ARC}:${PATH}
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
@@ -58,6 +71,11 @@ case ${ARCH} in
 	cmd=(${cmd_arm64[*]})
 	PREFIX="aarch64-linux-gnu-"
 	# PATH=${PATH_ARM}:${PATH}
+	;;
+    avr32)
+	cmd=(${cmd_avr32[*]})
+	PREFIX="avr32-linux-"
+	PATH=${PATH_AVR32}:${PATH}
 	;;
     blackfin)
 	cmd=(${cmd_blackfin[*]})
@@ -197,6 +215,15 @@ do
 	        echo "failed (config) - skipping"
 	 	i=$(expr $i + 1)
 	 	continue
+	fi
+	# run config file fixups if necessary
+	if [ ${#fixup[*]} -gt 0 ]; then
+	    fmax=$(expr ${#fixup[*]} - 1)
+	    for f in $(seq 0 ${fmax})
+	    do
+	        sed -e "${fixup[$f]}" .config > .config.tmp
+	        mv .config.tmp .config
+	    done
 	fi
 	make ${CROSS} ARCH=${ARCH} ${SUBARCH_CMD} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
