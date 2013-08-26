@@ -45,7 +45,7 @@ cp ${dir}/${rootfs} ${tmprootfs}
 
 # qemu-system-arm -kernel arch/arm/boot/zImage -M versatilepb -hda ${tmprootfs} -no-reboot -usb -usbdevice wacom-tablet -m 128 --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" -nographic > ${logfile} 2>&1 &
 
-qemu-system-arm -kernel arch/arm/boot/zImage -M versatilepb -drive file=${tmprootfs},if=scsi -no-reboot -m 128 --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" -nographic > ${logfile} 2>&1 &
+/usr/local/bin/qemu-system-arm -kernel arch/arm/boot/zImage -M versatilepb -drive file=${tmprootfs},if=scsi -no-reboot -m 128 --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" -nographic > ${logfile} 2>&1 &
 
 pid=$!
 
