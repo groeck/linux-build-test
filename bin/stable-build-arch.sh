@@ -17,6 +17,7 @@ PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 PATH_M68_NOMMU=/usr/local/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.6.3-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
@@ -129,6 +130,11 @@ case ${ARCH} in
 	cmd=(${cmd_mips[*]});
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS}:${PATH}
+	;;
+    openrisc)
+	cmd=(${cmd_openrisc[*]})
+	PREFIX="or32-linux-"
+	PATH=${PATH_OPENRISC}:${PATH}
 	;;
     parisc)
 	cmd=(${cmd_parisc[*]})

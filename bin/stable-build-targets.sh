@@ -1,5 +1,5 @@
 buildarch=(alpha arm arm64 avr32 blackfin cris frv i386 ia64 m68k m68k_nommu \
-	   microblaze mips parisc parisc64 powerpc s390 sh sparc32 sparc64 \
+	   microblaze mips openrisc parisc parisc64 powerpc s390 sh sparc32 sparc64 \
 	   tile x86_64 xtensa um)
 
 cmd_alpha=(defconfig)
@@ -23,6 +23,7 @@ cmd_microblaze=(mmu_defconfig nommu_defconfig)
 cmd_mips=(defconfig allmodconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig fuloong2e_defconfig \
 	e55_defconfig cavium_octeon_defconfig powertv_defconfig malta_defconfig)
+cmd_openrisc=(defconfig)
 cmd_parisc=(defconfig)
 cmd_parisc64=(a500_defconfig)
 cmd_powerpc=(defconfig allmodconfig ppc64e_defconfig cell_defconfig \
