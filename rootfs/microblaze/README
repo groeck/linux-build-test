@@ -1,0 +1,11 @@
+extract rootfs cpio:
+
+mkdir rootfs
+cd rootfs
+cpio -itv < ../rootfs.cpio
+
+create cpio file:
+as root:
+cd rootfs
+find . | cpio --quiet -o -H newc >../rootfs.cpio
+
