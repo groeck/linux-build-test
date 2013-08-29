@@ -44,11 +44,11 @@ send_mail()
 
 do_smatch_check()
 {
-    # Run smatch only on compiled files.
+    # Run smatch only on compiled files in drivers/hwmon.
     # This doesn't get us all of them, but we avoid false positives
     # due to uncompilable files.
     #
-    local l=$(ls drivers/hwmon/*.o 2>/dev/null)
+    local l=$(ls drivers/hwmon/*.o | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
     local x
 
     for x in $l
@@ -111,16 +111,21 @@ doit()
     	builds=$(expr ${builds} + 1)
 	make ${CROSS} -j10 -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
 	#
-	# If options are set, repeat the exercise after removing all object
-	# files in drivers/hwmon. This reduces build time and number of warnings
+	# If options are set, repeat the exercise for all object files
+	# in drivers/hwmon. This reduces build time and number of warnings
 	# we have to deal with.
 	# The odd redirect is to get error output to the console (for the
 	# buildbot log) and into a file for the status email.
 	#
 	if [ -n "${OPTIONS}" ]
 	then
-	    rm -f drivers/hwmon/*.o drivers/hwmon/*.ko
-	    make ${CROSS} -j10 -i ${OPTIONS} ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
+	    for f in $(ls drivers/hwmon/*.o | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
+	    do
+	    	rm -f $f
+	        make ${CROSS} -j10 -i ${OPTIONS} ARCH=${ARCH} $f >/dev/null 2> >(tee ${ERR}.tmp >&2)
+		cat ${ERR}.tmp >> ${ERR}
+		rm -f ${ERR}.tmp
+	    done
 	fi
 	# If smatch build is asked for as well, do another run with smatch.
 	# Append smatch output to warning log.
