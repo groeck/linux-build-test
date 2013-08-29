@@ -7,6 +7,7 @@ LOG=/tmp/log.$$
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
+PATH_ARM64=/opt/kernel/gcc-linaro-aarch64-linux-gnu-4.7-2013.03-20130313_linux/bin:
 PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
@@ -71,7 +72,7 @@ case ${ARCH} in
     arm64)
 	cmd=(${cmd_arm64[*]})
 	PREFIX="aarch64-linux-gnu-"
-	# PATH=${PATH_ARM}:${PATH}
+	PATH=${PATH_ARM64}:${PATH}
 	;;
     avr32)
 	cmd=(${cmd_avr32[*]})
