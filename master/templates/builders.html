@@ -16,7 +16,7 @@
   {% if b.build_url and b.build_css_class %}
     <td class="LastBuild box {{ b.build_css_class }}">
         <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-        <br/>{{ b.build_text }}
+        <br/> {{ b.build_text|replace('build successful', 'successful') }}
     </td>
   {% else %}
     <td class="LastBuild box">no build</td>
@@ -99,7 +99,7 @@
           {% if b.build_css_class == 'skipped' %}
             {{ b.build_text|replace('build successful', 'skipped') }}
 	  {% else %}
-            {{ b.build_text }}
+            {{ b.build_text|replace('build successful', 'successful') }}
 	  {% endif %}
         </td>
       {% else %}
@@ -126,7 +126,7 @@
 	    var skipped = getResults{{rel|replace('.','')}} (/skipped: \d+/);
 	    var fail = getResults{{rel|replace('.','')}} (/fail: \d+/);
 	    var box = "success";
-	    var build = "build successful";
+	    var build = "successful";
 	    if (total == 0 || total == skipped) {
 	    	box = "skipped";
 	    	build = "skipped";
@@ -172,7 +172,7 @@
       {% if b.build_url and b.build_css_class %}
         <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-          <br>{{ b.build_text }}
+          <br> {{ b.build_text|replace('build successful', 'successful') }}
       {% else %}
         <td class="LastBuild box skipped">no build</td>
       {% endif %}
@@ -201,7 +201,7 @@
   {% if b.build_url and b.build_css_class %}
     <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-          <br/>{{ b.build_text }}
+          <br/> {{ b.build_text|replace('build successful', 'successful') }}
     </td>
   {% else %}
     <td class="LastBuild box skipped">no build</td>
@@ -224,7 +224,7 @@
   {% if b.build_css_class %}
     <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-          <br/>{{ b.build_text }}
+          <br/> {{ b.build_text|replace('build successful', 'successful') }}
     </td>
   {% else %}
     <td class="LastBuild box skipped">no build</td>
