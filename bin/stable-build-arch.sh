@@ -16,6 +16,7 @@ PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 PATH_M68_NOMMU=/usr/local/bin
+PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
@@ -122,6 +123,11 @@ case ${ARCH} in
 	fi
 	ARCH=m68k
         ;;
+    metag)
+	cmd=(${cmd_metag[*]})
+	PREFIX="metag-unknown-linux-uclibc-"
+	PATH=${PATH_METAG}:${PATH}
+	;;
     microblaze)
 	cmd=(${cmd_microblaze[*]})
 	PREFIX="microblaze-linux-"

@@ -52,3 +52,23 @@ Path and prefix to use:
 	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
 	CROSS_COMPILE=arc-buildroot-linux-uclibc-
 
+---
+metag:
+
+Download minimorph SDK from
+http://www.imgtec.com/meta_insider/utilities/Minimorph_1_0-rel009.tar.gz
+Inside is ./metag-linux-GPL-Minimorph_1_0-rel009.tar.gz.
+Contains buildroot sources. Untar, then run the following commands.
+
+	cd GPL/buildroot
+	make comet_minimorph_defconfig
+	make
+	cd output
+	mkdir metag
+	mv host metag/gcc-4.2.4
+	tar czf /tmp/x86_64-gcc-4.2.4-uclibc_metag-linux.tar.gz metag
+
+Install in /opt/kernel.
+Path and prefix to use:
+PATH=/opt/kernel/metag/gcc-4.2.4/usr/bin
+CROSS_COMPILE= metag-unknown-linux-uclibc-

@@ -1,6 +1,6 @@
 buildarch=(alpha arm arm64 avr32 blackfin cris frv i386 ia64 m68k m68k_nommu \
-	   microblaze mips openrisc parisc parisc64 powerpc s390 sh sparc32 sparc64 \
-	   tile x86_64 xtensa um)
+	   metag microblaze mips openrisc parisc parisc64 powerpc s390 sh \
+	   sparc32 sparc64 tile x86_64 xtensa um)
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
@@ -19,6 +19,7 @@ cmd_ia64=(defconfig)
 cmd_m68k=(defconfig allmodconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
+cmd_metag=(defconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
 cmd_microblaze=(mmu_defconfig nommu_defconfig)
 cmd_mips=(defconfig allmodconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig fuloong2e_defconfig \
