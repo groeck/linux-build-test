@@ -1,4 +1,5 @@
-buildarch=(alpha arm arm64 avr32 blackfin cris frv hexagon i386 ia64 m32r m68k m68k_nommu \
+buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
+	   m32r m68k m68k_nommu \
 	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc s390 sh \
 	   sparc32 sparc64 tile x86_64 xtensa um)
 
@@ -12,6 +13,7 @@ cmd_arm=(defconfig allmodconfig exynos4_defconfig multi_v7_defconfig \
 cmd_arm64=(defconfig)
 cmd_avr32=(defconfig)
 cmd_blackfin=(defconfig)
+cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig etrax-100lx_defconfig allnoconfig)
 cmd_frv=(defconfig)
 cmd_hexagon=(defconfig)
