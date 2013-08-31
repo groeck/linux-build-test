@@ -6,6 +6,7 @@ basedir=$(cd $(dirname $0); pwd)
 LOG=/tmp/log.$$
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
+PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
 PATH_ARM64=/opt/kernel/gcc-linaro-aarch64-linux-gnu-4.7-2013.03-20130313_linux/bin:
 PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
@@ -13,7 +14,9 @@ PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
+PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
+PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 PATH_M68_NOMMU=/usr/local/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
@@ -95,6 +98,11 @@ case ${ARCH} in
 	PREFIX="frv-linux-"
 	PATH=${PATH_FRV}:${PATH}
 	;;
+    hexagon)
+	cmd=(${cmd_hexagon[*]})
+	PREFIX="hexagon-linux-"
+	PATH=${PATH_HEXAGON}:${PATH}
+	;;
     i386)
 	cmd=(${cmd_i386[*]})
 	PREFIX="x86_64-poky-linux-"
@@ -104,6 +112,11 @@ case ${ARCH} in
 	cmd=(${cmd_ia64[*]})
 	PREFIX="ia64-linux-"
 	PATH=${PATH_IA64}:${PATH}
+	;;
+    m32r)
+	cmd=(${cmd_m32r[*]})
+	PREFIX="m32r-linux-"
+	PATH=${PATH_M32R}:${PATH}
 	;;
     m68k)
     	cmd=(${cmd_m68k[*]})
@@ -137,6 +150,11 @@ case ${ARCH} in
 	cmd=(${cmd_mips[*]});
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS}:${PATH}
+	;;
+    mn10300)
+	cmd=(${cmd_mn10300[*]})
+	PREFIX="am33_2.0-linux-"
+	PATH=${PATH_AM33}:${PATH}
 	;;
     openrisc)
 	cmd=(${cmd_openrisc[*]})
@@ -198,6 +216,11 @@ case ${ARCH} in
 	cmd=(${cmd_xtensa[*]})
 	PREFIX="xtensa-linux-"
 	PATH=${PATH_XTENSA}:${PATH}
+	fmax=$(expr ${#fixup_xtensa[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_xtensa[$f]}
+	done
 	;;
     um)
 	cmd=(${cmd_um[*]})
@@ -220,6 +243,16 @@ SUBARCH_CMD=""
 if [ -n "${SUBARCH}" ]
 then
 	SUBARCH_CMD="SUBARCH=${SUBARCH}"
+fi
+
+if [ ${#fixup[*]} -gt 0 ]; then
+    echo "Configuration file workarounds:"
+    fmax=$(expr ${#fixup[*]} - 1)
+    for f in $(seq 0 ${fmax})
+    do
+        echo "    ${fixup[$f]}"
+    done
+    echo
 fi
 
 maxcmd=$(expr ${#cmd[*]} - 1)

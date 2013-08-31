@@ -1,5 +1,5 @@
-buildarch=(alpha arm arm64 avr32 blackfin cris frv i386 ia64 m68k m68k_nommu \
-	   metag microblaze mips openrisc parisc parisc64 powerpc s390 sh \
+buildarch=(alpha arm arm64 avr32 blackfin cris frv hexagon i386 ia64 m32r m68k m68k_nommu \
+	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc s390 sh \
 	   sparc32 sparc64 tile x86_64 xtensa um)
 
 cmd_alpha=(defconfig allmodconfig)
@@ -14,8 +14,10 @@ cmd_avr32=(defconfig)
 cmd_blackfin=(defconfig)
 cmd_cris=(defconfig etrax-100lx_defconfig allnoconfig)
 cmd_frv=(defconfig)
+cmd_hexagon=(defconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_ia64=(defconfig)
+cmd_m32r=(defconfig)
 cmd_m68k=(defconfig allmodconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
@@ -24,6 +26,7 @@ cmd_microblaze=(mmu_defconfig nommu_defconfig)
 cmd_mips=(defconfig allmodconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig fuloong2e_defconfig \
 	e55_defconfig cavium_octeon_defconfig powertv_defconfig malta_defconfig)
+cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_openrisc=(defconfig)
 cmd_parisc=(defconfig)
 cmd_parisc64=(a500_defconfig)
@@ -43,8 +46,10 @@ cmd_um=(defconfig)
 
 # fixups
 
-fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD is not set/"
+fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
-fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD is not set/"
+fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
+
+fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
