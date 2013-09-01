@@ -41,7 +41,7 @@
 
 {% set qemu_arches = [ "arm", "microblaze", "mips", "mips64", "ppc", "x86", "x86_64" ] %}
 
-{% set releases = ["3.0", "3.4", "3.10", "master", "testing" ] %}
+{% set releases = ["3.0", "3.2", "3.4", "3.10", "master", "testing" ] %}
 
 {% set exists = [] %}
 
@@ -220,11 +220,15 @@
 <h1> stable queue import: </h1>
 
 <table>
-{% for b in builders if b.name == "stable-queue-import" %}
+<tr>
+{% for b in builders if b.name.startswith("stable-queue-import") %}
+  <td>
+  <table>
   <tr>
   {% if b.build_css_class %}
     <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
+	  <br/>{{b.name}}
           <br/> {{ b.build_text|replace('build successful', 'successful') }}
     </td>
   {% else %}
@@ -234,9 +238,12 @@
   <tr>
           {{ box(**b.current_box) }}
   </tr>
+  </table>
+  </td>
 {% else %}
-  <tr><td class="LastBuild box skipped">no build</td></tr>
+  <td class="LastBuild box skipped">no build</td>
 {% endfor %}
+</tr>
 </table>
 
 <br>
