@@ -10,6 +10,13 @@ LINUX=${BASE}/linux-stable
 # The current directory is the stable-queue git directory.
 QCLONE=$(pwd)
 
+if [ $# -gt 0 ]
+then
+	releases=($*)
+else
+	releases=(3.0 3.4 3.10)
+fi
+
 do_import()
 {
 	release=$1
@@ -116,9 +123,9 @@ do_clone()
 
 do_clone linux-stable git://server.roeck-us.net/git/linux-stable.git
 
-do_import 3.0
-do_import 3.4
-# do_import 3.9
-do_import 3.10
+for rel in ${releases[*]}
+do
+	do_import ${rel}
+done
 
 echo "$(date): complete"
