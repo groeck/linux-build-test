@@ -19,7 +19,7 @@ cmd_frv=(defconfig)
 cmd_hexagon=(defconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_ia64=(defconfig)
-cmd_m32r=(defconfig atngw100mkii_evklcd101_defconfig merisc_defconfig)
+cmd_m32r=(defconfig)
 cmd_m68k=(defconfig allmodconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
