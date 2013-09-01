@@ -11,7 +11,7 @@ cmd_arm=(defconfig allmodconfig exynos4_defconfig multi_v7_defconfig \
 	pxa910_defconfig mvebu_defconfig armadillo800eva_defconfig \
 	mackerel_defconfig ixp4xx_defconfig)
 cmd_arm64=(defconfig)
-cmd_avr32=(defconfig)
+cmd_avr32=(defconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
 cmd_blackfin=(defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig etrax-100lx_defconfig allnoconfig)
@@ -19,7 +19,7 @@ cmd_frv=(defconfig)
 cmd_hexagon=(defconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_ia64=(defconfig)
-cmd_m32r=(defconfig)
+cmd_m32r=(defconfig atngw100mkii_evklcd101_defconfig merisc_defconfig)
 cmd_m68k=(defconfig allmodconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
