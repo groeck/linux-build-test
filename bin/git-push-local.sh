@@ -23,8 +23,24 @@ do
 	git push local origin/$a:$a
 	if [ $? -ne 0 ]
 	then
-		echo "git push error (branches): aborting"
-		exit 1
+		# Try again. Create local branch, then push it.
+		# If that doesn't work, give up.
+		echo Trying to clone new upstream branch $a
+		git branch -D $a >/dev/null 2>&1
+		git checkout -b $a origin/$a
+		if [ $? -ne 0 ]
+		then
+			echo "git checkout error (branches): aborting"
+			exit 1
+		fi
+		git push local $a
+		if [ $? -ne 0 ]
+		then
+			echo "git push error (branches): aborting"
+			exit 1
+		fi
+		git checkout master
+		git branch -D $a
 	fi
 done
 
