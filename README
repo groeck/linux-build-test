@@ -26,6 +26,7 @@ libssh2-1-dev
 libcurl4-openssl-dev
 libiscsi-dev
 libpixman-1-dev
+lzop
 module-init-tools
 nfs-client
 qemu-system
