@@ -5,11 +5,13 @@ buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
-cmd_arm=(defconfig allmodconfig exynos4_defconfig multi_v7_defconfig \
+cmd_arm=(defconfig allmodconfig exynos4_defconfig exynos_defconfig \
+	imx_v4_v5_defconfig imx_v6_v7_defconfig multi_v7_defconfig \
+	mxs_defconfig dove_defconfig ape6evm_defconfig marzen_defconfig \
 	kirkwood_defconfig omap2plus_defconfig tegra_defconfig u8500_defconfig \
 	at91sam9rl_defconfig ap4evb_defconfig bcm_defconfig bonito_defconfig \
 	pxa910_defconfig mvebu_defconfig armadillo800eva_defconfig \
-	mackerel_defconfig ixp4xx_defconfig)
+	mackerel_defconfig ixp4xx_defconfig vexpress_defconfig)
 cmd_arm64=(defconfig)
 cmd_avr32=(defconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
 cmd_blackfin=(defconfig)
