@@ -12,5 +12,6 @@ master/staging-workdir/
 master/state.sqlite
 master/templates/README.txt
 master/twistd.pid
+qemu
 buildroot
 smatch
