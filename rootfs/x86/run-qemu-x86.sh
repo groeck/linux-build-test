@@ -100,7 +100,14 @@ then
 	retcode=1
 fi
 
-if [ ${retcode} -ne 0 ]
+dolog=0
+grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
+if [ $? -eq 0 ]
+then
+	dolog=1
+fi
+
+if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
 then
 	echo "------------"
 	echo "qemu log:"
