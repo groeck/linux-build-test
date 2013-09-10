@@ -14,6 +14,7 @@ PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
+PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
@@ -36,6 +37,8 @@ PATH_XTENSA=/opt/kernel/gcc-4.6.3-nolibc/xtensa-linux/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 branch=$(git branch | cut -f2 -d' ')
+
+maxload=$(($(nproc) + 4))
 
 errors=0
 builds=0
@@ -93,6 +96,12 @@ case ${ARCH} in
 	cmd=(${cmd_c6x[*]})
 	PREFIX="tic6x-uclinux-"
 	PATH=${PATH_C6X}:${PATH}
+	;;
+    crisv32)
+	ARCH=cris
+	cmd=(${cmd_crisv32[*]})
+	PREFIX="crisv32-linux-"
+	PATH=${PATH_CRISV32}:${PATH}
 	;;
     cris)
 	cmd=(${cmd_cris[*]})
@@ -290,7 +299,7 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	make ${CROSS} -j12 ARCH=${ARCH} ${SUBARCH_CMD} >/dev/null 2>/tmp/buildlog.$$
+	make ${CROSS} -j${maxload} ARCH=${ARCH} ${SUBARCH_CMD} >/dev/null 2>/tmp/buildlog.$$
 	if [ $? -ne 0 ]; then
 	    echo "failed"
 	    echo "--------------"
