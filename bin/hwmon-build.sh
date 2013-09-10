@@ -20,6 +20,8 @@ errors=0
 builds=0
 retcode=0
 
+maxload=$(($(nproc) + 4))
+
 cmd_i386=(defconfig allyesconfig allmodconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig)
 cmd_mips=(defconfig allmodconfig cavium_octeon_defconfig)
@@ -109,7 +111,7 @@ doit()
 	fi
 	ext=$(basename $(pwd)).${BRANCH}.${ARCH}.$i
     	builds=$(expr ${builds} + 1)
-	make ${CROSS} -j10 -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
+	make ${CROSS} -j${maxload} -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
 	#
 	# If options are set, repeat the exercise for all object files
 	# in drivers/hwmon. This reduces build time and number of warnings
@@ -122,7 +124,7 @@ doit()
 	    for f in $(ls drivers/hwmon/*.o | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
 	    do
 	    	rm -f $f
-	        make ${CROSS} -j10 -i ${OPTIONS} ARCH=${ARCH} $f >/dev/null 2> >(tee ${ERR}.tmp >&2)
+	        make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} $f >/dev/null 2> >(tee ${ERR}.tmp >&2)
 		cat ${ERR}.tmp >> ${ERR}
 		rm -f ${ERR}.tmp
 	    done
