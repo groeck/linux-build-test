@@ -43,7 +43,7 @@ echo -n "Running qemu ..."
 rm -f ${logfile}
 cp ${dir}/${rootfs} ${tmprootfs}
 
-/usr/local/bin/qemu-system-sh4 -M r2d -kernel ./arch/sh/boot/zImage \
+/opt/buildbot/bin/qemu-system-sh4 -M r2d -kernel ./arch/sh/boot/zImage \
 	-drive file=${tmprootfs},if=ide \
 	-append "root=/dev/sda console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \

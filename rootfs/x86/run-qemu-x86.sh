@@ -6,7 +6,7 @@ defconfig=qemu_x86_pc_defconfig
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PREFIX=x86_64-poky-linux-
 ARCH=x86
-QEMUCMD=qemu-system-i386
+QEMUCMD=/opt/buildbot/bin/qemu-system-i386
 KERNEL_IMAGE=arch/x86/boot/bzImage
 
 # global constants

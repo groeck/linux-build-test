@@ -42,7 +42,7 @@ echo -n "Running qemu ..."
 
 rm -f ${logfile}
 
-/usr/local/bin/qemu-system-microblaze -M petalogix-s3adsp1800 -kernel arch/microblaze/boot/linux.bin -no-reboot -append "console=ttyUL0,115200 doreboot" -nographic > ${logfile} 2>&1 &
+/opt/buildbot/bin/qemu-system-microblaze -M petalogix-s3adsp1800 -kernel arch/microblaze/boot/linux.bin -no-reboot -append "console=ttyUL0,115200 doreboot" -nographic > ${logfile} 2>&1 &
 
 pid=$!
 

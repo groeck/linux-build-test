@@ -7,7 +7,7 @@ PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky
 PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
-QEMUCMD=qemu-system-ppc
+QEMUCMD=/opt/buildbot/bin/qemu-system-ppc
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=mac99
 

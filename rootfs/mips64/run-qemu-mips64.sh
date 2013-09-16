@@ -6,7 +6,7 @@ defconfig=qemu_mips_malta64_defconfig
 PATH_MIPS=/opt/kernel/gcc-4.6.3-nolibc/mips64-linux/bin
 PREFIX=mips64-linux-
 ARCH=mips
-QEMUCMD=qemu-system-mips64
+QEMUCMD=/opt/buildbot/bin/qemu-system-mips64
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
