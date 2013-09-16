@@ -1,6 +1,11 @@
 Repositories and packages
 -------------------------
 
+Note:
+	The following is obsolete.
+	Use aarch46 from gnu 4.8.1 built with buildroot 
+	Use qemu-1.6.0-local. README there describes distribution.
+
 sudo apt-add-repository 'deb http://people.debian.org/~wookey/bootstrap/ubunturepo/ raring-bootstrap main universe'
 sudo aptitude update
 sudo apt-get install gcc-aarch64-linux-gnu
@@ -8,6 +13,8 @@ sudo apt-get install gcc-aarch64-linux-gnu
 Then remove repository from /etc/apt/sources.list.
 
 qemu 1.5.2 (from qemu subdirectory)
+
+----
 
 automake
 autoconf
@@ -33,6 +40,22 @@ qemu-system
 qemu-user
 qemu-utils
 u-boot-tools
+
+---
+smatch:
+
+Prerequisites:	libsqlite3-dev sqlite3 libsqlite3-0
+
+Either
+	cd /opt/buildbot
+	git clone git://repo.or.cz/smatch.git
+or
+	cd /opt/buildbot/smatch
+	git pull
+
+then:
+make clean
+make PREFIX=/opt/buildbot install
 
 ---
 arc:
@@ -73,3 +96,27 @@ Install in /opt/kernel.
 Path and prefix to use:
 PATH=/opt/kernel/metag/gcc-4.2.4/usr/bin
 CROSS_COMPILE= metag-unknown-linux-uclibc-
+
+---
+qemu
+
+Packages needed to build:
+	libglib2.0-dev
+	libssh2-1-dev
+	libcurl4-openssl-dev
+	libiscsi-dev
+	autoconf
+	libpixman-1-dev
+
+Build:
+	cd qemu
+	./configure --prefix=/opt/buildbot
+	make install
+
+Distribution:
+	[ If necessary update VERSION file ]
+	make clean
+	./configure --prefix=/opt/buildbot
+	make dist
+	[ creates tarball ]
+
