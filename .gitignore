@@ -15,3 +15,9 @@ master/twistd.pid
 qemu
 buildroot
 smatch
+bin/qemu-*
+include
+lib
+libexec
+share
+usr
