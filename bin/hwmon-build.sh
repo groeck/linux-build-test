@@ -24,7 +24,8 @@ maxload=$(($(nproc) + 4))
 
 cmd_i386=(defconfig allyesconfig allmodconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig)
-cmd_mips=(defconfig allmodconfig cavium_octeon_defconfig)
+# cmd_mips=(defconfig allmodconfig cavium_octeon_defconfig)
+cmd_mips=(defconfig allmodconfig)
 cmd_arm=(defconfig allmodconfig multi_v7_defconfig)
 cmd_powerpc=(defconfig allmodconfig)
 cmd_m68k=(defconfig allmodconfig)
@@ -44,27 +45,11 @@ send_mail()
 	rm -f ${MAIL_FILE}
 }
 
-do_smatch_check()
-{
-    # Run smatch only on compiled files in drivers/hwmon.
-    # This doesn't get us all of them, but we avoid false positives
-    # due to uncompilable files.
-    #
-    local l=$(ls drivers/hwmon/*.o | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
-    local x
-
-    for x in $l
-    do
-        srcfile=$(echo $x | sed -e 's/\.o/.c/')
-	echo "smatch: checking $x [${srcfile}]"
-	/opt/buildbot/smatch/smatch_scripts/kchecker --spammy ${srcfile}
-    done
-}
-
 doit()
 {
     local ARCH=$1
     local i
+    local files
 
     # We should be on the target directory, in the target branch
 
@@ -114,29 +99,36 @@ doit()
 	make ${CROSS} -j${maxload} -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
 	#
 	# If options are set, repeat the exercise for all object files
-	# in drivers/hwmon. This reduces build time and number of warnings
+	# in drivers/hwmon. Only do it for the allmodconfig build;
+	# this should catch most buildable sources.
+	# This reduces build time and limits the number of repetitive warnings
 	# we have to deal with.
 	# The odd redirect is to get error output to the console (for the
 	# buildbot log) and into a file for the status email.
 	#
-	if [ -n "${OPTIONS}" ]
-	then
-	    for f in $(ls drivers/hwmon/*.o | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
-	    do
-	    	rm -f $f
-	        make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} $f >/dev/null 2> >(tee ${ERR}.tmp >&2)
-		cat ${ERR}.tmp >> ${ERR}
-		rm -f ${ERR}.tmp
-	    done
-	fi
-	# If smatch build is asked for as well, do another run with smatch.
-	# Append smatch output to warning log.
 	rm -f ${WARN}.smatch
-	if [ ${SMATCH} -ne 0 ]
+	touch ${WARN}.smatch
+	if [ -n "${OPTIONS}"  -a "${cmd[$i]}" = "allmodconfig" ]
 	then
-		do_smatch_check > /dev/null 2> >(tee ${WARN}.smatch >&2)
-	else
-		touch ${WARN}.smatch
+	    files=$(find drivers/hwmon -name '*.o' | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
+	    rm -f ${files}
+	    make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
+	    cat ${ERR}.tmp >> ${ERR}
+	    rm -f ${ERR}.tmp
+	    # If smatch build is asked for as well, do another run with smatch.
+	    # Append smatch log messages to warning log.
+	    # Run smatch on all sources, and ignore errors from the build step.
+	    if [ ${SMATCH} -ne 0 ]
+	    then
+		sfiles=$(find drivers/hwmon -name '*.c' | grep -v built-in.c |
+			egrep -v '.mod.c$' | sed -e 's/\.c/.o/')
+		rm -f ${sfiles}
+		make C=1 -j${maxload} -i \
+		    CHECK="/opt/buildbot/bin/smatch --project=kernel" \
+		    ${sfiles} 2>/dev/null | tee ${WARN}.smatch.tmp
+		egrep '(warn|error|info):' ${WARN}.smatch.tmp >> ${WARN}.smatch
+		rm -f ${WARN}.smatch.tmp
+	    fi
 	fi
 	grep Error ${ERR} >/dev/null 2>/dev/null
 	if [ $? -eq 0 ]; then
@@ -165,13 +157,13 @@ doit()
 		echo "smatch log:" >> ${WARN}
 	        cat ${WARN}.smatch >> ${WARN}
 	    fi
-	    if [ ${failed} -gt 0 ]
+	    if [ ${failed} -gt 0 -a -s ${WARN}.tmp ]
 	    then
 		echo "Build: ${BRANCH}:${ARCH}:${cmd[$i]} failed with hwmon warnings/errors"
 	    	retcode=1
 	    fi
 	fi
-	rm -f ${WARN}.tmp ${ERR}
+	rm -f ${WARN}.tmp ${ERR} ${WARN}.smatch
 	i=$(expr $i + 1)
     done
     return 0
