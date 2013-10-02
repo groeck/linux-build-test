@@ -40,6 +40,7 @@ qemu-system
 qemu-user
 qemu-utils
 u-boot-tools
+ia32-libs
 
 ---
 smatch:
