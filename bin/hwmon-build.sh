@@ -98,8 +98,8 @@ doit()
 	make ${CROSS} -j${maxload} -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
 	#
 	# If options are set, repeat the exercise for all object files
-	# in drivers/hwmon. Only do it for the allmodconfig build;
-	# this should catch most buildable sources.
+	# in drivers/hwmon and drivers/watchdog. Only do it for the
+	# allmodconfig build; this should catch most buildable sources.
 	# This reduces build time and limits the number of repetitive warnings
 	# we have to deal with.
 	# The odd redirect is to get error output to the console (for the
@@ -109,7 +109,8 @@ doit()
 	touch ${WARN}.smatch
 	if [ -n "${OPTIONS}"  -a "${cmd[$i]}" = "allmodconfig" ]
 	then
-	    files=$(find drivers/hwmon -name '*.o' | grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
+	    files=$(find drivers/hwmon drivers/watchdog -name '*.o' |
+	    		grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
 	    rm -f ${files}
 	    make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
 	    cat ${ERR}.tmp >> ${ERR}
@@ -119,7 +120,8 @@ doit()
 	    # Run smatch on all sources, and ignore errors from the build step.
 	    if [ ${SMATCH} -ne 0 ]
 	    then
-		sfiles=$(find drivers/hwmon -name '*.c' | grep -v built-in.c |
+		sfiles=$(find drivers/hwmon drivers/watchdog -name '*.c' |
+			grep -v built-in.c |
 			egrep -v '.mod.c$' | sed -e 's/\.c/.o/')
 		rm -f ${sfiles}
 		make C=1 -j${maxload} -i \
@@ -135,13 +137,13 @@ doit()
     	    echo "$(basename $0): build:${cmd[$i]} branch:${BRANCH} arch:${ARCH} prefix:${PREFIX} failed"
 	    failed=1
 	fi
-	egrep "drivers/hwmon" ${ERR} | \
-		egrep -v "drivers/hwmon/*\.ko\] undefined" | \
-		egrep -v "drivers/hwmon/*\.ko\] has no CRC" | \
-		egrep -v "drivers/hwmon.*mod\.[co]: undefined" | \
-		egrep -v "drivers/hwmon.*mod\.[co]: No such" | \
-		egrep -v "\[.*hwmon.*mod\.o\] Error 1" | \
-		egrep -v "\[.*hwmon.*\.ko\] Error 1" \
+	egrep "drivers/{hwmon|watchdog}" ${ERR} | \
+		egrep -v "drivers/{hwmon|watchdog}/*\.ko\] undefined" | \
+		egrep -v "drivers/{hwmon|watchdog}/*\.ko\] has no CRC" | \
+		egrep -v "drivers/{hwmon|watchdog}.*mod\.[co]: undefined" | \
+		egrep -v "drivers/{hwmon|watchdog}.*mod\.[co]: No such" | \
+		egrep -v "\[.*{hwmon|watchdog}.*mod\.o\] Error 1" | \
+		egrep -v "\[.*{hwmon|watchdog}.*\.ko\] Error 1" \
 		> ${WARN}.tmp 2>&1
 	if [ -s ${WARN}.tmp -o -s ${WARN}.smatch ]; then
 	    if [ -s ${WARN} ]; then
@@ -158,7 +160,7 @@ doit()
 	    fi
 	    if [ ${failed} -gt 0 -a -s ${WARN}.tmp ]
 	    then
-		echo "Build: ${BRANCH}:${ARCH}:${cmd[$i]} failed with hwmon warnings/errors"
+		echo "Build: ${BRANCH}:${ARCH}:${cmd[$i]} failed with hwmon/watchdog warnings/errors"
 	    	retcode=1
 	    fi
 	fi

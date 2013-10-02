@@ -4,10 +4,11 @@
 
 {% block content %}
 
-<h1>hwmon:</h1>
+<h1>hwmon, watchdog:</h1>
 
 <table border=1>
-{% for b in builders if 'hwmon' in b.name %}
+{% for b in builders if b.name in ('hwmon', 'hwmon-next', 'hwmon-staging',
+				   'watchdog', 'watchdog-next') %}
   <tr>
   <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
   <td>
@@ -41,7 +42,7 @@
 		  "sparc64", "tile", "um", "x86_64", "xtensa" ] %}
 
 {% set qemu_arches = [ "arm", "microblaze", "mips", "mips64", "ppc", "sh",
-			"sparc", "x86", "x86_64" ] %}
+			"sparc", "sparc64", "x86", "x86_64" ] %}
 
 {% set releases = ["3.0", "3.2", "3.4", "3.10", "3.11", "master", "testing" ] %}
 
