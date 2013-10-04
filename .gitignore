@@ -1,9 +1,12 @@
+aboriginal
 slave/qemu*
 slave/hwmon*
 slave/stable*
+slave/watchdog*
 slave/twistd.*
 master/qemu*
 master/hwmon*
+master/watchdog*
 master/stable*
 master/gitpoller-workdir/
 master/*.log
