@@ -14,7 +14,7 @@ if [ $# -gt 0 ]
 then
 	releases=($*)
 else
-	releases=(3.0 3.4 3.10 3.11)
+	releases=(3.4 3.10 3.12)
 fi
 
 do_import()
@@ -76,12 +76,12 @@ do_import()
 
 	# echo ready for import
 
-	git quiltimport --patches=${qdir}
+	git quiltimport --patches=${qdir} --author="Anonymous <unknown@nowhere.net>"
 	if [ $? -ne 0 ]
 	then
-		echo "${release}: git quiltimport failed - aborting"
+		echo "${release}: git quiltimport failed - skipping"
 		git clean -f -d -q
-		exit 1
+		return 0
 	fi
 
 	git diff --exit-code --summary ${qbranch}
@@ -112,7 +112,7 @@ do_clone()
 		echo "Updating ${REPO} ..."
 		cd ${REPO}
 		git fetch
-		git rebase --abort
+		git rebase --abort 2>/dev/null
 		git clean -f -d -q
 		git checkout master
 		git pull

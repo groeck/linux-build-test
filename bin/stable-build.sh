@@ -95,7 +95,7 @@ doit()
 	PATH=${PATH_M68}:${PATH}
 	;;
     m68k_nommu)
-	# kludge to work around nommu build problems in the 3.0 kernel
+	# kludge to work around nommu build problems in 3.0 and 3.2 kernels
     	cmd=(${cmd_m68k_nommu[*]})
 	if [ "${rel}" = "v3.0" -o "${rel}" = "v3.2" ]
 	then
