@@ -110,7 +110,8 @@ doit()
 	if [ -n "${OPTIONS}"  -a "${cmd[$i]}" = "allmodconfig" ]
 	then
 	    files=$(find drivers/hwmon drivers/watchdog -name '*.o' |
-	    		grep -v built-in.o | egrep -v 'mod.o$' 2>/dev/null)
+	    		grep -v built-in.o | egrep -v 'mod.o$' |
+			grep -v watchdog.o 2>/dev/null)
 	    rm -f ${files}
 	    make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
 	    cat ${ERR}.tmp >> ${ERR}
@@ -127,7 +128,10 @@ doit()
 		make C=1 -j${maxload} -i \
 		    CHECK="/opt/buildbot/bin/smatch --project=kernel" \
 		    ${sfiles} 2>/dev/null | tee ${WARN}.smatch.tmp
-		egrep '(warn|error|info):' ${WARN}.smatch.tmp >> ${WARN}.smatch
+		egrep '(warn|error|info):' ${WARN}.smatch.tmp | \
+				egrep -v "atomic\.h:.*ignoring unreachable code" | \
+				egrep -v "bitops\.h:.*ignoring unreachable code" \
+				>> ${WARN}.smatch
 		rm -f ${WARN}.smatch.tmp
 	    fi
 	fi
