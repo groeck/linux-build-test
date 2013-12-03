@@ -1,18 +1,9 @@
 Repositories and packages
 -------------------------
 
-Note:
-	The following is obsolete.
-	Use aarch46 from gnu 4.8.1 built with buildroot 
-	Use qemu-1.6.0-local. README there describes distribution.
-
-sudo apt-add-repository 'deb http://people.debian.org/~wookey/bootstrap/ubunturepo/ raring-bootstrap main universe'
-sudo aptitude update
-sudo apt-get install gcc-aarch64-linux-gnu
-
-Then remove repository from /etc/apt/sources.list.
-
-qemu 1.5.2 (from qemu subdirectory)
+Use aarch46 from gnu 4.8.1 built with buildroot 
+Use qemu-1.6.0-local; we need patches applied on top of qemu 1.6.0.
+README in the qemu driectoty describes distribution.
 
 ----
 
@@ -33,6 +24,7 @@ libssh2-1-dev
 libcurl4-openssl-dev
 libiscsi-dev
 libpixman-1-dev
+libxml2-dev
 lzop
 module-init-tools
 nfs-client
