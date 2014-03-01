@@ -4,11 +4,10 @@
 
 {% block content %}
 
-<h1>hwmon, watchdog:</h1>
+<h1>Source verification:</h1>
 
 <table border=1>
-{% for b in builders if b.name in ('hwmon', 'hwmon-next', 'hwmon-staging',
-				   'watchdog', 'watchdog-next') %}
+{% for b in builders if b.name in ('hwmon', 'hwmon-next', 'hwmon-staging') %}
   <tr>
   <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
   <td>
@@ -31,7 +30,7 @@
 </table>
 
 <br>
-<h1> stable queue: </h1>
+<h1> stable queue, hwmon, watchdog: </h1>
 
 {% set arches = [ "alpha", "arc", "arm", "arm64", "avr32", "blackfin",
 		  "c6x", "cris", "crisv32",
@@ -44,16 +43,27 @@
 {% set qemu_arches = [ "arm", "microblaze", "mips", "mips64", "ppc", "sh",
 			"sparc", "sparc64", "x86", "x86_64" ] %}
 
-{% set releases = [ "3.2", "3.4", "3.10", "3.12", "master" ] %}
+{% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.13", "master",
+			"hwmon", "hwmon-next", "hwmon-staging",
+			"watchdog-next" ] %}
+
+{% set hwmon_releases = [ "hwmon", "hwmon-next", "hwmon-staging",
+			"watchdog-next" ] %}
 
 {% set exists = [] %}
 
 <script type='text/javascript'>
 {% for rel in releases %}
   {% set exists = [] %}
-  var buildText_{{rel|replace('.','')}} = [
+  {% set rel_var = rel|replace('-','_') %}
+  {% set rel_var = rel_var|replace('.','_') %}
+  var buildText_{{rel_var}} = [
   {% for arch in arches %}
-    {% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    {% if rel in hwmon_releases %}
+    	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel %}
+    {% else %}
+    	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    {% endif %}
     {% for b in builders if b.name == bname %}
       {% if b.build_url and b.build_css_class %}
           {% if exists %} , {% endif %} "{{ b.build_text|replace('<br> ', '') }}"
@@ -62,12 +72,12 @@
     {% endfor %}
   {% endfor %} ];
 
-  function getResults{{rel|replace('.','')}} (match_string)
+  function getResults_{{rel_var}} (match_string)
   {
     var num = 0;
-    for (var i=0; i < buildText_{{rel|replace('.','')}}.length; i++)
+    for (var i=0; i < buildText_{{rel_var}}.length; i++)
     {
-        var elem = buildText_{{rel|replace('.','')}}[i];
+        var elem = buildText_{{rel_var}}[i];
 	var m = match_string.exec(elem);
 	if (m) {
 	    var match = /\d+/;
@@ -91,7 +101,11 @@
   <tr>
   <td class="box"><b>{{ arch }}</b></a></td>
   {% for rel in releases %}
-    {% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    {% if rel in hwmon_releases %}
+    	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel %}
+    {% else %}
+    	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel %}
+    {% endif %}
     <td class="LastBuild box">
     <table align=center>
     {% for b in builders if b.name == bname %}
@@ -124,11 +138,13 @@
   <tr>
   <td class="box"><b>Summary</b></a></td>
   {% for rel in releases %}
+  	{% set rel_var = rel|replace('-','_') %}
+  	{% set rel_var = rel_var|replace('.','_') %}
 	<script type='text/javascript'>
-	    var total = getResults{{rel|replace('.','')}} (/total: \d+/);
-	    var passed = getResults{{rel|replace('.','')}} (/pass: \d+/);
-	    var skipped = getResults{{rel|replace('.','')}} (/skipped: \d+/);
-	    var fail = getResults{{rel|replace('.','')}} (/fail: \d+/);
+	    var total = getResults_{{rel_var}} (/total: \d+/);
+	    var passed = getResults_{{rel_var}} (/pass: \d+/);
+	    var skipped = getResults_{{rel_var}} (/skipped: \d+/);
+	    var fail = getResults_{{rel_var}} (/fail: \d+/);
 	    var box = "success";
 	    var build = "successful";
 	    if (total == 0 || total == skipped) {
