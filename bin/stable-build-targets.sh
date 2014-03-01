@@ -5,13 +5,19 @@ buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
-cmd_arm=(defconfig allmodconfig exynos4_defconfig exynos_defconfig \
+cmd_arm=(defconfig exynos4_defconfig exynos_defconfig \
 	imx_v4_v5_defconfig imx_v6_v7_defconfig multi_v7_defconfig \
 	mxs_defconfig dove_defconfig ape6evm_defconfig marzen_defconfig \
 	kirkwood_defconfig omap2plus_defconfig tegra_defconfig u8500_defconfig \
 	at91sam9rl_defconfig ap4evb_defconfig bcm_defconfig bonito_defconfig \
 	pxa910_defconfig mvebu_defconfig armadillo800eva_defconfig \
-	mackerel_defconfig ixp4xx_defconfig vexpress_defconfig)
+	mackerel_defconfig ixp4xx_defconfig vexpress_defconfig \
+	vt8500_v6_v7_defconfig u300_defconfig sunxi_defconfig \
+	spear13xx_defconfig spear3xx_defconfig spear6xx_defconfig \
+	sama5_defconfig prima2_defconfig msm_defconfig at91_dt_defconfig \
+	at91rm9200_defconfig at91sam9260_9g20_defconfig \
+	at91sam9261_9g10_defconfig at91sam9263_defconfig at91sam9g45_defconfig \
+	at91x40_defconfig assabet_defconfig)
 cmd_arm64=(defconfig)
 cmd_avr32=(defconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
 cmd_blackfin=(defconfig)
