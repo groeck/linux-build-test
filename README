@@ -1,9 +1,9 @@
 Repositories and packages
 -------------------------
 
-Use aarch46 from gnu 4.8.1 built with buildroot 
+Use aarch64 from gnu 4.8.1 built with buildroot 
 Use qemu-1.6.0-local; we need patches applied on top of qemu 1.6.0.
-README in the qemu driectoty describes distribution.
+README in the qemu directory describes distribution.
 
 ----
 
@@ -68,6 +68,12 @@ The result can be installed in /opt/kernel as usual.
 Path and prefix to use:
 	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
 	CROSS_COMPILE=arc-buildroot-linux-uclibc-
+
+xtensa:
+
+Same as above; buildroot top of tree as of 2/23/2014 worked.
+
+Configure for xtensa default, enable LARGEFILE. gcc version 4.7.3.
 
 ---
 metag:
