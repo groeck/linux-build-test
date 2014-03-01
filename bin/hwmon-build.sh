@@ -6,28 +6,15 @@ ERR=/tmp/error.$$
 
 BRANCH=$(git branch | egrep "^\*" | cut -f2 -d' ')
 
-REPOSITORY=/home/groeck/src/linux-staging
-
-PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
-PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
-PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-PATH_M68K=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 
-export PATH=${PATH_MIPS}:${PATH_PPC}:${PATH_ARM}:${PATH_X86}:${PATH_M68K}:${PATH}
+export PATH=${PATH_X86}:${PATH}
 
 errors=0
 builds=0
 retcode=0
 
 maxload=$(($(nproc) + 4))
-
-cmd_i386=(defconfig allyesconfig allmodconfig)
-cmd_x86_64=(defconfig allyesconfig allmodconfig)
-cmd_mips=(defconfig allmodconfig cavium_octeon_defconfig)
-cmd_arm=(defconfig allmodconfig multi_v7_defconfig)
-cmd_powerpc=(defconfig allmodconfig)
-cmd_m68k=(defconfig allmodconfig)
 
 send_mail()
 {
@@ -55,18 +42,13 @@ doit()
     local OPTIONS=""
     local SMATCH=0
 
+    PREFIX="x86_64-poky-linux-"
+
     case ${ARCH} in
     x86_64)
-	cmd=(${cmd_x86_64[*]})
-	PREFIX="x86_64-poky-linux-"
 	OPTIONS="W=1 C=1"
 	SMATCH=1
 	;;
-    i386) cmd=(${cmd_i386[*]}); PREFIX="x86_64-poky-linux-";;
-    mips) cmd=(${cmd_mips[*]}); PREFIX="mips-poky-linux-";;
-    powerpc) cmd=(${cmd_powerpc[*]}); PREFIX="powerpc64-poky-linux-";;
-    arm) cmd=(${cmd_arm[*]}); PREFIX="arm-poky-linux-gnueabi-";;
-    m68k) cmd=(${cmd_m68k[*]}); PREFIX="m68k-linux-";;
     esac
 
     if [ "${PREFIX}" != "" ]; then
@@ -74,47 +56,57 @@ doit()
     fi
 
     i=0
-    while [ $i -lt ${#cmd[*]} ]
+    while [ $i -lt 2 ]
     do
 	failed=0
-    	echo "$(basename $0): build:${cmd[$i]} branch:${BRANCH} arch:${ARCH} prefix:${PREFIX}"
+	echo "$(basename $0): build:$i branch:${BRANCH} arch:${ARCH} prefix:${PREFIX}"
 	git clean -x -d -f -q
-	make ${CROSS} ARCH=${ARCH} ${cmd[$i]} >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} defconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
-		echo failed to configure build for ${ARCH}:${cmd[$i]}
+		echo failed to run defconfig for ${ARCH}:$i
 	 	i=$(expr $i + 1)
 	 	continue
+	fi
+	# Fix up configuration file.
+	# First run, build as modules. Second run, build into kernel.
+	if [ $i -eq 0 ]
+	then
+	    sed -i 's/^# \(CONFIG_SENSORS_\)\([A-Za-z0-9_]*\).*/\1\2=m/g' .config
+	else
+	    sed -i 's/^# \(CONFIG_SENSORS_\)\([A-Za-z0-9_]*\).*/\1\2=y/g' .config
 	fi
 	make ${CROSS} ARCH=${ARCH} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
-		echo failed to run oldnoconfig for ${ARCH}:${cmd[$i]}
+		echo failed to run oldnoconfig for ${ARCH}:$i
 	 	i=$(expr $i + 1)
 	 	continue
 	fi
-	ext=$(basename $(pwd)).${BRANCH}.${ARCH}.$i
-    	builds=$(expr ${builds} + 1)
+	builds=$(expr ${builds} + 1)
 	make ${CROSS} -j${maxload} -i ARCH=${ARCH} >/dev/null 2> >(tee ${ERR} >&2)
+	failed=$?
 	#
 	# If options are set, repeat the exercise for all object files
 	# in drivers/hwmon and drivers/watchdog. Only do it for the
-	# allmodconfig build; this should catch most buildable sources.
+	# module build; this should catch most buildable sources.
 	# This reduces build time and limits the number of repetitive warnings
 	# we have to deal with.
 	# The odd redirect is to get error output to the console (for the
 	# buildbot log) and into a file for the status email.
 	#
+	rm -f ${WARN}.sparse
+	touch ${WARN}.sparse
 	rm -f ${WARN}.smatch
 	touch ${WARN}.smatch
-	if [ -n "${OPTIONS}"  -a "${cmd[$i]}" = "allmodconfig" ]
+	if [ -n "${OPTIONS}" -a $i -eq 0 ]
 	then
 	    files=$(find drivers/hwmon drivers/watchdog -name '*.o' |
-	    		grep -v built-in.o | egrep -v 'mod.o$' |
+			grep -v built-in.o | egrep -v 'mod.o$' |
 			grep -v watchdog.o 2>/dev/null)
 	    rm -f ${files}
 	    make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
-	    cat ${ERR}.tmp >> ${ERR}
+	    egrep 'drivers/(hwmon|watchdog)' ${ERR}.tmp > ${WARN}.sparse 2>&1
 	    rm -f ${ERR}.tmp
 	    # If smatch build is asked for as well, do another run with smatch.
 	    # Append smatch log messages to warning log.
@@ -135,38 +127,34 @@ doit()
 		rm -f ${WARN}.smatch.tmp
 	    fi
 	fi
-	grep Error ${ERR} >/dev/null 2>/dev/null
-	if [ $? -eq 0 ]; then
-    	    errors=$(expr ${errors} + 1)
-    	    echo "$(basename $0): build:${cmd[$i]} branch:${BRANCH} arch:${ARCH} prefix:${PREFIX} failed"
-	    failed=1
+	if [ ${failed} -ne 0 ]; then
+	    errors=$(expr ${errors} + 1)
+	    echo "$(basename $0): build:$i branch:${BRANCH} arch:${ARCH} prefix:${PREFIX} failed"
 	fi
-	egrep "drivers/{hwmon|watchdog}" ${ERR} | \
-		egrep -v "drivers/{hwmon|watchdog}/*\.ko\] undefined" | \
-		egrep -v "drivers/{hwmon|watchdog}/*\.ko\] has no CRC" | \
-		egrep -v "drivers/{hwmon|watchdog}.*mod\.[co]: undefined" | \
-		egrep -v "drivers/{hwmon|watchdog}.*mod\.[co]: No such" | \
-		egrep -v "\[.*{hwmon|watchdog}.*mod\.o\] Error 1" | \
-		egrep -v "\[.*{hwmon|watchdog}.*\.ko\] Error 1" \
-		> ${WARN}.tmp 2>&1
-	if [ -s ${WARN}.tmp -o -s ${WARN}.smatch ]; then
-	    if [ -s ${WARN} ]; then
+	# egrep "drivers/{hwmon|watchdog}" ${ERR} > ${WARN}.tmp 2>&1
+	if [ ${failed} -ne 0 -o -s ${WARN}.smatch -o -s ${WARN}.sparse ]; then
+	    [ -s ${WARN} ] && {
 		echo "--------------------" >> ${WARN}
-	    fi
-	    echo "Build: ${BRANCH}:${ARCH}:${cmd[$i]}" >> ${WARN}
+	    }
+	    echo "Build: ${BRANCH}:${ARCH}:$i" >> ${WARN}
 	    echo >> ${WARN}
-	    cat ${WARN}.tmp >> ${WARN}
-	    if [ -s ${WARN}.smatch ]
-	    then
-	    	[ -s ${WARN}.tmp ] && echo "--------------------" >> ${WARN}
+	    [ ${failed} -ne 0 ] && {
+		cat ${ERR} >> ${WARN}
+		echo "--------------------" >> ${WARN}
+	    }
+	    [ -s ${WARN}.sparse ] && {
+		echo "sparse log:" >> ${WARN}
+	        cat ${WARN}.sparse >> ${WARN}
+		echo "--------------------" >> ${WARN}
+	    }
+	    [ -s ${WARN}.smatch ] && {
 		echo "smatch log:" >> ${WARN}
 	        cat ${WARN}.smatch >> ${WARN}
-	    fi
-	    if [ ${failed} -gt 0 -a -s ${WARN}.tmp ]
-	    then
-		echo "Build: ${BRANCH}:${ARCH}:${cmd[$i]} failed with hwmon/watchdog warnings/errors"
-	    	retcode=1
-	    fi
+	    }
+	    [ ${failed} -ne 0 ] && {
+		echo "Build: ${BRANCH}:${ARCH}:$i failed with build errors"
+		retcode=1
+	    }
 	fi
 	rm -f ${WARN}.tmp ${ERR} ${WARN}.smatch
 	i=$(expr $i + 1)
@@ -174,7 +162,7 @@ doit()
     return 0
 }
 
-for build in x86_64 i386 mips powerpc arm m68k
+for build in x86_64 i386
 do
 	doit ${build}
 done
