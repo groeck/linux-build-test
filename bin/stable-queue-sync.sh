@@ -28,7 +28,12 @@ do_import()
 		git config remote.local.pushurl "ssh://git@server.roeck-us.net//var/cache/git/linux-stable.git"
 	}
 	git fetch --all
-	git push --force local ${source}:${target}
+	git push local ${source}:${target}
+	if [ $? -ne 0 ]
+	then
+		echo "push failed, retrying with force"
+		git push --force local ${source}:${target}
+	fi
 }
 
 for rel in ${releases[*]}
