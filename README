@@ -37,7 +37,7 @@ ia32-libs
 ---
 smatch:
 
-Prerequisites:	libsqlite3-dev sqlite3 libsqlite3-0
+Prerequisites:	libsqlite3-dev sqlite3 libsqlite3-0 libgtk2.0-dev
 
 Either
 	cd /opt/buildbot
