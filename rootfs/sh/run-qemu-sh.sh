@@ -47,7 +47,7 @@ cp ${dir}/${rootfs} ${tmprootfs}
 	-drive file=${tmprootfs},if=ide \
 	-append "root=/dev/sda console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
-	> ${logfile} 2>&1 &
+	-nographic > ${logfile} 2>&1 &
 
 pid=$!
 
