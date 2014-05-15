@@ -1,0 +1,30 @@
+twistd memory leak seen once in a while may have a possible solution.
+Memory leak was seen with twistd 13.0.
+
+Symptom:
+master/twistd.log shows memory allocation failures, system is out of memory.
+
+File: .../twisted/internet/base.py
+
+class BaseConnector(styles.Ephemeral):
+    .
+    .
+    .
+
+    def connectionFailed(self, reason):
+        self.cancelTimeout()
+        if self.transport.doWrite == self.transport.doConnect:    # 1
+            del self.transport.doRead                             # 2
+            del self.transport.doWrite                            # 3
+        self.transport = None
+        self.state = "disconnected"
+        self.factory.clientConnectionFailed(self, reason)
+        if self.state == "disconnected":
+            # factory hasn't called our connect() method
+            self.factory.doStop()
+            self.factoryStarted = 0
+    .
+    .
+    .
+
+#1..#3 is added code.
