@@ -3,7 +3,8 @@
 # machine specific information
 rootfs=core-image-minimal-qemuppc.ext3
 defconfig=qemu_ppc_book3s_defconfig
-PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
+# PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
+PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc

@@ -1,7 +1,7 @@
 buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 	   m32r m68k m68k_nommu \
 	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc s390 sh \
-	   sparc32 sparc64 tile x86_64 xtensa um)
+	   sparc32 sparc64 tile x86_64 xtensa um unicore32)
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
@@ -54,6 +54,7 @@ cmd_tile=(tilegx_defconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_xtensa=(defconfig allmodconfig)
 cmd_um=(defconfig)
+cmd_unicore32=(defconfig)
 
 # fixups
 

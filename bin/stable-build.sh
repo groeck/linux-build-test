@@ -18,11 +18,13 @@ PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.6.3-nolibc/hppa64-linux/bin
-PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
+# PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
+PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
 PATH_SH4=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
+PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PATH_XTENSA=/opt/kernel/gcc-4.6.3-nolibc/xtensa-linux/bin
 
@@ -157,6 +159,11 @@ doit()
 	cmd=(${cmd_sh[*]})
 	PREFIX="sh4-linux-"
 	PATH=${PATH_SH4}:${PATH}
+	;;
+    unicore32)
+	cmd=(${cmd_unicore32[*]})
+	PREFIX="unicore32-linux-"
+	PATH=${PATH_UC32}:${PATH}
 	;;
     x86_64)
 	cmd=(${cmd_x86_64[*]})
