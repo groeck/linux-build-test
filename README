@@ -2,7 +2,7 @@ Repositories and packages
 -------------------------
 
 Use aarch64 from gnu 4.8.1 built with buildroot 
-Use qemu-1.6.0-local; we need patches applied on top of qemu 1.6.0.
+Use qemu-2.0.0-local branch; we need patches applied on top of qemu 2.0.0.
 README in the qemu directory describes distribution.
 
 ----
@@ -97,6 +97,28 @@ PATH=/opt/kernel/metag/gcc-4.2.4/usr/bin
 CROSS_COMPILE= metag-unknown-linux-uclibc-
 
 ---
+powerpc64
+
+Build from Yocto.
+
+	$ git clone git://git.yoctoproject.org/poky.git
+	$ cd poky
+	$ git checkout daisy # for 1.6
+	$ git clone git://git.yoctoproject.org/meta-fsl-ppc
+	$ cd meta-fsl-ppc
+	$ git checkout daisy # for 1.6
+	$ cd ..
+	$ . ./oe-init-build-env
+	$ vi conf/bblayers.conf
+		Add <path>/meta-fsl-ppc to BBLAYERS definition.
+	$ MACHINE=p5040ds-64b bitbake meta-toolchain
+	[ this will take a while ]
+	SDK will be in tmp/deploy/sdk directory, for example
+	"poky-eglibc-x86_64-meta-toolchain-ppc64e5500-toolchain-1.6.sh"
+	Execute with sudo to install in target directory (I use the default).
+
+---
+
 qemu
 
 Packages needed to build:
