@@ -39,8 +39,8 @@ cmd_mips=(defconfig allmodconfig bcm47xx_defconfig bcm63xx_defconfig \
 	e55_defconfig cavium_octeon_defconfig powertv_defconfig malta_defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_openrisc=(defconfig)
-cmd_parisc=(defconfig)
-cmd_parisc64=(a500_defconfig)
+cmd_parisc=(defconfig generic-32bit_defconfig)
+cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
 cmd_powerpc=(defconfig allmodconfig ppc64e_defconfig cell_defconfig \
 	chroma_defconfig maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
 	mpc85xx_defconfig mpc85xx_smp_defconfig tqm8xx_defconfig \
