@@ -57,12 +57,14 @@ ARCH=$1
 git clean -x -f -d -q
 
 SUBARCH=""
+EXTRA_CMD=""
 declare -a fixup
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
 	PREFIX="alpha-linux-"
 	PATH=${PATH_ALPHA}:${PATH}
+	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     arc)
 	cmd=(${cmd_arc[*]})
@@ -267,10 +269,9 @@ if [ "${PREFIX}" != "" ]; then
 	CROSS="CROSS_COMPILE=${PREFIX}"
 fi
 
-SUBARCH_CMD=""
 if [ -n "${SUBARCH}" ]
 then
-	SUBARCH_CMD="SUBARCH=${SUBARCH}"
+	EXTRA_CMD="${EXTRA_CMD} SUBARCH=${SUBARCH}"
 fi
 
 if [ ${#fixup[*]} -gt 0 ]; then
@@ -288,7 +289,7 @@ for i in $(seq 0 ${maxcmd})
 do
     	echo -n "Building ${ARCH}:${cmd[$i]} ... "
 	rm -f .config
-	make ${CROSS} ARCH=${ARCH} ${SUBARCH_CMD} ${cmd[$i]} >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (config) - skipping"
@@ -304,7 +305,7 @@ do
 	        mv .config.tmp .config
 	    done
 	fi
-	make ${CROSS} ARCH=${ARCH} ${SUBARCH_CMD} oldnoconfig >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} ${EXTRA_CMD} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (oldnoconfig) - skipping"
@@ -312,7 +313,7 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	make ${CROSS} -j${maxload} ARCH=${ARCH} ${SUBARCH_CMD} >/dev/null 2>/tmp/buildlog.$$
+	make ${CROSS} -j${maxload} ARCH=${ARCH} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
 	if [ $? -ne 0 ]; then
 	    echo "failed"
 	    echo "--------------"
