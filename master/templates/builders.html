@@ -57,8 +57,7 @@
 <script type='text/javascript'>
 {% for rel in releases -%}
   {% set exists = [] -%}
-  {% set rel_var = rel|replace('-','_') -%}
-  {% set rel_var = rel_var|replace('.','_') -%}
+  {% set rel_var = rel|regex_replace('[-.]','_') -%}
   var buildText_{{rel_var}} = [
   {% for arch in arches -%}
     {% if rel in hwmon_releases -%}
@@ -68,8 +67,8 @@
     {% endif -%}
     {% for b in builders if b.name == bname -%}
       {% if b.build_url and b.build_css_class -%}
-          {% set mytext = b.build_text|regex_replace('.*total', 'total') -%}
-          {% if exists -%},{% endif %} "{{ mytext }}"
+          {% if exists -%}, {% endif -%}
+          "{{ b.build_text|regex_replace('.*total', 'total') }}"
           {% if exists.append("1") -%} {% endif -%}
       {% endif -%}
     {% endfor -%}
@@ -141,8 +140,7 @@
   <tr>
   <td class="box"><b>Summary</b></a></td>
   {% for rel in releases -%}
-	{% set rel_var = rel|replace('-','_') -%}
-	{% set rel_var = rel_var|replace('.','_') -%}
+	{% set rel_var = rel|regex_replace('[-.]','_') -%}
 	<script type='text/javascript'>
 	    var total = getResults_{{rel_var}} (/total: \d+/);
 	    var passed = getResults_{{rel_var}} (/pass: \d+/);
