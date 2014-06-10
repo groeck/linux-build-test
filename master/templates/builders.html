@@ -68,10 +68,7 @@
     {% endif -%}
     {% for b in builders if b.name == bname -%}
       {% if b.build_url and b.build_css_class -%}
-          {% set mytext = b.build_text|replace('<br> ', '') -%}
-          {% set mytext = mytext|replace('build successful ', '') -%}
-          {% set mytext = mytext|replace('failed ', '') -%}
-          {% set mytext = mytext|replace('warnings ', '') -%}
+          {% set mytext = b.build_text|regex_replace('.*total', 'total') -%}
           {% if exists -%},{% endif %} "{{ mytext }}"
           {% if exists.append("1") -%} {% endif -%}
       {% endif -%}
