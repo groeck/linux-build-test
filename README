@@ -118,7 +118,6 @@ Build from Yocto.
 	Execute with sudo to install in target directory (I use the default).
 
 ---
-
 qemu
 
 Packages needed to build:
@@ -140,4 +139,78 @@ Distribution:
 	./configure --prefix=/opt/buildbot
 	make dist
 	[ creates tarball ]
+
+---
+buildbot
+
+Requires the following patch.
+
+To install,
+- clone and checkout buildbot source
+- select base version (branch)
+- apply the patch
+- If you have a local installation from source, install the result
+- Otherwise, loook for web/base.py in the distribution directory.
+  Example: Ubuntu Trusty (14.04)
+    File is in /usr/lib/python2.7/dist-packages/buildbot/status/web/base.py
+  Installation commands:
+    cd <installdir>
+    sudo mv base.py base.py.orig
+    sudo mv base.pyc base.pyc.orig
+    sudo cp <src>/master/buildbot/status/web/base.py .
+    Optional:
+    sudo python
+    >>> import py_compile
+    >>> py_compile.compile('base.py')
+    >>> exit()
+
+From f568eace0cbd64cba876cfcbe9326adfb461fcb2 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <linux@roeck-us.net>
+Date: Sun, 15 Jun 2014 08:23:20 -0700
+Subject: [PATCH] Add split and regex_replace to Jinja filters
+
+Used for more complex expressions on buildbot 'builders' page.
+
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ master/buildbot/status/web/base.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/master/buildbot/status/web/base.py b/master/buildbot/status/web/base.py
+index 24a4b8e..eea0751 100644
+--- a/master/buildbot/status/web/base.py
++++ b/master/buildbot/status/web/base.py
+@@ -14,7 +14,7 @@
+ # Copyright Buildbot Team Members
+ 
+ 
+-import urlparse, urllib, time, re
++import urlparse, urllib, time, re, string
+ import os, cgi, sys, locale
+ import jinja2
+ from zope.interface import Interface
+@@ -519,6 +519,8 @@ def createJinjaEnv(revlink=None, changecommentlink=None,
+     env.tests['mapping'] = lambda obj : isinstance(obj, dict)
+ 
+     env.filters.update(dict(
++        split = split,
++        regex_replace = regex_replace,
+         urlencode = urllib.quote,
+         email = emailfilter,
+         user = userfilter,
+@@ -531,6 +533,12 @@ def createJinjaEnv(revlink=None, changecommentlink=None,
+ 
+     return env
+ 
++def split(s, sep):
++    return string.split(s, sep)
++
++def regex_replace(s, find, replace):
++    return re.sub(find, replace, s)
++
+ def emailfilter(value):
+     ''' Escape & obfuscate e-mail addresses
+ 
+-- 
+1.9.1
 
