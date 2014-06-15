@@ -66,15 +66,16 @@
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
     {% endif -%}
-    {% for b in builders if b.name == bname -%}
-      {% if b.build_url and b.build_css_class -%}
-        {% if not b.build_text in ["exception buildcommand",
-			       "exception interrupted"] -%}
-          {% if exists -%}, {% endif -%}
-          "{{ b.build_text|regex_replace('.*total', 'total') }}"
-          {% if exists.append("1") -%} {% endif -%}
-	{% endif -%}
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
+			     "exception interrupted"] -%}
+	{% continue -%}
       {% endif -%}
+      {% set summary = b.build_text|regex_replace('.*total', 'total') -%}
+      {% set summary = summary|regex_replace('<!--.*', '') -%}
+      {% if exists -%}, {% endif -%}
+	"{{ summary }}"
+      {% do exists.append("1") -%}
     {% endfor -%}
   {% endfor -%} ];
 
@@ -87,22 +88,21 @@
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
     {% endif -%}
-    {% for b in builders if b.name == bname -%}
-      {% if b.build_url and b.build_css_class -%}
-        {% if not b.build_text in ["exception buildcommand",
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
 			       "exception interrupted"] -%}
-          {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
-	  {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
-	  {% if fbuilds != '' and fbuilds != b.build_text -%}
-	      {% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
-	      {% set fbuilds = fbuilds|split(' ') -%}
-	      {% for fbuild in fbuilds -%}
-	      {% if exists -%}, {% endif -%}
+	{% continue -%}
+      {% endif -%}
+      {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
+      {% if fbuilds != '' and fbuilds != b.build_text -%}
+	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
+	{% set fbuilds = fbuilds|split(' ') -%}
+	{% for fbuild in fbuilds -%}
+	  {% if exists -%}, {% endif -%}
 		"{{ fbuild }}"
-                {% if exists.append("1") -%} {% endif -%}
-	      {% endfor -%}
-	  {% endif -%}
-	{% endif -%}
+          {% do exists.append("1") -%}
+	{% endfor -%}
       {% endif -%}
     {% endfor -%}
   {% endfor -%} ];
