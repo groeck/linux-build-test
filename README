@@ -164,20 +164,22 @@ To install,
     >>> py_compile.compile('base.py')
     >>> exit()
 
-From f568eace0cbd64cba876cfcbe9326adfb461fcb2 Mon Sep 17 00:00:00 2001
+From 8a0af9a95cfedbecd090132c6637792cbc6530ff Mon Sep 17 00:00:00 2001
 From: Guenter Roeck <linux@roeck-us.net>
 Date: Sun, 15 Jun 2014 08:23:20 -0700
 Subject: [PATCH] Add split and regex_replace to Jinja filters
 
 Used for more complex expressions on buildbot 'builders' page.
 
+Also enable do and loopcontrols extensions.
+
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- master/buildbot/status/web/base.py | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ master/buildbot/status/web/base.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/master/buildbot/status/web/base.py b/master/buildbot/status/web/base.py
-index 24a4b8e..eea0751 100644
+index 24a4b8e..0eff637 100644
 --- a/master/buildbot/status/web/base.py
 +++ b/master/buildbot/status/web/base.py
 @@ -14,7 +14,7 @@
@@ -189,6 +191,15 @@ index 24a4b8e..eea0751 100644
  import os, cgi, sys, locale
  import jinja2
  from zope.interface import Interface
+@@ -510,7 +510,7 @@ def createJinjaEnv(revlink=None, changecommentlink=None,
+     loader = jinja2.ChoiceLoader(all_loaders)
+ 
+     env = jinja2.Environment(loader=loader,
+-                             extensions=['jinja2.ext.i18n'],
++                             extensions=['jinja2.ext.i18n', 'jinja2.ext.do', 'jinja2.ext.loopcontrols'],
+                              trim_blocks=True,
+                              undefined=AlmostStrictUndefined)
+ 
 @@ -519,6 +519,8 @@ def createJinjaEnv(revlink=None, changecommentlink=None,
      env.tests['mapping'] = lambda obj : isinstance(obj, dict)
  
