@@ -44,7 +44,7 @@
 {% set qemu_arches = [ "arm", "microblaze", "mips", "mips64", "ppc", "sh",
 			"sparc", "sparc64", "x86", "x86_64" ] -%}
 
-{% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14",
+{% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14", "3.15",
 			"master",
 			"hwmon", "hwmon-next", "hwmon-staging",
 			"watchdog-next" ] -%}
@@ -57,6 +57,7 @@
 <script type='text/javascript'>
 {% for rel in releases -%}
   {% set exists = [] -%}
+  {% set failed = [] -%}
   {% set rel_var = rel|regex_replace('[-.]','_') -%}
   var buildText_{{rel_var}} = [
   {% for arch in arches -%}
@@ -67,9 +68,41 @@
     {% endif -%}
     {% for b in builders if b.name == bname -%}
       {% if b.build_url and b.build_css_class -%}
+        {% if not b.build_text in ["exception buildcommand",
+			       "exception interrupted"] -%}
           {% if exists -%}, {% endif -%}
           "{{ b.build_text|regex_replace('.*total', 'total') }}"
           {% if exists.append("1") -%} {% endif -%}
+	{% endif -%}
+      {% endif -%}
+    {% endfor -%}
+  {% endfor -%} ];
+
+  {% set exists = [] -%}
+
+  var buildFailures_{{rel_var}} = [
+  {% for arch in arches -%}
+    {% if rel in hwmon_releases -%}
+	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
+    {% else -%}
+	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
+    {% endif -%}
+    {% for b in builders if b.name == bname -%}
+      {% if b.build_url and b.build_css_class -%}
+        {% if not b.build_text in ["exception buildcommand",
+			       "exception interrupted"] -%}
+          {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
+	  {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
+	  {% if fbuilds != '' and fbuilds != b.build_text -%}
+	      {% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
+	      {% set fbuilds = fbuilds|split(' ') -%}
+	      {% for fbuild in fbuilds -%}
+	      {% if exists -%}, {% endif -%}
+		"{{ fbuild }}"
+                {% if exists.append("1") -%} {% endif -%}
+	      {% endfor -%}
+	  {% endif -%}
+	{% endif -%}
       {% endif -%}
     {% endfor -%}
   {% endfor -%} ];
@@ -159,11 +192,18 @@
 		build = "warnings";
 	    }
 	document.write('<td class="LastBuild box ' + box + '">\n');
-	document.write(build + "<br>");
+	// document.write(build + "<br>");
         document.write('total: ' + total +
 			' pass: ' + passed +
 			' skipped: ' + skipped +
 			' fail: ' + fail);
+	if (buildFailures_{{rel_var}}.length > 0) {
+		document.write('<br>Failed builds:<br>\n');
+		for (var f=0; f < buildFailures_{{rel_var}}.length; f++) {
+			document.write(buildFailures_{{rel_var}}[f] + '<br>\n');
+		}
+		document.write('\n');
+	}
         document.write('</td>\n');
 	</script>
   {% endfor -%}
