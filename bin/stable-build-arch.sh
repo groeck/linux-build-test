@@ -29,6 +29,7 @@ PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.6.3-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_PPC_24=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
 PATH_SH4=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
@@ -216,6 +217,11 @@ case ${ARCH} in
 	cmd=(${cmd_s390[*]})
 	PREFIX="s390x-linux-"
 	PATH=${PATH_S390}:${PATH}
+	;;
+    score)
+	cmd=(${cmd_score[*]})
+	PREFIX="score-elf-"
+	PATH=${PATH_SCORE}:${PATH}
 	;;
     tile)
 	cmd=(${cmd_tile[*]})

@@ -1,7 +1,8 @@
 buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 	   m32r m68k m68k_nommu \
-	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc s390 sh \
-	   sparc32 sparc64 tile x86_64 xtensa um unicore32)
+	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc \
+	   s390 score sh sparc32 sparc64 \
+	   tile x86_64 xtensa um unicore32)
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
@@ -47,6 +48,7 @@ cmd_powerpc=(defconfig allmodconfig ppc64e_defconfig cell_defconfig \
 	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig \
 	86xx/sbc8641d_defconfig)
 cmd_s390=(defconfig)
+cmd_score=(defconfig)
 cmd_sh=(defconfig dreamcast_defconfig microdev_defconfig)
 cmd_sparc32=(defconfig)
 cmd_sparc64=(defconfig allmodconfig)
