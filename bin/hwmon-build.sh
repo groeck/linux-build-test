@@ -106,7 +106,7 @@ doit()
 			grep -v watchdog.o 2>/dev/null)
 	    rm -f ${files}
 	    make ${CROSS} -j${maxload} -i ${OPTIONS} ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
-	    egrep 'drivers/(hwmon|watchdog)' ${ERR}.tmp > ${WARN}.sparse 2>&1
+	    egrep '^drivers/(hwmon|watchdog)' ${ERR}.tmp > ${WARN}.sparse 2>&1
 	    rm -f ${ERR}.tmp
 	    # If smatch build is asked for as well, do another run with smatch.
 	    # Append smatch log messages to warning log.
