@@ -95,12 +95,12 @@ then
 	retcode=1
 fi
 
-grep "Restarting" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
-	echo "No 'Restarting' message in log. Test failed."
-	retcode=1
-fi
+# grep "Restarting" ${logfile} >/dev/null 2>&1
+# if [ ${retcode} -eq 0 -a $? -ne 0 ]
+# then
+# 	echo "No 'Restarting' message in log. Test failed."
+# 	retcode=1
+# fi
 
 dolog=0
 grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
