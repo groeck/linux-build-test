@@ -193,9 +193,9 @@
 	    }
 	document.write('<td class="LastBuild box ' + box + '">\n');
 	// document.write(build + "<br>");
+	total = total - skipped;
         document.write('total: ' + total +
 			' pass: ' + passed +
-			' skipped: ' + skipped +
 			' fail: ' + fail);
 	if (buildFailures_{{rel_var}}.length > 0) {
 		document.write('<br>Failed builds:<br>\n');
