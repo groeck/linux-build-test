@@ -27,12 +27,15 @@ libpixman-1-dev
 libxml2-dev
 lzop
 module-init-tools
-nfs-client
 qemu-system
 qemu-user
 qemu-utils
 u-boot-tools
-ia32-libs
+
+Ubuntu pre 14.04:
+	ia32-libs
+Ubuntu 14.04:
+	lib32z1 lib32ncurses5 lib32bz2-1.0
 
 ---
 smatch:
