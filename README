@@ -7,6 +7,8 @@ README in the qemu directory describes distribution.
 
 ----
 
+Packages to install (Debian/Ubuntu):
+
 automake
 autoconf
 autotools-dev
@@ -37,6 +39,10 @@ Ubuntu pre 14.04:
 Ubuntu 14.04:
 	lib32z1 lib32ncurses5 lib32bz2-1.0
 
+make sure /bin/sh points to bash.
+
+sudo update-alternatives --install /bin/sh sh /bin/bash
+
 ---
 smatch:
 
@@ -63,7 +69,7 @@ configure for ARC little endian (big endian is broken, at least with 2013.05).
 Commands to run (assuming gcc 4.4.7):
 	make toolchain
 	cd output
-	mkdir -p arc/gcc-4.4.7
+	mkdir arc
 	mv host arc/gcc-4.4.7
 	tar czf /tmp/x86_64-gcc-4.4.7-uclibc_arc-linux.tar.gz arc
 
@@ -72,11 +78,27 @@ Path and prefix to use:
 	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
 	CROSS_COMPILE=arc-buildroot-linux-uclibc-
 
+Building little endian arc 4.8-R3 from tip 7/15/2014 worked as well.
+
+---
 xtensa:
 
 Same as above; buildroot top of tree as of 2/23/2014 worked.
 
-Configure for xtensa default, enable LARGEFILE. gcc version 4.7.3.
+Configure for xtensa default, enable LARGEFILE (in toolchain options). gcc version 4.7.3.
+
+tip of buildroot as of 7/15/2014 fails building for gcc 4.8.3 and binutils 2.24.
+Configure for binutils 2.23.2.
+
+Build commands:
+	make toolchain
+	cd output
+	mkdir xtensa
+	mv host xtensa/gcc-4.8.3
+	tar czf /tmp/x86_64-gcc-4.8.3-uclibc_xtensa-linux.tar.gz xtensa
+
+gcc 4.6.3 from kernel.org is not recommended and may fail randomly with 'jump target
+out of range' errors.
 
 ---
 metag:
@@ -98,6 +120,17 @@ Install in /opt/kernel.
 Path and prefix to use:
 PATH=/opt/kernel/metag/gcc-4.2.4/usr/bin
 CROSS_COMPILE= metag-unknown-linux-uclibc-
+
+Note: As of 7/15/2014, the minimorph SDK is no longer available from above
+location (the meta insider web page seems to have disappeared entirely).
+Contact me for a copy of the toolchain if needed.
+
+---
+NIOS II
+
+Toolchain available from CodeSourcery. Untested.
+
+http://sourcery.mentor.com/public/gnu_toolchain/nios2-linux-gnu/sourceryg++-2013.05-43-nios2-linux-gnu-i686-pc-linux-gnu.tar.bz2
 
 ---
 powerpc64
