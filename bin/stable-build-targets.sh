@@ -6,7 +6,7 @@ buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
-cmd_arm=(defconfig exynos4_defconfig exynos_defconfig \
+cmd_arm_old=(defconfig exynos4_defconfig exynos_defconfig \
 	imx_v4_v5_defconfig imx_v6_v7_defconfig multi_v7_defconfig \
 	mxs_defconfig dove_defconfig ape6evm_defconfig marzen_defconfig \
 	kirkwood_defconfig omap2plus_defconfig tegra_defconfig u8500_defconfig \
@@ -18,7 +18,21 @@ cmd_arm=(defconfig exynos4_defconfig exynos_defconfig \
 	sama5_defconfig prima2_defconfig msm_defconfig at91_dt_defconfig \
 	at91rm9200_defconfig at91sam9260_9g20_defconfig \
 	at91sam9261_9g10_defconfig at91sam9263_defconfig at91sam9g45_defconfig \
-	at91x40_defconfig assabet_defconfig)
+	at91x40_defconfig assabet_defconfig s3c2410_defconfig s3c6400_defconfig)
+# New optimized build list. The total number object files is roughly the same,
+# but there are many more different object files.
+cmd_arm=(s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig \
+	ixp4xx_defconfig u8500_defconfig multi_v7_defconfig omap1_defconfig \
+	footbridge_defconfig davinci_all_defconfig mini2440_defconfig \
+	rpc_defconfig axm55xx_defconfig mxs_defconfig keystone_defconfig \
+	vexpress_defconfig imx_v4_v5_defconfig at91_dt_defconfig \
+	s3c6400_defconfig lpc32xx_defconfig shmobile_defconfig \
+	nhk8815_defconfig bcm2835_defconfig sama5_defconfig orion5x_defconfig \
+	exynos_defconfig cm_x2xx_defconfig s5pv210_defconfig \
+	integrator_defconfig msm_defconfig kirkwood_defconfig \
+	at91rm9200_defconfig s5p64x0_defconfig efm32_defconfig \
+	pxa910_defconfig clps711x_defconfig s5pc100_defconfig \
+	exynos4_defconfig ap4evb_defconfig bonito_defconfig mvebu_defconfig)
 cmd_arm64=(defconfig)
 cmd_avr32=(defconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
 cmd_blackfin=(defconfig)
