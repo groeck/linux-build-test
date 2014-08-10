@@ -30,7 +30,7 @@
 </table>
 
 <br>
-<h1> stable queue, hwmon, watchdog: </h1>
+<h1> stable queue, hwmon, watchdog, restart: </h1>
 
 {% set arches = [ "alpha", "arc", "arm", "arm64", "avr32", "blackfin",
 		  "c6x", "cris", "crisv32",
@@ -44,13 +44,13 @@
 {% set qemu_arches = [ "arm", "microblaze", "mips", "mips64", "ppc", "sh",
 			"sparc", "sparc64", "x86", "x86_64" ] -%}
 
-{% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14", "3.15",
-			"master",
+{% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14", "3.15", "3.16",
+			"master", "next",
 			"hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+			"watchdog-next", "restart-staging" ] -%}
 
-{% set hwmon_releases = [ "hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+{% set hwmon_releases = [ "master", "hwmon", "hwmon-next", "hwmon-staging",
+			"watchdog-next", "restart-staging" ] -%}
 
 {% set exists = [] -%}
 
@@ -63,6 +63,8 @@
   {% for arch in arches -%}
     {% if rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in [ "next" ] -%}
+	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
     {% endif -%}
@@ -85,6 +87,8 @@
   {% for arch in arches -%}
     {% if rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in [ "next" ] -%}
+	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
     {% endif -%}
@@ -138,6 +142,8 @@
   {% for rel in releases -%}
     {% if rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in [ "next" ] -%}
+	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
     {% endif -%}
@@ -253,7 +259,7 @@
 
 </table>
 
-{% set imports = [ "stable-updates",
+{% set imports = [ "master-updates", "stable-updates",
 		"stable-queue-import", "stable-queue-import-3.2",
 		"stable-queue-import-3.12",
 		] -%}
