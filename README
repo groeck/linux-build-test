@@ -276,3 +276,9 @@ target_configargs=enable_vtable_verify=yes --enable-obsolete --disable-libssp
 --disable-libquadmath
 
 Do _not_ configure/build gcc from its source directory; that will fail.
+
+---
+unicore32
+
+See http://mprc.pku.edu.cn/~guanxuetao/linux/ for toolchain. Current version
+is http://mprc.pku.edu.cn/~guanxuetao/linux/uc4-1.0.5-hard.tgz.
