@@ -4,10 +4,14 @@ slave/hwmon*
 slave/stable*
 slave/watchdog*
 slave/twistd.*
+slave/master*
+slave/next*
 master/qemu*
 master/hwmon*
 master/watchdog*
 master/stable*
+master/next*
+master/master*
 master/gitpoller-workdir/
 master/*.log
 master/queue-workdir*/
