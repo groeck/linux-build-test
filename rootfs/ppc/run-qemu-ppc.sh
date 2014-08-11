@@ -2,7 +2,6 @@
 
 # machine specific information
 rootfs=core-image-minimal-qemuppc.ext3
-defconfig=qemu_ppc_book3s_defconfig
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
@@ -21,41 +20,52 @@ logfile=/tmp/qemu.$$.log
 dir=$(cd $(dirname $0); pwd)
 tmprootfs=/tmp/$$.${rootfs}
 
-cp ${dir}/${defconfig} arch/${ARCH}/configs
-make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
-if [ $? -ne 0 ]
-then
-	echo "Failed to configure kernel - aborting"
-	exit 1
-fi
+runkernel()
+{
+    local defconfig=$1
+    local pid
+    local retcode
+    local t
 
-echo "Build reference: $(git describe)"
-echo "Building kernel ..."
-make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
-if [ $? -ne 0 ]
-then
+    cp ${dir}/${defconfig} arch/${ARCH}/configs
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    if [ $? -ne 0 ]
+    then
+	echo "Failed to configure kernel - aborting"
+	return 1
+    fi
+
+    echo "Build reference: $(git describe)"
+    echo "Configuration file: ${defconfig}"
+    echo "Building kernel ..."
+    make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
+    if [ $? -ne 0 ]
+    then
 	echo "Build failed - aborting"
 	echo "------------"
 	echo "Build log:"
 	cat ${logfile}
 	echo "------------"
 	rm -f ${logfile}
-	exit 1
-fi
+	return 1
+    fi
 
-echo -n "Running qemu ..."
+    echo -n "Running qemu ..."
 
-rm -f ${logfile}
-cp ${dir}/${rootfs} ${tmprootfs}
+    rm -f ${logfile}
+    cp ${dir}/${rootfs} ${tmprootfs}
 
-${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu G4 -hda ${tmprootfs} -usb -usbdevice wacom-tablet -no-reboot -m 128 --append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" -nographic > ${logfile} 2>&1 &
+    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu G4 \
+	-hda ${tmprootfs} -usb -usbdevice wacom-tablet -no-reboot -m 128 \
+	--append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" \
+	-nographic > ${logfile} 2>&1 &
 
-pid=$!
+    pid=$!
 
-retcode=0
-t=0
-while true
-do
+    retcode=0
+    t=0
+    while true
+    do
 	kill -0 ${pid} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
@@ -79,46 +89,53 @@ do
 	sleep ${looptime}
 	t=$(($t + ${looptime}))
 	echo -n .
-done
+    done
 
-echo
-grep "Boot successful" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    echo
+    grep "Boot successful" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Boot successful' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-grep "Rebooting" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    grep "Rebooting" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Rebooting' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-grep "Restarting" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    grep "Restarting" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Restarting' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-dolog=0
-grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
-if [ $? -eq 0 ]
-then
+    dolog=0
+    grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
 	dolog=1
-fi
+    fi
 
-if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
-then
+    if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
+    then
 	echo "------------"
 	echo "qemu log:"
 	cat ${logfile}
 	echo "------------"
-else
+    else
 	echo "Test successful"
-fi
+    fi
+    return ${retcode}
+}
+
+runkernel qemu_ppc_book3s_defconfig
+retcode=$?
+runkernel qemu_ppc_book3s_smp_defconfig
+retcode=$((${retcode} + $?))
 
 git clean -d -x -f -q
 
