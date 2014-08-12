@@ -3,6 +3,7 @@ Repositories and packages
 
 Use aarch64 from gnu 4.8.1 built with buildroot 
 Use qemu-2.0.0-local branch; we need patches applied on top of qemu 2.0.0.
+Note: qemu 2.1.0 is required for aarch64 (arm64).
 README in the qemu directory describes distribution.
 
 ----
