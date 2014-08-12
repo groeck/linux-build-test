@@ -3,7 +3,6 @@
 PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
-defconfig=qemu_sparc_defconfig
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
 
 logfile=/tmp/qemu.$$.log
@@ -14,35 +13,44 @@ PATH=${PATH_SPARC}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
-cp ${dir}/${defconfig} arch/sparc/configs
-make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
-if [ $? -ne 0 ]
-then
-    echo "failed (config) - aborting"
-    exit 1
-fi
+runkernel()
+{
+    local defconfig=$1
+    local pid
+    local retcode
+    local t
+    local crashed
 
-cp ${dir}/${rootfs} .
+    cp ${dir}/${defconfig} arch/sparc/configs
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    if [ $? -ne 0 ]
+    then
+	echo "failed (config) - aborting"
+	return 1
+    fi
 
-echo "Build reference: $(git describe)"
-echo "Building kernel ..."
-make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
-if [ $? -ne 0 ]
-then
+    cp ${dir}/${rootfs} .
+
+    echo "Build reference: $(git describe)"
+    echo "Configuration file: ${defconfig}"
+    echo "Building kernel ..."
+    make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} >${logfile} 2>&1
+    if [ $? -ne 0 ]
+    then
 	echo "Build failed - aborting"
 	echo "------------"
 	echo "Build log:"
 	cat ${logfile}
 	echo "------------"
 	rm -f ${logfile}
-	exit 1
-fi
+	return 1
+    fi
 
-echo -n "Running qemu ..."
+    echo -n "Running qemu ..."
 
-rm -f ${logfile}
+    rm -f ${logfile}
 
-/opt/buildbot/bin/qemu-system-sparc64 \
+    /opt/buildbot/bin/qemu-system-sparc64 \
 	-m 512 \
 	-drive file=${rootfs},if=virtio \
 	-net nic,model=virtio \
@@ -50,12 +58,12 @@ rm -f ${logfile}
 	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
-pid=$!
+    pid=$!
 
-retcode=0
-t=0
-while true
-do
+    retcode=0
+    t=0
+    while true
+    do
 	kill -0 ${pid} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
@@ -69,10 +77,17 @@ do
 		break
 	fi
 
-
-	if [ $t -gt ${maxtime} ]
+	crashed=0
+	grep "Kernel panic" ${logfile} >/dev/null 2>&1
+	if [ $? -eq 0 ]
 	then
-		echo " timeout - aborting"
+	    crashed=1
+	fi
+
+	# No need to continue waiting if the kernel crashed.
+	if [ ${crashed} -ne 0 -o $t -gt ${maxtime} ]
+	then
+		echo " timeout or panic - aborting"
 		kill ${pid} >/dev/null 2>&1
 		# give it some time to die, then kill it
 		# the hard way hard if it did not work.
@@ -88,46 +103,54 @@ do
 	sleep ${looptime}
 	t=$(($t + ${looptime}))
 	echo -n .
-done
+    done
 
-echo
-grep "Boot successful" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    echo
+    grep "Boot successful" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Boot successful' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-grep "Rebooting" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    grep "Rebooting" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Rebooting' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-grep "Restarting system" ${logfile} >/dev/null 2>&1
-if [ ${retcode} -eq 0 -a $? -ne 0 ]
-then
+    grep "Restarting system" ${logfile} >/dev/null 2>&1
+    if [ ${retcode} -eq 0 -a $? -ne 0 ]
+    then
 	echo "No 'Restarting system' message in log. Test failed."
 	retcode=1
-fi
+    fi
 
-dolog=0
-grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
-if [ $? -eq 0 ]
-then
+    dolog=0
+    grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
 	dolog=1
-fi
+    fi
 
-if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
-then
+    if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
+    then
 	echo "------------"
 	echo "qemu log:"
 	cat ${logfile}
 	echo "------------"
-else
+    else
 	echo "Test successful"
-fi
+    fi
+
+    return ${retcode}
+}
+
+runkernel qemu_sparc_smp_defconfig
+retcode=$?
+runkernel qemu_sparc_nosmp_defconfig
+retcode=$((${retcode} + $?))
 
 git clean -d -x -f -q
 
