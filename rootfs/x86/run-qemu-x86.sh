@@ -54,6 +54,7 @@ runkernel()
 
     ${QEMUCMD} -kernel ${KERNEL_IMAGE} -hda ${tmprootfs} -usb \
 	-usbdevice wacom-tablet -no-reboot -m 128 \
+	-cpu SandyBridge \
 	--append "root=/dev/hda rw mem=128M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" -nographic \
 	> ${logfile} 2>&1 &
 
