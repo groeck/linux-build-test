@@ -12,7 +12,7 @@ base=/opt/buildbot
 for system in saturn.roeck-us.net desktop jupiter mars hyperion titan
 do
 	echo -n "${system}: "
-	rsync --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share ${system}:${base}
+	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share ${system}:${base}
 	if [ $? -ne 0 ]
 	then
 		echo "failed"
