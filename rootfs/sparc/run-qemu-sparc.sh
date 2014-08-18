@@ -20,8 +20,10 @@ runkernel()
     local retcode
     local t
 
+    git clean -d -x -f -q
+
     cp ${dir}/${defconfig} arch/sparc/configs
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
     if [ $? -ne 0 ]
     then
 	echo "failed (config) - aborting"
@@ -124,8 +126,6 @@ runkernel()
     else
 	echo "Test successful"
     fi
-
-    git clean -d -x -f -q
 
     return ${retcode}
 }

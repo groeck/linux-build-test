@@ -21,8 +21,10 @@ runkernel()
     local t
     local crashed
 
+    git clean -d -x -f -q
+
     cp ${dir}/${defconfig} arch/sparc/configs
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
     if [ $? -ne 0 ]
     then
 	echo "failed (config) - aborting"
@@ -151,8 +153,6 @@ runkernel qemu_sparc_smp_defconfig
 retcode=$?
 runkernel qemu_sparc_nosmp_defconfig
 retcode=$((${retcode} + $?))
-
-git clean -d -x -f -q
 
 rm -f ${logfile}
 exit ${retcode}

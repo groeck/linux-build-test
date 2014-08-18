@@ -13,6 +13,17 @@ PATH=${PATH_ARM64}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
+doclean()
+{
+	pwd | grep buildbot >/dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		git clean -x -d -f -q
+	else
+		make ARCH=${ARCH} mrproper >/dev/null 2>&1
+	fi
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -20,8 +31,10 @@ runkernel()
     local retcode
     local t
 
+    doclean
+
     cp ${dir}/${defconfig} arch/${ARCH}/configs
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
     if [ $? -ne 0 ]
     then
         echo "failed (config) - aborting"
@@ -138,8 +151,6 @@ runkernel qemu_arm64_smp_defconfig
 retcode=$?
 runkernel qemu_arm64_nosmp_defconfig
 retcode=$((${retcode} + $?))
-
-git clean -d -x -f -q
 
 rm -f ${logfile}
 exit ${retcode}

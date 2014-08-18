@@ -14,8 +14,10 @@ PATH=${PATH_MICROBLAZE}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
+git clean -d -x -f -q
+
 cp ${dir}/${defconfig} arch/${ARCH}/configs
-make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
 if [ $? -ne 0 ]
 then
     echo "failed (config) - aborting"
@@ -121,8 +123,6 @@ then
 else
 	echo "Test successful"
 fi
-
-git clean -d -x -f -q
 
 rm -f ${logfile}
 exit ${retcode}

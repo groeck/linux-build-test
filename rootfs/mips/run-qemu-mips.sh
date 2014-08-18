@@ -19,6 +19,17 @@ logfile=/tmp/qemu.$$.log
 dir=$(cd $(dirname $0); pwd)
 tmprootfs=/tmp/$$.${rootfs}
 
+doclean()
+{
+	pwd | grep buildbot >/dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		git clean -x -d -f -q
+	else
+		make ARCH=${ARCH} mrproper >/dev/null 2>&1
+	fi
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -26,9 +37,11 @@ runkernel()
     local retcode
     local t
 
+    doclean
+
     cp ${dir}/${defconfig} arch/${ARCH}/configs
 
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
     if [ $? -ne 0 ]
     then
 	echo "Failed to configure kernel - aborting"
@@ -71,9 +84,17 @@ runkernel()
 	then
 		break
 	fi
-	if [ $t -gt ${maxtime} ]
+	crashed=0
+	egrep "^BUG:" ${logfile} >/dev/null 2>&1
+	if [ $? -eq 0 ]
 	then
-		echo " timeout - aborting"
+		crashed=1
+	fi
+
+	# Abort if crashed
+	if [ ${crashed} -ne 0 -o $t -gt ${maxtime} ]
+	then
+		echo " timeout or crashed - aborting"
 		kill ${pid} >/dev/null 2>&1
 		# give it some time to die, then kill it
 		# the hard way hard if it did not work.
@@ -139,8 +160,6 @@ runkernel qemu_mips_malta_defconfig
 retcode=$?
 runkernel qemu_mips_malta_smp_defconfig
 retcode=$((${retcode} + $?))
-
-git clean -d -x -f -q
 
 rm -f ${logfile} ${tmprootfs}
 exit ${retcode}

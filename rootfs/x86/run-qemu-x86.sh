@@ -24,8 +24,10 @@ runkernel()
     local retcode
     local t
 
+    git clean -d -x -f -q
+
     cp ${dir}/${defconfig} arch/${ARCH}/configs
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig}
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
     if [ $? -ne 0 ]
     then
 	echo "Failed to configure kernel - aborting"
@@ -144,8 +146,6 @@ runkernel qemu_x86_pc_defconfig
 retcode=$?
 runkernel qemu_x86_pc_nosmp_defconfig
 retcode=$((${retcode} + $?))
-
-git clean -d -x -f -q
 
 rm -f ${logfile} ${tmprootfs}
 exit ${retcode}
