@@ -12,7 +12,13 @@ base=/opt/buildbot
 for system in saturn.roeck-us.net desktop jupiter mars hyperion titan
 do
 	echo -n "${system}: "
-	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share ${system}:${base}
+	ping -c 1 -w 1 ${system} >/dev/null
+	if [ $? -ne 0 ]
+	then
+		echo "not responding"
+		continue
+	fi
+	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share ${base}/kconfig ${system}:${base}
 	if [ $? -ne 0 ]
 	then
 		echo "failed"
