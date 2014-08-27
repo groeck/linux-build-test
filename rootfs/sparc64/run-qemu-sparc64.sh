@@ -13,6 +13,17 @@ PATH=${PATH_SPARC}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
+doclean()
+{
+	pwd | grep buildbot >/dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		git clean -x -d -f -q
+	else
+		make ARCH=${ARCH} mrproper >/dev/null 2>&1
+	fi
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -21,7 +32,7 @@ runkernel()
     local t
     local crashed
 
-    git clean -d -x -f -q
+    doclean
 
     cp ${dir}/${defconfig} arch/sparc/configs
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
