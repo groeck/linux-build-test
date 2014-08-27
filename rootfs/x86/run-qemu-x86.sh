@@ -17,6 +17,17 @@ logfile=/tmp/qemu.$$.log
 dir=$(cd $(dirname $0); pwd)
 tmprootfs=/tmp/$$.${rootfs}
 
+doclean()
+{
+	pwd | grep buildbot >/dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		git clean -x -d -f -q
+	else
+		make ARCH=${ARCH} mrproper >/dev/null 2>&1
+	fi
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -24,7 +35,7 @@ runkernel()
     local retcode
     local t
 
-    git clean -d -x -f -q
+    doclean
 
     cp ${dir}/${defconfig} arch/${ARCH}/configs
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null
