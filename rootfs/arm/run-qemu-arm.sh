@@ -3,7 +3,6 @@
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
 rootfs=core-image-minimal-qemuarm.ext3
-defconfig=qemu_arm_versatile_defconfig
 # PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
 PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
 
