@@ -18,7 +18,8 @@ fi
 git fetch --all
 git push local origin/master:master
 
-for a in $(git tag -l | grep v3 | egrep -v "v3.1\$|v3.1\.|v3.1-|v3.3|v3.5|v3.6|v3.9|v3.8|v3.7")
+for a in $(git tag -l | grep v3 | \
+	egrep -v "v3.0|v3.1\$|v3.1\.|v3.1-|v3.3|v3.5|v3.6|v3.7|v3.8|v3.9|v3.11|v3.13|v3.15")
 do
 	echo -n "tag:$a: "
 	git push local refs/tags/$a
