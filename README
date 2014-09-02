@@ -1,7 +1,7 @@
 Repositories and packages
 -------------------------
 
-Use aarch64 from gnu 4.8.1 built with buildroot 
+Use aarch64 with gcc 4.8.1 built with buildroot. gcc 4.8.3 works as well.
 Use qemu-2.0.0-local branch; we need patches applied on top of qemu 2.0.0.
 Note: qemu 2.1.0 is required for aarch64 (arm64).
 README in the qemu directory describes distribution.
@@ -84,22 +84,58 @@ Building little endian arc 4.8-R3 from tip 7/15/2014 worked as well.
 ---
 xtensa:
 
-Same as above; buildroot top of tree as of 2/23/2014 worked.
+Same as above; buildroot 2014.08-rc3 is recommended.
 
-Configure for xtensa default, enable LARGEFILE (in toolchain options). gcc version 4.7.3.
-
-tip of buildroot as of 7/15/2014 fails building for gcc 4.8.3 and binutils 2.24.
-Configure for binutils 2.23.2.
+Use qemu_xtensa_lx60_defconfig as starting base. Also enable
+	BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+	BR2_TOOLCHAIN_BUILDROOT_INET_IPV6=y
+	BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+	BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
 
 Build commands:
+	make qemu_xtensa_lx60_defconfig
+	make menuconfig		# Add the above configuration flags
 	make toolchain
 	cd output
 	mkdir xtensa
-	mv host xtensa/gcc-4.8.3
-	tar czf /tmp/x86_64-gcc-4.8.3-uclibc_xtensa-linux.tar.gz xtensa
+	mv host xtensa/gcc-4.8.3-dc232b
+	tar czf /tmp/x86_64-gcc-4.8.3-dc232b-uclibc_xtensa-linux.tar.gz xtensa
 
-gcc 4.6.3 from kernel.org is not recommended and may fail randomly with 'jump target
-out of range' errors.
+gcc 4.6.3 from kernel.org is not recommended and may fail randomly
+with 'jump target out of range' errors. Also, it won't let you run
+the qemu target. Note that you _must_ use the same toolchain for both
+kernel and rootfs builds.
+
+qemu 2.1.0 is required.
+
+---
+arm:
+
+[ tested with tip of buildroot tree as of 8/23/2014 ]
+buildroot, configure for arm little endian, cortex-A7
+EABI, VFPv4-D16 (defaults)
+gcc 4.8.x, glibc 2.19
+binutils 2.24
+3.16 kernel headers
+
+	make toolchain
+	cd output
+	mkdir arm
+	mv host arm/gcc-4.8.3
+	tar czf /tmp/x86_64-gcc-4.8.3-glibc_arm-linux.tar.gz arm
+
+---
+Microblaze
+
+[ tested with tip of buildroot tree as of 8/23/2014 ]
+Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
+3.16 kernel headers
+
+	make toolchain
+	cd output
+	mkdir microblaze
+	mv host arm/gcc-4.9.1
+	tar czf /tmp/x86_64-gcc-4.9.1-glibc_microblaze-linux.tar.gz microblaze
 
 ---
 metag:
@@ -125,6 +161,15 @@ CROSS_COMPILE= metag-unknown-linux-uclibc-
 Note: As of 7/15/2014, the minimorph SDK is no longer available from above
 location (the meta insider web page seems to have disappeared entirely).
 Contact me for a copy of the toolchain if needed.
+
+Toolchain sources are available at git@github.com:img-meta/metag-buildroot.git.
+Run "make meta2_defconfig" followed by "make"; this should build the toolchain
+in the output/host directory.
+
+metag qemu:
+
+Clone git@github.com:img-meta/qemu.git and build.
+Install qemu-system-meta in your binary directory.
 
 ---
 NIOS II
