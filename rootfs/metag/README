@@ -1,0 +1,10 @@
+extract initramfs:
+
+mkdir rootfs
+cd rootfs
+cpio -i < ../busybox-metag.cpio
+
+create initramfs:
+as root:
+cd rootfs
+find . | cpio --quiet -o -H newc >../busybox-metag.cpio
