@@ -36,6 +36,7 @@ runkernel()
     local pid
     local retcode
     local t
+    local crashed
 
     doclean
 
@@ -85,7 +86,7 @@ runkernel()
 		break
 	fi
 	crashed=0
-	egrep "^BUG:" ${logfile} >/dev/null 2>&1
+	egrep "^BUG:|Kernel panic" ${logfile} >/dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 		crashed=1

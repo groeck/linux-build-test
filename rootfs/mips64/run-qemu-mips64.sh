@@ -35,6 +35,7 @@ runkernel()
     local pid
     local retcode
     local t
+    local crashed
 
     doclean
 
@@ -82,7 +83,15 @@ runkernel()
 	then
 		break
 	fi
-	if [ $t -gt ${maxtime} ]
+	crashed=0
+	egrep "^BUG:|Kernel panic" ${logfile} >/dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		crashed=1
+	fi
+
+	# Abort if crashed
+	if [ ${crashed} -ne 0 -o $t -gt ${maxtime} ]
 	then
 		echo " timeout - aborting"
 		kill ${pid} >/dev/null 2>&1
