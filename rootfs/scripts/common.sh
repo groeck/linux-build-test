@@ -108,6 +108,7 @@ dowait()
     local t=0
     local i
     local msg="passed"
+    local dolog
 
     while true
     do
@@ -170,14 +171,14 @@ dowait()
 
     echo " ${msg}"
 
-    dolog=0
+    dolog=${retcode}
     grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
     if [ $? -eq 0 ]
     then
 	dolog=1
     fi
 
-    if [ ${retcode} -ne 0 -o ${dolog} -ne 0 ]
+    if [ ${dolog} -ne 0 ]
     then
 	echo "------------"
 	echo "qemu log:"
