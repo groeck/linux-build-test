@@ -137,9 +137,15 @@ dowait()
 	egrep "^BUG:|Kernel panic" ${logfile} >/dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
-	    msg="failed (crashed)"
+	    # x86 has the habit of crashing in restart once in a while.
+	    # Try to ignore it.
+	    egrep "^machine restart" ${logfile} >/dev/null 2>&1
+	    if [ $? -ne 0 ]
+	    then
+	        msg="failed (crashed)"
+	        retcode=1
+	    fi
 	    dokill ${pid}
-	    retcode=1
 	    break
 	fi
 
