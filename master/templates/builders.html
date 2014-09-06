@@ -126,6 +126,71 @@
     }
     return num;
   }
+
+  {% set exists = [] -%}
+
+  var qemuBuildText_{{rel_var}} = [
+  {% for arch in qemu_arches -%}
+    {% set bname = "qemu-" ~ arch ~ "-" ~ rel -%}
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
+			     "exception interrupted"] -%}
+	{% continue -%}
+      {% endif -%}
+      {% if not 'total' in b.build_text -%}
+        {% continue -%}
+      {% endif -%}
+      {% set summary = b.build_text|regex_replace('.*total', 'total') -%}
+      {% set summary = summary|regex_replace('<!--.*', '') -%}
+      {% if exists -%}, {% endif -%}
+	"{{ summary }}"
+      {% do exists.append("1") -%}
+    {% endfor -%}
+  {% endfor -%} ];
+
+  {% set exists = [] -%}
+
+  var qemuBuildFailures_{{rel_var}} = [
+  {% for arch in qemu_arches -%}
+    {% set bname = "qemu-" ~ arch ~ "-" ~ rel -%}
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
+			       "exception interrupted"] -%}
+	{% continue -%}
+      {% endif -%}
+      {% if not 'total' in b.build_text -%}
+        {% continue -%}
+      {% endif -%}
+      {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
+      {% if fbuilds != '' and fbuilds != b.build_text -%}
+	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
+	{% set fbuilds = fbuilds|replace('qemu_', '') -%}
+	{% set fbuilds = fbuilds|split(' ') -%}
+	{% for fbuild in fbuilds -%}
+	  {% if exists -%}, {% endif -%}
+		"{{ fbuild }}"
+          {% do exists.append("1") -%}
+	{% endfor -%}
+      {% endif -%}
+    {% endfor -%}
+  {% endfor -%} ];
+
+  function qemuGetResults_{{rel_var}} (match_string)
+  {
+    var num = 0;
+    for (var i=0; i < qemuBuildText_{{rel_var}}.length; i++)
+    {
+        var elem = qemuBuildText_{{rel_var}}[i];
+	var m = match_string.exec(elem);
+	if (m) {
+	    var match = /\d+/;
+	    num += parseInt(match.exec(m));
+	}
+    }
+    return num;
+  }
+
 {% endfor -%}
 </script>
 
@@ -258,6 +323,42 @@
   </tr>
 {% endfor -%}
 
+  <tr>
+  <td class="box"><b>Summary</b></a></td>
+  {% for rel in releases -%}
+	{% set rel_var = rel|regex_replace('[-.]','_') -%}
+	<script type='text/javascript'>
+	    var total = qemuGetResults_{{rel_var}} (/total: \d+/);
+	    var passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
+	    var fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
+	    var box = "success";
+	    var build = "successful";
+	    if (total == 0) {
+		box = "skipped";
+		build = "skipped";
+	    } else if (passed == 0) {
+		box = "failure";
+		build = "failed";
+	    } else if (fail > 0) {
+		box = "warnings";
+		build = "warnings";
+	    }
+	document.write('<td class="LastBuild box ' + box + '">\n');
+	// document.write(build + "<br>");
+        document.write('total: ' + total +
+			' pass: ' + passed +
+			' fail: ' + fail);
+	if (qemuBuildFailures_{{rel_var}}.length > 0) {
+		document.write('<br>Failed tests:<br>\n');
+		for (var f=0; f < qemuBuildFailures_{{rel_var}}.length; f++) {
+			document.write(qemuBuildFailures_{{rel_var}}[f] + '<br>\n');
+		}
+		document.write('\n');
+	}
+        document.write('</td>\n');
+	</script>
+  {% endfor -%}
+  </tr>
 </table>
 
 {% set imports = [ "master-updates", "stable-updates",
