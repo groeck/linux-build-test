@@ -22,7 +22,7 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building mips64:${defconfig} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
     if [ $? -ne 0 ]
