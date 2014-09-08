@@ -19,8 +19,12 @@ master/staging-workdir/
 master/state.sqlite
 master/templates/README.txt
 master/twistd.pid
+metag
+or1k
 qemu
 buildroot
+sparse
+buildbot
 smatch
 bin/qemu-*
 include
