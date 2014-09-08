@@ -82,6 +82,27 @@ Path and prefix to use:
 Building little endian arc 4.8-R3 from tip 7/15/2014 worked as well.
 
 ---
+openrisc:
+
+Kernel can be built with openrisc toolchain from kernel.org, but finding
+a matching toolchain to build a root file system may be difficult.
+
+In general, don't build kernel and root file system from different
+tool chains. The ABI has changed over time, so the result likely won't
+work unless you are really lucky. A hanging (silent) kernel or odd
+tracebacks are an indication of a kernel / user space ABI mismatch.
+
+A toolchain built using http://opencores.org/or1k/OpenRISC_GNU_tool_chain
+is seen to be working if both kernel and root file system are built with
+the same toolchain. Kernels at least up to 3.17-rc4 need a patch to be
+able to build it with the resulting toolchain. See
+rootfs/openrisc/run-qemu-openrisc.sh for details.
+
+Current approach here is to use the kernel toolchain for kernel test builds,
+and to use the new toolchain built from the opencores.org for qemu tests.
+This avoids having to patch the kernel for build tests to succeed.
+
+---
 xtensa:
 
 Same as above; buildroot 2014.08-rc3 is recommended.
