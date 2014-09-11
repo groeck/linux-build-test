@@ -8,6 +8,7 @@ slave/master*
 slave/next*
 master/qemu*
 master/hwmon*
+master/mmotm*
 master/watchdog*
 master/stable*
 master/next*
