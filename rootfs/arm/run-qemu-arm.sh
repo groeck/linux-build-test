@@ -22,7 +22,10 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    # KALLSYMS_EXTRA_PASS is needed for earlier kernels (3.2, 3.4) due to
+    # a bug in kallsyms which would be too difficult to back-port.
+    # See upstream commits f6537f2f0e and 7122c3e915.
+    dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig}
     if [ $? -ne 0 ]
     then
 	return 1
