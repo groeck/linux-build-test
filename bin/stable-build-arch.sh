@@ -7,7 +7,8 @@ LOG=/tmp/log.$$
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
-PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
+# PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
+PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
 PATH_ARM64=/opt/kernel/gcc-4.8.1/aarch64-linux/bin
 PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
