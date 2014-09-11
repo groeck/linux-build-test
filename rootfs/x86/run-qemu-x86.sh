@@ -20,7 +20,7 @@ runkernel()
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
-    local waitlist=("Restarting" "Boot successful" "Rebooting")
+    local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
@@ -39,7 +39,7 @@ runkernel()
 	> ${logfile} 2>&1 &
 
     pid=$!
-    dowait ${pid} ${logfile} automatic waitlist[@]
+    dowait ${pid} ${logfile} manual waitlist[@]
     retcode=$?
     rm -f ${logfile}
     return ${retcode}
