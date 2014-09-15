@@ -5,6 +5,7 @@ slave/stable*
 slave/watchdog*
 slave/twistd.*
 slave/master*
+slave/mmotm*
 slave/next*
 master/qemu*
 master/hwmon*
