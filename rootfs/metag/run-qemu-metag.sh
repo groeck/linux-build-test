@@ -31,12 +31,12 @@ runkernel()
     echo -n "running ..."
 
     /opt/buildbot/bin/qemu-system-meta -display none \
-	-kernel vmlinux -device da \
+	-kernel vmlinux -device da,exit_threads=1 \
 	-chardev stdio,id=chan1 -chardev pty,id=chan2 \
 	-append "rdinit=/sbin/init doreboot" > ${logfile} 2>&1 &
 
     pid=$!
-    dowait ${pid} ${logfile} manual waitlist[@]
+    dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
     rm -f ${logfile}
     return ${retcode}
