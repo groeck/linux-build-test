@@ -21,7 +21,6 @@ PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
-PATH_M68_NOMMU=/usr/local/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
@@ -146,16 +145,9 @@ case ${ARCH} in
 	PATH=${PATH_M68}:${PATH}
 	;;
     m68k_nommu)
-	# kludge to work around nommu build problems in the 3.0 kernel
     	cmd=(${cmd_m68k_nommu[*]})
-	if [ "${rel}" = "v3.0" ]
-	then
-		PREFIX="m68k-uclinux-"
-		PATH=${PATH_M68_NOMMU}:${PATH}
-	else
-		PREFIX="m68k-linux-"
-		PATH=${PATH_M68}:${PATH}
-	fi
+	PREFIX="m68k-linux-"
+	PATH=${PATH_M68}:${PATH}
 	ARCH=m68k
         ;;
     metag)
