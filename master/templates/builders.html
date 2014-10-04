@@ -30,7 +30,7 @@
 </table>
 
 <br>
-<h1> stable queue, hwmon, watchdog, next, mmotm: </h1>
+<h1> stable queue, hwmon, watchdog, next, mmotm, poweroff: </h1>
 
 {% set arches = [ "alpha", "arc", "arm", "arm64", "avr32", "blackfin",
 		  "c6x", "cris", "crisv32",
@@ -42,16 +42,18 @@
 		  "tile", "um", "unicore32", "x86_64", "xtensa" ] -%}
 
 {% set qemu_arches = [ "alpha", "arm", "arm64", "metag", "microblaze",
-			"mips", "mips64", "openrisc", "ppc", "ppc64", "sh",
-			"sparc", "sparc64", "x86", "x86_64", "xtensa" ] -%}
+			"microblazeel", "mips", "mips64", "openrisc",
+			"ppc", "ppc64",
+			"sh", "sheb", "sparc", "sparc64",
+			"x86", "x86_64", "xtensa" ] -%}
 
 {% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14", "3.16",
 			"master", "next", "mmotm",
 			"hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+			"watchdog-next", "poweroff-handler" ] -%}
 
 {% set hwmon_releases = [ "master", "hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+			"watchdog-next", "poweroff-handler" ] -%}
 
 {% set exists = [] -%}
 

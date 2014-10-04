@@ -1,0 +1,11 @@
+extract rootfs cpio:
+
+mkdir rootfs
+cd rootfs
+cpio -itv < ../busybox-microblazeel.cpio
+
+create cpio file:
+as root:
+cd rootfs
+find . | cpio --quiet -o -H newc >../busybox-microblazeel.cpio
+
