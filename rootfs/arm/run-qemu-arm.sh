@@ -43,11 +43,17 @@ runkernel()
 	-nographic > ${logfile} 2>&1 & 
       pid=$!
     else
+      # if we have a dtb file use it
+      dtb=""
+      if [ -e arch/arm/boot/dts/vexpress-v2p-ca9.dtb ]
+      then
+          dtb="-dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb"
+      fi
       /opt/buildbot/bin/qemu-system-arm -M vexpress-a9 \
 	-kernel arch/arm/boot/zImage \
 	-drive file=${rootfs},if=sd -no-reboot \
 	-append "root=/dev/mmcblk0 rw console=ttyAMA0,115200 console=tty1 doreboot" \
-	-nographic > ${logfile} 2>&1 &
+	-nographic ${dtb} > ${logfile} 2>&1 &
       pid=$!
     fi
 
