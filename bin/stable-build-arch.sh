@@ -10,7 +10,8 @@ PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 # PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
 # PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
 PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
-PATH_ARM64=/opt/kernel/gcc-4.8.1/aarch64-linux/bin
+# PATH_ARM64=/opt/kernel/gcc-4.8.1/aarch64-linux/bin
+PATH_ARM64=/opt/kernel/aarch64/gcc-4.9.1/usr/bin
 PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
@@ -26,6 +27,7 @@ PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+PATH_NIOS2=/opt/sourceryg++-2014.05/bin
 PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.6.3-nolibc/hppa64-linux/bin
@@ -171,6 +173,11 @@ case ${ARCH} in
 	cmd=(${cmd_mn10300[*]})
 	PREFIX="am33_2.0-linux-"
 	PATH=${PATH_AM33}:${PATH}
+	;;
+    nios2)
+	cmd=(${cmd_nios2[*]})
+	PREFIX="nios2-linux-gnu-"
+	PATH=${PATH_NIOS2}:${PATH}
 	;;
     openrisc)
 	cmd=(${cmd_openrisc[*]})

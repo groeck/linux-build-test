@@ -53,6 +53,7 @@ cmd_mips=(defconfig allmodconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig fuloong2e_defconfig \
 	e55_defconfig cavium_octeon_defconfig powertv_defconfig malta_defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
+cmd_nios2=(3c120_defconfig)
 cmd_openrisc=(defconfig)
 cmd_parisc=(defconfig generic-32bit_defconfig)
 cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
