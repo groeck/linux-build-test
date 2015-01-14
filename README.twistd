@@ -6,6 +6,8 @@ master/twistd.log shows memory allocation failures, system is out of memory.
 
 File: .../twisted/internet/base.py
 
+[such as /usr/lib/python2.7/dist-packages/twisted/internet/base.py]
+
 class BaseConnector(styles.Ephemeral):
     .
     .
