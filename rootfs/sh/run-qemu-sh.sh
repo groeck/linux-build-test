@@ -33,7 +33,7 @@ runkernel()
 	-drive file=${rootfs},if=ide \
 	-append "root=/dev/sda console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
-	-nographic > ${logfile} 2>&1 &
+	-nographic -monitor null > ${logfile} 2>&1 &
 
     pid=$!
     dowait ${pid} ${logfile} automatic waitlist[@]
