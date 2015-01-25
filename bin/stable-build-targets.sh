@@ -7,7 +7,7 @@ buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
 cmd_arm_old=(defconfig exynos4_defconfig exynos_defconfig \
-	imx_v4_v5_defconfig imx_v6_v7_defconfig multi_v7_defconfig \
+	imx_v4_v5_defconfig imx_v6_v7_defconfig multi_v5_defconfig multi_v7_defconfig \
 	mxs_defconfig dove_defconfig ape6evm_defconfig marzen_defconfig \
 	kirkwood_defconfig omap2plus_defconfig tegra_defconfig u8500_defconfig \
 	at91sam9rl_defconfig ap4evb_defconfig bcm_defconfig bonito_defconfig \
