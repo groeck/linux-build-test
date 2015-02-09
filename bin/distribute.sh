@@ -18,7 +18,8 @@ do
 		echo "not responding"
 		continue
 	fi
-	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share ${base}/kconfig ${system}:${base}
+	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share \
+		${base}/lib ${base}/include ${base}/kconfig ${system}:${base}
 	if [ $? -ne 0 ]
 	then
 		echo "failed"

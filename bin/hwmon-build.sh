@@ -189,7 +189,8 @@ doit()
 			grep -v built-in.o | egrep -v 'mod.o$' |
 			grep -v watchdog.o 2>/dev/null)
     rm -f ${files}
-    make ${CROSS} -j${maxload} -i W=1 C=1 ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
+    make ${CROSS} -j${maxload} -i W=1 C=1 CHECK=/opt/buildbot/bin/sparse \
+		ARCH=${ARCH} ${files} >/dev/null 2> >(tee ${ERR}.tmp >&2)
     egrep '^drivers/(hwmon|watchdog)' ${ERR}.tmp > ${WARN}.sparse 2>&1
     rm -f ${ERR}.tmp
 
