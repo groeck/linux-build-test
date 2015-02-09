@@ -80,7 +80,7 @@ Path and prefix to use:
 	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
 	CROSS_COMPILE=arc-buildroot-linux-uclibc-
 
-Building little endian arc 4.8-R3 from tip 7/15/2014 worked as well.
+Building little endian arc 4.8.3 from 2014.11 works as well.
 
 ---
 openrisc:
