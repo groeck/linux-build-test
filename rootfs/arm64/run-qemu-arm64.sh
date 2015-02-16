@@ -21,7 +21,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} generic
     if [ $? -ne 0 ]
     then
 	return 1
@@ -31,7 +31,7 @@ runkernel()
 
     /opt/buildbot/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
 	-machine type=virt -nographic -smp 1 -m 2048 \
-	-kernel arch/arm64/boot/Image -initrd ${dir}/${rootfs} -no-reboot \
+	-kernel arch/arm64/boot/Image -initrd ${rootfs} -no-reboot \
 	-append "console=ttyAMA0 doreboot" > ${logfile} 2>&1 &
 
     pid=$!

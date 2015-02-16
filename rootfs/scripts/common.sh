@@ -45,10 +45,12 @@ dosetup()
     local EXTRAS=$3
     local rootfs=$4
     local defconfig=$5
+    local dynamic=$6
     local progdir=$(cd $(dirname $0); pwd)
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
     local xARCH
+    local tmprootfs=/tmp/rootfs.$$
 
     case ${ARCH} in
     mips32|mips64)
@@ -79,7 +81,12 @@ dosetup()
 	return 1
     fi
 
-    cp ${progdir}/${rootfs} .
+    if [ "${dynamic}" != "" ]
+    then
+	fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
+    else
+	cp ${progdir}/${rootfs} .
+    fi
 
     make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >${logfile} 2>&1
     retcode=$?
