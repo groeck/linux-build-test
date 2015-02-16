@@ -32,7 +32,7 @@ runkernel()
     /opt/buildbot/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
 	-machine type=virt -nographic -smp 1 -m 2048 \
 	-kernel arch/arm64/boot/Image -initrd ${rootfs} -no-reboot \
-	-append "console=ttyAMA0 doreboot" > ${logfile} 2>&1 &
+	-append "console=ttyAMA0" > ${logfile} 2>&1 &
 
     pid=$!
     dowait ${pid} ${logfile} manual waitlist[@]
