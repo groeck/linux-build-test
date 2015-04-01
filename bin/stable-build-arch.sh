@@ -67,6 +67,11 @@ declare -a fixup
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
+	fmax=$(expr ${#fixup_alpha[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_alpha[$f]}
+	done
 	PREFIX="alpha-linux-"
 	PATH=${PATH_ALPHA}:${PATH}
 	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
@@ -165,6 +170,11 @@ case ${ARCH} in
 	;;
     mips)
 	cmd=(${cmd_mips[*]});
+	fmax=$(expr ${#fixup_mips[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_mips[$f]}
+	done
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS}:${PATH}
 	;;
