@@ -60,9 +60,9 @@ cmd_unicore32=(defconfig)
 
 # fixups
 #
-fixup_alpha=("s/CONFIG_SAMPLES=y/# CONFIG_SAMPLES is not set/")
+fixup_alpha=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
 
-fixup_mips=("s/CONFIG_SAMPLES=y/# CONFIG_SAMPLES is not set/")
+fixup_mips=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
 
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
