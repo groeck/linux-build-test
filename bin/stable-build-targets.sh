@@ -47,7 +47,7 @@ cmd_powerpc=(defconfig allmodconfig ppc64e_defconfig cell_defconfig \
 	mpc85xx_defconfig mpc85xx_smp_defconfig tqm8xx_defconfig \
 	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig \
 	86xx/sbc8641d_defconfig)
-cmd_s390=(defconfig)
+cmd_s390=(defconfig allmodconfig)
 cmd_score=(defconfig)
 cmd_sh=(defconfig dreamcast_defconfig microdev_defconfig)
 cmd_sparc32=(defconfig)
