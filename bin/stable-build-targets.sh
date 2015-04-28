@@ -20,7 +20,7 @@ cmd_arm=(allmodconfig s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig 
 	exynos4_defconfig ap4evb_defconfig bonito_defconfig mvebu_defconfig)
 cmd_arm64=(defconfig allmodconfig)
 cmd_avr32=(defconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
-cmd_blackfin=(defconfig)
+cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig etrax-100lx_defconfig allnoconfig)
 cmd_crisv32=(artpec_3_defconfig etraxfs_defconfig)
