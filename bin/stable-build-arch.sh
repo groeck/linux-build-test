@@ -19,6 +19,7 @@ PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
+PATH_H8300=/opt/kernel/h8300/gcc-5.1.0/usr/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
@@ -126,6 +127,11 @@ case ${ARCH} in
 	cmd=(${cmd_frv[*]})
 	PREFIX="frv-linux-"
 	PATH=${PATH_FRV}:${PATH}
+	;;
+    h8300)
+	cmd=(${cmd_h8300[*]})
+	PREFIX="h8300-elf-linux-newlib-"
+	PATH=${PATH_H8300}:${PATH}
 	;;
     hexagon)
 	cmd=(${cmd_hexagon[*]})
