@@ -91,6 +91,7 @@ case ${ARCH} in
 	cmd=(${cmd_arm[*]})
 	PREFIX="arm-poky-linux-gnueabi-"
 	PATH=${PATH_ARM}:${PATH}
+	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     arm64)
 	cmd=(${cmd_arm64[*]})
