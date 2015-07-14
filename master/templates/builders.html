@@ -32,7 +32,8 @@
 <br>
 <h1> stable queue, hwmon, watchdog, next, mmotm, testing: </h1>
 
-{% set arches = [ "alpha", "arc", "arm", "arm64", "avr32", "blackfin",
+{% set arches = [ "alpha", "arc", "arcv2", "arm", "arm64", "avr32",
+		  "blackfin",
 		  "c6x", "cris", "crisv32", "frv",
 		  "h8300", "hexagon", "i386", "ia64", "m32r", "m68k",
 		  "m68k_nommu", "metag", "microblaze", "mips", "mn10300",
@@ -340,10 +341,11 @@
 	<script type='text/javascript'>
 	    var total = qemuGetResults_{{rel_var}} (/total: \d+/);
 	    var passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
+	    var skipped = qemuGetResults_{{rel_var}} (/skipped: \d+/);
 	    var fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
 	    var box = "success";
 	    var build = "successful";
-	    if (total == 0) {
+	    if (total == 0 || total == skipped) {
 		box = "skipped";
 		build = "skipped";
 	    } else if (passed == 0) {
@@ -355,6 +357,7 @@
 	    }
 	document.write('<td class="LastBuild box ' + box + '">\n');
 	// document.write(build + "<br>");
+	total = total - skipped;
         document.write('total: ' + total +
 			' pass: ' + passed +
 			' fail: ' + fail);

@@ -12,7 +12,9 @@ PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
 # PATH_ARM64=/opt/kernel/gcc-4.8.1/aarch64-linux/bin
 PATH_ARM64=/opt/kernel/aarch64/gcc-4.9.1/usr/bin
-PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
+# PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
+PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.3/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
@@ -44,6 +46,7 @@ PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PATH_XTENSA=/opt/kernel/xtensa/gcc-4.7.3/usr/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
 maxload=$(($(nproc) + 4))
@@ -61,6 +64,9 @@ ARCH=$1
 # clean up source directory expected to be done by caller
 # Do it again to be able to call script directly.
 git clean -x -f -d -q
+
+tmp=skip_${relx}
+skip=(${!tmp})
 
 SUBARCH=""
 EXTRA_CMD=""
@@ -86,6 +92,17 @@ case ${ARCH} in
 	done
 	PREFIX="arc-buildroot-linux-uclibc-"
 	PATH=${PATH_ARC}:${PATH}
+	;;
+    arcv2)
+	ARCH=arc
+	cmd=(${cmd_arcv2[*]})
+	fmax=$(expr ${#fixup_arcv2[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_arcv2[$f]}
+	done
+	PREFIX="arc-elf-linux-uclibc-"
+	PATH=${PATH_ARCV2}:${PATH}
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
@@ -306,7 +323,18 @@ fi
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
 do
-    	echo -n "Building ${ARCH}:${cmd[$i]} ... "
+	build="${ARCH}:${cmd[$i]}"
+
+	echo -n "Building ${build} ... "
+	for s in ${skip[*]}
+	do
+	    if [ "$s" = "${build}" ]
+	    then
+		echo "failed (script) - skipping"
+		continue 2
+	    fi
+	done
+
 	rm -f .config
 	make ${CROSS} ARCH=${ARCH} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
 	if [ $? -ne 0 ]

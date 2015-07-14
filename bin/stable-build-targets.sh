@@ -6,6 +6,7 @@ buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
 
 cmd_alpha=(defconfig allmodconfig)
 cmd_arc=(defconfig tb10x_defconfig)
+cmd_arcv2=(axs103_defconfig nsim_hs_smp_defconfig vdk_hs38_smp_defconfig)
 cmd_arm=(allmodconfig s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig multi_v7_defconfig omap1_defconfig \
 	footbridge_defconfig davinci_all_defconfig mini2440_defconfig \
@@ -57,6 +58,12 @@ cmd_xtensa=(defconfig allmodconfig)
 cmd_um=(defconfig)
 cmd_unicore32=(defconfig)
 
+# build to skip
+
+skip_32="arm:allmodconfig mips:allmodconfig xtensa:defconfig xtensa:allmodconfig"
+skip_34="arm:allmodconfig score:defconfig xtensa:allmodconfig sparc64:allmodconfig"
+skip_310="s390:allmodconfig"
+
 # fixups
 #
 fixup_alpha=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
@@ -67,6 +74,9 @@ fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
+	"/CONFIG_INITRAMFS_SOURCE/d")
+
+fixup_arcv2=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
