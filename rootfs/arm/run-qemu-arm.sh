@@ -10,6 +10,8 @@ PATH=${PATH_ARM}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
+skip_34="arm:qemu_arm_versatile_defconfig"
+
 . ${dir}/../scripts/common.sh
 
 runkernel()
@@ -26,7 +28,12 @@ runkernel()
     # a bug in kallsyms which would be too difficult to back-port.
     # See upstream commits f6537f2f0e and 7122c3e915.
     dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig}
-    if [ $? -ne 0 ]
+    retcode=$?
+    if [ ${retcode} -eq 2 ]
+    then
+        return 0
+    fi
+    if [ ${retcode} -ne 0 ]
     then
 	return 1
     fi

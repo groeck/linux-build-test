@@ -51,6 +51,20 @@ dosetup()
     local logfile=/tmp/qemu.setup.$$.log
     local xARCH
     local tmprootfs=/tmp/rootfs.$$
+    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+    local tmp="skip_${rel}"
+    local skip=(${!tmp})
+    local s
+    local build=${ARCH}:${defconfig}
+
+    for s in ${skip[*]}
+    do
+        if [ "$s" = "${build}" ]
+	then
+	    echo "skipped"
+	    return 2
+	fi
+    done
 
     case ${ARCH} in
     mips32|mips64)
