@@ -61,6 +61,7 @@ do_import()
 		git checkout -b ${qbranch} ${ref}
 	else
 		git checkout ${qbranch}
+		git reset --hard ${ref}
 	fi
 
 	# queue branch exists locally.
@@ -88,6 +89,9 @@ do_import()
 	then
 		echo "${release}: git quiltimport failed - skipping"
 		git clean -f -d -q
+		# Most likely the series has been applied but was not removed.
+		# Push branch updates to synchronize state.
+		git push --force origin ${branch} ${qbranch}
 		return 0
 	fi
 
