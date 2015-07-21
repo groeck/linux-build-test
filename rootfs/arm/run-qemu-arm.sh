@@ -51,6 +51,8 @@ runkernel()
       pid=$!
     else
       # if we have a dtb file use it
+      # Note: vexpress-v2p-ca15_a7.dtb with "-M vexpress-a15" also works
+      # with the same kernel and root file system.
       dtb=""
       if [ -e arch/arm/boot/dts/vexpress-v2p-ca9.dtb ]
       then
