@@ -40,7 +40,7 @@ cmd_mips=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defconfig
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nios2=(3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig)
-cmd_parisc=(defconfig allnoconfig generic-32bit_defconfig)
+cmd_parisc=(defconfig allnoconfig allmodconfig generic-32bit_defconfig)
 cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
 cmd_powerpc=(defconfig allmodconfig allnoconfig ppc64e_defconfig cell_defconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
@@ -50,7 +50,7 @@ cmd_powerpc=(defconfig allmodconfig allnoconfig ppc64e_defconfig cell_defconfig 
 cmd_s390=(defconfig allmodconfig allnoconfig)
 cmd_score=(defconfig)
 cmd_sh=(defconfig dreamcast_defconfig microdev_defconfig)
-cmd_sparc32=(defconfig allnoconfig)
+cmd_sparc32=(defconfig allnoconfig allmodconfig)
 cmd_sparc64=(defconfig allmodconfig allnoconfig)
 cmd_tile=(tilegx_defconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig)
@@ -66,11 +66,11 @@ skip_32="alpha:allnoconfig arm:allnoconfig avr32:allnoconfig m68k:allnoconfig \
 skip_34="arm:allmodconfig openrisc:allnoconfig score:defconfig sparc64:allmodconfig \
 	xtensa:allmodconfig"
 skip_310="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig microblaze:allnoconfig \
-	openrisc:allnoconfig s390:allmodconfig"
-skip_312="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig openrisc:allnoconfig"
-skip_314="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig openrisc:allnoconfig"
-skip_40="m68k:allnoconfig"
-skip_41="m68k:allnoconfig openrisc:allnoconfig"
+	openrisc:allnoconfig parisc:allmodconfig s390:allmodconfig"
+skip_312="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig \
+	openrisc:allnoconfig parisc:allmodconfig"
+skip_314="alpha:allnoconfig avr32:allnoconfig ia64:allmodconfig m68k:allnoconfig
+	openrisc:allnoconfig parisc:allmodconfig"
 
 # fixups
 #
