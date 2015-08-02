@@ -10,39 +10,65 @@ PATH=${PATH_ARM}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
-skip_34="arm:qemu_arm_versatile_defconfig"
+skip_32="arm:qemu_arm_vexpress_defconfig:vexpress-a15 \
+	arm:multi_v7_defconfig:vexpress-a9 \
+	arm:multi_v7_defconfig:vexpress-a15"
+skip_34="arm:qemu_arm_versatile_defconfig:versatilepb \
+	arm:qemu_arm_vexpress_defconfig:vexpress-a15 \
+	arm:multi_v7_defconfig:vexpress-a9 \
+	arm:multi_v7_defconfig:vexpress-a15"
+skip_310="arm:multi_v7_defconfig:vexpress-a9 \
+	arm:multi_v7_defconfig:vexpress-a15"
 
 . ${dir}/../scripts/common.sh
+
+cached_config=""
 
 runkernel()
 {
     local defconfig=$1
+    local mach=$2
+    local dtb="arch/arm/boot/dts/$3"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting" "Restarting")
+    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+    local tmp="skip_${rel}"
+    local skip=(${!tmp})
+    local s
+    local build=${ARCH}:${defconfig}:${mach}
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${build} ... "
 
-    # KALLSYMS_EXTRA_PASS is needed for earlier kernels (3.2, 3.4) due to
-    # a bug in kallsyms which would be too difficult to back-port.
-    # See upstream commits f6537f2f0e and 7122c3e915.
-    dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig}
-    retcode=$?
-    if [ ${retcode} -eq 2 ]
+    for s in ${skip[*]}
+    do
+	if [ "$s" = "${build}" ]
+	then
+	    echo "skipped"
+	    return 0
+	fi
+    done
+
+    if [ "${cached_config}" != "${defconfig}" ]
     then
-        return 0
+	# KALLSYMS_EXTRA_PASS is needed for earlier kernels (3.2, 3.4) due to
+	# a bug in kallsyms which would be too difficult to back-port.
+	# See upstream commits f6537f2f0e and 7122c3e915.
+	dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig}
+	retcode=$?
+	if [ ${retcode} -ne 0 ]
+	then
+	    return 1
+	fi
     fi
-    if [ ${retcode} -ne 0 ]
-    then
-	return 1
-    fi
+    cached_config=${defconfig}
 
     echo -n "running ..."
 
     if [ "${defconfig}" = "qemu_arm_versatile_defconfig" ]
     then
-      /opt/buildbot/bin/qemu-system-arm  -M versatilepb \
+      /opt/buildbot/bin/qemu-system-arm  -M ${mach} \
 	-kernel arch/arm/boot/zImage \
 	-drive file=${rootfs},if=scsi -no-reboot \
 	-m 128 \
@@ -51,18 +77,16 @@ runkernel()
       pid=$!
     else
       # if we have a dtb file use it
-      # Note: vexpress-v2p-ca15_a7.dtb with "-M vexpress-a15" also works
-      # with the same kernel and root file system.
-      dtb=""
-      if [ -e arch/arm/boot/dts/vexpress-v2p-ca9.dtb ]
+      dtbcmd=""
+      if [ -e ${dtb} ]
       then
-          dtb="-dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb"
+          dtbcmd="-dtb ${dtb}"
       fi
-      /opt/buildbot/bin/qemu-system-arm -M vexpress-a9 \
+      /opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	-kernel arch/arm/boot/zImage \
 	-drive file=${rootfs},if=sd -no-reboot \
 	-append "root=/dev/mmcblk0 rw console=ttyAMA0,115200 console=tty1 doreboot" \
-	-nographic ${dtb} > ${logfile} 2>&1 &
+	-nographic ${dtbcmd} > ${logfile} 2>&1 &
       pid=$!
     fi
 
@@ -76,9 +100,15 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm_versatile_defconfig
+runkernel qemu_arm_versatile_defconfig versatilepb
 retcode=$?
-runkernel qemu_arm_vexpress_defconfig
+runkernel qemu_arm_vexpress_defconfig vexpress-a9 vexpress-v2p-ca9.dtb
+retcode=$((${retcode} + $?))
+runkernel qemu_arm_vexpress_defconfig vexpress-a15 vexpress-v2p-ca15-tc1.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig vexpress-a9 vexpress-v2p-ca9.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig vexpress-a15 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
 exit ${retcode}

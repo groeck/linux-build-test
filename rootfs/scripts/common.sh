@@ -86,7 +86,10 @@ dosetup()
     doclean ${ARCH}
 
     mkdir -p arch/${xARCH}/configs
-    cp ${progdir}/${defconfig} arch/${xARCH}/configs
+    if [ -e ${progdir}/${defconfig} ]
+    then
+        cp ${progdir}/${defconfig} arch/${xARCH}/configs
+    fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
     if [ $? -ne 0 ]
