@@ -11,25 +11,32 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+cached_defconfig=""
+
 runkernel()
 {
     local defconfig=$1
+    local mach=$2
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${mach}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
-    if [ $? -ne 0 ]
+    if [ "${defconfig}" != "${cached_defconfig}" ]
     then
-	return 1
+        dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+        if [ $? -ne 0 ]
+        then
+	    return 1
+        fi
+	cached_defconfig=${defconfig}
     fi
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-sparc -cpu "Fujitsu MB86907" \
+    /opt/buildbot/bin/qemu-system-sparc -M ${mach} \
 	-kernel arch/sparc/boot/image -hda hda.sqf -no-reboot \
 	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
@@ -44,9 +51,17 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_sparc_defconfig
+runkernel qemu_sparc_defconfig SS-5
 retcode=$?
-runkernel qemu_sparc_smp_defconfig
+runkernel qemu_sparc_defconfig SS-20
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_defconfig SS-600MP
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_smp_defconfig SS-5
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_smp_defconfig SS-20
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_smp_defconfig SS-600MP
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
