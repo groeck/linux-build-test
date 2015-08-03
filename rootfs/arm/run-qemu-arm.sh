@@ -10,15 +10,15 @@ PATH=${PATH_ARM}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
 
-skip_32="arm:qemu_arm_vexpress_defconfig:vexpress-a15 \
-	arm:multi_v7_defconfig:vexpress-a9 \
-	arm:multi_v7_defconfig:vexpress-a15"
-skip_34="arm:qemu_arm_versatile_defconfig:versatilepb \
-	arm:qemu_arm_vexpress_defconfig:vexpress-a15 \
-	arm:multi_v7_defconfig:vexpress-a9 \
-	arm:multi_v7_defconfig:vexpress-a15"
-skip_310="arm:multi_v7_defconfig:vexpress-a9 \
-	arm:multi_v7_defconfig:vexpress-a15"
+skip_32="arm:vexpress-a15:qemu_arm_vexpress_defconfig \
+	arm:vexpress-a9:multi_v7_defconfig \
+	arm:vexpress-a15:multi_v7_defconfig"
+skip_34="arm:versatilepb:qemu_arm_versatile_defconfig \
+	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
+	arm:vexpress-a9:multi_v7_defconfig \
+	arm:vexpress-a15:multi_v7_defconfig"
+skip_310="arm:vexpress-a9:multi_v7_defconfig \
+	arm:vexpress-a15:multi_v7_defconfig"
 
 . ${dir}/../scripts/common.sh
 
@@ -28,7 +28,9 @@ runkernel()
 {
     local defconfig=$1
     local mach=$2
-    local dtb="arch/arm/boot/dts/$3"
+    local rootfs=$3
+    local dtb=$4
+    local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
@@ -37,7 +39,7 @@ runkernel()
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s
-    local build=${ARCH}:${defconfig}:${mach}
+    local build=${ARCH}:${mach}:${defconfig}
 
     echo -n "Building ${build} ... "
 
@@ -66,22 +68,31 @@ runkernel()
 
     echo -n "running ..."
 
-    if [ "${defconfig}" = "qemu_arm_versatile_defconfig" ]
+    # if we have a dtb file use it
+    dtbcmd=""
+    if [ -n "${dtb}" -a -f "${dtbfile}" ]
+    then
+	dtbcmd="-dtb ${dtbfile}"
+    fi
+
+    if [ "${rootfs}" = "busybox-arm.cpio" ]
+    then
+      /opt/buildbot/bin/qemu-system-arm -M ${mach} -m 512 \
+	-kernel arch/arm/boot/zImage -no-reboot \
+	--append "rdinit=/sbin/init console=ttyAMA0,115200 doreboot" \
+	-serial stdio -monitor null -nographic ${dtbcmd} \
+	-initrd ${rootfs} > ${logfile} 2>&1 &
+      pid=$!
+    elif [ "${defconfig}" = "qemu_arm_versatile_defconfig" ]
     then
       /opt/buildbot/bin/qemu-system-arm  -M ${mach} \
 	-kernel arch/arm/boot/zImage \
 	-drive file=${rootfs},if=scsi -no-reboot \
-	-m 128 \
+	-m 128 ${dtbcmd} \
 	--append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 & 
       pid=$!
     else
-      # if we have a dtb file use it
-      dtbcmd=""
-      if [ -e ${dtb} ]
-      then
-          dtbcmd="-dtb ${dtb}"
-      fi
       /opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	-kernel arch/arm/boot/zImage \
 	-drive file=${rootfs},if=sd -no-reboot \
@@ -90,7 +101,6 @@ runkernel()
       pid=$!
     fi
 
-    pid=$!
     dowait ${pid} ${logfile} auto waitlist[@]
     retcode=$?
     rm -f ${logfile}
@@ -100,15 +110,17 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm_versatile_defconfig versatilepb
+runkernel qemu_arm_versatile_defconfig versatilepb core-image-minimal-qemuarm.ext3
 retcode=$?
-runkernel qemu_arm_vexpress_defconfig vexpress-a9 vexpress-v2p-ca9.dtb
+runkernel qemu_arm_vexpress_defconfig vexpress-a9 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_vexpress_defconfig vexpress-a15 vexpress-v2p-ca15-tc1.dtb
+runkernel qemu_arm_vexpress_defconfig vexpress-a15 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig vexpress-a9 vexpress-v2p-ca9.dtb
+runkernel multi_v7_defconfig vexpress-a9 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig vexpress-a15 vexpress-v2p-ca15-tc1.dtb
+runkernel multi_v7_defconfig vexpress-a15 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca15-tc1.dtb
+retcode=$((${retcode} + $?))
+runkernel qemu_arm_realview_defconfig realview-pb-a8 busybox-arm.cpio
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
