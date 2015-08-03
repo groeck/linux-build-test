@@ -28,8 +28,10 @@ runkernel()
 {
     local defconfig=$1
     local mach=$2
-    local rootfs=$3
-    local dtb=$4
+    local cpu=$3
+    local rootfs=$4
+    local mode=$5
+    local dtb=$6
     local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
@@ -75,9 +77,16 @@ runkernel()
 	dtbcmd="-dtb ${dtbfile}"
     fi
 
-    if [ "${rootfs}" = "busybox-arm.cpio" ]
+    # Specify CPU if necssary
+    cpucmd=""
+    if [ -n "${cpu}" ]
     then
-      /opt/buildbot/bin/qemu-system-arm -M ${mach} -m 512 \
+	cpucmd="-cpu ${cpu}"
+    fi
+
+    if [ "${rootfs}" = "busybox-arm.cpio" -o "${rootfs}" = "core-image-minimal-qemuarm.cpio" ]
+    then
+      /opt/buildbot/bin/qemu-system-arm -M ${mach} ${cpucmd} -m 512 \
 	-kernel arch/arm/boot/zImage -no-reboot \
 	--append "rdinit=/sbin/init console=ttyAMA0,115200 doreboot" \
 	-serial stdio -monitor null -nographic ${dtbcmd} \
@@ -101,7 +110,7 @@ runkernel()
       pid=$!
     fi
 
-    dowait ${pid} ${logfile} auto waitlist[@]
+    dowait ${pid} ${logfile} ${mode} waitlist[@]
     retcode=$?
     rm -f ${logfile}
     return ${retcode}
@@ -110,17 +119,29 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm_versatile_defconfig versatilepb core-image-minimal-qemuarm.ext3
+runkernel qemu_arm_versatile_defconfig versatilepb "" \
+	core-image-minimal-qemuarm.ext3 auto
 retcode=$?
-runkernel qemu_arm_vexpress_defconfig vexpress-a9 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca9.dtb
+runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" \
+	core-image-minimal-qemuarm.ext3 auto vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_vexpress_defconfig vexpress-a15 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca15-tc1.dtb
+runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" \
+	core-image-minimal-qemuarm.ext3 auto vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig vexpress-a9 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca9.dtb
+runkernel multi_v7_defconfig vexpress-a9 "" \
+	core-image-minimal-qemuarm.ext3 auto vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig vexpress-a15 core-image-minimal-qemuarm.ext3 vexpress-v2p-ca15-tc1.dtb
+runkernel multi_v7_defconfig vexpress-a15 "" \
+	core-image-minimal-qemuarm.ext3 auto vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_realview_defconfig realview-pb-a8 busybox-arm.cpio
+runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" \
+	busybox-arm.cpio auto
+retcode=$((${retcode} + $?))
+runkernel qemu_arm_realview_eb_defconfig realview-eb-mpcore "" \
+	core-image-minimal-qemuarm.cpio manual
+retcode=$((${retcode} + $?))
+runkernel qemu_arm_realview_eb_defconfig realview-eb cortex-a8 \
+	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
