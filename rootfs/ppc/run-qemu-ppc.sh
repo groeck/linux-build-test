@@ -91,5 +91,7 @@ runkernel mpc85xx_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+runkernel qemu_bamboo_defconfig bamboo busybox-ppc.cpio vmlinux
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
