@@ -11,25 +11,33 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+cached_defconfig=""
+
 runkernel()
 {
     local defconfig=$1
+    local machine=$2
+    local cpu="$3"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${machine}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
-    if [ $? -ne 0 ]
+    if [ "${defconfig}" != "${cached_defconfig}" ]
     then
-	return 1
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+	if [ $? -ne 0 ]
+	then
+	    return 1
+	fi
+	cached_defconfig=${defconfig}
     fi
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-sparc64 \
+    /opt/buildbot/bin/qemu-system-sparc64 -M ${machine} -cpu "${cpu}" \
 	-m 512 \
 	-drive file=${rootfs},if=virtio \
 	-net nic,model=virtio \
@@ -47,9 +55,13 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_sparc_smp_defconfig
+runkernel qemu_sparc_smp_defconfig sun4u "TI UltraSparc IIi"
 retcode=$?
-runkernel qemu_sparc_nosmp_defconfig
+runkernel qemu_sparc_smp_defconfig sun4v "Fujitsu Sparc64 IV"
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_nosmp_defconfig sun4u "TI UltraSparc IIi"
+retcode=$((${retcode} + $?))
+runkernel qemu_sparc_nosmp_defconfig sun4v "Fujitsu Sparc64 IV"
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
