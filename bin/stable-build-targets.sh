@@ -25,7 +25,7 @@ cmd_cris=(defconfig allnoconfig etrax-100lx_defconfig)
 cmd_crisv32=(artpec_3_defconfig etraxfs_defconfig)
 cmd_frv=(defconfig)
 cmd_h8300=(allnoconfig edosk2674_defconfig h8300h-sim_defconfig h8s-sim_defconfig)
-cmd_hexagon=(defconfig)
+cmd_hexagon=(defconfig allnoconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_ia64=(defconfig allnoconfig)
 cmd_m32r=(defconfig)
@@ -50,13 +50,13 @@ cmd_powerpc=(defconfig allmodconfig allnoconfig ppc64e_defconfig cell_defconfig 
 cmd_s390=(defconfig allmodconfig allnoconfig)
 cmd_score=(defconfig)
 cmd_sh=(defconfig dreamcast_defconfig microdev_defconfig)
-cmd_sparc32=(defconfig allnoconfig allmodconfig)
+cmd_sparc32=(defconfig allmodconfig allnoconfig)
 cmd_sparc64=(defconfig allmodconfig allnoconfig)
 cmd_tile=(tilegx_defconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig)
 cmd_xtensa=(defconfig allmodconfig allnoconfig)
 cmd_um=(defconfig)
-cmd_unicore32=(defconfig)
+cmd_unicore32=(defconfig allnoconfig)
 
 # build to skip
 
@@ -73,6 +73,7 @@ skip_312="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig \
 	openrisc:allnoconfig parisc:allmodconfig sparc32:allmodconfig"
 skip_314="alpha:allnoconfig avr32:allnoconfig ia64:allmodconfig m68k:allnoconfig
 	openrisc:allnoconfig parisc:allmodconfig"
+skip_318="m68k:allnoconfig"
 
 # fixups
 #
