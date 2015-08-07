@@ -46,6 +46,7 @@ dosetup()
     local rootfs=$4
     local defconfig=$5
     local dynamic=$6
+    local fixup=$7
     local progdir=$(cd $(dirname $0); pwd)
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
@@ -89,6 +90,15 @@ dosetup()
     if [ -e ${progdir}/${defconfig} ]
     then
         cp ${progdir}/${defconfig} arch/${xARCH}/configs
+    fi
+
+    if [ -n "${fixup}" ]
+    then
+        local f="arch/${xARCH}/configs/${defconfig}"
+        local tf="arch/${xARCH}/configs/tmp_${defconfig}"
+	cp $f ${tf}
+	patch_defconfig ${tf}
+	defconfig="tmp_${defconfig}"
     fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
