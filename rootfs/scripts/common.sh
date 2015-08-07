@@ -97,7 +97,7 @@ dosetup()
         local f="arch/${xARCH}/configs/${defconfig}"
         local tf="arch/${xARCH}/configs/tmp_${defconfig}"
 	cp $f ${tf}
-	patch_defconfig ${tf}
+	patch_defconfig ${tf} ${fixup}
 	defconfig="tmp_${defconfig}"
     fi
 
