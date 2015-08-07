@@ -74,13 +74,29 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel sparc32_defconfig SS-5 nosmp
+runkernel sparc32_defconfig SPARCClassic nosmp
 retcode=$?
+runkernel sparc32_defconfig SPARCbook nosmp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SS-4 nosmp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SS-5 nosmp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SS-10 nosmp
+retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-20 nosmp
 retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-600MP nosmp
 retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SPARCClassic smp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SPARCbook smp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SS-4 smp
+retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-5 smp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig SS-10 smp
 retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-20 smp
 retcode=$((${retcode} + $?))
