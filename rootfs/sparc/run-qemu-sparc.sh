@@ -13,25 +13,48 @@ dir=$(cd $(dirname $0); pwd)
 
 cached_defconfig=""
 
+patch_defconfig()
+{
+    local defconfig=$1
+    local smp=$2
+
+    # Enable SQUASHFS and DEVTMPFS, and set SMP as needed.
+
+    sed -i -e '/CONFIG_SQUASHFS/d' ${defconfig}
+    sed -i -e '/CONFIG_SMP/d' ${defconfig}
+    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+
+    echo "CONFIG_SQUASHFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+
+    if [ "${smp}" = "nosmp" ]
+    then
+	echo "# CONFIG_SMP is not set" >> ${defconfig}
+    else
+	echo "CONFIG_SMP=y" >> ${defconfig}
+    fi
+}
+
 runkernel()
 {
     local defconfig=$1
     local mach=$2
+    local smp=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${mach}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${mach}:${smp}:${defconfig} ... "
 
-    if [ "${defconfig}" != "${cached_defconfig}" ]
+    if [ "${defconfig}_${smp}" != "${cached_defconfig}" ]
     then
-        dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+        dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${smp}
         if [ $? -ne 0 ]
         then
 	    return 1
         fi
-	cached_defconfig=${defconfig}
+	cached_defconfig="${defconfig}_${smp}"
     fi
 
     echo -n "running ..."
@@ -51,17 +74,17 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_sparc_defconfig SS-5
+runkernel sparc32_defconfig SS-5 nosmp
 retcode=$?
-runkernel qemu_sparc_defconfig SS-20
+runkernel sparc32_defconfig SS-20 nosmp
 retcode=$((${retcode} + $?))
-runkernel qemu_sparc_defconfig SS-600MP
+runkernel sparc32_defconfig SS-600MP nosmp
 retcode=$((${retcode} + $?))
-runkernel qemu_sparc_smp_defconfig SS-5
+runkernel sparc32_defconfig SS-5 smp
 retcode=$((${retcode} + $?))
-runkernel qemu_sparc_smp_defconfig SS-20
+runkernel sparc32_defconfig SS-20 smp
 retcode=$((${retcode} + $?))
-runkernel qemu_sparc_smp_defconfig SS-600MP
+runkernel sparc32_defconfig SS-600MP smp
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
