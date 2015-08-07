@@ -1,0 +1,2 @@
+rootfs.mipsel.ext3 is needed for Fulong2e, which requires MIPS I binaries.
+Configuration for Fulong2e is fuloong2e_defconfig plus CONFIG_DEVTMPFS.
