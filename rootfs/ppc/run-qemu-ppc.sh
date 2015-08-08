@@ -14,9 +14,19 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_32="powerpc:qemu_virtex440_defconfig \
+skip_32="powerpc:44x/bamboo_defconfig \
 	powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
 skip_34="powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
+
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Enable DEVTMPFS
+
+    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+}
 
 runkernel()
 {
@@ -24,7 +34,8 @@ runkernel()
     local mach=$2
     local rootfs=$3
     local kernel=$4
-    local dts=$5
+    local fixup=$5
+    local dts=$6
     local dtb
     local pid
     local retcode
@@ -33,7 +44,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
     retcode=$?
     if [ ${retcode} -ne 0 ]
     then
@@ -85,13 +96,13 @@ runkernel qemu_ppc_book3s_smp_defconfig mac99 core-image-minimal-qemuppc.ext3 vm
 retcode=$((${retcode} + $?))
 runkernel qemu_g3beige_defconfig g3beige core-image-minimal-qemuppc.ext3 vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_virtex440_defconfig virtex-ml507 busybox-ppc.cpio vmlinux ${VIRTEX440_DTS}
+runkernel 44x/virtex5_defconfig virtex-ml507 busybox-ppc.cpio vmlinux fixup ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel qemu_bamboo_defconfig bamboo busybox-ppc.cpio vmlinux
+runkernel 44x/bamboo_defconfig bamboo busybox-ppc.cpio vmlinux fixup
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
