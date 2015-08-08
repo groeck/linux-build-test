@@ -11,17 +11,33 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+    local smp=$2
+
+    sed -i -e '/CONFIG_SMP/d' ${defconfig}
+
+    if [ "${smp}" = "nosmp" ]
+    then
+	echo "# CONFIG_SMP is not set" >> ${defconfig}
+    else
+	echo "CONFIG_SMP=y" >> ${defconfig}
+    fi
+}
+
 runkernel()
 {
     local defconfig=$1
+    local smp=$2
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${smp}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} generic
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} generic ${smp}
     if [ $? -ne 0 ]
     then
 	return 1
@@ -30,7 +46,7 @@ runkernel()
     echo -n "running ..."
 
     /opt/buildbot/bin/qemu-system-aarch64 -machine virt -cpu cortex-a57 \
-	-machine type=virt -nographic -smp 1 -m 2048 \
+	-machine type=virt -nographic -smp 1 -m 512 \
 	-kernel arch/arm64/boot/Image -initrd ${rootfs} -no-reboot \
 	-append "console=ttyAMA0" > ${logfile} 2>&1 &
 
@@ -44,9 +60,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm64_smp_defconfig
+runkernel defconfig smp
 retcode=$?
-runkernel qemu_arm64_nosmp_defconfig
+runkernel defconfig nosmp
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
