@@ -1,0 +1,6 @@
+The 'Niagara' qemu target fails to load with
+
+qemu: fatal: Trap 0x0064 while trap level (6) >= MAXTL (6), Error state
+
+Changing the CPU type did not help. Research on the web gave no hint
+about the failure.
