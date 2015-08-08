@@ -95,10 +95,11 @@ dosetup()
     if [ -n "${fixup}" ]
     then
         local f="arch/${xARCH}/configs/${defconfig}"
-        local tf="arch/${xARCH}/configs/tmp_${defconfig}"
+	local ndefconfig="tmp_$(basename ${defconfig})"
+        local tf="arch/${xARCH}/configs/${ndefconfig}"
 	cp $f ${tf}
 	patch_defconfig ${tf} ${fixup}
-	defconfig="tmp_${defconfig}"
+	defconfig=${ndefconfig}
     fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
