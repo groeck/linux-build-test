@@ -14,7 +14,7 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_32="powerpc:44x/bamboo_defconfig \
+skip_32="powerpc:44x/bamboo_defconfig powerpc:44x/virtex5_defconfig \
 	powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
 skip_34="powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
 
