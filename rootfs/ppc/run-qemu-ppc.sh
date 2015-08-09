@@ -40,14 +40,17 @@ patch_defconfig()
     fi
 }
 
+cached_defconfig=""
+
 runkernel()
 {
     local defconfig=$1
-    local mach=$2
-    local rootfs=$3
-    local kernel=$4
-    local fixup=$5
-    local dts=$6
+    local fixup=$2
+    local mach=$3
+    local cpu=$4
+    local rootfs=$5
+    local kernel=$6
+    local dts=$7
     local dtb
     local pid
     local retcode
@@ -60,24 +63,28 @@ runkernel()
 	smp=":${fixup}"
     fi
 
-    echo -n "Building ${ARCH}${smp}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${mach}${smp}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
-    retcode=$?
-    if [ ${retcode} -ne 0 ]
+    if [ "${defconfig}_${fixup}" != "${cached_defconfig}" ]
     then
-	if [ ${retcode} -eq 2 ]
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	retcode=$?
+	if [ ${retcode} -ne 0 ]
 	then
-	    return 0
+	    if [ ${retcode} -eq 2 ]
+	    then
+		return 0
+	    fi
+	    return 1
 	fi
-	return 1
+	cached_defconfig="${defconfig}_${fixup}"
     fi
 
     echo -n "running ..."
 
     if [ "${rootfs}" = "core-image-minimal-qemuppc.ext3" ]
     then
-	${QEMUCMD} -kernel ${kernel} -M ${mach} -cpu G4 \
+	${QEMUCMD} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
 	    -hda ${rootfs} -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	    --append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" \
 	    -nographic > ${logfile} 2>&1 &
@@ -108,19 +115,23 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux nosmp
+runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 core-image-minimal-qemuppc.ext3 \
+	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux smp
+runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 core-image-minimal-qemuppc.ext3 \
+	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_g3beige_defconfig g3beige core-image-minimal-qemuppc.ext3 vmlinux
+runkernel qemu_ppc_book3s_defconfig smp mac99 G4 core-image-minimal-qemuppc.ext3 \
+	vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig virtex-ml507 busybox-ppc.cpio vmlinux devtmpfs ${VIRTEX440_DTS}
+runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" busybox-ppc.cpio \
+	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig bamboo busybox-ppc.cpio vmlinux devtmpfs
+runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
