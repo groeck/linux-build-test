@@ -21,11 +21,23 @@ skip_34="powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
 patch_defconfig()
 {
     local defconfig=$1
+    local fixup=$2
 
-    # Enable DEVTMPFS
+    # Enable DEVTMPFS, SMP as requested
 
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    if [ "${fixup}" = "devtmpfs" ]
+    then
+        sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+        echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    elif [ "${fixup}" = "nosmp" ]
+    then
+        sed -i -e '/CONFIG_SMP/d' ${defconfig}
+        echo "# CONFIG_SMP is not set" >> ${defconfig}
+    elif [ "${fixup}" = "smp" ]
+    then
+        sed -i -e '/CONFIG_SMP/d' ${defconfig}
+        echo "CONFIG_SMP=y" >> ${defconfig}
+    fi
 }
 
 runkernel()
@@ -41,8 +53,14 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting" "Boot successful" "Rebooting")
+    local smp
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
+    then
+	smp=":${fixup}"
+    fi
+
+    echo -n "Building ${ARCH}${smp}:${defconfig} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
     retcode=$?
@@ -90,19 +108,19 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux
+runkernel qemu_ppc_book3s_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux nosmp
 retcode=$?
-runkernel qemu_ppc_book3s_smp_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux
+runkernel qemu_ppc_book3s_defconfig mac99 core-image-minimal-qemuppc.ext3 vmlinux smp
 retcode=$((${retcode} + $?))
 runkernel qemu_g3beige_defconfig g3beige core-image-minimal-qemuppc.ext3 vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig virtex-ml507 busybox-ppc.cpio vmlinux fixup ${VIRTEX440_DTS}
+runkernel 44x/virtex5_defconfig virtex-ml507 busybox-ppc.cpio vmlinux devtmpfs ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig mpc8544ds busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig bamboo busybox-ppc.cpio vmlinux fixup
+runkernel 44x/bamboo_defconfig bamboo busybox-ppc.cpio vmlinux devtmpfs
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
