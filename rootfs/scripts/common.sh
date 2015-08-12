@@ -103,6 +103,7 @@ setup_config()
 	patch_defconfig ${tf} ${fixup}
 	defconfig=${ndefconfig}
     fi
+    echo ${defconfig}
 }
 
 dosetup()
@@ -134,7 +135,7 @@ dosetup()
 
     doclean ${ARCH}
 
-    setup_config ${ARCH} ${defconfig} ${fixup}
+    defconfig=$(setup_config ${ARCH} ${defconfig} ${fixup})
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
     if [ $? -ne 0 ]
