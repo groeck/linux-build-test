@@ -12,18 +12,19 @@ dir=$(cd $(dirname $0); pwd)
 skip_32="arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
+	arm:smdkc210:exynos_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_34="arm:versatilepb:qemu_arm_versatile_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
+	arm:smdkc210:exynos_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_310="arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_312="arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_314="arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_318="arm:xilinx-zynq-a9:multi_v7_defconfig"
 
 . ${dir}/../scripts/common.sh
 
@@ -47,8 +48,14 @@ runkernel()
     local skip=(${!tmp})
     local s
     local build=${ARCH}:${mach}:${defconfig}
+    local pbuild=${build}
 
-    echo -n "Building ${build} ... "
+    if [ -n "${dtb}" ]
+    then
+        pbuild="${build}:$(echo ${dtb} | sed -e 's/.dtb//')"
+    fi
+
+    echo -n "Building ${pbuild} ... "
 
     for s in ${skip[*]}
     do
@@ -70,6 +77,8 @@ runkernel()
 	then
 	    return 1
 	fi
+    else
+        setup_rootfs ${rootfs}
     fi
 
     cached_config=${defconfig}
@@ -91,6 +100,15 @@ runkernel()
     fi
 
     case ${mach} in
+    "smdkc210")
+	/opt/buildbot/bin/qemu-system-arm -M ${mach} -smp 2 \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -initrd ${rootfs} \
+	    -append "rdinit=/sbin/init console=ttySAC0,115200n8 doreboot" \
+	    -nographic -monitor none -serial stdio \
+	    ${dtbcmd} > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "xilinx-zynq-a9")
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -158,6 +176,16 @@ retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	core-image-minimal-qemuarm.ext3 auto zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	core-image-minimal-qemuarm.ext3 auto zynq-zc706.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	core-image-minimal-qemuarm.ext3 auto zynq-zed.dtb
+retcode=$((${retcode} + $?))
+
+runkernel exynos_defconfig smdkc210 "" \
+	core-image-minimal-qemuarm.cpio manual exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 
 runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" \
