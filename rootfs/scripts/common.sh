@@ -38,6 +38,73 @@ doclean()
 	fi
 }
 
+setup_rootfs()
+{
+    local rootfs=$1
+    local dynamic=$2
+    local progdir=$(cd $(dirname $0); pwd)
+
+    if [ -n "${rootfs}" ]
+    then
+	if [ -n "${dynamic}" ]
+	then
+	    fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
+        else
+	    cp ${progdir}/${rootfs} .
+	fi
+    fi
+}
+
+# Automatically determine if dynamic root file system
+# setup is supported.
+
+setup_rootfs_auto()
+{
+    setup_rootfs "$1" "$(echo $1 | grep cpio)"
+}
+
+setup_config()
+{
+    local ARCH=$1
+    local defconfig=$2
+    local fixup=$3
+    local progdir=$(cd $(dirname $0); pwd)
+    local arch
+
+    case ${ARCH} in
+    mips32|mips64)
+	arch=mips;;
+    crisv32)
+	arch=cris;;
+    m68k_nommu)
+	arch=m68k;;
+    parisc64)
+	arch=parisc;;
+    sparc64|sparc32)
+	arch=sparc;;
+    x86_64)
+	arch=x86;;
+    *)
+	arch=${ARCH};;
+    esac
+
+    mkdir -p arch/${arch}/configs
+    if [ -e ${progdir}/${defconfig} ]
+    then
+        cp ${progdir}/${defconfig} arch/${arch}/configs
+    fi
+
+    if [ -n "${fixup}" ]
+    then
+        local f="arch/${arch}/configs/${defconfig}"
+	local ndefconfig="tmp_$(basename ${defconfig})"
+        local tf="arch/${arch}/configs/${ndefconfig}"
+	cp $f ${tf}
+	patch_defconfig ${tf} ${fixup}
+	defconfig=${ndefconfig}
+    fi
+}
+
 dosetup()
 {
     local ARCH=$1
@@ -47,10 +114,8 @@ dosetup()
     local defconfig=$5
     local dynamic=$6
     local fixup=$7
-    local progdir=$(cd $(dirname $0); pwd)
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
-    local xARCH
     local tmprootfs=/tmp/rootfs.$$
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
     local tmp="skip_${rel}"
@@ -67,40 +132,9 @@ dosetup()
 	fi
     done
 
-    case ${ARCH} in
-    mips32|mips64)
-	xARCH=mips;;
-    crisv32)
-	xARCH=cris;;
-    m68k_nommu)
-	xARCH=m68k;;
-    parisc64)
-	xARCH=parisc;;
-    sparc64|sparc32)
-	xARCH=sparc;;
-    x86_64)
-	xARCH=x86;;
-    *)
-	xARCH=${ARCH};;
-    esac
-
     doclean ${ARCH}
 
-    mkdir -p arch/${xARCH}/configs
-    if [ -e ${progdir}/${defconfig} ]
-    then
-        cp ${progdir}/${defconfig} arch/${xARCH}/configs
-    fi
-
-    if [ -n "${fixup}" ]
-    then
-        local f="arch/${xARCH}/configs/${defconfig}"
-	local ndefconfig="tmp_$(basename ${defconfig})"
-        local tf="arch/${xARCH}/configs/${ndefconfig}"
-	cp $f ${tf}
-	patch_defconfig ${tf} ${fixup}
-	defconfig=${ndefconfig}
-    fi
+    setup_config ${ARCH} ${defconfig} ${fixup}
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
     if [ $? -ne 0 ]
@@ -109,12 +143,7 @@ dosetup()
 	return 1
     fi
 
-    if [ "${dynamic}" != "" ]
-    then
-	fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
-    else
-	cp ${progdir}/${rootfs} .
-    fi
+    setup_rootfs "${rootfs}" "${dynamic}"
 
     make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >${logfile} 2>&1
     retcode=$?
