@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# machine specific information
-rootfs=core-image-minimal-qemux86-64.ext3
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PREFIX=x86_64-poky-linux-
 ARCH=x86_64
-QEMUCMD=/opt/buildbot/bin/qemu-system-x86_64
-KERNEL_IMAGE=arch/x86/boot/bzImage
 
 PATH=${PATH_X86}:${PATH}
 
@@ -14,28 +10,52 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+cached_defconfig=""
+
 runkernel()
 {
     local defconfig=$1
+    local cpu=$2
+    local mach=$3
+    local drive
     local pid
     local retcode
+    local rootfs=core-image-minimal-qemux86-64.ext3
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${ARCH}:${cpu}:${mach}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
-    if [ $? -ne 0 ]
+    if [ "${cached_defconfig}" != "${defconfig}" ]
     then
-	return 1
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+	if [ $? -ne 0 ]
+	then
+	    return 1
+	fi
+	cached_defconfig=${defconfig}
     fi
 
     echo -n "running ..."
 
-    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -hda ${rootfs} \
-	-cpu SandyBridge \
-	-usb -usbdevice wacom-tablet -no-reboot -m 128 \
-	--append "root=/dev/hda rw mem=128M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
+    case "${mach}" in
+    pc)
+	drive=hda
+	usb="-usb -usbdevice wacom-tablet"
+	;;
+    q35)
+	drive=sda
+	usb="-usb -usbdevice wacom-tablet"
+	;;
+    *)
+        echo "failed (unsupported machine type ${mach})"
+	return 1
+	;;
+    esac
+
+    /opt/buildbot/bin/qemu-system-x86_64 -kernel arch/x86/boot/bzImage \
+	-M ${mach} -cpu ${cpu} ${usb} -hda ${rootfs} -no-reboot -m 256 \
+	--append "root=/dev/${drive} rw mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
@@ -48,9 +68,21 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_x86_64_pc_defconfig
-retcode=$?
-runkernel qemu_x86_64_pc_nosmp_defconfig
+runkernel qemu_x86_64_pc_defconfig SandyBridge q35
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig Haswell q35
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig core2duo pc
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig Nehalem q35
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig phenom pc
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig Opteron_G1 q35
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_nosmp_defconfig Opteron_G4 pc
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_nosmp_defconfig IvyBridge q35
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
