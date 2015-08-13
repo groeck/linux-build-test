@@ -1,0 +1,2 @@
+isapc fails to run for SMP configurations.
+IDE would need to be enabled, but then there are interrupt timeouts.
