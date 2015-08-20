@@ -240,12 +240,12 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-runkernel multi_v7_defconfig smdkc210 "" \
-	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
-retcode=$((${retcode} + $?))
-runkernel exynos_defconfig smdkc210 "" \
-	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
-retcode=$((${retcode} + $?))
+# runkernel multi_v7_defconfig smdkc210 "" \
+# 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
+# retcode=$((${retcode} + $?))
+# runkernel exynos_defconfig smdkc210 "" \
+# 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
+# retcode=$((${retcode} + $?))
 
 runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" \
 	busybox-arm.cpio auto
