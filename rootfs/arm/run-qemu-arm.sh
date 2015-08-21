@@ -140,6 +140,15 @@ runkernel()
     fi
 
     case ${mach} in
+    "kzm")
+	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
+	    -kernel arch/arm/boot/zImage  -no-reboot \
+	    -initrd ${rootfs} \
+	    -append "rdinit=/sbin/init console=ttymxc0,115200 doreboot" \
+	    -nographic -monitor none -serial stdio \
+	    ${dtbcmd} > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "smdkc210")
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -221,6 +230,10 @@ runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" \
 retcode=$((${retcode} + $?))
 runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
+retcode=$((${retcode} + $?))
+
+runkernel imx_v6_v7_defconfig kzm "" \
+	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig vexpress-a9 "" \
