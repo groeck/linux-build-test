@@ -17,6 +17,7 @@ build-essential
 buildbot
 buildbot-slave
 coccinelle
+device-tree-compiler
 nfs-client
 fakeroot
 git
