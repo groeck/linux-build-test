@@ -260,14 +260,12 @@ retcode=$((${retcode} + $?))
 # 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
 # retcode=$((${retcode} + $?))
 
-# smdkc210 stopped working in -next; it now requires DMA support
-# on serial lines which qemu does not support.
-# runkernel multi_v7_defconfig smdkc210 "" 128 \
-# 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
-# retcode=$((${retcode} + $?))
-# runkernel exynos_defconfig smdkc210 "" 128 \
-# 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
-# retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig smdkc210 "" 128 \
+	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
+retcode=$((${retcode} + $?))
+runkernel exynos_defconfig smdkc210 "" 128 \
+	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
+retcode=$((${retcode} + $?))
 
 runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" 512 \
 	busybox-arm.cpio auto
