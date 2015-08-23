@@ -12,7 +12,9 @@ dir=$(cd $(dirname $0); pwd)
 # multi_v7_defconfig only exists starting with v3.10.
 # versatileab/versatilepb need different binaries prior to 3.14.
 
-skip_32="arm:smdkc210:exynos_defconfig \
+skip_32="arm:highbank:multi_v7_defconfig \
+	arm:kzm:imx_v6_v7_defconfig \
+	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -20,7 +22,8 @@ skip_32="arm:smdkc210:exynos_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_34="arm:smdkc210:exynos_defconfig \
+skip_34="arm:highbank:multi_v7_defconfig \
+	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -248,10 +251,17 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-runkernel multi_v7_defconfig highbank cortex-a9 2G \
-	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
-retcode=$((${retcode} + $?))
+# highbank boots with updated qemu, but generates warnings to the console
+# due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
+# starting with 0x900, which isn't supported by qemu. As a result, the boot
+# CPU is not detected, which causes a warning in kernels prior to v3.14.
+# This is distracting, so disable for now.
+# runkernel multi_v7_defconfig highbank cortex-a9 2G \
+# 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
+# retcode=$((${retcode} + $?))
 
+# smdkc210 stopped working in -next; it now requires DMA support
+# on serial lines which qemu does not support.
 # runkernel multi_v7_defconfig smdkc210 "" 128 \
 # 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 # retcode=$((${retcode} + $?))
