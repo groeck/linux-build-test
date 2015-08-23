@@ -74,10 +74,11 @@ runkernel()
     local defconfig=$1
     local mach=$2
     local cpu=$3
-    local rootfs=$4
-    local mode=$5
-    local fixup=$6
-    local dtb=$7
+    local mem=$4
+    local rootfs=$5
+    local mode=$6
+    local fixup=$7
+    local dtb=$8
     local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
@@ -168,13 +169,7 @@ runkernel()
 	pid=$!
 	;;
     "realview-pb-a8" | "realview-eb-mpcore" | "realview-eb" | \
-    "versatileab" | "versatilepb" )
-	local mem=512
-	if [ "${mach}" = "versatileab" -o "${mach}" = "versatilepb" ]
-	then
-	    # 512 is too much for versatile, may not be enough for realview
-	    mem=128
-	fi
+    "versatileab" | "versatilepb" | "highbank" )
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} ${cpucmd} -m ${mem} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -214,60 +209,64 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm_versatile_defconfig versatilepb-qemu "" \
+runkernel qemu_arm_versatile_defconfig versatilepb-qemu "" 128 \
 	core-image-minimal-qemuarm.ext3 auto
 retcode=$?
 
-runkernel versatile_defconfig versatileab "" \
+runkernel versatile_defconfig versatileab "" 128 \
 	core-image-minimal-qemuarm.cpio auto devtmpfs
 retcode=$((${retcode} + $?))
-runkernel versatile_defconfig versatilepb "" \
+runkernel versatile_defconfig versatilepb "" 128 \
 	core-image-minimal-qemuarm.cpio auto devtmpfs
 retcode=$((${retcode} + $?))
 
-runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" \
+runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" \
+runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
-runkernel imx_v6_v7_defconfig kzm "" \
+runkernel imx_v6_v7_defconfig kzm "" 128 \
 	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
 
-runkernel multi_v7_defconfig vexpress-a9 "" \
+runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig vexpress-a15 "" \
+runkernel multi_v7_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc702.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc706.dtb
 retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-# runkernel multi_v7_defconfig smdkc210 "" \
+runkernel multi_v7_defconfig highbank cortex-a9 2G \
+	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
+retcode=$((${retcode} + $?))
+
+# runkernel multi_v7_defconfig smdkc210 "" 128 \
 # 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 # retcode=$((${retcode} + $?))
-# runkernel exynos_defconfig smdkc210 "" \
+# runkernel exynos_defconfig smdkc210 "" 128 \
 # 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 # retcode=$((${retcode} + $?))
 
-runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" \
+runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" 512 \
 	busybox-arm.cpio auto
 retcode=$((${retcode} + $?))
 
-runkernel qemu_arm_realview_eb_defconfig realview-eb-mpcore "" \
+runkernel qemu_arm_realview_eb_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_realview_eb_defconfig realview-eb cortex-a8 \
+runkernel qemu_arm_realview_eb_defconfig realview-eb cortex-a8 512 \
 	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
 
