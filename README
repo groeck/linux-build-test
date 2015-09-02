@@ -231,6 +231,9 @@ Build from Yocto.
 ---
 qemu
 
+Local patches are required. See groeck/qemu repository at kernel.org.
+Look for local and linaro branches.
+
 Packages needed to build:
 	libglib2.0-dev
 	libssh2-1-dev
@@ -240,9 +243,15 @@ Packages needed to build:
 	libpixman-1-dev
 
 Build:
+	git clone git@github.com:groeck/qemu.git
 	cd qemu
+	git checkout v2.4.0-local
 	./configure --prefix=/opt/buildbot
 	make install
+	git checkout v2.3.50-local-linaro
+	./configure --prefix=/opt/buildbot
+	make
+	cp arm-softmmu/qemu-system-arm /opt/buildbot/bin/linaro
 
 Distribution:
 	[ If necessary update VERSION file ]
