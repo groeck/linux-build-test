@@ -7,13 +7,14 @@ PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-p
 
 PATH=${PATH_ARM}:${PATH}
 
-dir=$(cd $(dirname $0); pwd)
+progdir=$(cd $(dirname $0); pwd)
 
 # multi_v7_defconfig only exists starting with v3.10.
 # versatileab/versatilepb need different binaries prior to 3.14.
 
 skip_32="arm:highbank:multi_v7_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
+	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
@@ -23,6 +24,7 @@ skip_32="arm:highbank:multi_v7_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_34="arm:highbank:multi_v7_defconfig \
+	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
@@ -32,21 +34,24 @@ skip_34="arm:highbank:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_310="arm:smdkc210:multi_v7_defconfig \
+skip_310="arm:overo:omap2plus_defconfig \
+	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_312="arm:smdkc210:multi_v7_defconfig \
+skip_312="arm:overo:omap2plus_defconfig \
+	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_314="arm:smdkc210:multi_v7_defconfig \
+skip_314="arm:overo:omap2plus_defconfig \
+	arm:smdkc210:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_318="arm:smdkc210:multi_v7_defconfig"
 
-. ${dir}/../scripts/common.sh
+. ${progdir}/../scripts/common.sh
 
 cached_config=""
 
@@ -144,6 +149,22 @@ runkernel()
     fi
 
     case ${mach} in
+    "overo")
+	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
+	    ${dtbfile} sd.img > ${logfile} 2>&1
+	if [ $? -ne 0 ]
+	then
+	    echo "failed"
+	    cat ${logfile}
+	    return 1
+	fi
+	/opt/buildbot/bin/linaro/qemu-system-arm -M ${mach} \
+	    -m ${mem} -sd sd.img -clock unix -no-reboot \
+	    -device usb-mouse -device usb-kbd \
+	    -serial stdio -monitor none -nographic \
+	    > ${logfile} 2>&1 &
+	pid=$!
+        ;;
     "kzm")
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
@@ -259,6 +280,10 @@ retcode=$((${retcode} + $?))
 # runkernel multi_v7_defconfig highbank cortex-a9 2G \
 # 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
 # retcode=$((${retcode} + $?))
+
+runkernel omap2plus_defconfig overo "" 256 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
+retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
