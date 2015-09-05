@@ -18,6 +18,7 @@ buildbot
 buildbot-slave
 coccinelle
 device-tree-compiler
+genext2fs
 nfs-client
 fakeroot
 git
