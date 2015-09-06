@@ -11,8 +11,13 @@ progdir=$(cd $(dirname $0); pwd)
 
 # multi_v7_defconfig only exists starting with v3.10.
 # versatileab/versatilepb need different binaries prior to 3.14.
+# beagle in 3.14 dumps a warning message to the console.
 
-skip_32="arm:highbank:multi_v7_defconfig \
+skip_32="arm:beagle:multi_v7_defconfig \
+	arm:beagle:omap2plus_defconfig \
+	arm:beaglexm:multi_v7_defconfig \
+	arm:beaglexm:omap2plus_defconfig \
+	arm:highbank:multi_v7_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
@@ -23,7 +28,11 @@ skip_32="arm:highbank:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_34="arm:highbank:multi_v7_defconfig \
+skip_34="arm:beagle:multi_v7_defconfig \
+	arm:beagle:omap2plus_defconfig \
+	arm:beaglexm:multi_v7_defconfig \
+	arm:beaglexm:omap2plus_defconfig \
+	arm:highbank:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
@@ -34,7 +43,11 @@ skip_34="arm:highbank:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_310="arm:overo:omap2plus_defconfig \
+skip_310="arm:beagle:multi_v7_defconfig \
+	arm:beagle:omap2plus_defconfig \
+	arm:beaglexm:multi_v7_defconfig \
+	arm:beaglexm:omap2plus_defconfig \
+	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -46,7 +59,9 @@ skip_312="arm:overo:omap2plus_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_314="arm:overo:omap2plus_defconfig \
+skip_314="arm:beagle:multi_v7_defconfig \
+	arm:beagle:omap2plus_defconfig \
+	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_318="arm:smdkc210:multi_v7_defconfig"
@@ -149,7 +164,7 @@ runkernel()
     fi
 
     case ${mach} in
-    "overo")
+    "overo" | "beagle" | "beaglexm")
 	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
 	    ${dtbfile} sd.img > ${logfile} 2>&1
 	if [ $? -ne 0 ]
@@ -159,7 +174,8 @@ runkernel()
 	    return 1
 	fi
 	/opt/buildbot/bin/linaro/qemu-system-arm -M ${mach} \
-	    -m ${mem} -sd sd.img -clock unix -no-reboot \
+	    -m ${mem} -clock unix -no-reboot \
+	    -drive file=sd.img,format=raw,if=sd,cache=writeback \
 	    -device usb-mouse -device usb-kbd \
 	    -serial stdio -monitor none -nographic \
 	    > ${logfile} 2>&1 &
@@ -255,6 +271,16 @@ runkernel imx_v6_v7_defconfig kzm "" 128 \
 	core-image-minimal-qemuarm.cpio manual
 retcode=$((${retcode} + $?))
 
+runkernel multi_v7_defconfig beagle "" 256 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig beaglexm "" 512 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-beagle-xm.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig overo "" 256 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
+retcode=$((${retcode} + $?))
+
 runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
@@ -281,15 +307,22 @@ retcode=$((${retcode} + $?))
 # 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
 # retcode=$((${retcode} + $?))
 
-runkernel omap2plus_defconfig overo "" 256 \
-	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
-retcode=$((${retcode} + $?))
-
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
+
 runkernel exynos_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
+retcode=$((${retcode} + $?))
+
+runkernel omap2plus_defconfig beagle "" 256 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
+retcode=$((${retcode} + $?))
+runkernel omap2plus_defconfig beaglexm "" 512 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-beagle-xm.dtb
+retcode=$((${retcode} + $?))
+runkernel omap2plus_defconfig overo "" 256 \
+	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 
 runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" 512 \
