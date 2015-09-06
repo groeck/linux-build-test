@@ -29,6 +29,7 @@ sparse
 buildbot
 smatch
 bin/qemu-*
+bin/linaro
 include
 lib
 libexec
