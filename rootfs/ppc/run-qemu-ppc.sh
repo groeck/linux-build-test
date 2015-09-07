@@ -37,6 +37,12 @@ patch_defconfig()
     then
         sed -i -e '/CONFIG_SMP/d' ${defconfig}
         echo "CONFIG_SMP=y" >> ${defconfig}
+    elif [ "${fixup}" = "smpdev" ]
+    then
+        sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+        echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+        sed -i -e '/CONFIG_SMP/d' ${defconfig}
+        echo "CONFIG_SMP=y" >> ${defconfig}
     fi
 }
 
@@ -130,6 +136,10 @@ retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+runkernel 85xx/mpc85xx_cds_defconfig devtmpfs mpc8548cds "" busybox-ppc.cpio arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+runkernel 85xx/mpc85xx_cds_defconfig smpdev mpc8548cds "" busybox-ppc.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
