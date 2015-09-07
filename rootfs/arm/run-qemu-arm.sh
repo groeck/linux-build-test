@@ -19,6 +19,7 @@ skip_32="arm:beagle:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:highbank:multi_v7_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
+	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
@@ -33,6 +34,7 @@ skip_34="arm:beagle:multi_v7_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:highbank:multi_v7_defconfig \
+	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
@@ -47,6 +49,7 @@ skip_310="arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
+	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
@@ -54,7 +57,8 @@ skip_310="arm:beagle:multi_v7_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_312="arm:overo:omap2plus_defconfig \
+skip_312="arm:overo:multi_v7_defconfig \
+	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
