@@ -8,6 +8,7 @@ slave/master*
 slave/mmotm*
 slave/next*
 master/qemu*
+master/twistd*.log*
 master/hwmon*
 master/mmotm*
 master/watchdog*
@@ -28,6 +29,8 @@ buildroot
 sparse
 buildbot
 smatch
+u-boot
+rootfs.new
 bin/qemu-*
 bin/linaro
 include
@@ -35,3 +38,4 @@ lib
 libexec
 share
 usr
+genfatfs
