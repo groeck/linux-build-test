@@ -207,7 +207,7 @@ runkernel()
     "xilinx-zynq-a9")
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -drive file=${rootfs},if=sd \
+	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rw console=ttyPS0 doreboot" \
 	    -nographic -monitor none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
@@ -226,7 +226,7 @@ runkernel()
     "versatilepb-qemu")
 	/opt/buildbot/bin/qemu-system-arm -M versatilepb -m 128 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -drive file=${rootfs},if=scsi \
+	    -drive file=${rootfs},format=raw,if=scsi \
 	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" \
 	    -nographic -serial stdio -monitor null \
 	    ${dtbcmd} > ${logfile} 2>&1 &
@@ -235,7 +235,7 @@ runkernel()
     "vexpress-a9" | "vexpress-a15")
 	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -drive file=${rootfs},if=sd \
+	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rw console=ttyAMA0,115200 console=tty1 doreboot" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
