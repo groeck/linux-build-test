@@ -61,7 +61,9 @@ do_import()
 		git checkout -b ${qbranch} ${ref}
 	else
 		git checkout ${qbranch}
-		git reset --hard ${ref}
+		# The following reverts all changes in qbranch,
+		# which does not make sense.
+		# git reset --hard ${ref}
 	fi
 
 	# queue branch exists locally.
