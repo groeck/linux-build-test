@@ -64,9 +64,11 @@ skip_32="alpha:allnoconfig arm:allnoconfig arm:allmodconfig avr32:allnoconfig \
 	m68k:allnoconfig microblaze:allnoconfig mips:allmodconfig \
 	openrisc:allnoconfig parisc:allnoconfig sparc32:allmodconfig \
 	xtensa:defconfig xtensa:allmodconfig xtensa:allnoconfig"
-skip_34="arm:allmodconfig microblaze:allnoconfig openrisc:allnoconfig \
+skip_34="alpha:allnoconfig arm:allnoconfig arm:allmodconfig avr32:allnoconfig \
+	m68k:allnoconfig microblaze:allnoconfig openrisc:allnoconfig \
+	parisc:allmodconfig \
 	score:defconfig sparc32:allmodconfig sparc64:allmodconfig \
-	xtensa:allmodconfig"
+	xtensa:allnoconfig xtensa:allmodconfig"
 skip_310="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig microblaze:allnoconfig \
 	openrisc:allnoconfig parisc:allmodconfig s390:allmodconfig \
 	sparc32:allmodconfig"
