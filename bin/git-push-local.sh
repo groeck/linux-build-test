@@ -44,14 +44,19 @@ do
 	fi
 done
 
-for a in $(git tag -l | grep v3 | egrep -v "v3.1\$|v3.1\.|v3.1-|v3.3|v3.5|v3.6|v3.9|v3.8|v3.7")
+epoch=$(date +%s)
+mepoch=$((${epoch} - 2500000))  # ~ one month back
+
+git tag -l | while read a
 do
-	echo -n "tag:$a: "
-	git push local refs/tags/$a
-	if [ $? -ne 0 ]
+	tepoch=$(git log -1 --format=%ct $a)
+	if [ -n "${tepoch}" ]
 	then
-		echo "git push error (tags): aborting"
-		exit 1
+		if [ ${tepoch} -gt ${mepoch} ]
+		then
+			echo -n "tag:$a: "
+			git push local refs/tags/$a
+		fi
 	fi
 done
 
