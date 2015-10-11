@@ -26,6 +26,7 @@ runkernel()
     local mach=$2
     local rootfs=$3
     local fixup=$4
+    local drive="hda"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
@@ -54,9 +55,13 @@ runkernel()
 	    -nographic > ${logfile} 2>&1 &
     	pid=$!
     else
+	# New configurations mount sda instead of hda
+        grep sda arch/mips/configs/${defconfig} >/dev/null 2>&1
+	[ $? -eq 0 ] && drive="sda"
+
         /opt/buildbot/bin/qemu-system-mips64el -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "root=/dev/hda rw console=ttyS0 doreboot" \
+	    --append "root=/dev/${drive} rw console=ttyS0 doreboot" \
 	    -hda ${rootfs} \
 	    -nographic -serial stdio -monitor null > ${logfile} 2>&1 &
     	pid=$!
