@@ -3,7 +3,7 @@
 PREFIX=aarch64-linux-
 ARCH=arm64
 rootfs=rootfs.arm64.cpio
-PATH_ARM64=/opt/kernel/gcc-4.8.1/aarch64-linux/bin
+PATH_ARM64=/opt/kernel/aarch64/gcc-4.9.1/usr/bin
 
 PATH=${PATH_ARM64}:${PATH}
 
