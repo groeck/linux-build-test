@@ -11,17 +11,25 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+    local fixup=$2
+
+    sed -i -e '/CONFIG_MARCH/d' ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
-    local waitlist=("Rebooting" "Boot successful" "Requesting system reboot")
+    local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     if [ $? -ne 0 ]
     then
 	return 1
@@ -45,7 +53,7 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_s390_defconfig
+runkernel defconfig
 retcode=$?
 
 exit ${retcode}
