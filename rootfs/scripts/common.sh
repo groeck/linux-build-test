@@ -99,6 +99,12 @@ setup_config()
         local f="arch/${arch}/configs/${defconfig}"
 	local ndefconfig="tmp_$(basename ${defconfig})"
         local tf="arch/${arch}/configs/${ndefconfig}"
+
+	# Try in arch directory if the configuration does not exist in
+	# the configs directory.
+
+	[ ! -e $f ] && f="arch/${arch}/${defconfig}"
+
 	cp $f ${tf}
 	patch_defconfig ${tf} ${fixup}
 	defconfig=${ndefconfig}
