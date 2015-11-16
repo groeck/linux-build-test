@@ -1,5 +1,10 @@
 #!/bin/bash
 
+configs=$1
+
+QEMU=/opt/buildbot/bin/qemu-system-arm
+# QEMU=/opt/buildbot/qemu/qemu/arm-softmmu/qemu-system-arm
+
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
 # PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
@@ -95,6 +100,16 @@ patch_defconfig()
 	sed -i -e '/CONFIG_CPU_IDLE/d' ${defconfig}
 	sed -i -e '/CONFIG_ARM_EXYNOS_CPUIDLE/d' ${defconfig}
     fi
+
+    # For imx25, disable NAND (not supported as of qemu 2.5, causes
+    # a runtime warning), and enable INITRD.
+
+    if [ "${fixup}" = "imx25" ]
+    then
+	sed -i -e '/CONFIG_MTD_NAND_MXC/d' ${defconfig}
+	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    fi
 }
 
 runkernel()
@@ -118,6 +133,12 @@ runkernel()
     local s
     local build=${ARCH}:${mach}:${defconfig}
     local pbuild=${build}
+
+    if [ -n "${configs}" -a "${configs}" != "${mach}" ]
+    then
+    	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
 
     if [ -n "${dtb}" ]
     then
@@ -186,8 +207,8 @@ runkernel()
 	    > ${logfile} 2>&1 &
 	pid=$!
         ;;
-    "kzm")
-	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
+    "kzm" | "imx25-pdk" )
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
 	    -append "rdinit=/sbin/init console=ttymxc0,115200 doreboot" \
@@ -196,7 +217,7 @@ runkernel()
 	pid=$!
 	;;
     "smdkc210")
-	/opt/buildbot/bin/qemu-system-arm -M ${mach} -smp 2 \
+	${QEMU} -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -append "rdinit=/sbin/init console=ttySAC0,115200n8 doreboot" \
@@ -205,7 +226,7 @@ runkernel()
 	pid=$!
 	;;
     "xilinx-zynq-a9")
-	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rw console=ttyPS0 doreboot" \
@@ -215,7 +236,7 @@ runkernel()
 	;;
     "realview-pb-a8" | "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | "highbank" )
-	/opt/buildbot/bin/qemu-system-arm -M ${mach} ${cpucmd} -m ${mem} \
+	${QEMU} -M ${mach} ${cpucmd} -m ${mem} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttyAMA0,115200 doreboot" \
@@ -224,7 +245,7 @@ runkernel()
 	pid=$!
 	;;
     "versatilepb-qemu")
-	/opt/buildbot/bin/qemu-system-arm -M versatilepb -m 128 \
+	${QEMU} -M versatilepb -m 128 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=scsi \
 	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" \
@@ -233,7 +254,7 @@ runkernel()
 	pid=$!
 	;;
     "vexpress-a9" | "vexpress-a15")
-	/opt/buildbot/bin/qemu-system-arm -M ${mach} \
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rw console=ttyAMA0,115200 console=tty1 doreboot" \
@@ -270,6 +291,10 @@ runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" 128 \
 retcode=$((${retcode} + $?))
 runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
+retcode=$((${retcode} + $?))
+
+runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
+	core-image-minimal-qemuarm.cpio manual imx25 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 
 runkernel imx_v6_v7_defconfig kzm "" 128 \
