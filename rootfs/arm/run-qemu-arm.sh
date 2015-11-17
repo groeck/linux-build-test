@@ -17,11 +17,15 @@ progdir=$(cd $(dirname $0); pwd)
 # multi_v7_defconfig only exists starting with v3.10.
 # versatileab/versatilepb need different binaries prior to 3.14.
 # beagle in 3.14 dumps a warning message to the console.
+# imx25-pdk passes reliably starting with 3.12. 3.10 would require
+# a patch (8bba8303b059, "ARM: imx_v4_v5_defconfig: Select
+# CONFIG_MACH_IMX25_DT") to be applied.
 
 skip_32="arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
+	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:highbank:multi_v7_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
 	arm:overo:multi_v7_defconfig \
@@ -39,6 +43,7 @@ skip_34="arm:beagle:multi_v7_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:highbank:multi_v7_defconfig \
+	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:exynos_defconfig \
@@ -54,6 +59,7 @@ skip_310="arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
+	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
