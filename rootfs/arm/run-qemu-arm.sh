@@ -1,6 +1,7 @@
 #!/bin/bash
 
-configs=$1
+machine=$1
+config=$2
 
 QEMU=/opt/buildbot/bin/qemu-system-arm
 # QEMU=/opt/buildbot/qemu/qemu/arm-softmmu/qemu-system-arm
@@ -140,7 +141,13 @@ runkernel()
     local build=${ARCH}:${mach}:${defconfig}
     local pbuild=${build}
 
-    if [ -n "${configs}" -a "${configs}" != "${mach}" ]
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
     	echo "Skipping ${pbuild} ... "
 	return 0
