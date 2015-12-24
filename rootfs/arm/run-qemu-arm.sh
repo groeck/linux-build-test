@@ -36,8 +36,9 @@ skip_32="arm:beagle:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
+	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
-	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
+	arm:vexpress-a15:vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_34="arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
@@ -53,8 +54,9 @@ skip_34="arm:beagle:multi_v7_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:versatilepb-qemu:qemu_arm_versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
+	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
-	arm:vexpress-a15:qemu_arm_vexpress_defconfig \
+	arm:vexpress-a15:vexpress_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_310="arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
@@ -94,10 +96,18 @@ patch_defconfig()
 
     # We need DEVTMPFS for initrd images.
 
-    if [ "${fixup}" = "devtmpfs" ]
+    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    fi
+
+    if [ "${fixup}" = "regulator" ]
+    then
+	sed -i -e '/CONFIG_REGULATOR/d' ${defconfig}
+	sed -i -e '/CONFIG_REGULATOR_VEXPRESS/d' ${defconfig}
+	echo "CONFIG_REGULATOR=y" >> ${defconfig}
+	echo "CONFIG_REGULATOR_VEXPRESS=y" >> ${defconfig}
     fi
 
     # CPUIDLE causes Exynos targets to run really slow.
@@ -293,17 +303,17 @@ runkernel qemu_arm_versatile_defconfig versatilepb-qemu "" 128 \
 retcode=$?
 
 runkernel versatile_defconfig versatileab "" 128 \
-	core-image-minimal-qemuarm.cpio auto devtmpfs
+	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-ab.dtb
 retcode=$((${retcode} + $?))
 runkernel versatile_defconfig versatilepb "" 128 \
-	core-image-minimal-qemuarm.cpio auto devtmpfs
+	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-pb.dtb
 retcode=$((${retcode} + $?))
 
-runkernel qemu_arm_vexpress_defconfig vexpress-a9 "" 128 \
-	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
+runkernel vexpress_defconfig vexpress-a9 "" 128 \
+	core-image-minimal-qemuarm.ext3 auto regulator vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_vexpress_defconfig vexpress-a15 "" 128 \
-	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
+runkernel vexpress_defconfig vexpress-a15 "" 128 \
+	core-image-minimal-qemuarm.ext3 auto regulator vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
 runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
