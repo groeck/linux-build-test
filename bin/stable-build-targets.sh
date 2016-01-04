@@ -37,6 +37,7 @@ cmd_microblaze=(mmu_defconfig nommu_defconfig allnoconfig)
 cmd_mips=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig \
 	e55_defconfig cavium_octeon_defconfig malta_defconfig)
+cmd_mips_25=(defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nios2=(3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig)

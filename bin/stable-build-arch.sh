@@ -30,6 +30,7 @@ PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
 PATH_NIOS2=/opt/sourceryg++-2014.05/bin
 PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
@@ -201,6 +202,17 @@ case ${ARCH} in
 	done
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS}:${PATH}
+	;;
+    mips_25)
+	ARCH=mips
+	cmd=(${cmd_mips_25[*]});
+	fmax=$(expr ${#fixup_mips[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_mips[$f]}
+	done
+	PREFIX="mips-poky-linux-"
+	PATH=${PATH_MIPS_25}:${PATH}
 	;;
     mn10300)
 	cmd=(${cmd_mn10300[*]})
