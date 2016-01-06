@@ -53,7 +53,7 @@ skip_34="arm:beagle:multi_v7_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
-	arm:versatilepb-qemu:qemu_arm_versatile_defconfig \
+	arm:versatilepb-scsi:versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
@@ -98,10 +98,29 @@ patch_defconfig()
     # We need DEVTMPFS for initrd images.
 
     if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
-         "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" ]
+         "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" -o \
+	 "${fixup}" = "versatile" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    fi
+
+    # Versatile (scsi) needs to have AEABI, PCI and SCSI enabled.
+
+    if [ "${fixup}" = "versatile" ]
+    then
+	sed -i -e '/CONFIG_AEABI/d' ${defconfig}
+	echo "CONFIG_AEABI=y" >> ${defconfig}
+	sed -i -e '/CONFIG_PCI/d' ${defconfig}
+	echo "CONFIG_PCI=y" >> ${defconfig}
+	sed -i -e '/CONFIG_PCI_VERSATILE/d' ${defconfig}
+	echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
+	sed -i -e '/CONFIG_SCSI/d' ${defconfig}
+	echo "CONFIG_SCSI=y" >> ${defconfig}
+	sed -i -e '/CONFIG_BLK_DEV_SD/d' ${defconfig}
+	echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+	sed -i -e '/CONFIG_SCSI_SYM53C8XX_2/d' ${defconfig}
+	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
     fi
 
     if [ "${fixup}" = "regulator" ]
@@ -310,7 +329,7 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "versatilepb-qemu")
+    "versatilepb-scsi" )
 	${QEMU} -M versatilepb -m 128 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=scsi \
@@ -341,8 +360,8 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_arm_versatile_defconfig versatilepb-qemu "" 128 \
-	core-image-minimal-qemuarm.ext3 auto
+runkernel versatile_defconfig versatilepb-scsi "" 128 \
+	core-image-minimal-qemuarm.ext3 auto versatile versatile-pb.dtb
 retcode=$?
 
 runkernel versatile_defconfig versatileab "" 128 \
