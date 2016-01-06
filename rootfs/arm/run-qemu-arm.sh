@@ -2,6 +2,7 @@
 
 machine=$1
 config=$2
+devtree=$3
 
 QEMU=/opt/buildbot/bin/qemu-system-arm
 # QEMU=/opt/buildbot/qemu/qemu/arm-softmmu/qemu-system-arm
@@ -96,7 +97,8 @@ patch_defconfig()
 
     # We need DEVTMPFS for initrd images.
 
-    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" ]
+    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
+         "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
@@ -119,13 +121,47 @@ patch_defconfig()
     fi
 
     # For imx25, disable NAND (not supported as of qemu 2.5, causes
-    # a runtime warning), and enable INITRD.
+    # a runtime warning).
 
     if [ "${fixup}" = "imx25" ]
     then
 	sed -i -e '/CONFIG_MTD_NAND_MXC/d' ${defconfig}
+    fi
+
+    # imx25 and realview need initrd support
+
+    if [ "${fixup}" = "imx25" -o "${fixup}" = "realview_eb" -o \
+	 "${fixup}" = "realview_pb" ]
+    then
 	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
 	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    fi
+
+    # Older versions of realview config files need additional CPU support.
+
+    if [ "${fixup}" = "realview_eb" ]
+    then
+	sed -i -e '/CONFIG_REALVIEW_EB_A9MP/d' ${defconfig}
+	echo "CONFIG_REALVIEW_EB_A9MP=y" >> ${defconfig}
+	sed -i -e '/CONFIG_REALVIEW_EB_ARM11MP_REVB/d' ${defconfig}
+	echo "CONFIG_REALVIEW_EB_ARM11MP_REVB=y" >> ${defconfig}
+	sed -i -e '/CONFIG_MACH_REALVIEW_PBX/d' ${defconfig}
+	echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
+	sed -i -e '/CONFIG_MACH_REALVIEW_PB1176/d' ${defconfig}
+	echo "CONFIG_MACH_REALVIEW_PB1176=y" >> ${defconfig}
+    fi
+
+    # Similar for PB-A8. Also disable some EB and incompatible PB
+    # configurations.
+
+    if [ "${fixup}" = "realview_pb" ]
+    then
+	sed -i -e '/CONFIG_REALVIEW_EB/d' ${defconfig}
+	sed -i -e '/CONFIG_MACH_REALVIEW_PB11/d' ${defconfig}
+	sed -i -e '/CONFIG_MACH_REALVIEW_PBX/d' ${defconfig}
+	echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
+	sed -i -e '/CONFIG_MACH_REALVIEW_PBA8/d' ${defconfig}
+	echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
     fi
 }
 
@@ -139,6 +175,7 @@ runkernel()
     local mode=$6
     local fixup=$7
     local dtb=$8
+    local ddtb=$(echo ${dtb} | sed -e 's/.dtb//')
     local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
@@ -151,6 +188,11 @@ runkernel()
     local build=${ARCH}:${mach}:${defconfig}
     local pbuild=${build}
 
+    if [ -n "${ddtb}" ]
+    then
+	pbuild="${build}:${ddtb}"
+    fi
+
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
     then
 	echo "Skipping ${pbuild} ... "
@@ -159,13 +201,14 @@ runkernel()
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
-    	echo "Skipping ${pbuild} ... "
+	echo "Skipping ${pbuild} ... "
 	return 0
     fi
 
-    if [ -n "${dtb}" ]
+    if [ -n "${devtree}" -a "${devtree}" != "${ddtb}" ]
     then
-	pbuild="${build}:$(echo ${dtb} | sed -e 's/.dtb//')"
+	echo "Skipping ${pbuild} ... "
+	return 0
     fi
 
     echo -n "Building ${pbuild} ... "
@@ -378,15 +421,14 @@ runkernel omap2plus_defconfig overo "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 
-runkernel qemu_arm_realview_pb_defconfig realview-pb-a8 "" 512 \
-	busybox-arm.cpio auto
-retcode=$((${retcode} + $?))
+runkernel realview_defconfig realview-pb-a8 "" 512 \
+	busybox-arm.cpio auto realview_pb
 
-runkernel qemu_arm_realview_eb_defconfig realview-eb-mpcore "" 512 \
-	core-image-minimal-qemuarm.cpio manual
+runkernel realview_defconfig realview-eb-mpcore "" 512 \
+	core-image-minimal-qemuarm.cpio manual realview_eb
 retcode=$((${retcode} + $?))
-runkernel qemu_arm_realview_eb_defconfig realview-eb cortex-a8 512 \
-	core-image-minimal-qemuarm.cpio manual
+runkernel realview_defconfig realview-eb cortex-a8 512 \
+	core-image-minimal-qemuarm.cpio manual realview_eb
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
