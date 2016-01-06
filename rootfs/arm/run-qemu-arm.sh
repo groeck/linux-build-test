@@ -424,10 +424,14 @@ retcode=$((${retcode} + $?))
 runkernel realview_defconfig realview-pb-a8 "" 512 \
 	busybox-arm.cpio auto realview_pb
 
+runkernel realview_defconfig realview-eb cortex-a8 512 \
+	core-image-minimal-qemuarm.cpio manual realview_eb
+retcode=$((${retcode} + $?))
 runkernel realview_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
 retcode=$((${retcode} + $?))
-runkernel realview_defconfig realview-eb cortex-a8 512 \
+
+runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
 retcode=$((${retcode} + $?))
 
