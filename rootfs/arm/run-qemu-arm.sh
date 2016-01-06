@@ -113,14 +113,15 @@ patch_defconfig()
 	echo "CONFIG_AEABI=y" >> ${defconfig}
 	sed -i -e '/CONFIG_PCI/d' ${defconfig}
 	echo "CONFIG_PCI=y" >> ${defconfig}
-	sed -i -e '/CONFIG_PCI_VERSATILE/d' ${defconfig}
 	echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
+	sed -i -e '/CONFIG_OF_PCI/d' ${defconfig}
+	echo "CONFIG_OF_PCI=y" >> ${defconfig}
+	echo "CONFIG_OF_PCI_IRQ=y" >> ${defconfig}
 	sed -i -e '/CONFIG_SCSI/d' ${defconfig}
 	echo "CONFIG_SCSI=y" >> ${defconfig}
+	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
 	sed -i -e '/CONFIG_BLK_DEV_SD/d' ${defconfig}
 	echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-	sed -i -e '/CONFIG_SCSI_SYM53C8XX_2/d' ${defconfig}
-	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
     fi
 
     if [ "${fixup}" = "regulator" ]
