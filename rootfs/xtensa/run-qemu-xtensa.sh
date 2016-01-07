@@ -1,5 +1,8 @@
 #!/bin/bash
 
+machine=$1
+config=$2
+
 PREFIX=xtensa-linux-
 ARCH=xtensa
 rootfs=busybox-xtensa.cpio
@@ -39,8 +42,21 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local fixup="initrd"
+    local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${cpu}:${mach}:${defconfig} ... "
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    echo -n "Building ${pbuild} ... "
 
     if [ "${cached_defconfig}" != "${defconfig}:${cpu}" ]
     then
