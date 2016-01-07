@@ -114,7 +114,8 @@ patch_defconfig()
 	sed -i -e '/CONFIG_PCI/d' ${defconfig}
 	echo "CONFIG_PCI=y" >> ${defconfig}
 	echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
-	sed -i -e '/CONFIG_OF_PCI/d' ${defconfig}
+	sed -i -e '/CONFIG_OF/d' ${defconfig}
+	echo "CONFIG_OF=y" >> ${defconfig}
 	echo "CONFIG_OF_PCI=y" >> ${defconfig}
 	echo "CONFIG_OF_PCI_IRQ=y" >> ${defconfig}
 	sed -i -e '/CONFIG_SCSI/d' ${defconfig}
