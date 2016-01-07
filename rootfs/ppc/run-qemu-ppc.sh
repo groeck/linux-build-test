@@ -1,5 +1,8 @@
 #!/bin/bash
 
+machine=$1
+config=$2
+
 # machine specific information
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
@@ -63,13 +66,26 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local smp
+    local pbuild="${ARCH}:${mach}${smp}:${defconfig}"
 
     if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
     then
 	smp=":${fixup}"
     fi
 
-    echo -n "Building ${ARCH}:${mach}${smp}:${defconfig} ... "
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    echo -n "Building ${pbuild} ... "
 
     if [ "${defconfig}_${fixup}" != "${cached_defconfig}" ]
     then
