@@ -85,6 +85,8 @@ skip_314="arm:beagle:multi_v7_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_318="arm:smdkc210:multi_v7_defconfig"
+skip_41="arm:versatilepb-scsi:versatile_defconfig"
+skip_43="arm:versatilepb-scsi:versatile_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
