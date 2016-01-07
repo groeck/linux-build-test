@@ -38,15 +38,14 @@ usage()
 
 make_image()
 {
-    local cylinders=$(echo ${imgsize}/255/63/512 | bc)
     local tmpfile=/tmp/sdimage.$$.img
 
     qemu-img create -f raw ${tmpfile} ${imgsize}
 
     {
-    echo ,9,0x0C,*
-    echo ,,,-
-    } | sfdisk -D -H 255 -S 63 -C ${cylinders} ${tmpfile} &> /dev/null
+    echo 63,144522,0x0C,*
+    echo 144585,369495,,-
+    } | sfdisk -u S ${tmpfile} &> /dev/null
 
     # Reverse engineer partition setup
     BYTES_PER_SECTOR="$(fdisk -l -u ${tmpfile} | grep Units | awk '{print $8}')"
