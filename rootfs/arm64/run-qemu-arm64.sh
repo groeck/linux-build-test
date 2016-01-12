@@ -1,5 +1,8 @@
 #!/bin/bash
 
+build=$1
+config=$2
+
 PREFIX=aarch64-linux-
 ARCH=arm64
 rootfs=rootfs.arm64.cpio
@@ -34,8 +37,21 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local pbuild="${ARCH}:${smp}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${smp}:${defconfig} ... "
+    if [ -n "${build}" -a "${build}" != "${smp}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    echo -n "Building ${pbuild} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} generic ${smp}
     if [ $? -ne 0 ]
