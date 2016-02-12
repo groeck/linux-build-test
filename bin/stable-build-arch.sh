@@ -17,7 +17,8 @@ PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
 PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.3/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
-PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
+# PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
+PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
@@ -128,7 +129,8 @@ case ${ARCH} in
 	;;
     c6x)
 	cmd=(${cmd_c6x[*]})
-	PREFIX="tic6x-uclinux-"
+	PREFIX="c6x-elf-"
+	# PREFIX="tic6x-uclinux-"
 	PATH=${PATH_C6X}:${PATH}
 	;;
     crisv32)
