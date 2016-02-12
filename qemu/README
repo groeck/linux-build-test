@@ -1,0 +1,48 @@
+Packages needed to build:
+	libglib2.0-dev
+	libssh2-1-dev
+	libcurl4-openssl-dev
+	libiscsi-dev
+	autoconf
+	libpixman-1-dev
+
+Build:
+	cd qemu
+	./configure --prefix=/opt/buildbot --disable-user
+	make install
+
+Distribution:
+	[ If necessary update VERSION file ]
+	make clean
+	./configure --prefix=/opt/buildbot --disable-user
+	make dist
+	[ creates tarball ]
+
+Branch updates:
+
+git checkout master
+git pull origin
+
+[ following is an example: update from v2.4.0-rc3 to v2.4.0-rc4 ]
+git checkout -b v2.4.0-rc4-local
+git merge v2.4.0-rc3
+
+# build and install
+./configure --prefix=/opt/buildbot --disable-user
+make install
+
+-----------
+
+qemu for blackfin
+
+The blackfin port is not working (yet), or command line parameters
+are unknown.
+
+git remote add blackfin git@github.com:vapier/qemu.git
+git fetch blackfin
+git checkout -b blackfin blackfin/bfin
+[ or git checkout blackfin; git pull/merge blackfin/bfin]
+
+./configure --prefix=/opt/buildbot/qemu/bfin --disable-user --target-list bfin-softmmu --disable-werror
+make install
+(cd /opt/buildbot/bin; ln -s ../qemu/bfin/bin/qemu-system-bfin .)
