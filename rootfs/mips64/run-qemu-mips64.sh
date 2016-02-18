@@ -2,7 +2,7 @@
 
 # machine specific information
 rootfs=core-image-minimal-qemumips64.ext3
-PATH_MIPS=/opt/kernel/gcc-4.6.3-nolibc/mips64-linux/bin
+PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips64-linux/bin
 PREFIX=mips64-linux-
 ARCH=mips
 QEMUCMD=/opt/buildbot/bin/qemu-system-mips64

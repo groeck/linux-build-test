@@ -1,4 +1,5 @@
 Packages needed to build:
+	libfdt-dev
 	libglib2.0-dev
 	libssh2-1-dev
 	libcurl4-openssl-dev
