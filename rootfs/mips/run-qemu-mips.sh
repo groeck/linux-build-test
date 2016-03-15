@@ -1,5 +1,7 @@
 #!/bin/bash
 
+config=$1
+
 # machine specific information
 rootfs=core-image-minimal-qemumips.ext3
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
@@ -22,8 +24,15 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
+    local build="${ARCH}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    echo -n "Building ${build} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
     if [ $? -ne 0 ]
