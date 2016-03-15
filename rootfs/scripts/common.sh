@@ -104,10 +104,14 @@ setup_config()
 	# the configs directory.
 
 	[ ! -e $f ] && f="arch/${arch}/${defconfig}"
-
-	cp $f ${tf}
-	patch_defconfig ${tf} ${fixup}
-	defconfig=${ndefconfig}
+	if [  -e $f ]
+	then
+	    cp $f ${tf}
+	    patch_defconfig ${tf} ${fixup}
+	    defconfig=${ndefconfig}
+	else
+	    defconfig=""
+	fi
     fi
     echo ${defconfig}
 }
@@ -142,6 +146,11 @@ dosetup()
     doclean ${ARCH}
 
     defconfig=$(setup_config ${ARCH} ${defconfig} ${fixup})
+    if [ -z "${defconfig}" ]
+    then
+	echo "skipped"
+	return 2
+    fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
     if [ $? -ne 0 ]
