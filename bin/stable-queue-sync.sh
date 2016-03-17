@@ -17,7 +17,7 @@ do_import()
 {
 	release=$1
 	target=linux-${release}.y.queue
-	if [ "${releases}" = "3.12" ]
+	if [ "${release}" = "3.12" ]
 	then
 		source=origin/stable-${release}-queue
 	else
