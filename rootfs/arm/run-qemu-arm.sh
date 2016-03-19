@@ -446,6 +446,7 @@ retcode=$((${retcode} + $?))
 
 runkernel realview_defconfig realview-pb-a8 "" 512 \
 	busybox-arm.cpio auto realview_pb
+retcode=$((${retcode} + $?))
 
 runkernel realview_defconfig realview-eb cortex-a8 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
