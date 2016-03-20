@@ -11,6 +11,19 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Enable BLK_DEV_INITRD
+    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+    # Enable DEVTMPFS
+    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -21,7 +34,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" fixup
     if [ $? -ne 0 ]
     then
 	return 1
@@ -46,5 +59,5 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_alpha_defconfig
+runkernel defconfig
 exit $?
