@@ -11,6 +11,22 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Enable BLK_DEV_INITRD, and append the initramfs to the kernel
+    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
+    echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
+
+
+    # Enable DEVTMPFS
+    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -22,7 +38,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     if [ $? -ne 0 ]
     then
 	return 1
@@ -45,5 +61,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_metag_defconfig
-exit $?
+runkernel meta2_defconfig
+rv=$?
+runkernel tz1090_defconfig
+retcode=$((${rv} + $?))
+
+exit $rv
