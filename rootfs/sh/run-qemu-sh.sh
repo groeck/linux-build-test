@@ -11,6 +11,14 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Drop command line overwrite
+    sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -21,7 +29,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     if [ $? -ne 0 ]
     then
 	return 1
@@ -30,7 +38,7 @@ runkernel()
     echo -n "running ..."
 
     /opt/buildbot/bin/qemu-system-sh4 -M r2d -kernel ./arch/sh/boot/zImage \
-	-drive file=${rootfs},if=ide \
+	-drive file=${rootfs},format=raw,if=ide \
 	-append "root=/dev/sda console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
 	-nographic -monitor null > ${logfile} 2>&1 &
@@ -45,7 +53,7 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_sh_defconfig
+runkernel rts7751r2dplus_defconfig
 retcode=$?
 
 exit ${retcode}
