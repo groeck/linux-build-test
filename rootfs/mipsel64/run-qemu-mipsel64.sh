@@ -1,12 +1,14 @@
 #!/bin/bash
 
+config=$1
+variant=$2
+
 # machine specific information
 PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
-PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=mips-poky-linux-
 ARCH=mips
 
-PATH=${PATH_MIPS}:${PATH_X86}:${PATH}
+PATH=${PATH_MIPS}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
@@ -18,6 +20,27 @@ patch_defconfig()
 
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+
+    # Build a 64 bit kernel with INITRD enabled.
+    # Don't touch the fulong2 configuration.
+    if [ "${fixup}" != "fulong2e" ]
+    then
+	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+	sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
+	sed -i -e '/CONFIG_32BIT/d' ${defconfig}
+	sed -i -e '/CONFIG_64BIT/d' ${defconfig}
+	echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
+	echo "CONFIG_64BIT=y" >> ${defconfig}
+    fi
+
+    # Only build an SMP image if asked for. Fulong2e is always SMP.
+    sed -i -e '/CONFIG_MIPS_MT_SMP/d' ${defconfig}
+    if [ "${fixup}" = "smp" -o "${fixup}" = "fulong2e" ]
+    then
+        echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
+    fi
 }
 
 runkernel()
@@ -31,8 +54,21 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
+    local build="${ARCH}:${defconfig}:${fixup}"
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    echo -n "Building ${build} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
     retcode=$?
@@ -52,7 +88,8 @@ runkernel()
         /opt/buildbot/bin/qemu-system-mips64el -M ${mach} \
 	    -kernel vmlinux -vga cirrus -no-reboot -m 128 \
 	    --append "rdinit=/sbin/init mem=128M console=ttyS0 console=tty doreboot" \
-	    -nographic > ${logfile} 2>&1 &
+	    -nographic -monitor none \
+	    -initrd ${rootfs} > ${logfile} 2>&1 &
     	pid=$!
     else
 	# New configurations mount sda instead of hda
@@ -76,11 +113,11 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_mipsel_malta64_defconfig malta busybox-mips64el.cpio
+runkernel malta_defconfig malta busybox-mips64el.cpio nosmp
 retcode=$?
-runkernel qemu_mipsel_malta64_smp_defconfig malta busybox-mips64el.cpio
+runkernel malta_defconfig malta busybox-mips64el.cpio smp
 retcode=$((${retcode} + $?))
-runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fixup
+runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fulong2e
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
