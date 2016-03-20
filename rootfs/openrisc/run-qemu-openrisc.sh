@@ -11,6 +11,19 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Specify initramfs file name
+    sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
+    echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
+
+    # We need to support initramfs gzip compression
+    sed -i -e '/CONFIG_RD_GZIP/d' ${defconfig}
+    echo "CONFIG_RD_GZIP=y" >> ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -24,7 +37,7 @@ runkernel()
     # Kernel assumes elf32-or32, but toolchain produces elf32-or1k.
     # Kludgy fix until we find a better solution.
     sed -i -e 's/elf32-or32/elf32-or1k/g' arch/openrisc/kernel/vmlinux.lds.S
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     retcode=$?
     sed -i -e 's/elf32-or1k/elf32-or32/g' arch/openrisc/kernel/vmlinux.lds.S
     if [ ${retcode} -ne 0 ]
@@ -48,7 +61,7 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_openrisc_defconfig
+runkernel or1ksim_defconfig
 retcode=$?
 
 exit ${retcode}
