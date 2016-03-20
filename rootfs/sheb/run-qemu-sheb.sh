@@ -12,6 +12,26 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Drop command line overwrite
+    sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
+
+    # Enable BLK_DEV_INITRD
+    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+    # Enable DEVTMPFS
+    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+
+    # Build a big endian image
+    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+    echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -22,7 +42,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     if [ $? -ne 0 ]
     then
 	return 1
@@ -46,7 +66,7 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_sheb_defconfig
+runkernel rts7751r2dplus_defconfig
 retcode=$?
 
 exit ${retcode}
