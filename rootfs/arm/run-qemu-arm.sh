@@ -101,10 +101,19 @@ patch_defconfig()
 
     if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
          "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" -o \
-	 "${fixup}" = "versatile" ]
+	 "${fixup}" = "versatile" -o "${fixup}" = "pxa" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    fi
+
+    # Non-generic pxa images need to have BLK_DEV_INITRD and EABI enabled.
+    if [ "${fixup}" = "pxa" ]
+    then
+	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+	sed -i -e '/CONFIG_AEABI/d' ${defconfig}
+	echo "CONFIG_AEABI=y" >> ${defconfig}
     fi
 
     # Versatile (scsi) needs to have AEABI, PCI and SCSI enabled.
@@ -252,6 +261,10 @@ runkernel()
 	# See upstream commits f6537f2f0e and 7122c3e915.
 	dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
+	if [ ${retcode} -eq 2 ]
+	then
+	    return 0
+	fi
 	if [ ${retcode} -ne 0 ]
 	then
 	    return 1
@@ -279,6 +292,15 @@ runkernel()
     fi
 
     case ${mach} in
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
+	${QEMU} -M ${mach} ${cpucmd} \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -initrd ${rootfs} \
+	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
+	    -monitor null -nographic \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "overo" | "beagle" | "beaglexm")
 	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
 	    ${dtbfile} sd.img > ${logfile} 2>&1
@@ -421,10 +443,9 @@ retcode=$((${retcode} + $?))
 # due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
 # starting with 0x900, which isn't supported by qemu. As a result, the boot
 # CPU is not detected, which causes a warning in kernels prior to v3.14.
-# This is distracting, so disable for now.
-# runkernel multi_v7_defconfig highbank cortex-a9 2G \
-# 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
-# retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig highbank cortex-a9 2G \
+	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
+retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
@@ -457,6 +478,34 @@ retcode=$((${retcode} + $?))
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
+retcode=$((${retcode} + $?))
+
+runkernel spitz_defconfig akita "" "" \
+	core-image-minimal-qemuarm.cpio automatic pxa
+retcode=$((${retcode} + $?))
+
+runkernel spitz_defconfig spitz "" "" \
+	core-image-minimal-qemuarm.cpio automatic pxa
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig akita "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig borzoi "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig spitz "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig tosa "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig terrier "" "" \
+	core-image-minimal-qemuarm.cpio automatic
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
