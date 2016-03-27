@@ -32,23 +32,28 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:vexpress_defconfig"
-skip_34="arm:beagle:omap2plus_defconfig \
+skip_34="arm:akita:spitz_defconfig \
+	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:versatilepb-scsi:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:vexpress_defconfig"
-skip_310="arm:beagle:multi_v7_defconfig \
+skip_310="arm:akita:spitz_defconfig \
+	arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:multi_v7_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
+	arm:highbank:multi_v7_defconfig \
 	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
+	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
