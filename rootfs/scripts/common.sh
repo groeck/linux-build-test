@@ -112,6 +112,14 @@ setup_config()
 	else
 	    defconfig=""
 	fi
+    else
+	# report to caller if configuration does not exist (not an error)
+        local f="arch/${arch}/configs/${defconfig}"
+	[ ! -e $f ] && f="arch/${arch}/${defconfig}"
+	if [ ! -e $f ]
+	then
+	    defconfig=""
+	fi
     fi
     echo ${defconfig}
 }
