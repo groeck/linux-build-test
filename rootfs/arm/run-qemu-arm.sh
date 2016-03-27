@@ -430,9 +430,9 @@ retcode=$((${retcode} + $?))
 # due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
 # starting with 0x900, which isn't supported by qemu. As a result, the boot
 # CPU is not detected, which causes a warning in kernels prior to v3.14.
-runkernel multi_v7_defconfig highbank cortex-a9 2G \
-	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
-retcode=$((${retcode} + $?))
+# runkernel multi_v7_defconfig highbank cortex-a9 2G \
+# 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
+# retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
