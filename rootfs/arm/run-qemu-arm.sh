@@ -88,14 +88,15 @@ patch_defconfig()
 
     if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
          "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" -o \
-	 "${fixup}" = "versatile" -o "${fixup}" = "pxa" ]
+	 "${fixup}" = "versatile" -o "${fixup}" = "pxa" -o "${fixup}" = "collie" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     fi
 
-    # Non-generic pxa images need to have BLK_DEV_INITRD and EABI enabled.
-    if [ "${fixup}" = "pxa" ]
+    # Non-generic pxa images as well as collie need to have BLK_DEV_INITRD
+    # and EABI enabled.
+    if [ "${fixup}" = "pxa" -o "${fixup}" = "collie" ]
     then
 	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
 	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
@@ -279,6 +280,15 @@ runkernel()
     fi
 
     case ${mach} in
+    "collie")
+	${QEMU} -M ${mach} \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -initrd ${rootfs} \
+	    --append "rdinit=/sbin/init console=ttySA1 doreboot" \
+	    -monitor null -nographic \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -497,6 +507,10 @@ retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig terrier "" "" \
 	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel collie_defconfig collie "" "" \
+	busybox-armv4.cpio manual collie
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
