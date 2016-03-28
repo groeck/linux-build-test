@@ -333,7 +333,7 @@ runkernel()
 	pid=$!
 	;;
     "realview-pb-a8" | "realview-eb-mpcore" | "realview-eb" | \
-    "versatileab" | "versatilepb" | "highbank" )
+    "versatileab" | "versatilepb" | "highbank" | "midway" )
 	${QEMU} -M ${mach} ${cpucmd} -m ${mem} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -433,6 +433,10 @@ retcode=$((${retcode} + $?))
 # runkernel multi_v7_defconfig highbank cortex-a9 2G \
 # 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
 # retcode=$((${retcode} + $?))
+
+runkernel multi_v7_defconfig midway "" 2G \
+	core-image-minimal-qemuarm.cpio auto "" ecx-2000.dtb
+retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
