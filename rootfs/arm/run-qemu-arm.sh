@@ -445,7 +445,7 @@ retcode=$((${retcode} + $?))
 # retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig midway "" 2G \
-	core-image-minimal-qemuarm.cpio auto "" ecx-2000.dtb
+	core-image-minimal-qemuarm.cpio auto devtmpfs ecx-2000.dtb
 retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
