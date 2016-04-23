@@ -16,7 +16,11 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
-    sed -i -e '/CONFIG_MARCH/d' ${defconfig}
+    # qemu only supports MARCH_Z900. Older kernels select it as default,
+    # but newer kernels may select MARCH_Z196.
+    sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
+    sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
+    echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
 }
 
 runkernel()
