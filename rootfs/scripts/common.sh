@@ -271,6 +271,11 @@ dowait()
     then
 	dolog=1
     fi
+    grep "stack backtrace" ${logfile} >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+	dolog=1
+    fi
 
     if [ ${dolog} -ne 0 ]
     then
