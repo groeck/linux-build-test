@@ -5,6 +5,7 @@ config=$2
 devtree=$3
 
 QEMU=/opt/buildbot/bin/qemu-system-arm
+QEMU_V26=/opt/buildbot/bin/qemu-v2.6/qemu-system-arm
 # QEMU=/opt/buildbot/qemu/qemu/arm-softmmu/qemu-system-arm
 
 PREFIX=arm-poky-linux-gnueabi-
@@ -281,11 +282,35 @@ runkernel()
     fi
 
     case ${mach} in
+    "raspi2")
+	${QEMU_V26} -M ${mach} \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -drive file=${rootfs},format=raw,if=sd \
+	    --append "root=/dev/mmcblk0 rootwait rw earlyprintk console=ttyAMA0 doreboot" \
+	    ${dtbcmd} \
+	    -nographic -monitor null -serial stdio \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "collie")
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttySA1 doreboot" \
+	    -monitor null -nographic \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
+    "mainstone")
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128
+	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
+	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
+	${QEMU} -M ${mach} ${cpucmd} \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -initrd ${rootfs} \
+	    -drive file=/tmp/flash,format=raw,if=pflash \
+	    -drive file=/tmp/flash,format=raw,if=pflash \
+	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -437,6 +462,11 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
+# Disabled for now due to warnings from uart driver (qemu 2.6.0-rc3)
+# runkernel multi_v7_defconfig raspi2 "" "" \
+# 	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
+# retcode=$((${retcode} + $?))
+
 # highbank boots with updated qemu, but generates warnings to the console
 # due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
 # starting with 0x900, which isn't supported by qemu. As a result, the boot
@@ -495,6 +525,10 @@ runkernel pxa_defconfig akita "" "" \
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig borzoi "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
+runkernel pxa_defconfig mainstone "" "" \
 	core-image-minimal-qemuarm.cpio automatic
 retcode=$((${retcode} + $?))
 
