@@ -338,7 +338,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rw console=ttyPS0 doreboot" \
+	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0 doreboot" \
 	    -nographic -monitor none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -366,7 +366,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rw console=ttyAMA0,115200 console=tty1 doreboot" \
+	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1 doreboot" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
