@@ -79,7 +79,7 @@ skip_312="alpha:allnoconfig avr32:allnoconfig m68k:allnoconfig \
 skip_314="alpha:allnoconfig avr32:allnoconfig ia64:allmodconfig \
 	m68k:allnoconfig microblaze:allnoconfig \
 	openrisc:allnoconfig parisc:allmodconfig"
-skip_316="arc:allnoconfig m68k:allnoconfig"
+skip_316="m68k:allnoconfig"
 skip_318="m68k:allnoconfig"
 skip_44="cris:allnoconfig"
 
