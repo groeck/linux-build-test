@@ -4,6 +4,7 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 LOG=/tmp/log.$$
+BUILDDIR=/tmp/build.$$
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
@@ -334,6 +335,9 @@ if [ ${#fixup[*]} -gt 0 ]; then
     echo
 fi
 
+rm -rf ${BUILDDIR}
+mkdir -p ${BUILDDIR}
+
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
 do
@@ -350,7 +354,7 @@ do
 	done
 
 	rm -f .config
-	make ${CROSS} ARCH=${ARCH} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (config) - skipping"
@@ -362,11 +366,10 @@ do
 	    fmax=$(expr ${#fixup[*]} - 1)
 	    for f in $(seq 0 ${fmax})
 	    do
-	        sed -e "${fixup[$f]}" .config > .config.tmp
-	        mv .config.tmp .config
+	        sed -i -e "${fixup[$f]}" ${BUILDDIR}/.config
 	    done
 	fi
-	make ${CROSS} ARCH=${ARCH} ${EXTRA_CMD} oldnoconfig >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
 	        echo "failed (oldnoconfig) - skipping"
@@ -374,7 +377,7 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	make ${CROSS} -j${maxload} ARCH=${ARCH} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
+	make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
 	if [ $? -ne 0 ]; then
 	    echo "failed"
 	    echo "--------------"
@@ -388,9 +391,10 @@ do
 	rm -f /tmp/buildlog.$$
 done
 
-# Clean up again to conserve disk space
+rm -rf ${BUILDDIR}
 
-git clean -d -f -x -q
+# Clean up again to conserve disk space
+# git clean -d -f -x -q
 
 echo
 echo "-----------------------"
