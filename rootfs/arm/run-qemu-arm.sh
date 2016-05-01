@@ -1,5 +1,12 @@
 #!/bin/bash
 
+runall=0
+if [ "$1" = "-a" ]
+then
+    runall=1
+    shift
+fi
+
 machine=$1
 config=$2
 devtree=$3
@@ -301,8 +308,8 @@ runkernel()
 	    > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "mainstone")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128
+    "mainstone" | "z2")
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
 	${QEMU} -M ${mach} ${cpucmd} \
@@ -462,18 +469,28 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-# Disabled for now due to warnings from uart driver (qemu 2.6.0-rc3)
-# runkernel multi_v7_defconfig raspi2 "" "" \
-# 	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
-# retcode=$((${retcode} + $?))
+# Disabled by default for now due to warnings from uart driver (qemu 2.6.0-rc3).
+# Underlying problem is that cprman is not implemented in qemu. The uart
+# clock is derived from it, and reports a clock rate of 0.
+
+if [ ${runall} -eq 1 ]
+then
+    runkernel multi_v7_defconfig raspi2 "" "" \
+	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
+    retcode=$((${retcode} + $?))
+fi
 
 # highbank boots with updated qemu, but generates warnings to the console
 # due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
 # starting with 0x900, which isn't supported by qemu. As a result, the boot
 # CPU is not detected, which causes a warning in kernels prior to v3.14.
-# runkernel multi_v7_defconfig highbank cortex-a9 2G \
-# 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
-# retcode=$((${retcode} + $?))
+
+if [ ${runall} -eq 1 ]
+then
+    runkernel multi_v7_defconfig highbank cortex-a9 2G \
+	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
+    retcode=$((${retcode} + $?))
+fi
 
 runkernel multi_v7_defconfig midway "" 2G \
 	core-image-minimal-qemuarm.cpio auto devtmpfs ecx-2000.dtb
@@ -536,11 +553,15 @@ runkernel pxa_defconfig spitz "" "" \
 	core-image-minimal-qemuarm.cpio automatic
 retcode=$((${retcode} + $?))
 
+runkernel pxa_defconfig terrier "" "" \
+	core-image-minimal-qemuarm.cpio automatic
+retcode=$((${retcode} + $?))
+
 runkernel pxa_defconfig tosa "" "" \
 	core-image-minimal-qemuarm.cpio automatic
 retcode=$((${retcode} + $?))
 
-runkernel pxa_defconfig terrier "" "" \
+runkernel pxa_defconfig z2 "" "" \
 	core-image-minimal-qemuarm.cpio automatic
 retcode=$((${retcode} + $?))
 
