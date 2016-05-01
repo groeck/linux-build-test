@@ -376,7 +376,7 @@ runkernel()
 	pid=$!
 	;;
     "realview-pb-a8" | "realview-eb-mpcore" | "realview-eb" | \
-    "versatileab" | "versatilepb" | "highbank" | "midway" )
+    "versatileab" | "versatilepb" | "highbank" | "midway" | "integratorcp")
 	${QEMU} -M ${mach} ${cpucmd} -m ${mem} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -568,5 +568,9 @@ retcode=$((${retcode} + $?))
 runkernel collie_defconfig collie "" "" \
 	busybox-armv4.cpio manual collie
 retcode=$((${retcode} + $?))
+
+runkernel integrator_defconfig integratorcp "" 128 \
+	busybox-armv4.cpio automatic devtmpfs integratorcp.dtb
+    retcode=$((${retcode} + $?))
 
 exit ${retcode}
