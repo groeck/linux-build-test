@@ -309,7 +309,7 @@ runkernel()
 	pid=$!
 	;;
     "mainstone" | "z2")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
 	${QEMU} -M ${mach} ${cpucmd} \
@@ -527,6 +527,10 @@ retcode=$((${retcode} + $?))
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
+retcode=$((${retcode} + $?))
+
+runkernel mainstone_defconfig mainstone "" "" \
+	core-image-minimal-qemuarm.cpio automatic pxa
 retcode=$((${retcode} + $?))
 
 runkernel spitz_defconfig akita "" "" \
