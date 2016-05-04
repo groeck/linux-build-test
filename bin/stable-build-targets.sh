@@ -89,6 +89,8 @@ fixup_alpha=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
 
 fixup_mips=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
 
+fixup_parisc64=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
+
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
