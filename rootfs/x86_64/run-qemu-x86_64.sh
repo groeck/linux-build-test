@@ -54,7 +54,8 @@ runkernel()
     esac
 
     /opt/buildbot/bin/qemu-system-x86_64 -kernel arch/x86/boot/bzImage \
-	-M ${mach} -cpu ${cpu} ${usb} -hda ${rootfs} -no-reboot -m 256 \
+	-M ${mach} -cpu ${cpu} ${usb} -no-reboot -m 256 \
+	-drive file=${rootfs},format=raw,if=ide \
 	--append "root=/dev/${drive} rw mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
