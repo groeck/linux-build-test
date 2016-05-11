@@ -116,7 +116,8 @@ runkernel()
     if [ "${rootfs}" = "core-image-minimal-qemuppc.ext3" ]
     then
 	${QEMUCMD} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
-	    -hda ${rootfs} -usb -usbdevice wacom-tablet -no-reboot -m 128 \
+	    -drive file=${rootfs},format=raw,if=ide \
+	    -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	    --append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" \
 	    -nographic > ${logfile} 2>&1 &
     else
