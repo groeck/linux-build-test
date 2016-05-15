@@ -31,7 +31,8 @@ PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 # PATH_M68=/opt/kernel/gcc-4.6.3-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
-PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
 PATH_NIOS2=/opt/sourceryg++-2014.05/bin
 PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
@@ -196,15 +197,27 @@ case ${ARCH} in
 	PREFIX="microblaze-linux-"
 	PATH=${PATH_MICROBLAZE}:${PATH}
 	;;
-    mips)
-	cmd=(${cmd_mips[*]});
+    mips_22)
+	ARCH=mips
+	cmd=(${cmd_mips_22[*]});
 	fmax=$(expr ${#fixup_mips[*]} - 1)
 	for f in $(seq 0 ${fmax})
 	do
 	    fixup[$f]=${fixup_mips[$f]}
 	done
 	PREFIX="mips-poky-linux-"
-	PATH=${PATH_MIPS}:${PATH}
+	PATH=${PATH_MIPS_22}:${PATH}
+	;;
+    mips_24)
+	ARCH=mips
+	cmd=(${cmd_mips_24[*]});
+	fmax=$(expr ${#fixup_mips[*]} - 1)
+	for f in $(seq 0 ${fmax})
+	do
+	    fixup[$f]=${fixup_mips[$f]}
+	done
+	PREFIX="mips-linux-"
+	PATH=${PATH_MIPS_24}:${PATH}
 	;;
     mips_25)
 	ARCH=mips

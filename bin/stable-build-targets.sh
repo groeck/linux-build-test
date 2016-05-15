@@ -34,10 +34,11 @@ cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
 cmd_metag=(defconfig allnoconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
 cmd_microblaze=(mmu_defconfig nommu_defconfig allnoconfig)
-cmd_mips=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defconfig \
+cmd_mips_22=(defconfig allnoconfig)
+cmd_mips_24=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig \
 	e55_defconfig cavium_octeon_defconfig malta_defconfig)
-cmd_mips_25=(defconfig)
+cmd_mips_25=(defconfig allnoconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nios2=(3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig)
