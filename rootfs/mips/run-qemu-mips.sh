@@ -3,17 +3,25 @@
 config=$1
 variant=$2
 
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v3.2|v3.4|v3.10|v3.12|v3.16)
+	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+	;;
+*)
+	PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+	;;
+esac
+
 # machine specific information
 rootfs=busybox-mips.ext3
-PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
-PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=mips-poky-linux-
 ARCH=mips
 QEMUCMD=/opt/buildbot/bin/qemu-system-mips
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
-PATH=${PATH_MIPS}:${PATH_X86}:${PATH}
+PATH=${PATH_MIPS}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
