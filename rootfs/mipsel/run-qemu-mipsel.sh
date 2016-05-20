@@ -5,7 +5,7 @@ variant=$2
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4|v3.10|v3.12|v3.16)
+v3.2|v3.4|v3.10|v3.12|v3.14|v3.16)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 	;;
 *)
