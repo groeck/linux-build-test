@@ -100,6 +100,13 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
+    # explicitly disable fdt for some tests
+    if [ "${fixup}" = "nofdt" ]
+    then
+	sed -i -e '/MACH_PXA27X_DT/d' ${defconfig}
+	sed -i -e '/MACH_PXA3XX_DT/d' ${defconfig}
+    fi
+
     # We need DEVTMPFS for initrd images.
 
     if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
@@ -549,31 +556,31 @@ runkernel spitz_defconfig spitz "" "" \
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig akita "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig borzoi "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig mainstone "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig spitz "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig terrier "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig tosa "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel pxa_defconfig z2 "" "" \
-	core-image-minimal-qemuarm.cpio automatic
+	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
 
 runkernel collie_defconfig collie "" "" \
