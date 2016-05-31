@@ -4,7 +4,7 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 LOG=/tmp/log.$$
-BUILDDIR=/tmp/build.$$
+BUILDDIR=/tmp/buildbot-builddir
 
 PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
