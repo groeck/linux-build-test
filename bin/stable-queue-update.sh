@@ -51,14 +51,7 @@ do_import()
 	else
 		git checkout ${branch}
 		bref=$(git describe | cut -f1 -d-)
-		# Don't import v3.16.24; it does not exist upstream.
-		# Instead, reset branch to base tag.
-		if [ "${bref}" != "v3.16.24" ]
-		then
-		    git reset --hard origin/${branch}
-		else
-		    git reset --hard "v3.16.24"
-		fi
+		git reset --hard origin/${branch}
 	fi
 
 	# reference branch exists locally and is up to date

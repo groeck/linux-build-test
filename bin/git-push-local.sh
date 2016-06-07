@@ -23,12 +23,6 @@ do
 	git push local origin/$a:$a
 	if [ $? -ne 0 ]
 	then
-		# Skip 3.16.y failures
-		if [ "$a" = "linux-3.16.y" ]
-		then
-			echo "Skipping $a"
-			continue
-		fi
 		# Try again. Create local branch, then push it.
 		# If that doesn't work, give up.
 		echo Trying to clone new upstream branch $a
