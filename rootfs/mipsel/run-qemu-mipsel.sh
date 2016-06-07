@@ -53,7 +53,7 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
-    local build="${ARCH}:${defconfig}:${fixup}"
+    local build="mipsel:${defconfig}:${fixup}"
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
