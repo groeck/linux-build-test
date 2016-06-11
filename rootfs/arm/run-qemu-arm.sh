@@ -34,6 +34,7 @@ progdir=$(cd $(dirname $0); pwd)
 skip_32="arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:imx25-pdk:imx_v4_v5_defconfig \
+	arm:integratorcp:integrator_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:omap2plus_defconfig \
