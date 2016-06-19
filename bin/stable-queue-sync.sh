@@ -10,19 +10,24 @@ if [ $# -gt 0 ]
 then
 	releases=($*)
 else
-	releases=(3.10 3.12 3.18 4.1)
+	releases=(3.14 4.4 4.6)
 fi
 
 do_import()
 {
 	release=$1
 	target=linux-${release}.y.queue
-	if [ "${release}" = "3.12" ]
-	then
+	case "${release}" in
+	"3.12")
 		source=origin/stable-${release}-queue
-	else
+		;;
+	"3.18" | "4.1")
 		source=origin/linux-${release}.y-queue
-	fi
+		;;
+	*)
+		source=origin/linux-${release}.y
+		;;
+	esac
 
 	echo "Importing ${release}"
 	echo source: ${source} target: ${target}
