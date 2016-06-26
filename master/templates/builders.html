@@ -30,7 +30,7 @@
 </table>
 
 <br>
-<h1> stable queue, hwmon, watchdog, next: </h1>
+<h1> stable queue, hwmon, watchdog, next, testing: </h1>
 
 {% set arches = [ "alpha", "arc", "arcv2", "arm", "arm64", "avr32",
 		  "blackfin",
@@ -54,10 +54,10 @@
 			"4.1", "4.4", "4.6",
 			"master", "next",
 			"hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+			"watchdog-next", "testing" ] -%}
 
 {% set hwmon_releases = [ "master", "hwmon", "hwmon-next", "hwmon-staging",
-			"watchdog-next" ] -%}
+			"watchdog-next", "testing" ] -%}
 
 {% set exists = [] -%}
 
