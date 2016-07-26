@@ -1,5 +1,12 @@
 #!/bin/bash
 
+debug=0
+if [ "$1" = "-d" ]
+then
+	debug=1
+	shift
+fi
+
 machine=$1
 config=$2
 
@@ -94,6 +101,10 @@ runkernel()
     pid=$!
     dowait ${pid} ${logfile} manual waitlist[@]
     retcode=$?
+    if [ ${debug} -ne 0 ]
+    then
+	cat ${logfile}
+    fi
     rm -f ${logfile}
     return ${retcode}
 }
