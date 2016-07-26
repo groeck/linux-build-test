@@ -3,7 +3,7 @@
 PREFIX=alpha-linux-
 ARCH=alpha
 rootfs=busybox-alpha.cpio
-PATH_ALPHA=/opt/kernel/alpha/gcc-4.8.3/usr/bin
+PATH_ALPHA=/opt/kernel/alpha/gcc-5.1.0/usr/bin
 
 PATH=${PATH_ALPHA}:${PATH}
 
