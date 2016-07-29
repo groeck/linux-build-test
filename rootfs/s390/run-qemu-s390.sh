@@ -44,7 +44,7 @@ runkernel()
     /opt/buildbot/bin/qemu-system-s390x -kernel vmlinux \
         -initrd ${rootfs} \
 	-append "rdinit=/sbin/init doreboot" \
-	-m 256 \
+	-m 512 \
 	-nographic -monitor null --no-reboot > ${logfile} 2>&1 &
 
     pid=$!
