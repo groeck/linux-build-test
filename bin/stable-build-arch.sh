@@ -15,7 +15,7 @@ PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnue
 PATH_ARM64=/opt/kernel/aarch64/gcc-5.2/usr/bin
 # PATH_ARC=/opt/kernel/arc/gcc-4.4.7/usr/bin
 PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
-PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.3/usr/bin
+PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 # PATH_C6X=/opt/kernel/gcc-4.8.1/tic6x-uclinux/bin
@@ -64,6 +64,7 @@ echo "Build reference: ${ref}"
 echo
 
 ARCH=$1
+BRANCH=$2
 
 # clean up source directory expected to be done by caller
 # Do it again to be able to call script directly.
@@ -105,7 +106,7 @@ case ${ARCH} in
 	do
 	    fixup[$f]=${fixup_arcv2[$f]}
 	done
-	PREFIX="arc-elf-linux-uclibc-"
+	PREFIX="arc-linux-"
 	PATH=${PATH_ARCV2}:${PATH}
 	;;
     arm)
@@ -387,6 +388,13 @@ do
 	        sed -i -e "${fixup[$f]}" ${BUILDDIR}/.config
 	    done
 	fi
+
+	# Run branch specific initialization if necessary
+	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
+	then
+		. ${basedir}/branches/${BRANCH}/setup.sh ${ARCH} ${BRANCH} ${BUILDDIR}
+	fi
+
 	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} oldnoconfig >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
