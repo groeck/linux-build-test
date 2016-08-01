@@ -7,7 +7,7 @@
 <h1>Source verification:</h1>
 
 <table border=1>
-{% for b in builders if b.name in ('hwmon', 'hwmon-next', 'hwmon-staging') -%}
+{% for b in builders if b.name in ('hwmon', 'hwmon-next') -%}
   <tr>
   <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
   <td>
@@ -51,12 +51,12 @@
 			"x86", "x86_64", "xtensa" ] -%}
 
 {% set releases = [ "3.2", "3.4", "3.10", "3.12", "3.14", "3.16", "3.18",
-			"4.1", "4.4", "4.6",
+			"4.1", "4.4", "4.6", "4.7",
 			"master", "next",
-			"hwmon", "hwmon-next", "hwmon-staging",
+			"hwmon", "hwmon-next",
 			"watchdog-next", "testing" ] -%}
 
-{% set hwmon_releases = [ "master", "hwmon", "hwmon-next", "hwmon-staging",
+{% set hwmon_releases = [ "master", "hwmon", "hwmon-next",
 			"watchdog-next", "testing" ] -%}
 
 {% set exists = [] -%}
