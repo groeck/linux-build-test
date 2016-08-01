@@ -169,13 +169,13 @@ dosetup()
 
     setup_rootfs "${rootfs}" "${dynamic}"
 
-    make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >${logfile} 2>&1
+    make -j12 ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
     retcode=$?
     if [ ${retcode} -ne 0 ]
     then
 	echo "failed"
 	echo "------------"
-	echo "Build log:"
+	echo "Error log:"
 	cat ${logfile}
 	echo "------------"
     fi
