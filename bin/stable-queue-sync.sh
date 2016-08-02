@@ -38,11 +38,22 @@ do_import()
 		git config remote.local.pushurl "ssh://git@server.roeck-us.net//var/cache/git/linux-stable.git"
 	}
 	git fetch --all
-	git push local ${source}:${target}
+	# Check if target branch exists
+	# If not, we have to create it first
+	# Note: "git push local ${source}:${target}" does not work
+	# if ${target} does not exist.
+	git branch -r | grep local/${target} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
-		echo "push failed, retrying with force"
-		git push --force local ${source}:${target}
+		git checkout -b ${target} ${source}
+		git push local ${target}
+	else
+		git push local ${source}:${target}
+		if [ $? -ne 0 ]
+		then
+			echo "push failed, retrying with force"
+			git push --force local ${source}:${target}
+		fi
 	fi
 }
 
