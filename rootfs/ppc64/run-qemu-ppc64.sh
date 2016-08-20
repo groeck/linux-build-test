@@ -7,6 +7,8 @@ PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
 
+QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-ppc64}
+
 PATH=${PATH_PPC}:${PATH_X86}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 

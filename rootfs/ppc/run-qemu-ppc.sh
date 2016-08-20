@@ -10,8 +10,9 @@ PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-li
 PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
-QEMUCMD=/opt/buildbot/bin/qemu-system-ppc
 QEMU_MACH=mac99
+
+QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-ppc}
 
 PATH=${PATH_PPC}:${PATH_X86}:${PATH}
 dir=$(cd $(dirname $0); pwd)
@@ -115,7 +116,7 @@ runkernel()
 
     if [ "${rootfs}" = "core-image-minimal-qemuppc.ext3" ]
     then
-	${QEMUCMD} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
+	${QEMU} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
 	    -drive file=${rootfs},format=raw,if=ide \
 	    -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	    --append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" \
@@ -128,7 +129,7 @@ runkernel()
 	    dtbcmd="-dtb ${dtb}"
 	    dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
 	fi
-	${QEMUCMD} -kernel ${kernel} -M ${mach} -no-reboot -m 256 \
+	${QEMU} -kernel ${kernel} -M ${mach} -no-reboot -m 256 \
 	    --append "rdinit=/sbin/init console=ttyS0 console=tty doreboot" \
 	    ${dtbcmd} -monitor none -nographic \
 	    -initrd ${rootfs} > ${logfile} 2>&1 &
