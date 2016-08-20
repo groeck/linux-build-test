@@ -4,6 +4,8 @@ PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PREFIX=x86_64-poky-linux-
 ARCH=x86_64
 
+QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-x86_64}
+
 PATH=${PATH_X86}:${PATH}
 
 dir=$(cd $(dirname $0); pwd)
@@ -53,7 +55,7 @@ runkernel()
 	;;
     esac
 
-    /opt/buildbot/bin/qemu-system-x86_64 -kernel arch/x86/boot/bzImage \
+    ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} ${usb} -no-reboot -m 256 \
 	-drive file=${rootfs},format=raw,if=ide \
 	--append "root=/dev/${drive} rw mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
