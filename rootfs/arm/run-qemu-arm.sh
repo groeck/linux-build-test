@@ -11,9 +11,7 @@ machine=$1
 config=$2
 devtree=$3
 
-QEMU=/opt/buildbot/bin/qemu-system-arm
-QEMU_V26=/opt/buildbot/bin/qemu-v2.6/qemu-system-arm
-# QEMU=/opt/buildbot/qemu/qemu/arm-softmmu/qemu-system-arm
+QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-arm}
 
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
@@ -305,7 +303,7 @@ runkernel()
 
     case ${mach} in
     "raspi2")
-	${QEMU_V26} -M ${mach} \
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    --append "root=/dev/mmcblk0 rootwait rw earlyprintk console=ttyAMA0 doreboot" \
