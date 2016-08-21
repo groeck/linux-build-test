@@ -1,5 +1,8 @@
 #!/bin/bash
 
+mach=$1
+variant=$2
+
 # machine specific information
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
@@ -8,6 +11,7 @@ PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
 
 QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-ppc64}
+QEMU_V27=${QEMU:=/opt/buildbot/bin/qemu-v2.7/qemu-system-ppc64}
 
 PATH=${PATH_PPC}:${PATH_X86}:${PATH}
 dir=$(cd $(dirname $0); pwd)
@@ -59,16 +63,29 @@ runkernel()
     local dt=$9
     local pid
     local retcode
+    local qemu
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
-    local fixup_msg
+    local msg="${ARCH}:${machine}:${defconfig}"
 
-    if [ "${fixup}" != "devtmpfs" ]
+    if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
     then
-        fixup_msg=":${fixup}"
+	msg="${msg}:${fixup}"
     fi
 
-    echo -n "Building ${ARCH}${fixup_msg}:${defconfig} ... "
+    if [ -n "${mach}" -a "${mach}" != "${machine}" ]
+    then
+	echo "Skipping ${msg} ... "
+	return 0
+    fi
+
+    if [ -n "${variant}" -a "${fixup}" != "${variant}" ]
+    then
+	echo "Skipping ${msg} ... "
+	return 0
+    fi
+
+    echo -n "Building ${msg} ... "
 
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
     retcode=$?
@@ -89,7 +106,22 @@ runkernel()
         dt_cmd="-machine ${dt}"
     fi
 
-    /opt/buildbot/bin/qemu-system-ppc64 -M ${machine} -cpu ${cpu} -m 1024 \
+    case "${machine}" in
+    mac99)
+	# mac99 crashes with qemu v2.7 (rc3)
+	qemu=${QEMU}
+	;;
+    mpc8544ds)
+	# mpc8544ds may crash with qemu v2.6.x
+	qemu=${QEMU_V27}
+	;;
+    *)
+	# pseries works withs with both v2.6.x and v2.7 (rc3)
+	qemu=${QEMU_V27}
+	;;
+    esac
+
+    ${qemu} -M ${machine} -cpu ${cpu} -m 1024 \
     	-kernel ${kernel} -initrd $(basename ${rootfs}) \
 	-nographic -vga none -monitor null -no-reboot \
 	--append "rdinit=/sbin/init console=tty console=${console} doreboot" \
