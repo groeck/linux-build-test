@@ -9,13 +9,18 @@ Packages needed to build:
 
 Build:
 	cd qemu
-	./configure --prefix=/opt/buildbot --disable-user
+	./configure --prefix=/opt/buildbot --disable-user --disable-gnutls \
+		--disable-nettle --disable-gcrypt --disable-xen \
+		--disable-xen-pci-passthrough
 	make install
 
 Distribution:
 	[ If necessary update VERSION file ]
 	make clean
-	./configure --prefix=/opt/buildbot --disable-user
+	./configure --prefix=/opt/buildbot --disable-user --disable-gnutls \
+		--disable-nettle --disable-gcrypt --disable-xen \
+		--disable-xen-pci-passthrough
+
 	make dist
 	[ creates tarball ]
 
@@ -29,7 +34,10 @@ git checkout -b v2.4.0-rc4-local
 git merge v2.4.0-rc3
 
 # build and install
-./configure --prefix=/opt/buildbot --disable-user
+./configure --prefix=/opt/buildbot --disable-user --disable-gnutls \
+	--disable-nettle --disable-gcrypt --disable-xen \
+	--disable-xen-pci-passthrough
+
 make install
 
 -----------
