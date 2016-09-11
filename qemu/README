@@ -14,6 +14,12 @@ Build:
 		--disable-xen-pci-passthrough
 	make install
 
+For v2.3.50 (linaro):
+
+	./configure --prefix=/opt/buildbot --disable-user --disable-xen \
+		--disable-xen-pci-passthrough --disable-vnc-tls --disable-vnc-ws
+		--disable-quorum
+
 Distribution:
 	[ If necessary update VERSION file ]
 	make clean
