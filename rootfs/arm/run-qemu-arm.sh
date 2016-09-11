@@ -36,6 +36,7 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:kzm:imx_v6_v7_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
@@ -46,6 +47,7 @@ skip_34="arm:akita:spitz_defconfig \
 	arm:imx25-pdk:imx_v4_v5_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -62,6 +64,7 @@ skip_310="arm:akita:spitz_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
@@ -72,6 +75,7 @@ skip_310="arm:akita:spitz_defconfig \
 skip_312="arm:mainstone:mainstone_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -81,14 +85,18 @@ skip_314="arm:beagle:multi_v7_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_316="arm:mainstone:mainstone_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
+	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
-skip_41="arm:versatilepb-scsi:versatile_defconfig"
-skip_43="arm:versatilepb-scsi:versatile_defconfig"
+skip_41="arm:realview-pbx-a9:realview_defconfig \
+	arm:versatilepb-scsi:versatile_defconfig"
+skip_44="arm:realview-pbx-a9:realview_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
@@ -288,17 +296,24 @@ runkernel()
     echo -n "running ..."
 
     # if we have a dtb file use it
-    dtbcmd=""
+    local dtbcmd=""
     if [ -n "${dtb}" -a -f "${dtbfile}" ]
     then
 	dtbcmd="-dtb ${dtbfile}"
     fi
 
-    # Specify CPU if necssary
-    cpucmd=""
+    # Specify CPU if provided
+    local cpucmd=""
     if [ -n "${cpu}" ]
     then
 	cpucmd="-cpu ${cpu}"
+    fi
+
+    # Specify amount of memory if provided
+    local memcmd=""
+    if [ -n "${mem}" ]
+    then
+	memcmd="-m ${mem}"
     fi
 
     case ${mach} in
@@ -354,7 +369,7 @@ runkernel()
 	    return 1
 	fi
 	/opt/buildbot/bin/linaro/qemu-system-arm -M ${mach} \
-	    -m ${mem} -clock unix -no-reboot \
+	    ${memcmd} -clock unix -no-reboot \
 	    -drive file=sd.img,format=raw,if=sd,cache=writeback \
 	    -device usb-mouse -device usb-kbd \
 	    -serial stdio -monitor none -nographic \
@@ -388,9 +403,11 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "realview-pb-a8" | "realview-eb-mpcore" | "realview-eb" | \
-    "versatileab" | "versatilepb" | "highbank" | "midway" | "integratorcp")
-	${QEMU} -M ${mach} ${cpucmd} -m ${mem} \
+    "realview-pb-a8" | "realview-pbx-a9" | \
+    "realview-eb-mpcore" | "realview-eb" | \
+    "versatileab" | "versatilepb" | \
+    "highbank" | "midway" | "integratorcp")
+	${QEMU} -M ${mach} ${cpucmd} ${memcmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttyAMA0,115200 doreboot" \
@@ -528,14 +545,20 @@ runkernel omap2plus_defconfig overo "" 256 \
 retcode=$((${retcode} + $?))
 
 runkernel realview_defconfig realview-pb-a8 "" 512 \
-	busybox-arm.cpio auto realview_pb
+	busybox-arm.cpio auto realview_pb arm-realview-pba8.dtb
+retcode=$((${retcode} + $?))
+
+runkernel realview_defconfig realview-pbx-a9 "" "" \
+	busybox-arm.cpio auto realview_pb arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 
 runkernel realview_defconfig realview-eb cortex-a8 512 \
-	core-image-minimal-qemuarm.cpio manual realview_eb
+	core-image-minimal-qemuarm.cpio manual realview_eb arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
+
 runkernel realview_defconfig realview-eb-mpcore "" 512 \
-	core-image-minimal-qemuarm.cpio manual realview_eb
+	core-image-minimal-qemuarm.cpio manual realview_eb \
+	arm-realview-eb-11mp-revb.dtb
 retcode=$((${retcode} + $?))
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
