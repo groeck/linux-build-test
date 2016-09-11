@@ -80,14 +80,6 @@ skip_312="arm:mainstone:mainstone_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_314="arm:beagle:multi_v7_defconfig \
-	arm:beagle:omap2plus_defconfig \
-	arm:mainstone:mainstone_defconfig \
-	arm:overo:multi_v7_defconfig \
-	arm:overo:omap2plus_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:smdkc210:multi_v7_defconfig \
-	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"

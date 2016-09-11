@@ -24,8 +24,6 @@ dir=$(cd $(dirname $0); pwd)
 
 cached_defconfig=""
 
-skip_314="xtensa:generic_kc705_defconfig"
-
 patch_defconfig()
 {
     local defconfig=$1

@@ -23,7 +23,6 @@ skip_32="powerpc:qemu_ppc64_book3s_defconfig powerpc:qemu_ppc64_e5500_defconfig"
 skip_34="powerpc:qemu_ppc64_e5500_defconfig"
 skip_310="powerpc:qemu_ppc64_e5500_defconfig"
 skip_312="powerpc:qemu_ppc64_e5500_defconfig"
-skip_314="powerpc:qemu_ppc64_e5500_defconfig"
 
 patch_defconfig()
 {
