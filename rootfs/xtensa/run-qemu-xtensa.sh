@@ -30,9 +30,27 @@ patch_defconfig()
     local fixup=$2
     local progdir=$(cd $(dirname $0); pwd)
 
+	echo fixup is ${fixup} >> /tmp/fixup
+
+    case "${fixup}" in
+    dc232b)
+	sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
+	echo "CONFIG_XTENSA_VARIANT_DC232B=y" >> ${defconfig}
+	echo "# CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX is not set" >> ${defconfig}
+	echo "CONFIG_KERNEL_LOAD_ADDRESS=0xd0003000" >> ${defconfig}
+	;;
+    dc233c)
+	sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
+	echo "CONFIG_XTENSA_VARIANT_DC233C=y" >> ${defconfig}
+	;;
+    *)
+	;;
+    esac
+
     # No built-in initrd
 
     sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
+    cp ${defconfig} /tmp/defconfig
 }
 
 runkernel()
@@ -46,7 +64,7 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local fixup="initrd"
+    local fixup=${cpu}
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
@@ -110,9 +128,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_xtensa_defconfig "" dc232b lx60 128M
+runkernel generic_kc705_defconfig lx60.dts dc232b lx60 128M
 retcode=$?
-runkernel qemu_xtensa_defconfig "" dc232b kc705 1G
+runkernel generic_kc705_defconfig kc705.dts dc232b kc705 1G
 retcode=$((${retcode} + $?))
 runkernel generic_kc705_defconfig ml605.dts dc233c ml605 128M
 retcode=$((${retcode} + $?))
