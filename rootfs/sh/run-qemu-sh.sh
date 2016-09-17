@@ -3,7 +3,8 @@
 PREFIX=sh4-linux-
 ARCH=sh
 rootfs=rootfs.ext2
-PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
+# PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
+PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
 
 PATH=${PATH_SH}:${PATH}
 
