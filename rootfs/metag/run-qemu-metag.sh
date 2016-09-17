@@ -64,6 +64,6 @@ echo
 runkernel meta2_defconfig
 rv=$?
 runkernel tz1090_defconfig
-retcode=$((${rv} + $?))
+rv=$((${rv} + $?))
 
-exit $rv
+exit ${rv}
