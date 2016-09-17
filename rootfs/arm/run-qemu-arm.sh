@@ -550,7 +550,7 @@ retcode=$((${retcode} + $?))
 
 runkernel realview_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb \
-	arm-realview-eb-11mp-revb.dtb
+	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
