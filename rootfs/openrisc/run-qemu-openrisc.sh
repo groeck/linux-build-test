@@ -31,15 +31,24 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("MACHINE RESTART" "Boot successful" "Rebooting")
+    local fixup=0
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    # Kernel assumes elf32-or32, but toolchain produces elf32-or1k.
+    # Kernel may expect elf32-or32, but toolchain produces elf32-or1k.
     # Kludgy fix until we find a better solution.
-    sed -i -e 's/elf32-or32/elf32-or1k/g' arch/openrisc/kernel/vmlinux.lds.S
+    grep "elf32-or1k" arch/openrisc/kernel/vmlinux.lds.S >/dev/null 2>&1
+    fixup=$?
+    if [ ${fixup} -ne 0 ]
+    then
+        sed -i -e 's/elf32-or32/elf32-or1k/g' arch/openrisc/kernel/vmlinux.lds.S
+    fi
     dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
     retcode=$?
-    sed -i -e 's/elf32-or1k/elf32-or32/g' arch/openrisc/kernel/vmlinux.lds.S
+    if [ ${fixup} -ne 0 ]
+    then
+        sed -i -e 's/elf32-or1k/elf32-or32/g' arch/openrisc/kernel/vmlinux.lds.S
+    fi
     if [ ${retcode} -ne 0 ]
     then
 	return ${retcode}
