@@ -46,7 +46,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-meta -display none \
+    /opt/buildbot/qemu-install/metag/bin/qemu-system-meta -display none \
 	-kernel vmlinux -device da,exit_threads=1 \
 	-chardev stdio,id=chan1 -chardev pty,id=chan2 \
 	-append "rdinit=/sbin/init doreboot" > ${logfile} 2>&1 &
