@@ -16,7 +16,8 @@ QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-arm}
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
 # PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
-PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
+# PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
+PATH_ARM=/opt/poky/1.8/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
 
 PATH=${PATH_ARM}:${PATH}
 
@@ -98,6 +99,13 @@ patch_defconfig()
 {
     local defconfig=$1
     local fixup=$2
+
+    # explicitly disable HW random generator for raspi2
+    # (results in runtime hangup).
+    if [ "${fixup}" = "raspi2" ]
+    then
+	sed -i -e '/CONFIG_HW_RANDOM/d' ${defconfig}
+    fi
 
     # explicitly disable fdt for some tests
     if [ "${fixup}" = "nofdt" ]
@@ -498,7 +506,7 @@ retcode=$((${retcode} + $?))
 if [ ${runall} -eq 1 ]
 then
     runkernel multi_v7_defconfig raspi2 "" "" \
-	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
+	core-image-minimal-qemuarm.ext3 manual raspi2 bcm2836-rpi-2-b.dtb
     retcode=$((${retcode} + $?))
 fi
 
