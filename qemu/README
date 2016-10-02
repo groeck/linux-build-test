@@ -9,21 +9,23 @@ Packages needed to build:
 
 Build:
 	cd qemu
-	./configure --prefix=/opt/buildbot --disable-user --disable-gnutls \
+	./configure --prefix=/opt/buildbot/qemu-install/v<version> \
+		--disable-user --disable-gnutls \
 		--disable-nettle --disable-gcrypt --disable-xen \
 		--disable-xen-pci-passthrough
 	make install
 
 For v2.3.50 (linaro):
 
-	./configure --prefix=/opt/buildbot --disable-user --disable-xen \
+	./configure --prefix=/opt/buildbot/qemu-install/v2.3.50 --disable-user --disable-xen \
 		--disable-xen-pci-passthrough --disable-vnc-tls --disable-vnc-ws
 		--disable-quorum
 
 Distribution:
 	[ If necessary update VERSION file ]
 	make clean
-	./configure --prefix=/opt/buildbot --disable-user --disable-gnutls \
+	./configure --prefix=/opt/buildbot/qemu-install/v<version> \
+		--disable-user --disable-gnutls \
 		--disable-nettle --disable-gcrypt --disable-xen \
 		--disable-xen-pci-passthrough
 
