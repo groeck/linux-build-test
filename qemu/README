@@ -17,9 +17,9 @@ Build:
 
 For v2.3.50 (linaro):
 
-	./configure --prefix=/opt/buildbot/qemu-install/v2.3.50 --disable-user --disable-xen \
+	./configure --prefix=/opt/buildbot/qemu-install/v2.3.50-linaro --disable-user --disable-xen \
 		--disable-xen-pci-passthrough --disable-vnc-tls --disable-vnc-ws
-		--disable-quorum
+		--disable-quorum --target-list=arm-softmmu
 
 Distribution:
 	[ If necessary update VERSION file ]
