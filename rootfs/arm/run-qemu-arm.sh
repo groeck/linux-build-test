@@ -11,12 +11,15 @@ machine=$1
 config=$2
 devtree=$3
 
-QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-arm}
+# Some zynq images fail to run with qemu v2.7
+QEMU_V26=${QEMU:=/opt/buildbot/qemu-install/v2.6/bin/qemu-system-arm}
+# Use Linaro version for overo / beagle
+QEMU_LINARO=/opt/buildbot/qemu-install/v2.3.50-linaro/bin/qemu-system-arm
+# Default is qemu v2.7
+QEMU=${QEMU:=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-arm}
 
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
-# PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
-# PATH_ARM=/opt/poky/1.4.2/sysroots/x86_64-pokysdk-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi
 PATH_ARM=/opt/poky/1.8/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
 
 PATH=${PATH_ARM}:${PATH}
@@ -368,7 +371,7 @@ runkernel()
 	    cat ${logfile}
 	    return 1
 	fi
-	/opt/buildbot/bin/linaro/qemu-system-arm -M ${mach} \
+	${QEMU_LINARO} -M ${mach} \
 	    ${memcmd} -clock unix -no-reboot \
 	    -drive file=sd.img,format=raw,if=sd,cache=writeback \
 	    -device usb-mouse -device usb-kbd \
@@ -395,7 +398,7 @@ runkernel()
 	pid=$!
 	;;
     "xilinx-zynq-a9")
-	${QEMU} -M ${mach} \
+	${QEMU_V26} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0 doreboot" \
