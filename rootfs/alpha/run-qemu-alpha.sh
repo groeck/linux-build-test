@@ -51,7 +51,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-alpha -M clipper \
+    /opt/buildbot/qemu-install/v2.7/bin/qemu-system-alpha -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
 	-initrd ${rootfs} \
 	-append 'rdinit=/sbin/init console=ttyS0 console=tty doreboot' \
