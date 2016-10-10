@@ -18,7 +18,7 @@ do
 		echo "not responding"
 		continue
 	fi
-	rsync --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share \
+	rsync -l --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share \
 		${base}/lib ${base}/include ${base}/kconfig ${base}/qemu-install \
 		${system}:${base}
 	if [ $? -ne 0 ]
