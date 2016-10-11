@@ -21,7 +21,7 @@ do_import()
 	"3.12")
 		source=origin/stable-${release}-queue
 		;;
-	"3.18" | "4.1")
+	"3.10" | "3.18" | "4.1")
 		source=origin/linux-${release}.y-queue
 		;;
 	*)
