@@ -44,7 +44,8 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
-	arm:vexpress-a15:vexpress_defconfig"
+	arm:vexpress-a15:vexpress_defconfig \
+	arm:vexpress-a15-a7:vexpress_defconfig"
 skip_34="arm:akita:spitz_defconfig \
 	arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
@@ -57,7 +58,8 @@ skip_34="arm:akita:spitz_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:versatilepb-scsi:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
-	arm:vexpress-a15:vexpress_defconfig"
+	arm:vexpress-a15:vexpress_defconfig \
+	arm:vexpress-a15-a7:vexpress_defconfig"
 skip_310="arm:akita:spitz_defconfig \
 	arm:beagle:multi_v7_defconfig \
 	arm:beagle:omap2plus_defconfig \
@@ -75,6 +77,7 @@ skip_310="arm:akita:spitz_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:multi_v7_defconfig \
 	arm:vexpress-a15:multi_v7_defconfig \
+	arm:vexpress-a15-a7:multi_v7_defconfig \
 	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_312="arm:mainstone:mainstone_defconfig \
 	arm:overo:multi_v7_defconfig \
@@ -427,7 +430,7 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "vexpress-a9" | "vexpress-a15")
+    "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
@@ -492,14 +495,10 @@ runkernel multi_v7_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
-# Causes hardware mismatch warning/traceback
-# vexpress-sysreg 1c010000.sysreg: DT HBI (249) is not matching hardware (237)!
-if [ ${runall} -eq 1 ]
-then
-    runkernel multi_v7_defconfig vexpress-a15 "" 256 \
+# Local qemu v2.7+ has minimal support for vexpress-a15-a7
+runkernel multi_v7_defconfig vexpress-a15-a7 "" 256 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15_a7.dtb
-    retcode=$((${retcode} + $?))
-fi
+retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc702.dtb
