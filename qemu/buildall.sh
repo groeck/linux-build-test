@@ -6,7 +6,15 @@ git checkout meta-v1.3.1
 	--disable-user --disable-xen --disable-xen-pci-passthrough \
 	--disable-vnc-tls --disable-werror --disable-docs \
 	--target-list=meta-softmmu
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 make -j20 install
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 
 git clean -d -x -f -q
 git checkout v2.3.50-local-linaro
@@ -15,7 +23,15 @@ git checkout v2.3.50-local-linaro
 	--disable-vnc-tls --disable-vnc-ws --disable-quorum \
 	--disable-docs \
 	--target-list=arm-softmmu
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 make -j20 install
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 
 git clean -d -x -f -q
 git checkout v2.5.1-local
@@ -24,7 +40,15 @@ git checkout v2.5.1-local
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
 	--target-list=ppc64-softmmu
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 make -j20 install
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 
 git clean -d -x -f -q
 git checkout v2.6.2-local
@@ -33,7 +57,15 @@ git checkout v2.6.2-local
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
 	--target-list="ppc64-softmmu arm-softmmu"
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 make -j20 install
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 
 git clean -d -x -f -q
 git checkout v2.7.0-local
@@ -41,4 +73,8 @@ git checkout v2.7.0-local
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
 make -j20 install
