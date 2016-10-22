@@ -6,7 +6,7 @@ rootfs=busybox-alpha.cpio
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4)
+v3.2|v3.4|v3.8)
 	PATH_ALPHA=/opt/kernel/alpha/gcc-4.8.3/usr/bin
 	;;
 *)
