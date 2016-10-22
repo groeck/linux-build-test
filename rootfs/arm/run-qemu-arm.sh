@@ -492,6 +492,15 @@ runkernel multi_v7_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 
+# Causes hardware mismatch warning/traceback
+# vexpress-sysreg 1c010000.sysreg: DT HBI (249) is not matching hardware (237)!
+if [ ${runall} -eq 1 ]
+then
+    runkernel multi_v7_defconfig vexpress-a15 "" 256 \
+	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15_a7.dtb
+    retcode=$((${retcode} + $?))
+fi
+
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc702.dtb
 retcode=$((${retcode} + $?))
@@ -502,7 +511,7 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-# Disabled by default for now due to warnings from uart driver (qemu 2.6.0-rc3).
+# Disabled by default for now due to warnings from uart driver (qemu 2.6, 2.7).
 # Underlying problem is that cprman is not implemented in qemu. The uart
 # clock is derived from it, and reports a clock rate of 0.
 
