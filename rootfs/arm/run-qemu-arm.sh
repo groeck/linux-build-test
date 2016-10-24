@@ -12,11 +12,11 @@ config=$2
 devtree=$3
 
 # Some zynq images fail to run with qemu v2.7
-QEMU_V26=${QEMU:=/opt/buildbot/qemu-install/v2.6/bin/qemu-system-arm}
+QEMU_V26=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-arm}
 # Use Linaro version for overo / beagle
 QEMU_LINARO=/opt/buildbot/qemu-install/v2.3.50-linaro/bin/qemu-system-arm
 # Default is qemu v2.7
-QEMU=${QEMU:=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-arm}
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-arm}
 
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
@@ -41,6 +41,7 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
+	arm:sabrelite:imx_v6_v7_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
@@ -53,6 +54,7 @@ skip_34="arm:akita:spitz_defconfig \
 	arm:mainstone:mainstone_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
+	arm:sabrelite:imx_v6_v7_defconfig \
 	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
 	arm:versatilepb:versatile_defconfig \
@@ -71,6 +73,7 @@ skip_310="arm:akita:spitz_defconfig \
 	arm:overo:multi_v7_defconfig \
 	arm:overo:omap2plus_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
+	arm:sabrelite:imx_v6_v7_defconfig \
 	arm:smdkc210:multi_v7_defconfig \
 	arm:spitz:spitz_defconfig \
 	arm:versatileab:versatile_defconfig \
@@ -182,6 +185,16 @@ patch_defconfig()
     if [ "${fixup}" = "imx25" ]
     then
 	sed -i -e '/CONFIG_MTD_NAND_MXC/d' ${defconfig}
+    fi
+
+    # qemu does not support CONFIG_DRM_IMX. This starts to fail
+    # with commit 5f2f911578fb ("drm/imx: # atomic phase 3 step 1:
+    # Use atomic configuration"), ie since v4.8. Impact is long boot delay
+    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
+    # in drm code.
+    if [ "${fixup}" = "imx6" ]
+    then
+	sed -i -e '/CONFIG_DRM_IMX/d' ${defconfig}
     fi
 
     # imx25 and realview need initrd support
@@ -391,6 +404,15 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
+    "sabrelite" )
+	${QEMU} -M ${mach} \
+	    -kernel arch/arm/boot/zImage  -no-reboot \
+	    -initrd ${rootfs} \
+	    -append "rdinit=/sbin/init earlycon console=ttymxc1,115200 doreboot" \
+	    -nographic -monitor none -display none -serial null -serial stdio \
+	    ${dtbcmd} > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "smdkc210")
 	${QEMU} -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -475,7 +497,11 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
 retcode=$((${retcode} + $?))
 
 runkernel imx_v6_v7_defconfig kzm "" 128 \
-	core-image-minimal-qemuarm.cpio manual
+	core-image-minimal-qemuarm.cpio manual imx6
+retcode=$((${retcode} + $?))
+
+runkernel imx_v6_v7_defconfig sabrelite "" "" \
+	core-image-minimal-qemuarm.cpio manual imx6 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig beagle "" 256 \
