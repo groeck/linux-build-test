@@ -1,7 +1,8 @@
 #!/bin/bash
 
-config=$1
-variant=$2
+_cpu=$1
+config=$2
+variant=$3
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
@@ -17,7 +18,7 @@ esac
 rootfs=busybox-mipsel.cpio
 PREFIX=mips-poky-linux-
 ARCH=mips
-QEMUCMD=/opt/buildbot/bin/qemu-system-mipsel
+QEMUCMD=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mipsel
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
@@ -47,13 +48,20 @@ patch_defconfig()
 
 runkernel()
 {
-    local defconfig=$1
-    local fixup=$2
+    local cpu=$1
+    local defconfig=$2
+    local fixup=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
-    local build="mipsel:${defconfig}:${fixup}"
+    local build="mipsel:${cpu}:${defconfig}:${fixup}"
+
+    if [ -n "${_cpu}" -a "${_cpu}" != "${cpu}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
@@ -77,7 +85,7 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
+    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu ${cpu} \
 	-initrd ${rootfs} \
 	-vga cirrus -no-reboot -m 128 \
 	--append "rdinit=/sbin/init mem=128M console=ttyS0 console=tty doreboot" \
@@ -93,9 +101,12 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig nosmp
+runkernel 24Kf malta_defconfig nosmp
 retcode=$?
-runkernel malta_defconfig smp
+runkernel 24Kf malta_defconfig smp
 retcode=$((${retcode} + $?))
+# No root file system available
+# runkernel mips32r6-generic malta_qemu_32r6_defconfig smp
+# retcode=$((${retcode} + $?))
 
 exit ${retcode}
