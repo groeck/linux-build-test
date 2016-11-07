@@ -1,9 +1,14 @@
 #!/bin/bash
 
+machine=$1
+smpflag=$2
+config=$3
+
 PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sparc64
 
 PATH=${PATH_SPARC}:${PATH}
 
@@ -45,15 +50,34 @@ CONFIG_SCSI_VIRTIO=y
 runkernel()
 {
     local defconfig=$1
-    local machine=$2
+    local mach=$2
     local cpu="$3"
     local smp=$4
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local build=${ARCH}:${mach}:${smp}:${defconfig}
 
-    echo -n "Building ${ARCH}:${machine}:${smp}:${defconfig} ... "
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    if [ -n "${smpflag}" -a "${smpflag}" != "${smp}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    echo -n "Building ${build} ... "
 
     if [ "${defconfig}_${smp}" != "${cached_defconfig}" ]
     then
@@ -67,7 +91,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-sparc64 -M ${machine} -cpu "${cpu}" \
+    ${QEMU} -M ${mach} -cpu "${cpu}" \
 	-m 512 \
 	-drive file=${rootfs},if=virtio \
 	-net nic,model=virtio \
