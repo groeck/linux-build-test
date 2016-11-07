@@ -7,14 +7,13 @@ config=$3
 # machine specific information
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-PATH_X86=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
 QEMU_MACH=mac99
 
-QEMU=${QEMU:=/opt/buildbot/bin/qemu-system-ppc}
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-ppc}
 
-PATH=${PATH_PPC}:${PATH_X86}:${PATH}
+PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
