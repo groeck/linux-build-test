@@ -20,7 +20,7 @@ esac
 
 # machine specific information
 ARCH=mips
-
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips64el
 PATH=${PATH_MIPS}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
@@ -98,7 +98,7 @@ runkernel()
 
     if [ "${rootfs}" = "busybox-mips64el.cpio" ]
     then
-        /opt/buildbot/bin/qemu-system-mips64el -M ${mach} \
+        ${QEMU} -M ${mach} \
 	    -kernel vmlinux -vga cirrus -no-reboot -m 128 \
 	    --append "rdinit=/sbin/init mem=128M console=ttyS0 console=tty doreboot" \
 	    -nographic -monitor none \
@@ -109,7 +109,7 @@ runkernel()
         grep sda arch/mips/configs/${defconfig} >/dev/null 2>&1
 	[ $? -eq 0 ] && drive="sda"
 
-        /opt/buildbot/bin/qemu-system-mips64el -M ${mach} \
+        ${QEMU} -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
 	    --append "root=/dev/${drive} rw console=ttyS0 doreboot" \
 	    -hda ${rootfs} \
