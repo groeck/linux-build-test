@@ -222,7 +222,7 @@ dowait()
 	    fi
 	fi
 
-	egrep "^BUG:|Kernel panic" ${logfile} >/dev/null 2>&1
+	egrep "^BUG:|Kernel panic|Internal error:" ${logfile} >/dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 	    # x86 has the habit of crashing in restart once in a while.
