@@ -17,7 +17,7 @@ esac
 rootfs=busybox-mips.ext3
 PREFIX=mips-poky-linux-
 ARCH=mips
-QEMUCMD=/opt/buildbot/bin/qemu-system-mips
+QEMUCMD=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
