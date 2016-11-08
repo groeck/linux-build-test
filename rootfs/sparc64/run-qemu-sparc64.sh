@@ -8,7 +8,7 @@ PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sparc64
+QEMU=/opt/buildbot/qemu-install/v2.6/bin/qemu-system-sparc64
 
 PATH=${PATH_SPARC}:${PATH}
 
