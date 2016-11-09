@@ -28,7 +28,7 @@ PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
-PATH_NIOS2=/opt/sourceryg++-2014.05/bin
+PATH_NIOS2=/opt/kernel/nios2/gcc-6.1.0/usr/bin
 PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
@@ -231,7 +231,7 @@ case ${ARCH} in
 	;;
     nios2)
 	cmd=(${cmd_nios2[*]})
-	PREFIX="nios2-linux-gnu-"
+	PREFIX="nios2-linux-"
 	PATH=${PATH_NIOS2}:${PATH}
 	;;
     openrisc)
