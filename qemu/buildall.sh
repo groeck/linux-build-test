@@ -1,4 +1,12 @@
-cd qemu
+if [ ! -d .git -o ! -f qemu-io.c ]
+then
+	if [ ! -d qemu ]
+	then
+		echo "Bad directory"
+		exit 1
+	fi
+	cd qemu
+fi
 
 git clean -d -x -f -q
 git checkout meta-v1.3.1
@@ -39,7 +47,7 @@ git checkout v2.5.1-local
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
-	--target-list=ppc64-softmmu
+	--target-list="ppc64-softmmu"
 if [ $? -ne 0 ]
 then
     exit 1
@@ -56,7 +64,7 @@ git checkout v2.6.2-local
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
-	--target-list="ppc64-softmmu arm-softmmu"
+	--target-list="ppc64-softmmu arm-softmmu sparc64-softmmu"
 if [ $? -ne 0 ]
 then
     exit 1
@@ -73,6 +81,19 @@ git checkout v2.7.0-local
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+make -j20 install
+
+git clean -d -x -f -q
+git checkout master-local
+./configure --prefix=/opt/buildbot/qemu-install/master \
+	--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list="nios2-softmmu"
 if [ $? -ne 0 ]
 then
     exit 1
