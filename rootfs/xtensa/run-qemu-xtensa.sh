@@ -30,8 +30,6 @@ patch_defconfig()
     local fixup=$2
     local progdir=$(cd $(dirname $0); pwd)
 
-	echo fixup is ${fixup} >> /tmp/fixup
-
     case "${fixup}" in
     dc232b)
 	sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
@@ -48,9 +46,7 @@ patch_defconfig()
     esac
 
     # No built-in initrd
-
     sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
-    cp ${defconfig} /tmp/defconfig
 }
 
 runkernel()
