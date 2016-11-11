@@ -18,7 +18,7 @@ esac
 # machine specific information
 rootfs=core-image-minimal-qemumips64.ext3
 ARCH=mips
-QEMUCMD=/opt/buildbot/bin/qemu-system-mips64
+QEMUCMD=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips64
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 

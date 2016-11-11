@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-s390x
 PREFIX=s390x-linux-
 ARCH=s390
 rootfs=busybox-s390.cpio
@@ -41,7 +42,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-s390x -kernel vmlinux \
+    ${QEMU} -kernel vmlinux \
         -initrd ${rootfs} \
 	-append "rdinit=/sbin/init doreboot" \
 	-m 512 \

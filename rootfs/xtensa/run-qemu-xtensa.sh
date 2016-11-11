@@ -10,6 +10,8 @@ fi
 machine=$1
 config=$2
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-xtensa
+
 PREFIX=xtensa-linux-
 ARCH=xtensa
 rootfs=busybox-xtensa.cpio
@@ -102,7 +104,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-xtensa -cpu ${cpu} -M ${mach} \
+    ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel arch/xtensa/boot/uImage -no-reboot \
 	${dtbcmd} \
 	--append "rdinit=/sbin/init earlycon=uart8250,mmio32,0xfd050020,115200n8 console=ttyS0,115200n8" \

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-microblazeel
 PREFIX=microblazeel-linux-
 ARCH=microblaze
 rootfs=busybox-microblazeel.cpio
@@ -29,7 +30,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-microblazeel -M petalogix-s3adsp1800 \
+    ${QEMU} -M petalogix-s3adsp1800 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot -nographic \
 	> ${logfile} 2>&1 &
 

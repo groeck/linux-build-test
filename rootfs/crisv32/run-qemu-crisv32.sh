@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-cris
 PREFIX=crisv32-linux-
 ARCH=cris
 rootfs=busybox-cris.cpio
@@ -29,7 +30,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-cris -serial stdio -kernel vmlinux \
+    ${QEMU} -serial stdio -kernel vmlinux \
     	-no-reboot -monitor none -nographic \
 	-append "console=ttyS0,115200,N,8 rdinit=/sbin/init" \
 	> ${logfile} 2>&1 &

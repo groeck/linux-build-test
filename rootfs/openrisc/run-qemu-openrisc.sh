@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-or32
 PREFIX=or1k-linux-uclibc-
 ARCH=openrisc
 rootfs=busybox-openrisc.cpio
@@ -56,7 +57,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-or32 -cpu or1200 -M or32-sim \
+    ${QEMU} -cpu or1200 -M or32-sim \
     	-kernel vmlinux -nographic -serial stdio -monitor none \
 	> ${logfile} 2>&1 &
 

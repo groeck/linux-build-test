@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-alpha
 PREFIX=alpha-linux-
 ARCH=alpha
 rootfs=busybox-alpha.cpio
@@ -51,7 +52,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/qemu-install/v2.7/bin/qemu-system-alpha -M clipper \
+    ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
 	-initrd ${rootfs} \
 	-append 'rdinit=/sbin/init console=ttyS0 console=tty doreboot' \

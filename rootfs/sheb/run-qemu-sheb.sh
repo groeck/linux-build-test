@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sh4eb
 PREFIX=sh4-linux-
 ARCH=sh
 rootfs=busybox-sheb.img
@@ -50,7 +51,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-sh4eb -M r2d -kernel ./arch/sh/boot/zImage \
+    ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	-initrd ${rootfs} \
 	-append "rdinit=/sbin/init console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -monitor null -nographic \

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sparc
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
@@ -59,7 +60,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/bin/qemu-system-sparc -M ${mach} \
+    ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/image -hda hda.sqf -no-reboot \
 	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
