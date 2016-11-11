@@ -22,9 +22,11 @@ master/staging-workdir/
 master/state.sqlite
 master/templates/README.txt
 master/twistd.pid
+crosstool-ng
 metag
 or1k
 qemu
+qemu-install
 buildroot
 buildall
 sparse
@@ -32,11 +34,8 @@ buildbot
 smatch
 u-boot
 rootfs.new
-bin/qemu-*
-bin/linaro
 include
 lib
-libexec
 share
-usr
 genfatfs
+virtual
