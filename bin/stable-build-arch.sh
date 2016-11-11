@@ -10,6 +10,7 @@ PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
 PATH_ARM64=/opt/kernel/aarch64/gcc-5.2/usr/bin
+PATH_ARC_48=/opt/kernel/arc/gcc-4.8.3/usr/bin
 PATH_ARC=/opt/kernel/arc/gcc-6.1.1/usr/bin
 PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
 PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
@@ -89,7 +90,14 @@ case ${ARCH} in
 	    fixup[$f]=${fixup_arc[$f]}
 	done
 	PREFIX="arc-linux-"
-	PATH=${PATH_ARC}:${PATH}
+	case ${rel} in
+	v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
+		PATH=${PATH_ARC_48}:${PATH}
+		;;
+	*)
+		PATH=${PATH_ARC}:${PATH}
+		;;
+	esac
 	;;
     arcv2)
 	ARCH=arc
