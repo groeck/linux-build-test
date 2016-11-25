@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-s390x
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-s390x}
 PREFIX=s390x-linux-
 ARCH=s390
 rootfs=busybox-s390.cpio
