@@ -10,7 +10,7 @@ fi
 machine=$1
 config=$2
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-xtensa
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-xtensa}
 
 PREFIX=xtensa-linux-
 ARCH=xtensa
