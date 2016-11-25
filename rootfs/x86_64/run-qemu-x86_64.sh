@@ -71,6 +71,10 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+runkernel qemu_x86_64_pc_defconfig Broadwell-noTSX q35
+retcode=$((${retcode} + $?))
+runkernel qemu_x86_64_pc_defconfig IvyBridge q35
+retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig SandyBridge q35
 retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig Haswell q35
