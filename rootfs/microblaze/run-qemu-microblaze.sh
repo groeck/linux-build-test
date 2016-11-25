@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-microblaze
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-microblaze}
 PREFIX=microblaze-linux-
 ARCH=microblaze
 rootfs=rootfs.cpio
