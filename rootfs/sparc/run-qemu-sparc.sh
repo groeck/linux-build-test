@@ -61,7 +61,8 @@ runkernel()
     echo -n "running ..."
 
     ${QEMU} -M ${mach} \
-	-kernel arch/sparc/boot/image -hda hda.sqf -no-reboot \
+	-kernel arch/sparc/boot/image -no-reboot \
+	-drive file=hda.sqf,if=scsi,format=raw \
 	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
