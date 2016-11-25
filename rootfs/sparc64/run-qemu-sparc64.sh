@@ -8,7 +8,12 @@ PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
-QEMU=/opt/buildbot/qemu-install/v2.6/bin/qemu-system-sparc64
+
+# QEMU v2.7 or its interaction with the kernel is broken.
+# Kernel gets stuck or crashes in virtio initialization code.
+# Problem is that qemu now defaults to "modern" mode, which
+# appears to create issues with the Linux kernel.
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-sparc64}
 
 PATH=${PATH_SPARC}:${PATH}
 
