@@ -14,7 +14,7 @@ PREFIX=nios2-linux-
 ARCH=nios2
 rootfs=busybox-nios2.cpio
 PATH_NIOS2=/opt/kernel/nios2/gcc-6.1.0/usr/bin
-QEMU=/opt/buildbot/qemu-install/master/bin/qemu-system-nios2
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-nios2}
 
 PATH=${PATH_NIOS2}:${PATH}
 
