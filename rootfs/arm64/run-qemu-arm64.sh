@@ -3,7 +3,7 @@
 machine=$1
 config=$2
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-aarch64
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/aarch64/gcc-5.2/usr/bin
