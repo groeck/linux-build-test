@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-cris
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-cris}
 PREFIX=crisv32-linux-
 ARCH=cris
 rootfs=busybox-cris.cpio
