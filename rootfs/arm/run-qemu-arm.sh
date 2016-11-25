@@ -411,7 +411,7 @@ runkernel()
 	pid=$!
 	;;
     "sabrelite" )
-	${QEMU} -M ${mach} \
+	${QEMU} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
 	    -append "rdinit=/sbin/init earlycon console=ttymxc1,115200 doreboot" \
@@ -506,7 +506,7 @@ runkernel imx_v6_v7_defconfig kzm "" 128 \
 	core-image-minimal-qemuarm.cpio manual imx6
 retcode=$((${retcode} + $?))
 
-runkernel imx_v6_v7_defconfig sabrelite "" "" \
+runkernel imx_v6_v7_defconfig sabrelite "" 256 \
 	core-image-minimal-qemuarm.cpio manual imx6 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 
@@ -520,7 +520,7 @@ runkernel multi_v7_defconfig overo "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 
-runkernel multi_v7_defconfig sabrelite "" "" \
+runkernel multi_v7_defconfig sabrelite "" 256 \
 	core-image-minimal-qemuarm.cpio manual "" imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 
