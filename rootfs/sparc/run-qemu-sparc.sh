@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sparc
+QEMU=/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
@@ -41,10 +41,12 @@ runkernel()
     local defconfig=$1
     local mach=$2
     local smp=$3
+    local noapcflag=$4
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local apc=""
 
     echo -n "Building ${ARCH}:${mach}:${smp}:${defconfig} ... "
 
@@ -58,12 +60,17 @@ runkernel()
 	cached_defconfig="${defconfig}_${smp}"
     fi
 
+    if [ -n "${noapcflag}" ]
+    then
+	apc="apc=noidle"
+    fi
+
     echo -n "running ..."
 
     ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/image -no-reboot \
 	-drive file=hda.sqf,if=scsi,format=raw \
-	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 doreboot" \
+	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 ${apc} doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
@@ -90,6 +97,10 @@ runkernel sparc32_defconfig SS-20 nosmp
 retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-600MP nosmp
 retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig LX nosmp noapc
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig Voyager nosmp noapc
+retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SPARCClassic smp
 retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SPARCbook smp
@@ -103,6 +114,10 @@ retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-20 smp
 retcode=$((${retcode} + $?))
 runkernel sparc32_defconfig SS-600MP smp
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig LX smp noapc
+retcode=$((${retcode} + $?))
+runkernel sparc32_defconfig Voyager smp noapc
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
