@@ -12,11 +12,11 @@ config=$2
 devtree=$3
 
 # Some zynq images fail to run with qemu v2.7
-QEMU_V26=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-arm}
+QEMU_ZYNQ=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-arm}
 # Use Linaro version for overo / beagle
 QEMU_LINARO=/opt/buildbot/qemu-install/v2.3.50-linaro/bin/qemu-system-arm
-# Default is qemu v2.7
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-arm}
+# Default is qemu v2.8
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-arm}
 
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
@@ -429,7 +429,7 @@ runkernel()
 	pid=$!
 	;;
     "xilinx-zynq-a9")
-	${QEMU_V26} -M ${mach} \
+	${QEMU_ZYNQ} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0 doreboot" \
