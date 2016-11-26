@@ -7,7 +7,7 @@ PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PREFIX=x86_64-poky-linux-
 ARCH=x86_64
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-x86_64}
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-x86_64}
 
 PATH=${PATH_X86}:${PATH}
 
