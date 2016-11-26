@@ -9,6 +9,7 @@ PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-li
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
 
+QEMU_V28=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-ppc64}
 QEMU_V27=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-ppc64}
 QEMU_V25=${QEMU:-/opt/buildbot/qemu-install/v2.5/bin/qemu-system-ppc64}
 QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-ppc64}
@@ -108,15 +109,15 @@ runkernel()
     case "${machine}" in
     mac99)
 	# mac99 crashes with qemu v2.7 (rc3)
-	qemu=${QEMU}
+	qemu=${QEMU_V28}
 	;;
     mpc8544ds)
 	# mpc8544ds may crash with qemu v2.6.x+
-	qemu=${QEMU_V25}
+	qemu=${QEMU_V28}
 	;;
     *)
 	# pseries works withs with v2.5.x..v2.7.0-rc3
-	qemu=${QEMU_V27}
+	qemu=${QEMU_V28}
 	;;
     esac
 
