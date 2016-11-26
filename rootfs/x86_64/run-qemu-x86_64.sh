@@ -1,5 +1,8 @@
 #!/bin/bash
 
+machine=$1
+cputype=$2
+
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 PREFIX=x86_64-poky-linux-
 ARCH=x86_64
@@ -25,8 +28,21 @@ runkernel()
     local rootfs=core-image-minimal-qemux86-64.ext3
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
+    local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${cpu}:${mach}:${defconfig} ... "
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${cputype}" -a "${cputype}" != "${cpu}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    echo -n "Building ${pbuild} ... "
 
     if [ "${cached_defconfig}" != "${defconfig}" ]
     then
