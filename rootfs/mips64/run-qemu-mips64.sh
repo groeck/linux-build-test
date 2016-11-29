@@ -108,6 +108,7 @@ runkernel()
     echo -n "running ..."
 
     ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
+	-cpu 5KEc \
 	-drive file=${rootfs},format=raw,if=ide \
 	-vga cirrus -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \
