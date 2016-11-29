@@ -1,6 +1,9 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc
+machine=$1
+smpflag=$2
+
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc}
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
@@ -47,8 +50,21 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local apc=""
+    local build="${ARCH}:${mach}:${smp}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${mach}:${smp}:${defconfig} ... "
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    if [ -n "${smpflag}" -a "${smpflag}" != "${smp}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
+    echo -n "Building ${build} ... "
 
     if [ "${defconfig}_${smp}" != "${cached_defconfig}" ]
     then
