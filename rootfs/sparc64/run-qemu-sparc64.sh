@@ -9,11 +9,7 @@ ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
 PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
 
-# QEMU v2.7 or its interaction with the kernel is broken.
-# Kernel gets stuck or crashes in virtio initialization code.
-# Problem is that qemu now defaults to "modern" mode, which
-# appears to create issues with the Linux kernel.
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-sparc64}
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc64}
 
 PATH=${PATH_SPARC}:${PATH}
 
@@ -98,8 +94,9 @@ runkernel()
 
     ${QEMU} -M ${mach} -cpu "${cpu}" \
 	-m 512 \
-	-drive file=${rootfs},if=virtio \
-	-net nic,model=virtio \
+	-drive file=${rootfs},if=none,id=hd,format=raw \
+	-device virtio-blk-pci,disable-modern=on,drive=hd \
+	-device virtio-net-pci,disable-modern=on \
 	-kernel arch/sparc/boot/image -no-reboot \
 	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
