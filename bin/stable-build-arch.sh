@@ -73,22 +73,14 @@ declare -a fixup
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
-	fmax=$(expr ${#fixup_alpha[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_alpha[$f]}
-	done
+	fixup=("${fixup_alpha[@]}")
 	PREFIX="alpha-linux-"
 	PATH=${PATH_ALPHA}:${PATH}
 	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     arc)
 	cmd=(${cmd_arc[*]})
-	fmax=$(expr ${#fixup_arc[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_arc[$f]}
-	done
+	fixup=("${fixup_arc[@]}")
 	PREFIX="arc-linux-"
 	case ${rel} in
 	v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
@@ -102,11 +94,7 @@ case ${ARCH} in
     arcv2)
 	ARCH=arc
 	cmd=(${cmd_arcv2[*]})
-	fmax=$(expr ${#fixup_arcv2[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_arcv2[$f]}
-	done
+	fixup=("${fixup_arcv2[@]}")
 	PREFIX="arc-linux-"
 	PATH=${PATH_ARCV2}:${PATH}
 	;;
@@ -202,33 +190,21 @@ case ${ARCH} in
     mips_22)
 	ARCH=mips
 	cmd=(${cmd_mips_22[*]});
-	fmax=$(expr ${#fixup_mips[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_mips[$f]}
-	done
+	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS_22}:${PATH}
 	;;
     mips_24)
 	ARCH=mips
 	cmd=(${cmd_mips_24[*]});
-	fmax=$(expr ${#fixup_mips[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_mips[$f]}
-	done
+	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-linux-"
 	PATH=${PATH_MIPS_24}:${PATH}
 	;;
     mips_25)
 	ARCH=mips
 	cmd=(${cmd_mips_25[*]});
-	fmax=$(expr ${#fixup_mips[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_mips[$f]}
-	done
+	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS_25}:${PATH}
 	;;
@@ -254,11 +230,7 @@ case ${ARCH} in
 	;;
     parisc64)
 	cmd=(${cmd_parisc64[*]})
-	fmax=$(expr ${#fixup_parisc64[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_parisc64[$f]}
-	done
+	fixup=("${fixup_parisc64[@]}")
 	PREFIX="hppa64-linux-"
 	PATH=${PATH_PARISC64}:${PATH}
 	ARCH=parisc
@@ -290,11 +262,7 @@ case ${ARCH} in
 	;;
     tile)
 	cmd=(${cmd_tile[*]})
-	fmax=$(expr ${#fixup_tile[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_tile[$f]}
-	done
+	fixup=("${fixup_tile[@]}")
 	PREFIX="tilegx-linux-"
 	PATH=${PATH_TILE}:${PATH}
 	;;
@@ -315,13 +283,9 @@ case ${ARCH} in
 	;;
     xtensa)
 	cmd=(${cmd_xtensa[*]})
+	fixup=("${fixup_xtensa[@]}")
 	PREFIX="xtensa-linux-"
 	PATH=${PATH_XTENSA}:${PATH}
-	fmax=$(expr ${#fixup_xtensa[*]} - 1)
-	for f in $(seq 0 ${fmax})
-	do
-	    fixup[$f]=${fixup_xtensa[$f]}
-	done
 	;;
     um)
 	cmd=(${cmd_um[*]})
