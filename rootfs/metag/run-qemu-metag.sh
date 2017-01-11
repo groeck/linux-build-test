@@ -1,15 +1,17 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_METAG_BIN}/qemu-system-meta}
+
 PREFIX=metag-unknown-linux-uclibc-
 ARCH=metag
 rootfs=busybox-metag.cpio
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 
 PATH=${PATH_METAG}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {
@@ -51,7 +53,7 @@ runkernel()
 
     echo -n "running ..."
 
-    /opt/buildbot/qemu-install/metag/bin/qemu-system-meta -display none \
+    ${QEMU} -display none \
 	-kernel vmlinux -device da,exit_threads=1 \
 	-chardev stdio,id=chan1 -chardev pty,id=chan2 \
 	-append "rdinit=/sbin/init doreboot" > ${logfile} 2>&1 &
