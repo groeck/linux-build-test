@@ -1,6 +1,11 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-alpha
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
+
 PREFIX=alpha-linux-
 ARCH=alpha
 rootfs=busybox-alpha.cpio
@@ -16,10 +21,6 @@ v3.2|v3.4|v3.8)
 esac
 
 PATH=${PATH_ALPHA}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {
