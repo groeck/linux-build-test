@@ -1,5 +1,9 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
 runall=0
 if [ "$1" = "-a" ]
 then
@@ -7,16 +11,14 @@ then
     shift
 fi
 
+# Some zynq images fail to run with qemu v2.7
+QEMU_ZYNQ=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
+QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
+
 machine=$1
 config=$2
 devtree=$3
-
-# Some zynq images fail to run with qemu v2.7
-QEMU_ZYNQ=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-arm}
-# Use Linaro version for overo / beagle
-QEMU_LINARO=/opt/buildbot/qemu-install/v2.3.50-linaro/bin/qemu-system-arm
-# Default is qemu v2.8
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-arm}
 
 PREFIX=arm-poky-linux-gnueabi-
 ARCH=arm
