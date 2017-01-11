@@ -111,6 +111,7 @@ case ${ARCH} in
 	;;
     avr32)
 	cmd=(${cmd_avr32[*]})
+	fixup=("${fixup_avr32[@]}")
 	PREFIX="avr32-linux-"
 	PATH=${PATH_AVR32}:${PATH}
 	;;

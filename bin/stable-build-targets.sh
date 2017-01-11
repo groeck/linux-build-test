@@ -102,3 +102,5 @@ fixup_arcv2=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
+
+fixup_avr32=("s/CONFIG_NET=y/# CONFIG_NET is not set/")
