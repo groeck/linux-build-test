@@ -1,5 +1,11 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-ppc64}
+
 mach=$1
 variant=$2
 
@@ -8,11 +14,6 @@ PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-li
 # PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
-
-QEMU_V28=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-ppc64}
-QEMU_V27=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-ppc64}
-QEMU_V25=${QEMU:-/opt/buildbot/qemu-install/v2.5/bin/qemu-system-ppc64}
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.6/bin/qemu-system-ppc64}
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
@@ -108,16 +109,17 @@ runkernel()
 
     case "${machine}" in
     mac99)
-	# mac99 crashes with qemu v2.7 (rc3)
-	qemu=${QEMU_V28}
+	# mac99 crashes with qemu v2.7(rc3).
+	# v2.6 and v2.8 are ok.
+	qemu=${QEMU}
 	;;
     mpc8544ds)
-	# mpc8544ds may crash with qemu v2.6.x+
-	qemu=${QEMU_V28}
+	# mpc8544ds may crash with qemu v2.6.x+..v2.7
+	qemu=${QEMU}
 	;;
     *)
-	# pseries works withs with v2.5.x..v2.7.0-rc3
-	qemu=${QEMU_V28}
+	# pseries works withs with v2.5.x+
+	qemu=${QEMU}
 	;;
     esac
 
