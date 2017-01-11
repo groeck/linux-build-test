@@ -1,5 +1,9 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
 debug=0
 if [ "$1" = "-d" ]
 then
@@ -10,7 +14,7 @@ fi
 machine=$1
 config=$2
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-xtensa}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
 
 PREFIX=xtensa-linux-
 ARCH=xtensa
@@ -19,10 +23,6 @@ PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
 PATH_XTENSA_TOOLS=/opt/buildbot/bin/xtensa
 
 PATH=${PATH_XTENSA}:${PATH_XTENSA_TOOLS}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 cached_defconfig=""
 
