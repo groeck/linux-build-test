@@ -99,15 +99,15 @@ then
 fi
 make -j20 install
 
-# git clean -d -x -f -q
-# git checkout master-local
-# ./configure --prefix=/opt/buildbot/qemu-install/master \
-# 	--disable-user --disable-gnutls --disable-docs \
-# 	--disable-nettle --disable-gcrypt \
-# 	--disable-xen --disable-xen-pci-passthrough \
-# 	--target-list="nios2-softmmu"
-# if [ $? -ne 0 ]
-# then
-#     exit 1
-# fi
-# make -j20 install
+git clean -d -x -f -q
+git checkout master-local
+./configure --prefix=/opt/buildbot/qemu-install/master \
+	--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list="nios2-softmmu sparc64-softmmu sparc-softmmu"
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+make -j20 install
