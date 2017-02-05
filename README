@@ -166,7 +166,7 @@ Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
 	make toolchain
 	cd output
 	mkdir microblaze
-	mv host arm/gcc-4.9.1
+	mv host microblaze/gcc-4.9.1
 	tar czf /tmp/x86_64-gcc-4.9.1-glibc_microblaze-linux.tar.gz microblaze
 
 ---
