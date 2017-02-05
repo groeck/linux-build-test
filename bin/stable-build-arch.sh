@@ -30,7 +30,8 @@ PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-lin
 PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
 PATH_NIOS2=/opt/kernel/nios2/gcc-6.1.0/usr/bin
-PATH_OPENRISC=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
+PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
+PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
@@ -221,8 +222,16 @@ case ${ARCH} in
 	;;
     openrisc)
 	cmd=(${cmd_openrisc[*]})
-	PREFIX="or32-linux-"
-	PATH=${PATH_OPENRISC}:${PATH}
+	case ${rel} in
+	v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1|v4.4|v4.9)
+		PREFIX="or32-linux-"
+		PATH=${PATH_OPENRISC_45}:${PATH}
+		;;
+	*)
+		PREFIX="or1k-linux-"
+		PATH=${PATH_OPENRISC}:${PATH}
+		;;
+	esac
 	;;
     parisc)
 	cmd=(${cmd_parisc[*]})
