@@ -71,10 +71,18 @@ runkernel()
 	;;
     esac
 
+    kvm=""
+    mem="-m 256"
+    if [ "${cpu}" = "kvm64" ]
+    then
+	kvm="-enable-kvm -smp 4"
+	mem="-m 1024"
+    fi
+
     ${QEMU} -kernel arch/x86/boot/bzImage \
-	-M ${mach} -cpu ${cpu} ${usb} -no-reboot -m 256 \
+	-M ${mach} -cpu ${cpu} ${kvm} ${usb} -no-reboot ${mem} \
 	-drive file=${rootfs},format=raw,if=ide \
-	--append "root=/dev/${drive} rw mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
+	--append "root=/dev/${drive} rw console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
@@ -87,6 +95,10 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+retcode=0
+
+runkernel qemu_x86_64_pc_defconfig kvm64 q35
+retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig Broadwell-noTSX q35
 retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig IvyBridge q35
