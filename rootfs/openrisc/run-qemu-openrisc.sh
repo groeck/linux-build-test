@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-or32
+QEMU=/opt/buildbot/qemu-install/v2.8/bin/qemu-system-or32
 PREFIX=or1k-linux-uclibc-
 ARCH=openrisc
 rootfs=busybox-openrisc.cpio
