@@ -7,15 +7,17 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2|v3.4|v3.10|v3.12|v3.14|v3.16)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+	PREFIX=mips-poky-linux-
 	;;
 *)
-	PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+	# PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+	PATH_MIPS=/opt/kernel/mips/gcc-5.4.0/usr/bin
+	PREFIX=mips-linux-
 	;;
 esac
 
 # machine specific information
 rootfs=busybox-mips.ext3
-PREFIX=mips-poky-linux-
 ARCH=mips
 QEMUCMD=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips
 KERNEL_IMAGE=vmlinux
