@@ -8,17 +8,19 @@ case "${rel}" in
 v3.2|v3.4)
 	PATH_MIPS=/opt/kernel/gcc-4.6.3-nolibc/mips64-linux/bin
 	PREFIX=mips64-linux-
+	cpu=""
 	;;
 *)
 	PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 	PREFIX=mips-linux-
+	cpu="-cpu 5KEc"
 	;;
 esac
 
 # machine specific information
 rootfs=core-image-minimal-qemumips64.ext3
 ARCH=mips
-QEMUCMD=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips64
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-mips64}
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
@@ -107,8 +109,8 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
-	-cpu 5KEc \
+    ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
+	${cpu} \
 	-drive file=${rootfs},format=raw,if=ide \
 	-vga cirrus -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \
