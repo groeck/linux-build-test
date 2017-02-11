@@ -97,8 +97,8 @@ echo
 
 retcode=0
 
-runkernel qemu_x86_64_pc_defconfig kvm64 q35
-retcode=$((${retcode} + $?))
+# runkernel qemu_x86_64_pc_defconfig kvm64 q35
+# retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig Broadwell-noTSX q35
 retcode=$((${retcode} + $?))
 runkernel qemu_x86_64_pc_defconfig IvyBridge q35
