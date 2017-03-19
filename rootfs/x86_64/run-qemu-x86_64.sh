@@ -3,8 +3,8 @@
 machine=$1
 cputype=$2
 
-PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-PREFIX=x86_64-poky-linux-
+PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+PREFIX=x86_64-linux-
 ARCH=x86_64
 
 QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-x86_64}
