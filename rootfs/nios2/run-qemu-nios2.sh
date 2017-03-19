@@ -13,7 +13,7 @@ config=$2
 PREFIX=nios2-linux-
 ARCH=nios2
 rootfs=busybox-nios2.cpio
-PATH_NIOS2=/opt/kernel/nios2/gcc-6.1.0/usr/bin
+PATH_NIOS2=/opt/kernel/nios2/gcc-6.3.0/usr/bin
 QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-nios2}
 
 PATH=${PATH_NIOS2}:${PATH}
@@ -78,7 +78,7 @@ runkernel()
     ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \
 	-dtb ${dtb} \
-	--append "rdinit=/sbin/init doreboot" \
+	--append "rdinit=/sbin/init earlycon console=ttyS0,115200 doreboot" \
 	-initrd busybox-nios2.cpio \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
