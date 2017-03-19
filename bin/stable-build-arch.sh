@@ -42,13 +42,13 @@ PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
 PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-PATH_XTENSA=/opt/kernel/xtensa/gcc-4.7.3/usr/bin
+PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
-maxload=$(($(nproc) + 4))
+maxload=$(($(nproc) * 3 / 2))
 
 errors=0
 builds=0

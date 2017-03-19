@@ -19,7 +19,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
 PREFIX=xtensa-linux-
 ARCH=xtensa
 rootfs=busybox-xtensa.cpio
-PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
+PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 PATH_XTENSA_TOOLS=/opt/buildbot/bin/xtensa
 
 PATH=${PATH_XTENSA}:${PATH_XTENSA_TOOLS}:${PATH}
