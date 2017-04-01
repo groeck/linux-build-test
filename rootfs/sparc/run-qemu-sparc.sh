@@ -7,7 +7,17 @@ QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc}
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
-PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v3.2|v3.4|v3.10)
+	# Old kernels crash with newer compilers
+	PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
+	;;
+*)
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+	;;
+esac
 
 PATH=${PATH_SPARC}:${PATH}
 
