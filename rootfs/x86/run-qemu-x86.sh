@@ -4,10 +4,21 @@ _cpu=$1
 _mach=$2
 _defconfig=$3
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-i386}
-PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
-PREFIX=x86_64-linux-
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-i386}
 ARCH=x86
+
+# Older releases don't like gcc 6+
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case ${rel} in
+v3.2|v3.4|v3.10|v3.12|v3.16|v3.18)
+	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
+	PREFIX="x86_64-poky-linux-"
+	;;
+*)
+	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+	PREFIX="x86_64-linux-"
+	;;
+esac
 
 PATH=${PATH_X86}:${PATH}
 

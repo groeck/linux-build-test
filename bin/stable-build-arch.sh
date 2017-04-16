@@ -41,12 +41,23 @@ PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
 PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
-PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
+
+# Older releases don't like gcc 6+
+case ${rel} in
+v3.2|v3.4|v3.10|v3.12|v3.16|v3.18)
+	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
+	PREFIX_X86="x86_64-poky-linux-"
+	;;
+*)
+	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+	PREFIX_X86="x86_64-linux-"
+	;;
+esac
 
 maxload=$(($(nproc) * 3 / 2))
 
@@ -155,7 +166,7 @@ case ${ARCH} in
 	;;
     i386)
 	cmd=(${cmd_i386[*]})
-	PREFIX="x86_64-linux-"
+	PREFIX=${PREFIX_X86}
 	PATH=${PATH_X86}:${PATH}
 	;;
     ia64)
@@ -288,7 +299,7 @@ case ${ARCH} in
 	;;
     x86_64)
 	cmd=(${cmd_x86_64[*]})
-	PREFIX="x86_64-linux-"
+	PREFIX=${PREFIX_X86}
 	PATH=${PATH_X86}:${PATH}
 	;;
     xtensa)
@@ -299,7 +310,7 @@ case ${ARCH} in
 	;;
     um)
 	cmd=(${cmd_um[*]})
-	PREFIX="x86_64-linux-"
+	PREFIX=${PREFIX_X86}
 	PATH=${PATH_X86}:${PATH}
 	SUBARCH="x86_64"
 	;;

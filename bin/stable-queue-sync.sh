@@ -10,7 +10,7 @@ if [ $# -gt 0 ]
 then
 	releases=($*)
 else
-	releases=(4.4 4.9 4.10)
+	releases=(3.18 4.4 4.9 4.10)
 fi
 
 do_import()
@@ -21,7 +21,7 @@ do_import()
 	"3.12")
 		source=origin/stable-${release}-queue
 		;;
-	"3.10" | "3.18" | "4.1")
+	"3.10" | "4.1")
 		source=origin/linux-${release}.y-queue
 		;;
 	*)

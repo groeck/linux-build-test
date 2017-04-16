@@ -14,7 +14,7 @@ if [ $# -gt 0 ]
 then
 	releases=($*)
 else
-	releases=(4.4 4.9 4.10)
+	releases=(3.18 4.4 4.9 4.10)
 fi
 
 do_import()
