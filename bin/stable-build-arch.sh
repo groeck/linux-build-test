@@ -389,17 +389,30 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
-	if [ $? -ne 0 ]; then
+	# Auto-repeat a few times to handle internal compiler errors
+	# [Ryzen problem]
+	n=0
+	while true
+	do
+	  make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
+	  if [ $? -eq 0 ]
+	  then
+	    echo "passed"
+	    break
+	  fi
+	  grep "internal compiler error" /tmp/buildlog.$$ >/dev/null 2>&1
+	  if [ $? -ne 0 -o $n -gt 2 ]
+	  then
 	    echo "failed"
 	    echo "--------------"
 	    echo "Error log:"
 	    cat /tmp/buildlog.$$
 	    echo "--------------"
-    	    errors=$(expr ${errors} + 1)
-	else
-	    echo "passed"
-	fi
+	    errors=$(expr ${errors} + 1)
+	    break
+	  fi
+	  n=$(expr $n + 1)
+	done
 	rm -f /tmp/buildlog.$$
 done
 
