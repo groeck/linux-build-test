@@ -400,7 +400,7 @@ do
 	    echo "passed"
 	    break
 	  fi
-	  grep "internal compiler error" /tmp/buildlog.$$ >/dev/null 2>&1
+	  egrep "internal compiler error|Segmentation fault" /tmp/buildlog.$$ >/dev/null 2>&1
 	  if [ $? -ne 0 -o $n -gt 2 ]
 	  then
 	    echo "failed"
