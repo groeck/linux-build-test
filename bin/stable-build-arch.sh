@@ -49,7 +49,7 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2|v3.4|v3.10|v3.12|v3.16|v3.18)
+v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
 	;;
