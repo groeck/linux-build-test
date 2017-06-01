@@ -1,7 +1,8 @@
 #!/bin/bash
 
 machine=$1
-config=$2
+option=$2
+config=$3
 
 QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-aarch64}
 PREFIX=aarch64-linux-
@@ -67,6 +68,12 @@ runkernel()
     fi
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
+    then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [ -n "${option}" -a "${option}" != "${fixup}" ]
     then
 	echo "Skipping ${pbuild} ... "
 	return 0
