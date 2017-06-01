@@ -41,7 +41,6 @@ PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
 PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
-PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
@@ -52,10 +51,12 @@ case ${rel} in
 v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
+	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
 	;;
 *)
 	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	PREFIX_X86="x86_64-linux-"
+	PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 	;;
 esac
 
