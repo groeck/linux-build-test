@@ -104,7 +104,8 @@ git checkout v2.9.0-local
 ./configure --prefix=/opt/buildbot/qemu-install/v2.9 \
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list="nios2-softmmu sparc64-softmmu sparc-softmmu"
 if [ $? -ne 0 ]
 then
     exit 1
