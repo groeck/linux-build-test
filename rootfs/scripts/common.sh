@@ -5,7 +5,9 @@
 LOOPTIME=5	# Wait time before checking status
 MAXTIME=120	# Maximum wait time for qemu session to complete
 
-maxload=$(($(nproc) * 3 / 2))
+# We run multiple builds at a time
+# maxload=$(($(nproc) * 3 / 2))
+maxload=$(nproc)
 
 dokill()
 {
