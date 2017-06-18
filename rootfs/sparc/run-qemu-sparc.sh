@@ -3,7 +3,7 @@
 machine=$1
 smpflag=$2
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-sparc}
+QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.9/bin/qemu-system-sparc}
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
