@@ -4,16 +4,16 @@ machine=$1
 option=$2
 config=$3
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-aarch64}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/aarch64/gcc-5.2/usr/bin
 
 PATH=${PATH_ARM64}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 skip_32="arm64:xlnx-ep108:smp:defconfig \
 	arm64:xlnx-ep108:nosmp:defconfig"

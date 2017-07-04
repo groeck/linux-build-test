@@ -1,16 +1,16 @@
 #!/bin/bash
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-microblazeel}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
 PREFIX=microblazeel-linux-
 ARCH=microblaze
 rootfs=busybox-microblazeel.cpio
 PATH_MICROBLAZE=/opt/kernel/microblazeel/gcc-4.9.1/usr/bin
 
 PATH=${PATH_MICROBLAZE}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 runkernel()
 {

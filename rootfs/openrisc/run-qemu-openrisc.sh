@@ -1,16 +1,16 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.8/bin/qemu-system-or32
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-or1k}
 PREFIX=or1k-linux-uclibc-
 ARCH=openrisc
 rootfs=busybox-openrisc.cpio
 PATH_OR32=/opt/kernel/or1k/gcc-4.9.0/bin
 
 PATH=${PATH_OR32}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {
@@ -57,7 +57,7 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -cpu or1200 -M or32-sim \
+    ${QEMU} -cpu or1200 -M or1k-sim \
     	-kernel vmlinux -nographic -serial stdio -monitor none \
 	> ${logfile} 2>&1 &
 

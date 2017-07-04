@@ -3,6 +3,12 @@
 config=$1
 variant=$2
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2|v3.4|v3.10|v3.12|v3.14|v3.16)
@@ -20,11 +26,7 @@ esac
 
 # machine specific information
 ARCH=mips
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-mips64el
 PATH=${PATH_MIPS}:${PATH}
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 # Called from dosetup() to patch the configuration file.
 patch_defconfig()

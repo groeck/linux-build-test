@@ -4,6 +4,8 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
+
 debug=0
 if [ "$1" = "-d" ]
 then
@@ -13,8 +15,6 @@ fi
 
 machine=$1
 config=$2
-
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
 
 PREFIX=xtensa-linux-
 ARCH=xtensa

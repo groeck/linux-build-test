@@ -3,6 +3,12 @@
 config=$1
 variant=$2
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips}
+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2|v3.4|v3.10|v3.12|v3.14)
@@ -19,14 +25,10 @@ esac
 # machine specific information
 rootfs=busybox-mips.ext3
 ARCH=mips
-QEMUCMD=/opt/buildbot/qemu-install/v2.8/bin/qemu-system-mips
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {
@@ -94,7 +96,7 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMUCMD} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
+    ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	-drive file=${rootfs},format=raw,if=ide \
 	-vga cirrus -usb -usbdevice wacom-tablet -no-reboot -m 128 \
 	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \

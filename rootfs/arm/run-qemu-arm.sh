@@ -12,8 +12,12 @@ then
 fi
 
 # Some zynq images fail to run with qemu v2.7
-QEMU_ZYNQ=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
+QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
+# Failures seen with qemu v2.9:
+# arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
+# arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
+# arm:z2:pxa_defconfig
 QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 
 machine=$1

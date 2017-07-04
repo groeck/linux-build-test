@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-ppc64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 mach=$1
 variant=$2

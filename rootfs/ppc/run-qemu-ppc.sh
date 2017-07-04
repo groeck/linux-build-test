@@ -4,6 +4,11 @@ machine=$1
 variant=$2
 config=$3
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
+
 # machine specific information
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
 PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
@@ -11,12 +16,7 @@ PREFIX=powerpc64-poky-linux-
 ARCH=powerpc
 QEMU_MACH=mac99
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-ppc}
-
 PATH=${PATH_PPC}:${PATH}
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 skip_32="powerpc:44x/bamboo_defconfig powerpc:44x/virtex5_defconfig \
 	powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"

@@ -4,7 +4,11 @@ _cpu=$1
 _mach=$2
 _defconfig=$3
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-i386}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=x86
 
 # Older releases don't like gcc 6+
@@ -21,10 +25,6 @@ v3.2|v3.4|v3.10|v3.12|v3.16|v3.18)
 esac
 
 PATH=${PATH_X86}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 cached_defconfig=""
 

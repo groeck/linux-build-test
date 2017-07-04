@@ -1,16 +1,16 @@
 #!/bin/bash
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-cris}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-cris}
 PREFIX=crisv32-linux-
 ARCH=cris
 rootfs=busybox-cris.cpio
 PATH_CRIS=/opt/kernel/crisv32/gcc-4.9.2/usr/bin
 
 PATH=${PATH_CRIS}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 runkernel()
 {

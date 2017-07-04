@@ -4,18 +4,18 @@ machine=$1
 smpflag=$2
 config=$3
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc64}
+
 PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
 PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.9/bin/qemu-system-sparc64}
-
 PATH=${PATH_SPARC}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 cached_defconfig=""
 

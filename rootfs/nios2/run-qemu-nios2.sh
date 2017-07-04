@@ -10,17 +10,18 @@ fi
 machine=$1
 config=$2
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-nios2}
+
 PREFIX=nios2-linux-
 ARCH=nios2
 rootfs=busybox-nios2.cpio
 PATH_NIOS2=/opt/kernel/nios2/gcc-6.3.0/usr/bin
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-nios2}
 
 PATH=${PATH_NIOS2}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {

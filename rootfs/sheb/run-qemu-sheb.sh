@@ -1,6 +1,10 @@
 #!/bin/bash
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sh4eb
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
 PREFIX=sh4-linux-
 ARCH=sh
 rootfs=busybox-sheb.img
@@ -8,10 +12,6 @@ PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
 # PATH_SH=/opt/kernel/sh4eb/gcc-4.8.3/usr/bin
 
 PATH=${PATH_SH}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {

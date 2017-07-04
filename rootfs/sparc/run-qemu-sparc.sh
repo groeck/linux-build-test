@@ -3,7 +3,11 @@
 machine=$1
 smpflag=$2
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.9/bin/qemu-system-sparc}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc}
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
@@ -20,10 +24,6 @@ v3.2|v3.4|v3.10)
 esac
 
 PATH=${PATH_SPARC}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 cached_defconfig=""
 

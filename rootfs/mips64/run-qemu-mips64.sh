@@ -3,6 +3,12 @@
 config=$1
 variant=$2
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2|v3.4)
@@ -20,14 +26,10 @@ esac
 # machine specific information
 rootfs=core-image-minimal-qemumips64.ext3
 ARCH=mips
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.8/bin/qemu-system-mips64}
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {

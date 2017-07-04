@@ -1,16 +1,16 @@
 #!/bin/bash
 
-QEMU=${QEMU:-/opt/buildbot/qemu-install/v2.7/bin/qemu-system-microblaze}
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblaze}
 PREFIX=microblaze-linux-
 ARCH=microblaze
 rootfs=rootfs.cpio
 PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 
 PATH=${PATH_MICROBLAZE}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 runkernel()
 {

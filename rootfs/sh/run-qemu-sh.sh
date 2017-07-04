@@ -1,5 +1,11 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
+
 PREFIX=sh4-linux-
 ARCH=sh
 rootfs=rootfs.ext2
@@ -14,13 +20,7 @@ v3.2|v3.4)
 	;;
 esac
 
-QEMU=/opt/buildbot/qemu-install/v2.7/bin/qemu-system-sh4
-
 PATH=${PATH_SH}:${PATH}
-
-dir=$(cd $(dirname $0); pwd)
-
-. ${dir}/../scripts/common.sh
 
 patch_defconfig()
 {
