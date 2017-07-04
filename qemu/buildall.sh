@@ -78,46 +78,6 @@ then
     fi
 fi
 
-if [ -z "$1" -o "$1" = "v2.5" ]
-then
-    git clean -d -x -f -q
-    git checkout v2.5.1-local
-    ./configure --prefix=/opt/buildbot/qemu-install/v2.5 \
-	--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough \
-	--target-list="ppc64-softmmu"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-    make -j20 install
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v2.6" ]
-then
-    git clean -d -x -f -q
-    git checkout v2.6.2-local
-    ./configure --prefix=/opt/buildbot/qemu-install/v2.6 \
-	--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough \
-	--target-list="ppc64-softmmu arm-softmmu sparc64-softmmu"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-    make -j20 install
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-fi
-
 if [ -z "$1" -o "$1" = "v2.7" ]
 then
     git clean -d -x -f -q
