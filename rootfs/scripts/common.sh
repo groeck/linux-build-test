@@ -238,7 +238,7 @@ dowait()
 	    fi
 	fi
 
-	egrep "Oops: |Kernel panic|Internal error:" ${logfile} >/dev/null 2>&1
+	egrep "Oops: |Kernel panic|Internal error:|segfault" ${logfile} >/dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 	    # x86 has the habit of crashing in restart once in a while.
