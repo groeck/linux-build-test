@@ -7,7 +7,7 @@ config=$3
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
+QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-ppc}
 
 # machine specific information
 # PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
