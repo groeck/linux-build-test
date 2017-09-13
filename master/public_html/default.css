@@ -136,6 +136,10 @@ td.idle,td.waiting,td.offline,td.building {
 }
 
 /* Console view styles */
+td.DevStatus > table {
+	table-layout: fixed;
+}
+
 td.DevRev {
 	padding: 4px 8px 4px 8px;
 	color: #333333;
@@ -266,6 +270,10 @@ td.Alt {
 	margin-right: auto;
 }
 
+.DevStatusBox a.notinbuilder {
+	border-style: none;
+}
+
 .DevSlaveBox {
 	text-align: center;
 	height: 10px;
@@ -369,6 +377,12 @@ div.BuildWaterfall {
 	border-color: #A77272;
 }
 
+.failure-again {
+	color: #000;
+	background-color: #eA9;
+	border-color: #A77272;
+}
+
 .warnings {
 	color: #FFFFFF;
 	background-color: #fa3;
@@ -397,6 +411,12 @@ div.BuildWaterfall {
 	color: #000;
 	background-color: #fd3;
 	border-color: #C5C56D;
+}
+
+.paused {
+    color: #FFFFFF;
+    background-color: #8080FF;
+    border-color: #dddddd;
 }
 
 .offline,td.offline {
@@ -515,6 +535,11 @@ table.info td.left {
 	text-align: left
 }
 
+table.info td .reason {
+    display:block;
+    font-weight: bold;
+}
+
 .alt {
 	background-color: #f6f6f6;
 }
@@ -530,7 +555,6 @@ li {
 /* log view */
 .log * {
 	vlink: #800080;
-	font-family: "Courier New", courier, monotype, monospace;
 }
 
 span.stdout {
@@ -544,6 +568,30 @@ span.stderr {
 span.header {
 	color: blue;
 }
+span.ansi30 {
+	color: black;
+}
+span.ansi31 {
+	color: red;
+}
+span.ansi32 {
+	color: green;
+}
+span.ansi33 {
+	color: orange;
+}
+span.ansi34 {
+	color: yellow;
+}
+span.ansi35 {
+	color: purple;
+}
+span.ansi36 {
+	color: blue;
+}
+span.ansi37 {
+	color: white;
+}
 
 /* revision & email */
 .revision .full {
@@ -552,6 +600,10 @@ span.header {
 
 .user .email {
 	display: none;
+}
+
+pre {
+	white-space: pre-wrap;
 }
 
 /* change comments (use regular colors here) */
