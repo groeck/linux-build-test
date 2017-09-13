@@ -56,7 +56,7 @@ v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
 *)
 	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	PREFIX_X86="x86_64-linux-"
-	PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
+	PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
 	;;
 esac
 
