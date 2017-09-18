@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
+QEMU=${QEMU:-${QEMU_V210_BIN}/qemu-system-sh4eb}
 PREFIX=sh4-linux-
 ARCH=sh
 rootfs=busybox-sheb.img

@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
+QEMU=${QEMU:-${QEMU_V210_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
 ARCH=sh
