@@ -169,5 +169,7 @@ runkernel 85xx/mpc85xx_cds_defconfig smpdev mpc8548cds "" busybox-ppc.cpio arch/
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
+runkernel 44x/bamboo_defconfig smpdev bamboo "" busybox-ppc.cpio vmlinux
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
