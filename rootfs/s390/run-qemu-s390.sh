@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-s390x}
 PREFIX=s390x-linux-
 ARCH=s390
 rootfs=busybox-s390.cpio

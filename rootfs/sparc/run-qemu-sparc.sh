@@ -7,7 +7,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc}
+QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-sparc}
 PREFIX=sparc64-linux-
 ARCH=sparc32
 rootfs=hda.sqf
