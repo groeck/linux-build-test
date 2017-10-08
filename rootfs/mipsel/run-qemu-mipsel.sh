@@ -8,15 +8,15 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
-
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4|v3.10|v3.12|v3.14)
+v3.2|v3.4|v3.10)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+	QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-mipsel}
 	;;
 *)
 	PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
 	;;
 esac
 

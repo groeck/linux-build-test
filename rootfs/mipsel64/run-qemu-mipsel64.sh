@@ -7,13 +7,13 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4|v3.10|v3.12|v3.14|v3.16)
+v3.2|v3.4|v3.10)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 	PREFIX=mips-poky-linux-
+	QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-mips64el}
 	;;
 *)
 	# Using Poky 2.0 appears to result in random crashes due to stack
@@ -21,6 +21,7 @@ v3.2|v3.4|v3.10|v3.12|v3.14|v3.16)
 	# PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
 	PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 	PREFIX=mips-linux-
+	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
 	;;
 esac
 
