@@ -26,12 +26,7 @@ do_import()
 	tbranch=${qbranch}.test
 	ref=origin/${branch}
 
-	if [ "${release}" = "3.4" ]
-	then
-		qdir=${QCLONE}/patches
-	else
-		qdir=${QCLONE}/queue-${release}
-	fi
+	qdir=${QCLONE}/queue-${release}
 
 	echo "Importing ${release}"
 

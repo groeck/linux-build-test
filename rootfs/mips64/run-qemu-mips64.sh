@@ -11,7 +11,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4)
+v3.2)
 	PATH_MIPS=/opt/kernel/gcc-4.6.3-nolibc/mips64-linux/bin
 	PREFIX=mips64-linux-
 	cpu=""

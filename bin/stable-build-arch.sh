@@ -48,7 +48,7 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
+v3.2|v3.10|v3.16|v3.18|v4.1)
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
 	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
@@ -96,7 +96,7 @@ case ${ARCH} in
 	fixup=("${fixup_arc[@]}")
 	PREFIX="arc-linux-"
 	case ${rel} in
-	v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1)
+	v3.2|v3.10|v3.16|v3.18|v4.1)
 		PATH=${PATH_ARC_48}:${PATH}
 		;;
 	*)
@@ -235,7 +235,7 @@ case ${ARCH} in
     openrisc)
 	cmd=(${cmd_openrisc[*]})
 	case ${rel} in
-	v3.2|v3.4|v3.10|v3.12|v3.16|v3.18|v4.1|v4.4|v4.9)
+	v3.2|v3.10|v3.16|v3.18|v4.1|v4.4|v4.9)
 		PREFIX="or32-linux-"
 		PATH=${PATH_OPENRISC_45}:${PATH}
 		;;
