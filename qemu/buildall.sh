@@ -133,6 +133,18 @@ then
     fi
 fi
 
+if [ -z "$1" -o "$1" = "v2.11" ]
+then
+    dobuild v2.11.0-local v2.11 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough"
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+fi
+
 if [ "$1" = "master" ]
 then
     dobuild master-local master \
