@@ -193,19 +193,23 @@
   {% for rel in releases -%}
 	{% set rel_var = rel|regex_replace('[-.]','_') -%}
 	<script type='text/javascript'>
+	    var qemu_total = qemuGetResults_{{rel_var}} (/total: \d+/);
+	    var qemu_passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
+	    var qemu_skipped = qemuGetResults_{{rel_var}} (/skipped: \d+/);
+	    var qemu_fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
 	    var total = getResults_{{rel_var}} (/total: \d+/);
 	    var passed = getResults_{{rel_var}} (/pass: \d+/);
 	    var skipped = getResults_{{rel_var}} (/skipped: \d+/);
 	    var fail = getResults_{{rel_var}} (/fail: \d+/);
 	    var box = "success";
 	    var build = "successful";
-	    if (total == 0 || total == skipped) {
+	    if ((total == 0 && qemu_total == 0) || total == skipped) {
 		box = "skipped";
 		build = "skipped";
-	    } else if (passed == 0) {
+	    } else if (passed == 0 && qemu_passed == 0) {
 		box = "failure";
 		build = "failed";
-	    } else if (fail > 0) {
+	    } else if (fail > 0 || qemu_fail > 0) {
 		box = "warnings";
 		build = "warnings";
 	    }
@@ -221,30 +225,11 @@
 			document.write('<br>' + buildFailures_{{rel_var}}[f] + '\n');
 		}
 	}
-	document.write("<br>");
-	</script>
-	<script type='text/javascript'>
-	    var total = qemuGetResults_{{rel_var}} (/total: \d+/);
-	    var passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
-	    var skipped = qemuGetResults_{{rel_var}} (/skipped: \d+/);
-	    var fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
-	    var box = "success";
-	    var build = "successful";
-	    if (total == 0 || total == skipped) {
-		box = "skipped";
-		build = "skipped";
-	    } else if (passed == 0) {
-		box = "failure";
-		build = "failed";
-	    } else if (fail > 0) {
-		box = "warnings";
-		build = "warnings";
-	    }
-	document.write("Qemu test results:<br>");
-	total = total - skipped;
-        document.write('total: ' + total +
-			' pass: ' + passed +
-			' fail: ' + fail);
+	document.write("<br>Qemu test results:<br>");
+	qemu_total = qemu_total - qemu_skipped;
+        document.write('total: ' + qemu_total +
+			' pass: ' + qemu_passed +
+			' fail: ' + qemu_fail);
 	if (qemuBuildFailures_{{rel_var}}.length > 0) {
 		document.write('<br>Failed tests:\n');
 		for (var f=0; f < qemuBuildFailures_{{rel_var}}.length; f++) {
