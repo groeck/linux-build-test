@@ -14,7 +14,7 @@ rootfs=hda.sqf
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.2|v3.4|v3.10)
+v3.2)
 	# Old kernels crash with newer compilers
 	PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
 	;;

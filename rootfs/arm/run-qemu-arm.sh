@@ -54,54 +54,6 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:vexpress-a9:vexpress_defconfig \
 	arm:vexpress-a15:vexpress_defconfig \
 	arm:vexpress-a15-a7:vexpress_defconfig"
-skip_34="arm:akita:spitz_defconfig \
-	arm:beagle:omap2plus_defconfig \
-	arm:beaglexm:omap2plus_defconfig \
-	arm:imx25-pdk:imx_v4_v5_defconfig \
-	arm:mainstone:mainstone_defconfig \
-	arm:overo:omap2plus_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:sabrelite:imx_v6_v7_defconfig \
-	arm:sabrelite:multi_v7_defconfig \
-	arm:spitz:spitz_defconfig \
-	arm:versatileab:versatile_defconfig \
-	arm:versatilepb:versatile_defconfig \
-	arm:versatilepb-scsi:versatile_defconfig \
-	arm:vexpress-a9:vexpress_defconfig \
-	arm:vexpress-a15:vexpress_defconfig \
-	arm:vexpress-a15-a7:vexpress_defconfig"
-skip_310="arm:akita:spitz_defconfig \
-	arm:beagle:multi_v7_defconfig \
-	arm:beagle:omap2plus_defconfig \
-	arm:beaglexm:multi_v7_defconfig \
-	arm:beaglexm:omap2plus_defconfig \
-	arm:highbank:multi_v7_defconfig \
-	arm:imx25-pdk:imx_v4_v5_defconfig \
-	arm:mainstone:mainstone_defconfig \
-	arm:overo:multi_v7_defconfig \
-	arm:overo:omap2plus_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:sabrelite:imx_v6_v7_defconfig \
-	arm:sabrelite:multi_v7_defconfig \
-	arm:smdkc210:multi_v7_defconfig \
-	arm:spitz:spitz_defconfig \
-	arm:versatileab:versatile_defconfig \
-	arm:versatilepb:versatile_defconfig \
-	arm:vexpress-a9:multi_v7_defconfig \
-	arm:vexpress-a15:multi_v7_defconfig \
-	arm:vexpress-a15-a7:multi_v7_defconfig \
-	arm:xilinx-zynq-a9:multi_v7_defconfig"
-skip_312="arm:mainstone:mainstone_defconfig \
-	arm:overo:multi_v7_defconfig \
-	arm:overo:omap2plus_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:sabrelite:imx_v6_v7_defconfig \
-	arm:sabrelite:multi_v7_defconfig \
-	arm:smdkc210:multi_v7_defconfig \
-	arm:versatileab:versatile_defconfig \
-	arm:versatilepb:versatile_defconfig \
-	arm:vexpress-a15-a7:multi_v7_defconfig \
-	arm:xilinx-zynq-a9:multi_v7_defconfig"
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"

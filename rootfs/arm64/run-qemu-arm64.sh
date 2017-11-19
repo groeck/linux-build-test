@@ -17,12 +17,6 @@ PATH=${PATH_ARM64}:${PATH}
 
 skip_32="arm64:xlnx-ep108:smp:defconfig \
 	arm64:xlnx-ep108:nosmp:defconfig"
-skip_34="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
-skip_310="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
-skip_312="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
 skip_316="arm64:xlnx-ep108:smp:defconfig \
 	arm64:xlnx-ep108:nosmp:defconfig"
 skip_318="arm64:xlnx-ep108:smp:defconfig \
