@@ -35,6 +35,7 @@ PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
 PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+PATH_RISCV64=/opt/kernel/riscv64/gcc-7.2.0/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
 PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
@@ -261,6 +262,11 @@ case ${ARCH} in
 	cmd=(${cmd_powerpc[*]})
 	PREFIX="powerpc64-poky-linux-"
 	PATH=${PATH_PPC}:${PATH}
+	;;
+    riscv)
+	cmd=(${cmd_riscv[*]})
+	PREFIX="riscv64-linux-"
+	PATH=${PATH_RISCV64}:${PATH}
 	;;
     sparc32)
 	cmd=(${cmd_sparc32[*]})
