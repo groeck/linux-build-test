@@ -78,6 +78,26 @@ then
     fi
 fi
 
+if [ -z "$1" -o "$1" = "riscv64" ]
+then
+    git clean -d -x -f -q
+    git checkout v2.7.0-local-riscv64
+    ./configure --prefix=/opt/buildbot/qemu-install/v2.7-riscv64 \
+	--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=riscv64-softmmu
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+    make -j20 install
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
+fi
+
 if [ -z "$1" -o "$1" = "v2.7" ]
 then
     git clean -d -x -f -q
