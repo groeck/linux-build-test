@@ -69,7 +69,6 @@ builds=0
 ref=$(git describe)
 echo
 echo "Build reference: ${ref}"
-echo
 
 ARCH=$1
 BRANCH=$2
@@ -326,6 +325,9 @@ case ${ARCH} in
 	exit 1
 	;;
     esac
+
+echo "gcc version: $(${PREFIX}gcc --version | grep gcc)"
+echo
 
 CROSS=""
 if [ "${PREFIX}" != "" ]; then
