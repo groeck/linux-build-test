@@ -5,10 +5,10 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-s390x}
-PREFIX=s390x-linux-
+PREFIX=s390-linux-
 ARCH=s390
 rootfs=busybox-s390.cpio
-PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
+PATH_SH=/opt/kernel/s390/gcc-6.4.0/bin
 
 PATH=${PATH_SH}:${PATH}
 
