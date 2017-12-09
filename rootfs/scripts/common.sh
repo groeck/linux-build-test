@@ -72,8 +72,10 @@ setup_config()
     local ARCH=$1
     local defconfig=$2
     local fixup=$3
+    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
     local progdir=$(cd $(dirname $0); pwd)
     local arch
+    local target
 
     case ${ARCH} in
     mips32|mips64)
@@ -92,40 +94,35 @@ setup_config()
 	arch=${ARCH};;
     esac
 
-    mkdir -p arch/${arch}/configs
     if [ -e ${progdir}/${defconfig} ]
     then
+	mkdir -p arch/${arch}/configs
         cp ${progdir}/${defconfig} arch/${arch}/configs
     fi
 
+    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null
+    if [ $? -ne 0 ]
+    then
+	return 2
+    fi
+
+    # the configuration is in .config
+
     if [ -n "${fixup}" ]
     then
-        local f="arch/${arch}/configs/${defconfig}"
-	local ndefconfig="tmp_$(basename ${defconfig})"
-        local tf="arch/${arch}/configs/${ndefconfig}"
-
-	# Try in arch directory if the configuration does not exist in
-	# the configs directory.
-
-	[ ! -e $f ] && f="arch/${arch}/${defconfig}"
-	if [  -e $f ]
+	patch_defconfig .config ${fixup}
+	target="olddefconfig"
+	if [ "${rel}" = "v3.16" ]
 	then
-	    cp $f ${tf}
-	    patch_defconfig ${tf} ${fixup}
-	    defconfig=${ndefconfig}
-	else
-	    defconfig=""
+	    target="oldconfig"
 	fi
-    else
-	# report to caller if configuration does not exist (not an error)
-        local f="arch/${arch}/configs/${defconfig}"
-	[ ! -e $f ] && f="arch/${arch}/${defconfig}"
-	if [ ! -e $f ]
+	make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null
+	if [ $? -ne 0 ]
 	then
-	    defconfig=""
+	    return 1
 	fi
     fi
-    echo ${defconfig}
+    return 0
 }
 
 dosetup()
@@ -158,18 +155,17 @@ dosetup()
 
     doclean ${ARCH}
 
-    defconfig=$(setup_config ${ARCH} ${defconfig} ${fixup})
-    if [ -z "${defconfig}" ]
+    setup_config ${ARCH} ${defconfig} ${fixup}
+    rv=$?
+    if [ ${rv} -ne 0 ]
     then
-	echo "skipped"
-	return 2
-    fi
-
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1
-    if [ $? -ne 0 ]
-    then
-	echo "failed (config)"
-	return 1
+	if [ ${rv} -eq 1 ]
+	then
+	    echo "failed (config)"
+	else
+	    echo "skipped"
+	fi
+	return ${rv}
     fi
 
     setup_rootfs "${rootfs}" "${dynamic}"
