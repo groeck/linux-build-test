@@ -76,11 +76,11 @@ runkernel()
     case "${mach}" in
     pc)
 	drive=hda
-	usb="-usb -usbdevice wacom-tablet"
+	usb="-usb -device usb-wacom-tablet"
 	;;
     q35)
 	drive=sda
-	usb="-usb -usbdevice wacom-tablet"
+	usb="-usb -device usb-wacom-tablet"
 	;;
     isapc)
 	drive=hda
