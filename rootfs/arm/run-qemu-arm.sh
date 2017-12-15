@@ -13,12 +13,13 @@ fi
 
 # Some zynq images fail to run with qemu v2.7
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
+QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 # Failures seen with qemu v2.9:
 # arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
 # arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
 # arm:z2:pxa_defconfig
-QEMU=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_V211_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -319,7 +320,7 @@ runkernel()
 	    > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "mainstone" | "z2")
+    "mainstone")
         dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
@@ -327,6 +328,19 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
+	    -drive file=/tmp/flash,format=raw,if=pflash \
+	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
+	    -monitor null -nographic \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
+    "z2")
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
+	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
+	${QEMU} -M ${mach} ${cpucmd} \
+	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
 	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
 	    -monitor null -nographic \
@@ -378,7 +392,7 @@ runkernel()
 	pid=$!
 	;;
     "smdkc210")
-	${QEMU} -M ${mach} -smp 2 \
+	${QEMU_SMDKC} -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -append "rdinit=/sbin/init console=ttySAC0,115200n8 doreboot" \
