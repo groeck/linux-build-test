@@ -100,7 +100,8 @@ case ${ARCH} in
 		PATH=${PATH_ARC_48}:${PATH}
 		;;
 	*)
-		PATH=${PATH_ARC}:${PATH}
+		# Original path first to pick up bison
+		PATH=${PATH}:${PATH_ARC}
 		;;
 	esac
 	;;
@@ -109,7 +110,8 @@ case ${ARCH} in
 	cmd=(${cmd_arcv2[*]})
 	fixup=("${fixup_arcv2[@]}")
 	PREFIX="arc-linux-"
-	PATH=${PATH_ARCV2}:${PATH}
+	# Original path first to pick up bison
+	PATH=${PATH}:${PATH_ARCV2}
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
