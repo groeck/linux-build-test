@@ -287,11 +287,7 @@
       {% endif -%}
       </tr>
       <tr>
-          {% if b.current_box.text[0] == 'waiting' -%}
-            <td class="Activity idle"> idle </td>
-	  {% else -%}
-            {{ box(**b.current_box) }}
-          {% endif -%}
+          {{ box(**b.current_box) }}
       </tr>
     {% else -%}
         <tr><td class="LastBuild box skipped">skipped</td></tr>
@@ -371,11 +367,7 @@
       </td>
       </tr>
       <tr>
-          {% if b.current_box.text[0] == 'waiting' -%}
-            <td class="Activity idle"> idle </td>
-	  {% else -%}
-            {{ box(**b.current_box) }}
-          {% endif -%}
+          {{ box(**b.current_box) }}
       </tr>
     {% else -%}
         <tr><td class="LastBuild box skipped">skipped</td></tr>
