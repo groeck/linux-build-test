@@ -378,10 +378,10 @@
         <td class="LastBuild box {{ b.build_css_class }}">
           <a href="{{ b.build_url }}">{{ b.build_label }}</a>
           <br> {{ b.build_text|replace('build successful', 'successful') }}
+        </td>
       {% else -%}
         <td class="LastBuild box skipped">no build</td>
       {% endif -%}
-      </td>
       </tr>
       <tr>
           {%- set c = b.current_box -%}
