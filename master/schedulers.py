@@ -8,7 +8,7 @@ from buildbot.schedulers.basic import AnyBranchScheduler
 import datetime
 from dateutil import parser
 
-def timeInRange(range):
+def currentTimeInRange(range):
     start = parser.parse(range[0])
     end = parser.parse(range[1])
     now=datetime.datetime.now()
@@ -20,8 +20,9 @@ def timeToStart(start):
     start=parser.parse(start)
     now=datetime.datetime.now()
     if start > now:
-        delta=start-now
-        return delta.seconds
+	delta=start-now
+	# delta includes fractions of seconds, so let's round up.
+	return delta.days*24*60*60 + delta.seconds + 1
     return 0
 
 class TimedSingleBranchScheduler(SingleBranchScheduler):
@@ -38,30 +39,30 @@ class TimedSingleBranchScheduler(SingleBranchScheduler):
     def gotChange(self, change, important):
 	log.msg("TimedSingleBranchScheduler: Handling change: %s, important=%d"
 		% (change, important))
-	if timeInRange(self.timeRange):
+	if currentTimeInRange(self.timeRange):
 	    log.msg("Time in range. Calling SingleBranchScheduler.gotChange.")
-	    d = SingleBranchScheduler.gotChange(self, change, important)
-	else:
-	    log.msg("Time not in range. Scheduling %d seconds from now." %
+	    return SingleBranchScheduler.gotChange(self, change, important)
+
+	log.msg("Time not in range. Scheduling %d seconds from now." %
 		timeToStart(self.timeRange[0]))
 
-	    d = self.master.db.schedulers.classifyChanges(
-			self.objectid, {change.number: important})
+	d = self.master.db.schedulers.classifyChanges(
+				self.objectid, {change.number: important})
 
-	    def set_timer(_):
-		if not important and not self._timed_change_timer:
-		    return
+	def set_timer(_):
+	    if not important and not self._timed_change_timer:
+		return
 
-		if self._timed_change_timer:
-		    self._timed_change_timer.cancel()
+	    if self._timed_change_timer:
+		self._timed_change_timer.cancel()
 
-		def fire_timer():
-		     d = self.timedChangeTimerFired(change, important)
-		     d.addCallback(log.msg, "deferred timed timer fired")
-		     d.addErrback(log.err, "while firing deferred timed timer")
-		self._timed_change_timer = self._reactor.callLater(
+	    def fire_timer():
+		d = self.timedChangeTimerFired(change, important)
+		d.addCallback(log.msg, "deferred timed timer fired")
+		d.addErrback(log.err, "while firing deferred timed timer")
+	    self._timed_change_timer = self._reactor.callLater(
 			timeToStart(self.timeRange[0]), fire_timer)
-	    d.addCallback(set_timer)
+	d.addCallback(set_timer)
 	return d
 
     @util.deferredLocked('_timed_change_lock')
@@ -82,14 +83,14 @@ class TimedSingleBranchScheduler(SingleBranchScheduler):
 	@util.deferredLocked(self._timed_change_lock)
 	def cancel_timer(_):
 	    if self._timed_change_timer:
-	        self._timed_change_timer.cancel()
+		self._timed_change_timer.cancel()
 		del self._timed_change_timer
 	d.addCallback(cancel_timer)
 	return d
 
     def getPendingBuildTimes(self):
 	t = self._timed_change_timer
-        if t and t.active():
+	if t and t.active():
 	    return [t.getTime()]
 	return []
 
@@ -107,30 +108,30 @@ class TimedAnyBranchScheduler(AnyBranchScheduler):
     def gotChange(self, change, important):
 	log.msg("TimedAnyBranchScheduler: Handling change: %s, important=%d"
 		% (change, important))
-	if timeInRange(self.timeRange):
+	if currentTimeInRange(self.timeRange):
 	    log.msg("Time in range. Calling AnyBranchScheduler.gotChange.")
-	    d = AnyBranchScheduler.gotChange(self, change, important)
-	else:
-	    log.msg("Time not in range. Scheduling %d seconds from now." %
+	    return AnyBranchScheduler.gotChange(self, change, important)
+
+	log.msg("Time not in range. Scheduling %d seconds from now." %
 		timeToStart(self.timeRange[0]))
 
-	    d = self.master.db.schedulers.classifyChanges(
-			self.objectid, {change.number: important})
+	d = self.master.db.schedulers.classifyChanges(
+				self.objectid, {change.number: important})
 
-	    def set_timer(_):
-		if not important and not self._timed_change_timer:
-		    return
+	def set_timer(_):
+	    if not important and not self._timed_change_timer:
+		return
 
-		if self._timed_change_timer:
-		    self._timed_change_timer.cancel()
+	    if self._timed_change_timer:
+		self._timed_change_timer.cancel()
 
-		def fire_timer():
-		     d = self.timedChangeTimerFired(change, important)
-		     d.addCallback(log.msg, "deferred timed timer fired")
-		     d.addErrback(log.err, "while firing deferred timed timer")
-		self._timed_change_timer = self._reactor.callLater(
-			timeToStart(self.timeRange[0]), fire_timer)
-	    d.addCallback(set_timer)
+	    def fire_timer():
+		d = self.timedChangeTimerFired(change, important)
+		d.addCallback(log.msg, "deferred timed timer fired")
+		d.addErrback(log.err, "while firing deferred timed timer")
+	    self._timed_change_timer = self._reactor.callLater(
+				timeToStart(self.timeRange[0]), fire_timer)
+	d.addCallback(set_timer)
 	return d
 
     @util.deferredLocked('_timed_change_lock')
@@ -151,12 +152,13 @@ class TimedAnyBranchScheduler(AnyBranchScheduler):
 	@util.deferredLocked(self._timed_change_lock)
 	def cancel_timer(_):
 	    if self._timed_change_timer:
-	        self._timed_change_timer.cancel()
+		self._timed_change_timer.cancel()
 		del self._timed_change_timer
 	d.addCallback(cancel_timer)
 	return d
 
     def getPendingBuildTimes(self):
-        if self._timed_change_timer:
-	    return [self._timed_change_timer.values()]
+	t = self._timed_change_timer
+	if t and t.active():
+	    return [t.getTime()]
 	return []
