@@ -35,7 +35,7 @@ class TimedSingleBranchScheduler(SingleBranchScheduler):
 
     @util.deferredLocked('_timed_change_lock')
     def gotChange(self, change, important):
-	if currentTimeInRange(self.timeRange):
+	if currentTimeInRange(self.timeRange) and not self._timed_change_timer:
 	    return SingleBranchScheduler.gotChange(self, change, important)
 
 	d = self.master.db.schedulers.classifyChanges(
