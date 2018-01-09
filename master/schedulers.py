@@ -12,8 +12,11 @@ def currentTimeInRange(range):
     start = parser.parse(range[0])
     end = parser.parse(range[1])
     now=datetime.datetime.now()
-    if end < start:
-	end += datetime.timedelta(1)
+    if end < start:	# crosses midnight
+        if end >= now:	# not yet ended
+	    start -= datetime.timedelta(1)
+	else:		# possibly not yet started
+	    end += datetime.timedelta(1)
     return start <= now <= end
 
 def timeToStart(start):
