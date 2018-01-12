@@ -140,7 +140,6 @@ dosetup()
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s
-    local n
     local build=${ARCH}:${defconfig}
 
     for s in ${skip[*]}
@@ -169,27 +168,16 @@ dosetup()
 
     setup_rootfs "${rootfs}" "${dynamic}"
 
-    n=0
-    while true
-    do
-      make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
-      retcode=$?
-      if [ ${retcode} -eq 0 ]
-      then
-        break
-      fi
-      egrep "internal compiler error|Segmentation fault" ${logfile} >/dev/null 2>&1
-      if [ $? -ne 0 -o $n -gt 2 ]
-      then
+    make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
+    retcode=$?
+    if [ ${retcode} -ne 0 ]
+    then
 	echo "failed"
 	echo "------------"
 	echo "Error log:"
 	cat ${logfile}
 	echo "------------"
-	break
-      fi
-      n=$(expr $n + 1)
-    done
+    fi
 
     rm -f ${logfile}
 
