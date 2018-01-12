@@ -16,7 +16,15 @@ then
 fi
 
 git fetch --all
-git push local origin/master:master
+git pull
+
+echo "Remotes:"
+git remote -v
+echo "Reference: $(git describe)"
+
+git push local master
+
+echo "Updated reference: $(git describe local/master)"
 
 epoch=$(date +%s)
 mepoch=$((${epoch} - 2500000))  # ~ one month back
