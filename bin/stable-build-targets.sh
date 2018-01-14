@@ -75,7 +75,11 @@ skip_44="cris:allnoconfig"
 #
 fixup_alpha=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
 
-fixup_mips=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/")
+# v4.15 allmodconfig creates a bad configuration file.
+# We should not really patch that up, but it is hiding other problems.
+fixup_mips=("s/CONFIG_SAMPLE_KDBUS=y/# CONFIG_SAMPLE_KDBUS is not set/"
+	"s/CONFIG_MIPS_CPS_NS16550_BASE=$/CONFIG_MIPS_CPS_NS16550_BASE=0/"
+	"s/CONFIG_MIPS_CPS_NS16550_SHIFT=$/CONFIG_MIPS_CPS_NS16550_SHIFT=0/")
 
 fixup_parisc64=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
