@@ -25,6 +25,7 @@ PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
+PATH_MICROBLAZE_48=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MICROBLAZE=/opt/kernel/microblaze/gcc-6.4.0/bin
 PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
@@ -201,7 +202,14 @@ case ${ARCH} in
     microblaze)
 	cmd=(${cmd_microblaze[*]})
 	PREFIX="microblaze-linux-"
-	PATH=${PATH_MICROBLAZE}:${PATH}
+	case ${rel} in
+	v3.2|v3.10|v3.16|v3.18|v4.1)
+		PATH=${PATH_MICROBLAZE_48}:${PATH}
+		;;
+	*)
+		PATH=${PATH_MICROBLAZE}:${PATH}
+		;;
+	esac
 	;;
     mips_22)
 	ARCH=mips
