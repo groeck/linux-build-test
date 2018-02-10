@@ -50,10 +50,11 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2|v3.10|v3.16|v3.18|v4.1)
+v3.2|v3.10|v3.16|v4.1)
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
 	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
+	PATH_MICROBLAZE=${PATH_MICROBLAZE_48}
 	;;
 *)
 	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
@@ -202,14 +203,7 @@ case ${ARCH} in
     microblaze)
 	cmd=(${cmd_microblaze[*]})
 	PREFIX="microblaze-linux-"
-	case ${rel} in
-	v3.2|v3.10|v3.16|v3.18|v4.1)
-		PATH=${PATH_MICROBLAZE_48}:${PATH}
-		;;
-	*)
-		PATH=${PATH_MICROBLAZE}:${PATH}
-		;;
-	esac
+	PATH=${PATH_MICROBLAZE}:${PATH}
 	;;
     mips_22)
 	ARCH=mips
