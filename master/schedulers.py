@@ -63,7 +63,8 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 
     @util.deferredLocked('_timed_change_lock')
     def gotChange(self, change, important):
-	log.msg("TimedSingleBranchScheduler %s: gotChange %d:%d" % (self.name, self.objectid, change.number))
+	log.msg("TimedSingleBranchScheduler %s: gotChange %d:%d [%d]" %
+			(self.name, self.objectid, change.number, important))
 	if currentTimeInRange(self.timeRange) and not self._timed_change_timer:
 	    return self.addBuildsetForChanges(reason=self.reason,
 					      changeids=[change.number])
@@ -110,7 +111,7 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
     def timedChangeTimerFired(self):
 	log.msg("TimedSingleBranchScheduler %s: timedChangeTimerFired (%d)" % (self.name, self.objectid))
 	if not self._timed_change_timer:
-	    log.msg("TimedSingleBranchScheduler %s: timedChangeTimerFired: no timer, abort" % self.name)
+	    log.msg("%s: timedChangeTimerFired: no timer, abort" % self.name)
 	    return
 	del self._timed_change_timer
 	self._timed_change_timer = None
@@ -121,13 +122,13 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 
 	# just in case: databases do weird things sometimes!
 	if not classifications:
-	    log.msg("TimedSingleBranchScheduler %s: timedChangeTimerFired: objectid %d not found, abort" %
-			(self.name, self.objecid))
+	    log.msg("%s: timedChangeTimerFired: classifications for objectid %d not found, abort" %
+			(self.name, self.objectid))
 	    return
 
 	changeids = sorted(classifications.keys())
 	for changeid in changeids:
-	    log.msg("change ID: %d\n" % changeid)
+	    log.msg("change ID: %d" % changeid)
 	yield self.addBuildsetForChanges(reason=self.reason,
 					 changeids=changeids)
 
