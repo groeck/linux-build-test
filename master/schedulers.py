@@ -63,7 +63,7 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 
     @util.deferredLocked('_timed_change_lock')
     def gotChange(self, change, important):
-	log.msg("TimedSingleBranchScheduler %s: gotChange %d:%d [%d]" %
+	log.msg("TimedSingleBranchScheduler %s[%d]: gotChange %d[%d]" %
 			(self.name, self.objectid, change.number, important))
 	if currentTimeInRange(self.timeRange) and not self._timed_change_timer:
 	    return self.addBuildsetForChanges(reason=self.reason,
@@ -73,17 +73,17 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 				self.objectid, {change.number: important})
 
 	def set_timer(_):
-	    log.msg("TimedSingleBranchScheduler %s: set_timer" % self.name)
+	    log.msg("TimedSingleBranchScheduler %s[%d]: set_timer" % (self.name, self.objectid))
 	    if not important and not self._timed_change_timer:
 	        log.msg("TimedSingleBranchScheduler %s: set_timer abort(1)" % self.name)
 		return
 
 	    if self._timed_change_timer:
-	        log.msg("TimedSingleBranchScheduler %s: canceling old timer" % self.name)
+	        log.msg("TimedSingleBranchScheduler %s[%d]: canceling old timer" % (self.name, self.objectid))
 		self._timed_change_timer.cancel()
 
 	    def fire_timer():
-	        log.msg("TimedSingleBranchScheduler %s: fire_timer" % self.name)
+	        log.msg("TimedSingleBranchScheduler %s[%d]: fire_timer" % (self.name, self.objectid))
 		d = self.timedChangeTimerFired()
 		d.addErrback(log.err, "while firing deferred timed timer")
 	    self._timed_change_timer = self._reactor.callLater(
@@ -109,9 +109,9 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
     @util.deferredLocked('_timed_change_lock')
     @defer.inlineCallbacks
     def timedChangeTimerFired(self):
-	log.msg("TimedSingleBranchScheduler %s: timedChangeTimerFired (%d)" % (self.name, self.objectid))
+	log.msg("TimedSingleBranchScheduler %s[%d]: timedChangeTimerFired" % (self.name, self.objectid))
 	if not self._timed_change_timer:
-	    log.msg("%s: timedChangeTimerFired: no timer, abort" % self.name)
+	    log.msg("%s[%d]: timedChangeTimerFired: no timer, abort" % (self.name, self.objectid))
 	    return
 	del self._timed_change_timer
 	self._timed_change_timer = None
@@ -122,7 +122,7 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 
 	# just in case: databases do weird things sometimes!
 	if not classifications:
-	    log.msg("%s: timedChangeTimerFired: classifications for objectid %d not found, abort" %
+	    log.msg("%s[%d]: timedChangeTimerFired: no classifications found, abort" %
 			(self.name, self.objectid))
 	    return
 
@@ -133,6 +133,7 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 					 changeids=changeids)
 
 	max_changeid = changeids[-1]
+	log.msg("%s[%d]: Flushing change IDs up to %d" % (self.name, self.objectid, max_changeid))
 	yield self.master.db.schedulers.flushChangeClassifications(
 		self.objectid, less_than=max_changeid + 1)
 
