@@ -11,9 +11,9 @@ dir=$(cd $(dirname $0); pwd)
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
-PATH_ARM64=/opt/kernel/aarch64/gcc-7.3.0/bin
+PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
 
-PATH=${PATH_ARM64}:${PATH}
+PATH=${PATH}:${PATH_ARM64}
 
 skip_32="arm64:xlnx-ep108:smp:defconfig \
 	arm64:xlnx-ep108:nosmp:defconfig"
