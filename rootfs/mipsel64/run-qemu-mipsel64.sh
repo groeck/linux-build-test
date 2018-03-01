@@ -33,6 +33,10 @@ patch_defconfig()
 {
     local defconfig=$1
 
+    # INITRD may be disabled. Enable for testing.
+    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
@@ -57,18 +61,26 @@ patch_defconfig()
     fi
 }
 
+cached_config=""
+
 runkernel()
 {
     local defconfig=$1
     local mach=$2
     local rootfs=$3
     local fixup=$4
-    local hddev="sda"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel64:${defconfig}:${fixup}"
+    local buildconfig="${defconfig}:${fixup}"
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
@@ -84,30 +96,43 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
-    retcode=$?
-    if [ ${retcode} -ne 0 ]
-    then
-	if [ ${retcode} -eq 2 ]
-	then
-	    return 0
+    if [ "${cached_build}" != "${buildconfig}" ]; then
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	retcode=$?
+	if [ ${retcode} -ne 0 ]; then
+	    if [ ${retcode} -eq 2 ]; then
+		return 0
+	    fi
+	    return 1
 	fi
-	return 1
+	cached_build="${buildconfig}"
+    else
+	setup_rootfs "${rootfs}" ""
     fi
 
-    # Configurations with CONFIG_IDE=y mount hda instead of sda
-    grep -q CONFIG_IDE=y .config >/dev/null 2>&1
-    [ $? -eq 0 ] && hddev="hda"
-
     echo -n "running ..."
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+    else
+	local hddev="sda"
+	# Configurations with CONFIG_IDE=y mount hda instead of sda
+	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
+	[ $? -eq 0 ] && hddev="hda"
+	initcli="root=/dev/${hddev} rw"
+	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	# or something like:
+	# -device ide-hd,drive=d0,bus=ide.0 \
+	# -drive file=${rootfs},id=d0,format=raw,if=none
+    fi
 
     case ${mach} in
     "malta")
         ${QEMU} -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "root=/dev/${hddev} rw mem=128M console=ttyS0" \
-	    -device ide-hd,drive=d0,bus=ide.0 \
-	    -drive file=${rootfs},id=d0,if=none,format=raw \
+	    --append "${initcli} mem=128M console=ttyS0" \
+	    ${diskcmd} \
 	    -nographic -monitor none \
 	    > ${logfile} 2>&1 &
     	pid=$!
@@ -142,6 +167,8 @@ echo
 
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 nosmp
 retcode=$?
+runkernel malta_defconfig malta busybox-mips64el.cpio smp
+retcode=$((${retcode} + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 smp
 retcode=$((${retcode} + $?))
 runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fulong2e
