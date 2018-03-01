@@ -13,16 +13,16 @@ case "${rel}" in
 v3.2)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 	QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-mipsel}
+	PREFIX=mips-poky-linux-
 	;;
 *)
-	PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+	PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips-linux/bin
 	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
+	PREFIX=mips-linux-
 	;;
 esac
 
 # machine specific information
-rootfs=busybox-mipsel.cpio
-PREFIX=mips-poky-linux-
 ARCH=mips
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
@@ -38,6 +38,7 @@ patch_defconfig()
     # DEVTMPFS needs to be explicitly enabled for v3.14 and older kernels.
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
@@ -48,16 +49,26 @@ patch_defconfig()
     fi
 }
 
+cached_config=""
+
 runkernel()
 {
     local cpu=$1
     local defconfig=$2
-    local fixup=$3
+    local rootfs=$3
+    local fixup=$4
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel:${cpu}:${defconfig}:${fixup}"
+    local buildconfig="${defconfig}:${fixup}"
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
     if [ -n "${_cpu}" -a "${_cpu}" != "${cpu}" ]
     then
@@ -79,18 +90,33 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
-    if [ $? -ne 0 ]
-    then
-	return 1
+    if [ "${cached_config}" != "${buildconfig}" ]; then
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	if [ $? -ne 0 ]; then
+	    return 1
+	fi
+	cached_config="${buildconfig}"
+    else
+	setup_rootfs ${rootfs} ""
     fi
 
     echo -n "running ..."
 
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+    else
+	local hddev="sda"
+	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
+	[ $? -eq 0 ] && hddev="hda"
+	initcli="root=/dev/${hddev} rw"
+	diskcmd="-drive file=${rootfs},if=ide,format=raw"
+    fi
+
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu ${cpu} \
-	-initrd ${rootfs} \
+	${diskcmd} \
 	-vga cirrus -no-reboot -m 128 \
-	--append "rdinit=/sbin/init mem=128M console=ttyS0 console=tty doreboot" \
+	--append "${initcli} mem=128M console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
@@ -103,9 +129,11 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel 24Kf malta_defconfig nosmp
+runkernel 24Kf malta_defconfig busybox-mipsel.cpio nosmp
 retcode=$?
-runkernel 24Kf malta_defconfig smp
+runkernel 24Kf malta_defconfig busybox-mipsel.cpio smp
+retcode=$((${retcode} + $?))
+runkernel 24Kf malta_defconfig rootfs-mipselr1.ext2 smp
 retcode=$((${retcode} + $?))
 # No root file system available
 # runkernel mips32r6-generic malta_qemu_32r6_defconfig smp
