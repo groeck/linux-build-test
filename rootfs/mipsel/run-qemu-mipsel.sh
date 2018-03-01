@@ -135,8 +135,7 @@ runkernel 24Kf malta_defconfig busybox-mipsel.cpio smp
 retcode=$((${retcode} + $?))
 runkernel 24Kf malta_defconfig rootfs-mipselr1.ext2 smp
 retcode=$((${retcode} + $?))
-# No root file system available
-# runkernel mips32r6-generic malta_qemu_32r6_defconfig smp
-# retcode=$((${retcode} + $?))
+runkernel mips32r6-generic malta_qemu_32r6_defconfig rootfs-mipselr6.ext2 smp
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
