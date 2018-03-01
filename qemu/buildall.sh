@@ -78,22 +78,14 @@ then
     fi
 fi
 
-if [ -z "$1" -o "$1" = "riscv64" ]
+if [ -z "$1" -o "$1" = "riscv" ]
 then
-    git clean -d -x -f -q
-    git checkout v2.7.0-local-riscv64
-    ./configure --prefix=/opt/buildbot/qemu-install/v2.7-riscv64 \
-	--disable-user --disable-gnutls --disable-docs \
+    dobuild master-local-riscv64 master-riscv \
+	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough \
-	--target-list=riscv64-softmmu
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
-    make -j20 install
-    if [ $? -ne 0 ]
-    then
+	--disable-xen --disable-xen-pci-passthrough" \
+	"riscv64-softmmu riscv32-softmmu"
+    if [ $? -ne 0 ]; then
         exit 1
     fi
 fi
@@ -171,7 +163,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough" \
-	"nios2-softmmu sparc64-softmmu sparc-softmmu hppa-softmmu"
+	"nios2-softmmu sparc64-softmmu sparc-softmmu hppa-softmmu arm-softmmu aarch64-softmmu"
     if [ $? -ne 0 ]
     then
         exit 1
