@@ -43,10 +43,6 @@ patch_defconfig()
 	return 0
     fi
 
-    # Build a 64 bit kernel with INITRD enabled.
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
     sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
     sed -i -e '/CONFIG_32BIT/d' ${defconfig}
     sed -i -e '/CONFIG_64BIT/d' ${defconfig}
@@ -67,7 +63,7 @@ runkernel()
     local mach=$2
     local rootfs=$3
     local fixup=$4
-    local drive="hda"
+    local hddev="sda"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
@@ -99,37 +95,41 @@ runkernel()
 	return 1
     fi
 
+    # Configurations with CONFIG_IDE=y mount hda instead of sda
+    grep -q CONFIG_IDE=y .config >/dev/null 2>&1
+    [ $? -eq 0 ] && hddev="hda"
+
     echo -n "running ..."
 
-    if [ "${rootfs}" = "busybox-mips64el.cpio" ]
-    then
+    case ${mach} in
+    "malta")
         ${QEMU} -M ${mach} \
-	    -kernel vmlinux -vga cirrus -no-reboot -m 128 \
-	    --append "rdinit=/sbin/init mem=128M console=ttyS0 console=tty doreboot" \
+	    -kernel vmlinux -no-reboot -m 128 \
+	    --append "root=/dev/${hddev} rw mem=128M console=ttyS0" \
+	    -device ide-hd,drive=d0,bus=ide.0 \
+	    -drive file=${rootfs},id=d0,if=none,format=raw \
 	    -nographic -monitor none \
-	    -initrd ${rootfs} > ${logfile} 2>&1 &
+	    > ${logfile} 2>&1 &
     	pid=$!
-    elif [ "${mach}" = "boston" ]
-    then
+	;;
+    "boston")
 	${QEMU} -M ${mach} -m 1G -kernel arch/mips/boot/vmlinux.gz.itb \
 		-drive file=${rootfs},format=raw,if=ide \
-		--append "root=/dev/sda rw console=ttyS0" \
+		--append "root=/dev/${hddev} rw console=ttyS0" \
 		-serial stdio -monitor none -no-reboot -nographic \
 		-dtb arch/mips/boot/dts/img/boston.dtb \
 		> ${logfile} 2>&1 &
 	pid=$!
-    else
-	# New configurations mount sda instead of hda
-        grep sda arch/mips/configs/${defconfig} >/dev/null 2>&1
-	[ $? -eq 0 ] && drive="sda"
-
+	;;
+    "fulong2e")
         ${QEMU} -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "root=/dev/${drive} rw console=ttyS0 doreboot" \
-	    -hda ${rootfs} \
+	    --append "root=/dev/${hddev} rw console=ttyS0 doreboot" \
+	    -drive file=${rootfs},format=raw,if=ide \
 	    -nographic -serial stdio -monitor null > ${logfile} 2>&1 &
     	pid=$!
-    fi
+	;;
+    esac
 
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
@@ -140,9 +140,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig malta busybox-mips64el.cpio nosmp
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 nosmp
 retcode=$?
-runkernel malta_defconfig malta busybox-mips64el.cpio smp
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 smp
 retcode=$((${retcode} + $?))
 runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fulong2e
 retcode=$((${retcode} + $?))
