@@ -3,7 +3,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-if [ ! -f /tmp/$1 ]; then
+if [ -f /tmp/$1 ]; then
     f=/tmp/$1
 elif [ -f $1 ]; then
     f=$1
