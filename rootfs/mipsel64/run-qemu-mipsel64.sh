@@ -7,7 +7,6 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2|v3.16)
@@ -19,9 +18,9 @@ v3.2|v3.16)
 	# Using Poky 2.0 appears to result in random crashes due to stack
 	# corruption (?). No idea if this is a qemu or a compiler problem.
 	# PATH_MIPS=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
-	PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
-	PREFIX=mips-linux-
-	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
+	PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips64-linux/bin
+	PREFIX=mips64-linux-
+	QEMU=${QEMU:-${QEMU_V211_BIN}/qemu-system-mips64el}
 	;;
 esac
 
@@ -36,24 +35,27 @@ patch_defconfig()
 
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
-    # Build a 64 bit kernel with INITRD enabled.
-    # Don't touch the fulong2 configuration.
-    if [ "${fixup}" != "fulong2e" ]
+    # Leave fulong2e and boston configuration alone
+    if [ "${fixup}" = "fulong2e" -o "${fixup}" = "boston" ]
     then
-	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-	sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
-	sed -i -e '/CONFIG_32BIT/d' ${defconfig}
-	sed -i -e '/CONFIG_64BIT/d' ${defconfig}
-	echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
-	echo "CONFIG_64BIT=y" >> ${defconfig}
+	return 0
     fi
 
-    # Only build an SMP image if asked for. Fulong2e is always SMP.
+    # Build a 64 bit kernel with INITRD enabled.
+    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+    sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
+    sed -i -e '/CONFIG_32BIT/d' ${defconfig}
+    sed -i -e '/CONFIG_64BIT/d' ${defconfig}
+    echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
+    echo "CONFIG_64BIT=y" >> ${defconfig}
+
+    # Only build an SMP image if asked for.
     sed -i -e '/CONFIG_MIPS_MT_SMP/d' ${defconfig}
-    if [ "${fixup}" = "smp" -o "${fixup}" = "fulong2e" ]
+    if [ "${fixup}" = "smp" ]
     then
         echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
     fi
@@ -107,6 +109,15 @@ runkernel()
 	    -nographic -monitor none \
 	    -initrd ${rootfs} > ${logfile} 2>&1 &
     	pid=$!
+    elif [ "${mach}" = "boston" ]
+    then
+	${QEMU} -M ${mach} -m 1G -kernel arch/mips/boot/vmlinux.gz.itb \
+		-drive file=${rootfs},format=raw,if=ide \
+		--append "root=/dev/sda rw console=ttyS0" \
+		-serial stdio -monitor none -no-reboot -nographic \
+		-dtb arch/mips/boot/dts/img/boston.dtb \
+		> ${logfile} 2>&1 &
+	pid=$!
     else
 	# New configurations mount sda instead of hda
         grep sda arch/mips/configs/${defconfig} >/dev/null 2>&1
@@ -134,6 +145,8 @@ retcode=$?
 runkernel malta_defconfig malta busybox-mips64el.cpio smp
 retcode=$((${retcode} + $?))
 runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fulong2e
+retcode=$((${retcode} + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6.ext2 boston
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
