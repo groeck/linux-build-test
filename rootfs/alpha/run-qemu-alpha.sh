@@ -8,7 +8,6 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
 
 PREFIX=alpha-linux-
 ARCH=alpha
-rootfs=busybox-alpha.cpio
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
@@ -33,30 +32,56 @@ patch_defconfig()
     # Enable DEVTMPFS
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 }
+
+cached_config=""
 
 runkernel()
 {
     local defconfig=$1
+    local rootfs=$2
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting" "Restarting system")
+    local build="${ARCH}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
-    dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" fixup
-    if [ $? -ne 0 ]
-    then
-	return 1
+    echo -n "Building ${build} ... "
+
+    if [ "${cached_config}" != "${defconfig}" ]; then
+	dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" fixup
+	if [ $? -ne 0 ]; then
+	    return 1
+	fi
+	cached_config="${defconfig}"
+    else
+	setup_rootfs ${rootfs} ""
     fi
 
     echo -n "running ..."
 
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+    else
+	local hddev="sda"
+	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
+	[ $? -eq 0 ] && hddev="hda"
+	initcli="root=/dev/${hddev} rw"
+	diskcmd="-drive file=${rootfs},if=ide,format=raw"
+    fi
+
     ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
-	-initrd ${rootfs} \
-	-append 'rdinit=/sbin/init console=ttyS0 console=tty doreboot' \
+	${diskcmd} \
+	-append "${initcli} console=ttyS0" \
 	-m 128M -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
 
@@ -70,5 +95,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel defconfig
-exit $?
+runkernel defconfig busybox-alpha.cpio
+rv=$?
+runkernel defconfig rootfs.ext2
+retcode=$((${retcode} + $?))
+
+exit ${rv}
