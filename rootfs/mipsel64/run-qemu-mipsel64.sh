@@ -3,6 +3,8 @@
 config=$1
 variant=$2
 
+skip_49="mipsel64:64r6el_defconfig:boston:rootfs"
+
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
@@ -76,6 +78,9 @@ runkernel()
     local build="mipsel64:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup}"
     local wait="automatic"
+    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+    local tmp="skip_${rel}"
+    local skip=(${!tmp})
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -96,6 +101,13 @@ runkernel()
     fi
 
     echo -n "Building ${build} ... "
+
+    for s in ${skip[*]}; do
+	if [ "$s" = "${build}" ]; then
+	    echo "skipped"
+	    return 0
+	fi
+    done
 
     if [ "${cached_build}" != "${buildconfig}" ]; then
 	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
