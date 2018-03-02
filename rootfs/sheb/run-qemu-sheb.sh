@@ -5,10 +5,12 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
-PREFIX=sh4-linux-
+# PREFIX=sh4-linux-
+PREFIX=sh4eb-linux-
 ARCH=sh
-PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
-# PATH_SH=/opt/kernel/sh4eb/gcc-4.8.3/usr/bin
+# PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
+# PATH_SH=/opt/kernel/gcc-7.3.0-nolibc/sh4-linux/bin
+PATH_SH=/opt/kernel/sh4eb/gcc-6.3.0/usr/bin
 
 PATH=${PATH_SH}:${PATH}
 
