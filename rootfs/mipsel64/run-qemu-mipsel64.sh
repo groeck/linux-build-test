@@ -75,6 +75,7 @@ runkernel()
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel64:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup}"
+    local wait="automatic"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -128,35 +129,28 @@ runkernel()
     fi
 
     case ${mach} in
-    "malta")
+    "malta"|"fulong2e")
         ${QEMU} -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "${initcli} mem=128M console=ttyS0" \
+	    --append "${initcli} mem=128M console=ttyS0 doreboot" \
 	    ${diskcmd} \
-	    -nographic -monitor none \
+	    -nographic -serial stdio -monitor none \
 	    > ${logfile} 2>&1 &
     	pid=$!
 	;;
     "boston")
 	${QEMU} -M ${mach} -m 1G -kernel arch/mips/boot/vmlinux.gz.itb \
-		-drive file=${rootfs},format=raw,if=ide \
-		--append "root=/dev/${hddev} rw console=ttyS0" \
+		${diskcmd} \
+		--append "${initcli} console=ttyS0" \
 		-serial stdio -monitor none -no-reboot -nographic \
 		-dtb arch/mips/boot/dts/img/boston.dtb \
 		> ${logfile} 2>&1 &
 	pid=$!
-	;;
-    "fulong2e")
-        ${QEMU} -M ${mach} \
-	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "root=/dev/${hddev} rw console=ttyS0 doreboot" \
-	    -drive file=${rootfs},format=raw,if=ide \
-	    -nographic -serial stdio -monitor null > ${logfile} 2>&1 &
-    	pid=$!
+	wait="manual"
 	;;
     esac
 
-    dowait ${pid} ${logfile} automatic waitlist[@]
+    dowait ${pid} ${logfile} ${wait} waitlist[@]
     retcode=$?
     rm -f ${logfile}
     return ${retcode}
