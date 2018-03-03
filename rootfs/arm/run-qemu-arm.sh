@@ -96,6 +96,7 @@ patch_defconfig()
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     fi
 
     # Non-generic pxa images as well as collie need to have BLK_DEV_INITRD
@@ -438,6 +439,16 @@ runkernel()
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
+    "ast2500-evb")
+	${QEMU} -M ${mach} \
+		-nodefaults -nographic -serial stdio -monitor none \
+		-kernel arch/arm/boot/zImage -no-reboot \
+		${dtbcmd} \
+		-append "rdinit=/sbin/init console=ttyS4,115200 earlyprintk doreboot" \
+		-initrd ${rootfs} \
+		> ${logfile} 2>&1 &
+	pid=$!
+	;;
     *)
 	echo "Missing build recipe for machine ${mach}"
 	exit 1
@@ -630,6 +641,10 @@ retcode=$((${retcode} + $?))
 
 runkernel integrator_defconfig integratorcp "" 128 \
 	busybox-armv4.cpio automatic devtmpfs integratorcp.dtb
-    retcode=$((${retcode} + $?))
+retcode=$((${retcode} + $?))
+
+runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
+	busybox-armv4.cpio automatic "" aspeed-ast2500-evb.dtb
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
