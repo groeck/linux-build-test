@@ -29,24 +29,27 @@ patch_defconfig()
 
     if [ "${fixup}" = "devtmpfs" ]
     then
-        sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-        echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     elif [ "${fixup}" = "nosmp" ]
     then
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        echo "# CONFIG_SMP is not set" >> ${defconfig}
+	sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	echo "# CONFIG_SMP is not set" >> ${defconfig}
     elif [ "${fixup}" = "smp4" ]
     then
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
-        echo "CONFIG_SMP=y" >> ${defconfig}
-        echo "CONFIG_NR_CPUS=4" >> ${defconfig}
+	sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
+	echo "CONFIG_SMP=y" >> ${defconfig}
+	echo "CONFIG_NR_CPUS=4" >> ${defconfig}
     elif [ "${fixup}" = "smp" ]
     then
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        echo "CONFIG_SMP=y" >> ${defconfig}
+	sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	echo "CONFIG_SMP=y" >> ${defconfig}
     fi
 }
+
+cached_config=""
 
 runkernel()
 {
@@ -61,10 +64,18 @@ runkernel()
     local dt=$9
     local pid
     local retcode
-    local qemu
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
+    local buildconfig="${machine}:${defconfig}:${fixup}"
     local msg="${ARCH}:${machine}:${defconfig}"
+    local initcli
+    local diskcmd
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	msg+=":initrd"
+    else
+	msg+=":rootfs"
+    fi
 
     if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
     then
@@ -85,45 +96,49 @@ runkernel()
 
     echo -n "Building ${msg} ... "
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
-    retcode=$?
-    if [ ${retcode} -ne 0 ]
-    then
-        if [ ${retcode} -eq 2 ]
-	then
-	    return 0
+    if [ "${cached_config}" != "${buildconfig}" ]; then
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	retcode=$?
+	if [ ${retcode} -ne 0 ]; then
+	    if [ ${retcode} -eq 2 ]; then
+		return 0
+	    fi
+	    return 1
 	fi
-	return 1
+	cached_config="${buildconfig}"
+    else
+	setup_rootfs ${rootfs} ""
     fi
 
     echo -n "running ..."
 
     dt_cmd=""
-    if [ -n "${dt}" ]
-    then
-        dt_cmd="-machine ${dt}"
+    if [ -n "${dt}" ]; then
+	dt_cmd="-machine ${dt}"
     fi
 
-    case "${machine}" in
-    mac99)
-	# mac99 crashes with qemu v2.7(rc3).
-	# v2.6 and v2.8 are ok.
-	qemu=${QEMU}
-	;;
-    mpc8544ds)
-	# mpc8544ds may crash with qemu v2.6.x+..v2.7
-	qemu=${QEMU}
-	;;
-    *)
-	# pseries works withs with v2.5.x+
-	qemu=${QEMU}
-	;;
-    esac
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd $(basename ${rootfs})"
+    else
+	local hddev="sda"
+	local iftype="scsi"
+	if [[ "${machine}" = "mac99" ]]; then
+	    iftype="ide"
+	    grep -q "CONFIG_IDE=y" .config >/dev/null 2>&1
+	    if [[ $? -eq 0 ]]; then
+		hddev="hda"
+	    fi
+	fi
+	initcli="root=/dev/${hddev} rw"
+	diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
+    fi
 
-    ${qemu} -M ${machine} -cpu ${cpu} -m 1024 \
-    	-kernel ${kernel} -initrd $(basename ${rootfs}) \
+    ${QEMU} -M ${machine} -cpu ${cpu} -m 1024 \
+	-kernel ${kernel} \
+	${diskcmd} \
 	-nographic -vga none -monitor null -no-reboot \
-	--append "rdinit=/sbin/init console=tty console=${console} doreboot" \
+	--append "${initcli} console=tty console=${console} doreboot" \
 	${dt_cmd} > ${logfile} 2>&1 &
 
     pid=$!
@@ -138,13 +153,19 @@ echo "Build reference: $(git describe)"
 echo
 
 runkernel qemu_ppc64_book3s_defconfig nosmp mac99 ppc64 ttyS0 vmlinux \
-	busybox-powerpc64.img manual
+	rootfs.cpio manual
 retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
-	busybox-powerpc64.img manual
+	rootfs.cpio manual
+retcode=$((${retcode} + $?))
+runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
+	rootfs.ext2 manual
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
-	busybox-powerpc64.img auto
+	rootfs.cpio auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
+	rootfs.ext2 auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 arch/powerpc/boot/uImage \
 	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
