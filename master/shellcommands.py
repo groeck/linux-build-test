@@ -40,6 +40,9 @@ class RefShellCommand(ShellCommand):
         s = re.search("stack backtrace", log.getText(), re.MULTILINE)
 	if s:
 	    self.traceback = True
+        s = re.search('(try booting with the "irqpoll" option)', log.getText(), re.MULTILINE)
+	if s:
+	    self.traceback = True
 
     def getText(self, cmd, results):
         if results != SKIPPED:
