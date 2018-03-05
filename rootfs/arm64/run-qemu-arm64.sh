@@ -8,6 +8,8 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+kernelrelease=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -15,12 +17,36 @@ PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
 
 PATH=${PATH}:${PATH_ARM64}
 
-skip_32="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
-skip_316="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
-skip_318="arm64:xlnx-ep108:smp:defconfig \
-	arm64:xlnx-ep108:nosmp:defconfig"
+# Xilinx boards don't work on v3.x kernels
+# Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx)
+skip_32="xlnx-zcu102:smp:defconfig:initrd \
+	xlnx-zcu102:nosmp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs \
+	virt:smp:defconfig:rootfs \
+	virt:nosmp:defconfig:rootfs"
+skip_316="xlnx-zcu102:smp:defconfig:initrd \
+	xlnx-zcu102:nosmp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs \
+	virt:smp:defconfig:rootfs \
+	virt:nosmp:defconfig:rootfs"
+skip_318="xlnx-zcu102:smp:defconfig:initrd \
+	xlnx-zcu102:nosmp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs \
+	virt:smp:defconfig:rootfs \
+	virt:nosmp:defconfig:rootfs"
+skip_41="virt:smp:defconfig:rootfs \
+	virt:nosmp:defconfig:rootfs \
+	xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs"
+skip_44="virt:smp:defconfig:rootfs \
+	virt:nosmp:defconfig:rootfs \
+	xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs"
+skip_49="xlnx-zcu102:smp:defconfig:rootfs \
+	xlnx-zcu102:nosmp:defconfig:rootfs"
 
 patch_defconfig()
 {
@@ -29,8 +55,7 @@ patch_defconfig()
 
     sed -i -e '/CONFIG_SMP/d' ${defconfig}
 
-    if [ "${fixup}" = "nosmp" ]
-    then
+    if [ "${fixup}" = "nosmp" ]; then
 	echo "# CONFIG_SMP is not set" >> ${defconfig}
     else
 	echo "CONFIG_SMP=y" >> ${defconfig}
@@ -50,25 +75,27 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local build=${ARCH}:${mach}:${fixup}:${defconfig}
-    local pbuild=${build}
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-    local tmp="skip_${rel}"
+    local build="${mach}:${fixup}:${defconfig}"
+    local tmp="skip_${kernelrelease}"
     local skip=(${!tmp})
 
-    if [ -n "${ddtb}" ]
-    then
-	pbuild="${build}:${ddtb}"
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
     fi
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
+    local pbuild="${ARCH}:${build}"
+    if [ -n "${ddtb}" ]; then
+	pbuild+=":${ddtb}"
+    fi
+
+    if [ -n "${machine}" -a "${machine}" != "${mach}" ]; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
 
-    if [ -n "${option}" -a "${option}" != "${fixup}" ]
-    then
+    if [ -n "${option}" -a "${option}" != "${fixup}" ]; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -83,36 +110,42 @@ runkernel()
 
     for s in ${skip[*]}
     do
-	if [ "$s" = "${build}" ]
-	then
+	if [ "$s" = "${build}" ]; then
 	    echo "skipped"
 	    return 0
 	fi
     done
 
-    if [ "${cached_config}" != "${defconfig}:${fixup}" ]
-    then
+    if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
 	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} generic ${fixup}
 	retcode=$?
-	if [ ${retcode} -eq 2 ]
-	then
+	if [ ${retcode} -eq 2 ]; then
 	    return 0
 	fi
-	if [ ${retcode} -ne 0 ]
-	then
+	if [ ${retcode} -ne 0 ]; then
 	    return 1
 	fi
+	cached_config="${defconfig}:${fixup}"
     else
 	setup_rootfs ${rootfs}
     fi
 
-    cached_config="${defconfig}:${fixup}"
-
     # if we have a dtb file use it
     local dtbcmd=""
-    if [ -n "${dtb}" -a -f "${dtbfile}" ]
-    then
+    if [ -n "${dtb}" -a -f "${dtbfile}" ]; then
 	dtbcmd="-dtb ${dtbfile}"
+    fi
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+    elif [[ "${mach}" = "virt" ]]; then
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0 \
+		-drive file=${rootfs},format=raw,if=none,id=d0"
+    else
+	initcli="root=/dev/mmcblk0 rw"
+	diskcmd="-drive file=${rootfs},if=sd,format=raw"
     fi
 
     echo -n "running ..."
@@ -120,21 +153,21 @@ runkernel()
     case ${mach} in
     "virt")
 	${QEMU} -machine ${mach} -cpu cortex-a57 \
-	-machine type=virt -nographic -smp 1 -m 512 \
-	-kernel arch/arm64/boot/Image -initrd ${rootfs} -no-reboot \
-	-append "console=ttyAMA0" > ${logfile} 2>&1 &
-
+		-machine type=virt -nographic -smp 1 -m 512 \
+		-kernel arch/arm64/boot/Image -no-reboot \
+		${diskcmd} \
+		-append "console=ttyAMA0 ${initcli}" \
+		> ${logfile} 2>&1 &
 	pid=$!
 	dowait ${pid} ${logfile} manual waitlist[@]
 	retcode=$?
 	;;
-    "xlnx-ep108")
+    "xlnx-ep108"|"xlnx-zcu102")
 	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
-		-nographic -serial mon:stdio \
-		-monitor none \
+		-nographic -serial mon:stdio -monitor none -no-reboot \
 		${dtbcmd} \
-		-no-reboot -initrd ${rootfs} \
-		--append "rdinit=/sbin/init console=ttyPS0 doreboot" \
+		${diskcmd} \
+		--append "${initcli} console=ttyPS0" \
 		> ${logfile} 2>&1 &
 	pid=$!
 	dowait ${pid} ${logfile} automatic waitlist[@]
@@ -149,14 +182,19 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel virt defconfig smp rootfs.arm64.cpio
+runkernel virt defconfig smp rootfs.cpio
 retcode=$?
-# Needs changes in root file system to correctly handle reboot
-runkernel xlnx-ep108 defconfig smp busybox-arm64.cpio xilinx/zynqmp-ep108.dtb
+runkernel virt defconfig smp rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig nosmp rootfs.arm64.cpio
+runkernel xlnx-zcu102 defconfig smp rootfs.cpio xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
-runkernel xlnx-ep108 defconfig nosmp busybox-arm64.cpio xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig smp rootfs.ext2 xilinx/zynqmp-ep108.dtb
+retcode=$((${retcode} + $?))
+runkernel virt defconfig nosmp rootfs.cpio
+retcode=$((${retcode} + $?))
+runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio xilinx/zynqmp-ep108.dtb
+retcode=$((${retcode} + $?))
+runkernel xlnx-zcu102 defconfig nosmp rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
