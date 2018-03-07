@@ -10,9 +10,11 @@ mach=$1
 variant=$2
 
 # machine specific information
-PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+# PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 # PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-PREFIX=powerpc64-poky-linux-
+PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+# PREFIX=powerpc64-poky-linux-
+PREFIX=powerpc64-linux-
 ARCH=powerpc
 
 PATH=${PATH_PPC}:${PATH}
@@ -134,7 +136,12 @@ runkernel()
 	diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
     fi
 
-    ${QEMU} -M ${machine} -cpu ${cpu} -m 1024 \
+    mem=1G
+    if [[ "${machine}" = "powernv" ]]; then
+	mem=2G
+    fi
+
+    ${QEMU} -M ${machine} -cpu ${cpu} -m ${mem} \
 	-kernel ${kernel} \
 	${diskcmd} \
 	-nographic -vga none -monitor null -no-reboot \
@@ -167,11 +174,16 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 	rootfs.ext2 auto
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 arch/powerpc/boot/uImage \
+runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
+	arch/powerpc/boot/uImage \
 	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 arch/powerpc/boot/uImage \
+runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
+	arch/powerpc/boot/uImage \
 	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig devtmpfs powernv POWER8 hvc0 \
+	arch/powerpc/boot/zImage.epapr rootfs-el.cpio manual
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
