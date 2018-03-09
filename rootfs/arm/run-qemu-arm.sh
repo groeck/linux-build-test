@@ -40,12 +40,6 @@ progdir=$(cd $(dirname $0); pwd)
 # a patch (8bba8303b059, "ARM: imx_v4_v5_defconfig: Select
 # CONFIG_MACH_IMX25_DT") to be applied.
 
-# sabrelite should actually work at least from v3.18 (possibly even v3.16).
-# Unfortunately, it suffers from a problem related to irq lines on Ethernet,
-# and a combination of bugs in both qemu and kernel code.
-# See https://bugs.launchpad.net/qemu/+bug/1753309 for details.
-# Disable for now, but we should re-enable once the bugs have been fixed.
-
 skip_32="arm:beagle:omap2plus_defconfig \
 	arm:beaglexm:omap2plus_defconfig \
 	arm:imx25-pdk:imx_v4_v5_defconfig \
@@ -63,9 +57,7 @@ skip_32="arm:beagle:omap2plus_defconfig \
 	arm:vexpress-a15-a7:vexpress_defconfig"
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
-	arm:smdkc210:multi_v7_defconfig \
-	arm:sabrelite:imx_v6_v7_defconfig \
-	arm:sabrelite:multi_v7_defconfig"
+	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
