@@ -162,8 +162,10 @@ then
     dobuild master-local master \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough" \
-	"nios2-softmmu sparc64-softmmu sparc-softmmu hppa-softmmu arm-softmmu aarch64-softmmu s390x-softmmu"
+	--disable-xen --disable-xen-pci-passthrough \
+	--enable-debug --disable-strip" \
+	"nios2-softmmu sparc64-softmmu sparc-softmmu hppa-softmmu arm-softmmu \
+	 aarch64-softmmu s390x-softmmu ppc-softmmu ppc64-softmmu"
     if [ $? -ne 0 ]
     then
         exit 1
