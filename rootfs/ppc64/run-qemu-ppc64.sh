@@ -10,19 +10,32 @@ mach=$1
 variant=$2
 
 # machine specific information
-# PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 # PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
-# PREFIX=powerpc64-poky-linux-
-PREFIX=powerpc64-linux-
 ARCH=powerpc
+
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v3.2|v3.16|v3.18|v4.1)
+	PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+	PREFIX=powerpc64-poky-linux-
+	;;
+*)
+	PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+	PREFIX=powerpc64-linux-
+	;;
+esac
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_32="powerpc:qemu_ppc64_book3s_defconfig powerpc:qemu_ppc64_e5500_defconfig"
+skip_32="powerpc:qemu_ppc64_book3s_defconfig \
+	powerpc:qemu_ppc64_e5500_defconfig
+	powerpc:powernv_defconfig"
+skip_316="powerpc:powernv_defconfig"
+skip_318="powerpc:powernv_defconfig"
+skip_41="powerpc:powernv_defconfig"
 
 patch_defconfig()
 {
