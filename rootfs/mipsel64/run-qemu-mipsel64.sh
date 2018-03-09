@@ -129,10 +129,10 @@ runkernel()
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
     else
-	local hddev="sda"
-	# Configurations with CONFIG_IDE=y mount hda instead of sda
-	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
-	[ $? -eq 0 ] && hddev="hda"
+	local hddev="hda"
+	# Configurations with CONFIG_ATA=y mount sda
+	grep -q CONFIG_ATA=y .config >/dev/null 2>&1
+	[ $? -eq 0 ] && hddev="sda"
 	initcli="root=/dev/${hddev} rw"
 	diskcmd="-drive file=${rootfs},format=raw,if=ide"
 	# or something like:

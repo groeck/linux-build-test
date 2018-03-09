@@ -110,9 +110,9 @@ runkernel()
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
     else
-	local hddev="sda"
-	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
-	[ $? -eq 0 ] && hddev="hda"
+	local hddev="hda"
+	grep -q CONFIG_ATA=y .config >/dev/null 2>&1
+	[ $? -eq 0 ] && hddev="sda"
 	initcli="root=/dev/${hddev} rw"
 	diskcmd="-drive file=${rootfs},if=ide,format=raw"
     fi
