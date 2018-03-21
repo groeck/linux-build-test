@@ -1,11 +1,11 @@
 from buildbot import util
 from twisted.internet import defer
+from twisted.internet import reactor
 from twisted.python import log
 
-from buildbot.schedulers.basic import BaseBasicScheduler
 from buildbot.schedulers import base
-# from buildbot.schedulers.basic import AnyBranchScheduler
 from buildbot.util import NotABranch
+from buildbot.changes import changes
 from buildbot.changes import filter
 
 import datetime
@@ -31,16 +31,40 @@ def timeToStart(start):
 	return delta.days*24*60*60 + delta.seconds + 1
     return 0
 
-class TimedSingleBranchScheduler(BaseBasicScheduler):
+class TimedSingleBranchScheduler(base.BaseScheduler):
 
-    compare_attrs = ['timeRange', 'treeStableTimer']
+    compare_attrs = ['timeRange', 'treeStableTimer', 'change_filter', 'fileIsImportant',
+		     'onlyImportant', 'reason']
 
-    def __init__(self, name, timeRange=["0:00","23:59:59"], treeStableTimer=None, **kwargs):
+    _reactor = reactor  # for tests
+
+    fileIsImportant = None
+    reason = ''
+
+    def __init__(self, name, timeRange=["0:00","23:59:59"], treeStableTimer=None,
+		 builderNames=None, branch=NotABranch, branches=NotABranch,
+		 fileIsImportant=None, properties={}, categories=None,
+		 reason="The %(classname)s scheduler named '%(name)s' triggered this build",
+		 change_filter=None, onlyImportant=False, **kwargs):
 	log.msg("TimedSingleBranchScheduler %s: __init__" % self.name)
+
+	base.BaseScheduler.__init__(self, name, builderNames, properties, **kwargs)
+
 	self.timeRange = timeRange
 	self._timed_change_lock = defer.DeferredLock()
 	self._timed_change_timer = None
-	BaseBasicScheduler.__init__(self, name, **kwargs)
+
+	self.treeStableTimer = treeStableTimer
+	if fileIsImportant is not None:
+	    self.fileIsImportant = fileIsImportant
+	self.onlyImportant = onlyImportant
+	self.change_filter = self.getChangeFilter(branch=branch,
+						  branches=branches, change_filter=change_filter,
+						  categories=categories)
+
+    def preStartConsumingChanges(self):
+	# Hook for subclasses to setup before startConsumingChanges().
+	return defer.succeed(None)
 
     def startService(self, _returnDeferred=False):
 	log.msg("TimedSingleBranchScheduler %s: startService" % self.name)
@@ -91,6 +115,28 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 	d.addCallback(set_timer)
 	return d
 
+    @defer.inlineCallbacks
+    def scanExistingClassifiedChanges(self):
+        # call gotChange for each classified change.  This is called at startup
+        # and is intended to re-start the build timer for any changes that
+        # had not yet been built when the scheduler was stopped.
+
+        # NOTE: this may double-call gotChange for changes that arrive just as
+        # the scheduler starts up.  In practice, this doesn't hurt anything.
+        classifications = \
+            yield self.master.db.schedulers.getChangeClassifications(
+                self.objectid)
+
+        # call gotChange for each change, after first fetching it from the db
+        for changeid, important in classifications.iteritems():
+            chdict = yield self.master.db.changes.getChange(changeid)
+
+            if not chdict:
+                continue
+
+            change = yield changes.Change.fromChdict(self.master, chdict)
+            yield self.gotChange(change, important)
+
     def getChangeFilter(self, branch, branches, change_filter, categories):
 	if branch is NotABranch and not change_filter:
 	    config.error(
@@ -138,7 +184,7 @@ class TimedSingleBranchScheduler(BaseBasicScheduler):
 		self.objectid, less_than=max_changeid + 1)
 
     def stopService(self):
-	d = BaseBasicScheduler.stopService(self)
+	d = base.BaseScheduler.stopService(self)
 
 	@util.deferredLocked(self._timed_change_lock)
 	def cancel_timer(_):
