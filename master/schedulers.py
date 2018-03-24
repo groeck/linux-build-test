@@ -33,7 +33,8 @@ def timeToStart(start):
 
 class TimedSingleBranchScheduler(base.BaseScheduler):
 
-    compare_attrs = ['timeRange', 'treeStableTimer', 'change_filter', 'fileIsImportant',
+    compare_attrs = ['timeRange', 'treeStableTimer', 'change_filter',
+		      'fileIsImportant', 'collapseRequests',
 		     'onlyImportant', 'reason']
 
     _reactor = reactor  # for tests
@@ -45,7 +46,9 @@ class TimedSingleBranchScheduler(base.BaseScheduler):
 		 builderNames=None, branch=NotABranch, branches=NotABranch,
 		 fileIsImportant=None, properties={}, categories=None,
 		 reason="The %(classname)s scheduler named '%(name)s' triggered this build",
-		 change_filter=None, onlyImportant=False, **kwargs):
+		 change_filter=None, onlyImportant=False,
+		 collapseRequests=None,
+		 **kwargs):
 	log.msg("TimedSingleBranchScheduler %s: __init__" % self.name)
 
 	base.BaseScheduler.__init__(self, name, builderNames, properties, **kwargs)
@@ -58,6 +61,7 @@ class TimedSingleBranchScheduler(base.BaseScheduler):
 	if fileIsImportant is not None:
 	    self.fileIsImportant = fileIsImportant
 	self.onlyImportant = onlyImportant
+	self.collapseRequests = collapseRequests
 	self.change_filter = self.getChangeFilter(branch=branch,
 						  branches=branches, change_filter=change_filter,
 						  categories=categories)
@@ -173,12 +177,25 @@ class TimedSingleBranchScheduler(base.BaseScheduler):
 	    return
 
 	changeids = sorted(classifications.keys())
-	for changeid in changeids:
-	    log.msg("change ID: %d" % changeid)
-	yield self.addBuildsetForChanges(reason=self.reason,
-					 changeids=changeids)
-
 	max_changeid = changeids[-1]
+	# Verify that each change is still in the database; if it isn't,
+	# addBuildsetForChanges() will bail out.
+	# Use list() to copy the list for use as iterator; otherwise
+	# the iterator fails if an element is removed from the list.
+	for changeid in list(changeids):
+	    chdict = yield self.master.db.changes.getChange(changeid)
+	    if not chdict:
+		log.msg("change ID: %d [dropped]" % changeid)
+		changeids.remove(changeid)
+	    else:
+		log.msg("change ID: %d" % changeid)
+
+	if changeids:
+	    if self.collapseRequests:
+		changeids = changeids[-1:]
+	    yield self.addBuildsetForChanges(reason=self.reason,
+					     changeids=changeids)
+
 	log.msg("%s[%d]: Flushing change IDs up to %d" % (self.name, self.objectid, max_changeid))
 	yield self.master.db.schedulers.flushChangeClassifications(
 		self.objectid, less_than=max_changeid + 1)
