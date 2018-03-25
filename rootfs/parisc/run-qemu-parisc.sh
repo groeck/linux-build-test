@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-hppa}
+QEMU=${QEMU:-${QEMU_V212_BIN}/qemu-system-hppa}
 
 PREFIX=hppa-linux-
 ARCH=parisc
