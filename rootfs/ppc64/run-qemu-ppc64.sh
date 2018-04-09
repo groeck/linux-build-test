@@ -31,7 +31,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 skip_32="powerpc:qemu_ppc64_book3s_defconfig \
-	powerpc:qemu_ppc64_e5500_defconfig
+	powerpc:qemu_ppc64_e5500_defconfig \
 	powerpc:powernv_defconfig"
 skip_316="powerpc:powernv_defconfig"
 skip_318="powerpc:powernv_defconfig"
