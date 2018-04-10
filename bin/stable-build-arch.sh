@@ -243,7 +243,6 @@ case ${ARCH} in
 	;;
     parisc64)
 	cmd=(${cmd_parisc64[*]})
-	fixup=("${fixup_parisc64[@]}")
 	PREFIX="hppa64-linux-"
 	PATH=${PATH_PARISC64}:${PATH}
 	ARCH=parisc
