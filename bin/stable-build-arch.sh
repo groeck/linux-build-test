@@ -88,14 +88,12 @@ declare -a fixup
 case ${ARCH} in
     alpha)
 	cmd=(${cmd_alpha[*]})
-	fixup=("${fixup_alpha[@]}")
 	PREFIX="alpha-linux-"
 	PATH=${PATH_ALPHA}:${PATH}
 	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     arc)
 	cmd=(${cmd_arc[*]})
-	fixup=("${fixup_arc[@]}")
 	PREFIX="arc-linux-"
 	case ${rel} in
 	v3.2|v3.10|v3.16|v3.18|v4.1)
@@ -110,7 +108,6 @@ case ${ARCH} in
     arcv2)
 	ARCH=arc
 	cmd=(${cmd_arcv2[*]})
-	fixup=("${fixup_arcv2[@]}")
 	PREFIX="arc-linux-"
 	# Original path first to pick up bison
 	PATH=${PATH}:${PATH_ARCV2}
@@ -128,7 +125,6 @@ case ${ARCH} in
 	;;
     avr32)
 	cmd=(${cmd_avr32[*]})
-	fixup=("${fixup_avr32[@]}")
 	PREFIX="avr32-linux-"
 	PATH=${PATH_AVR32}:${PATH}
 	;;
@@ -208,21 +204,18 @@ case ${ARCH} in
     mips_22)
 	ARCH=mips
 	cmd=(${cmd_mips_22[*]});
-	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS_22}:${PATH}
 	;;
     mips_24)
 	ARCH=mips
 	cmd=(${cmd_mips_24[*]});
-	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-linux-"
 	PATH=${PATH_MIPS_24}:${PATH}
 	;;
     mips_25)
 	ARCH=mips
 	cmd=(${cmd_mips_25[*]});
-	fixup=("${fixup_mips[@]}")
 	PREFIX="mips-poky-linux-"
 	PATH=${PATH_MIPS_25}:${PATH}
 	;;
@@ -293,7 +286,6 @@ case ${ARCH} in
 	;;
     tile)
 	cmd=(${cmd_tile[*]})
-	fixup=("${fixup_tile[@]}")
 	PREFIX="tilegx-linux-"
 	PATH=${PATH_TILE}:${PATH}
 	;;
@@ -314,7 +306,6 @@ case ${ARCH} in
 	;;
     xtensa)
 	cmd=(${cmd_xtensa[*]})
-	fixup=("${fixup_xtensa[@]}")
 	PREFIX="xtensa-linux-"
 	PATH=${PATH_XTENSA}:${PATH}
 	;;
@@ -328,7 +319,17 @@ case ${ARCH} in
 	echo "Unsupported or unspecified architecture ${ARCH}"
 	exit 1
 	;;
-    esac
+esac
+
+tmp="fixup_${ARCH}[@]"
+if [[ -n "${!tmp}" ]]; then
+    fixup+=("${!tmp}")
+fi
+
+tmp="fixup_${ARCH}_${relx}[@]"
+if [[ -n "${!tmp}" ]]; then
+    fixup+=("${!tmp}")
+fi
 
 echo "gcc version: $(${PREFIX}gcc --version | grep gcc)"
 echo
@@ -348,7 +349,7 @@ if [ ${#fixup[*]} -gt 0 ]; then
     fmax=$(expr ${#fixup[*]} - 1)
     for f in $(seq 0 ${fmax})
     do
-        echo "    ${fixup[$f]}"
+        echo "    \"${fixup[$f]}\""
     done
     echo
 fi
