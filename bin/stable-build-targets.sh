@@ -73,10 +73,8 @@ skip_44="cris:allnoconfig"
 
 # fixups
 
-# v4.15 allmodconfig creates a bad configuration file.
-# We should not really patch that up, but it is hiding other problems.
-fixup_mips=("s/CONFIG_MIPS_CPS_NS16550_BASE=$/CONFIG_MIPS_CPS_NS16550_BASE=0/"
-	"s/CONFIG_MIPS_CPS_NS16550_SHIFT=$/CONFIG_MIPS_CPS_NS16550_SHIFT=0/")
+# I40E/mips builds are broken in v4.16
+fixup_mips_416=("/CONFIG_I40E/d")
 
 fixup_parisc64=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
@@ -84,9 +82,6 @@ fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
-	"/CONFIG_INITRAMFS_SOURCE/d")
-
-fixup_arcv2=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
