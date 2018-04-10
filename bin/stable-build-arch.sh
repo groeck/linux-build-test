@@ -13,7 +13,6 @@ PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
 PATH_ARC_48=/opt/kernel/arc/gcc-4.8.3/usr/bin
 PATH_ARC=/opt/kernel/arc/gcc-7.1.1/usr/bin
 PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
-PATH_AVR32=/opt/kernel/gcc-4.2.4-nolibc/avr32-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
@@ -122,11 +121,6 @@ case ${ARCH} in
 	cmd=(${cmd_arm64[*]})
 	PREFIX="aarch64-linux-"
 	PATH=${PATH_ARM64}:${PATH}
-	;;
-    avr32)
-	cmd=(${cmd_avr32[*]})
-	PREFIX="avr32-linux-"
-	PATH=${PATH_AVR32}:${PATH}
 	;;
     blackfin)
 	cmd=(${cmd_blackfin[*]})

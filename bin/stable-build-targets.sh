@@ -1,4 +1,4 @@
-buildarch=(alpha arm arm64 avr32 blackfin c6x cris frv hexagon i386 ia64 \
+buildarch=(alpha arm arm64 blackfin c6x cris frv hexagon i386 ia64 \
 	   m32r m68k m68k_nommu \
 	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc \
 	   s390 score sh sparc32 sparc64 \
@@ -18,7 +18,6 @@ cmd_arm=(allmodconfig allnoconfig s3c2410_defconfig omap2plus_defconfig imx_v6_v
 	integrator_defconfig efm32_defconfig \
 	pxa910_defconfig clps711x_defconfig)
 cmd_arm64=(allnoconfig allmodconfig)
-cmd_avr32=(defconfig allnoconfig merisc_defconfig atngw100mkii_evklcd101_defconfig)
 cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig allnoconfig etrax-100lx_defconfig)
@@ -63,7 +62,7 @@ cmd_unicore32=(defconfig allnoconfig)
 
 # build to skip
 
-skip_32="alpha:allnoconfig arm:allnoconfig arm:allmodconfig avr32:allnoconfig \
+skip_32="alpha:allnoconfig arm:allnoconfig arm:allmodconfig \
 	m68k:allnoconfig microblaze:allnoconfig mips:allmodconfig \
 	openrisc:allnoconfig parisc:allnoconfig sparc32:allmodconfig \
 	xtensa:defconfig xtensa:allmodconfig xtensa:allnoconfig"
@@ -85,5 +84,3 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
-
-fixup_avr32=("s/CONFIG_NET=y/# CONFIG_NET is not set/")
