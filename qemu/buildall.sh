@@ -1,3 +1,10 @@
+checkexit()
+{
+	if [ $1 -ne 0 ]; then
+		exit $1
+	fi
+}
+
 dobuild()
 {
 	local branch=$1
@@ -47,15 +54,9 @@ then
 	--disable-user --disable-xen --disable-xen-pci-passthrough \
 	--disable-vnc-tls --disable-werror --disable-docs \
 	--target-list=meta-softmmu
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
     make -j20 install
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "linaro" ]
@@ -67,15 +68,9 @@ then
 	--disable-vnc-tls --disable-vnc-ws --disable-quorum \
 	--disable-docs --disable-werror \
 	--target-list=arm-softmmu
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
     make -j20 install
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "riscv" ]
@@ -85,9 +80,7 @@ then
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough" \
 	"riscv64-softmmu riscv32-softmmu"
-    if [ $? -ne 0 ]; then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.7" ]
@@ -98,15 +91,9 @@ then
 	--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
     make -j20 install
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.8" ]
@@ -115,10 +102,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.9" ]
@@ -127,10 +111,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.10" ]
@@ -139,10 +120,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.11" ]
@@ -151,10 +129,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.12" ]
@@ -163,10 +138,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+    checkexit $?
 fi
 
 if [ "$1" = "master" ]; then
@@ -175,7 +147,5 @@ if [ "$1" = "master" ]; then
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
 	--enable-debug --disable-strip"
-    if [ $? -ne 0 ]; then
-        exit 1
-    fi
+    checkexit $?
 fi
