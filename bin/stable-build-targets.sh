@@ -39,6 +39,7 @@ cmd_mips_24=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defcon
 	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
 cmd_mips_25=(defconfig)	# allnoconfig fails with binutils 2.25
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
+cmd_nds32=(defconfig allnoconfig)
 cmd_nios2=(3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig)
 cmd_parisc=(defconfig allnoconfig allmodconfig generic-32bit_defconfig)
