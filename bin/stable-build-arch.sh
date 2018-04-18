@@ -29,7 +29,7 @@ PATH_MICROBLAZE=/opt/kernel/microblaze/gcc-6.4.0/bin
 PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
-PATH_NDS32=/opt/kernel/gcc-7.3.0-nolibc/nds32le-elf/bin
+PATH_NDS32=/opt/kernel/gcc-6.4.0-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/nios2/gcc-6.3.0/usr/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
@@ -221,7 +221,7 @@ case ${ARCH} in
 	;;
     nds32)
 	cmd=(${cmd_nds32[*]})
-	PREFIX="nds32le-elf-"
+	PREFIX="nds32le-linux-"
 	PATH=${PATH_NDS32}:${PATH}
 	;;
     nios2)
