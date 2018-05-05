@@ -1,5 +1,11 @@
 #!/bin/bash
 
+runall=0
+if [ "$1" = "-a" ]; then
+    runall=1
+    shift
+fi
+
 machine=$1
 option=$2
 config=$3
@@ -10,6 +16,7 @@ dir=$(cd $(dirname $0); pwd)
 
 kernelrelease=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
 
+QEMU_V212=${QEMU_V212:-${QEMU_V212_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -159,8 +166,18 @@ runkernel()
 		-append "console=ttyAMA0 ${initcli}" \
 		> ${logfile} 2>&1 &
 	pid=$!
-	dowait ${pid} ${logfile} manual waitlist[@]
-	retcode=$?
+	waitflag="manual"
+	;;
+    "raspi3")
+	${QEMU_V212} -M ${mach} \
+	    -kernel arch/arm64/boot/Image -no-reboot \
+	    --append "${initcli} console=ttyAMA0,115200" \
+	    ${diskcmd} \
+	    ${dtbcmd} \
+	    -nographic -monitor null -serial stdio \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	waitflag="manual"
 	;;
     "xlnx-ep108"|"xlnx-zcu102")
 	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
@@ -170,10 +187,12 @@ runkernel()
 		--append "${initcli} console=ttyPS0" \
 		> ${logfile} 2>&1 &
 	pid=$!
-	dowait ${pid} ${logfile} automatic waitlist[@]
-	retcode=$?
+	waitflag="automatic"
 	;;
     esac
+
+    dowait ${pid} ${logfile} ${waitflag} waitlist[@]
+    retcode=$?
 
     rm -f ${logfile}
     return ${retcode}
@@ -190,6 +209,14 @@ runkernel xlnx-zcu102 defconfig smp rootfs.cpio xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
 runkernel xlnx-zcu102 defconfig smp rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
+
+if [ ${runall} -eq 1 ]; then
+    runkernel raspi3 defconfig smp rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((${retcode} + $?))
+    runkernel raspi3 defconfig smp rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((${retcode} + $?))
+fi
+
 runkernel virt defconfig nosmp rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio xilinx/zynqmp-ep108.dtb
