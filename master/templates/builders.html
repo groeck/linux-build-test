@@ -27,7 +27,7 @@
 
 {% set releases = [ "3.2", "3.16", "3.18",
 			"4.1", "4.4", "4.9", "4.14", "4.16",
-			"master", "next",
+			"master", "pending-fixes", "next",
 			"hwmon", "hwmon-next",
 			"watchdog-next", "testing" ] -%}
 
@@ -47,7 +47,7 @@
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
-    {% elif rel in [ "next" ] -%}
+    {% elif rel in [ "next", "pending-fixes" ] -%}
 	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
@@ -74,7 +74,7 @@
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
-    {% elif rel in [ "next" ] -%}
+    {% elif rel in [ "next", "pending-fixes" ] -%}
 	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
@@ -264,7 +264,7 @@
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
-    {% elif rel in [ "next" ] -%}
+    {% elif rel in [ "next", "pending-fixes" ] -%}
 	{% set bname = "next-" ~ arch ~ "-" ~ rel -%}
     {% else -%}
 	{% set bname = "stable-queue-" ~ arch ~ "-" ~ rel -%}
