@@ -7,7 +7,6 @@ dir=$(cd $(dirname $0); pwd)
 QEMU=${QEMU:-${QEMU_V211_BIN}/qemu-system-m68k}
 PREFIX=m68k-linux-
 ARCH=m68k
-rootfs=rootfs.cpio
 PATH_M68K=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
 
 PATH=${PATH_M68K}:${PATH}
@@ -17,50 +16,84 @@ patch_defconfig()
     local defconfig=$1
     local mach=$2
 
-    echo "Patching ${defconfig}" >/tmp/patchlog
+    if [[ "${mach}" = "mcf5208evb" ]]; then
+	# Enable DEVTMPFS
+	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
+	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	sed -i -e '/CONFIG_DEVTMPFS_MOUNT/d' ${defconfig}
+	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
-    # Enable DEVTMPFS
-
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    sed -i -e '/CONFIG_DEVTMPFS_MOUNT/d' ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # Specify initramfs file name
-    sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
-    sed -i -e '/CONFIG_INITRAMFS_ROOT_UID/d' ${defconfig}
-    sed -i -e '/CONFIG_INITRAMFS_ROOT_GID/d' ${defconfig}
-    echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
-    echo "CONFIG_INITRAMFS_ROOT_UID=0" >> ${defconfig}
-    echo "CONFIG_INITRAMFS_ROOT_GID=0" >> ${defconfig}
+	# Specify initramfs file name
+	sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
+	sed -i -e '/CONFIG_INITRAMFS_ROOT_UID/d' ${defconfig}
+	sed -i -e '/CONFIG_INITRAMFS_ROOT_GID/d' ${defconfig}
+	echo "CONFIG_INITRAMFS_SOURCE=\"rootfs.cpio\"" >> ${defconfig}
+	echo "CONFIG_INITRAMFS_ROOT_UID=0" >> ${defconfig}
+	echo "CONFIG_INITRAMFS_ROOT_GID=0" >> ${defconfig}
+    fi
 }
+
+cached_config=""
 
 runkernel()
 {
     local mach=$1
     local cpu=$2
     local defconfig=$3
+    local rootfs=$4
     local pid
     local retcode
     local waitlist=("Rebooting" "Boot successful")
     local logfile=/tmp/runkernel-$$.log
+    local build="${mach}:${cpu}:${defconfig}"
+    local qemu="${QEMU}"
 
-    echo -n "Building ${ARCH}:${mach}:${cpu}:${defconfig} ... "
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
-    dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} dynamic ${mach}
-    if [ $? -ne 0 ]
-    then
-	return 1
+    echo -n "Building ${build} ... "
+
+    if [ "${cached_config}" != "${defconfig}" ]; then
+	dosetup "${ARCH}" "${PREFIX}" "" "${rootfs}" "${defconfig}" dynamic ${mach}
+	if [ $? -ne 0 ]; then
+		return 1
+	fi
+	cached_config="${defconfig}"
+    else
+	setup_rootfs "${rootfs}"
+    fi
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	if [[ "${mach}" = "q800" ]]; then
+	    initcli="rdinit=/sbin/init"
+	    diskcmd="-initrd ${rootfs}"
+	else
+	    # initrd is embedded in image
+	    initcli=""
+	    diskcmd=""
+	fi
+    else
+	initcli="root=/dev/sda rw"
+	diskcmd="-drive file=${rootfs},format=raw"
     fi
 
     echo -n "running ..."
 
-    ${QEMU} -M ${mach} \
+    if [[ "${mach}" = "q800" ]]; then
+	# q800 needs special qemu, which in turn does not support mcf5208evb
+	qemu="${QEMU_V211_M68K_BIN}/qemu-system-m68k"
+    fi
+
+    ${qemu} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
-	-append "console=ttyS0,115200" \
+	${diskcmd} \
+	-append "${initcli} console=ttyS0,115200" \
 	> ${logfile} 2>&1 &
 
     pid=$!
@@ -74,6 +107,8 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel mcf5208evb m5208 m5208evb_defconfig
+runkernel mcf5208evb m5208 m5208evb_defconfig rootfs.cpio
+runkernel q800 m68040 mac_defconfig rootfs-q800.cpio
+runkernel q800 m68040 mac_defconfig rootfs.ext2
 
 exit $?
