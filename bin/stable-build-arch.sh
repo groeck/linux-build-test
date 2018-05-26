@@ -22,6 +22,7 @@ PATH_H8300=/opt/kernel/h8300/gcc-5.1.0/usr/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
+PATH_M68_49=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 PATH_M68=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE_48=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
@@ -50,11 +51,12 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2|v3.10|v3.16|v4.1)
+v3.2)
+	PATH_M68=${PATH_M68_49}
+	PATH_MICROBLAZE=${PATH_MICROBLAZE_48}
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
 	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
-	PATH_MICROBLAZE=${PATH_MICROBLAZE_48}
 	;;
 *)
 	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
