@@ -50,8 +50,7 @@ setup_rootfs()
 
     if [ -n "${rootfs}" ]
     then
-	if [ -n "${dynamic}" ]
-	then
+	if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
 	    fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
         else
 	    cp ${progdir}/${rootfs} .
