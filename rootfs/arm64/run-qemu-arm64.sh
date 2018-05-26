@@ -151,7 +151,7 @@ runkernel()
 	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0 \
 		-drive file=${rootfs},format=raw,if=none,id=d0"
     else
-	initcli="root=/dev/mmcblk0 rw"
+	initcli="root=/dev/mmcblk0 rw rootwait"
 	diskcmd="-drive file=${rootfs},if=sd,format=raw"
     fi
 
