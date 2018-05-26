@@ -130,6 +130,12 @@ then
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
+    dobuild v2.11.0-q800 v2.11-m68k \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=m68k-softmmu"
+    checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "v2.12" ]
