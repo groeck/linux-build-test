@@ -51,7 +51,7 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2)
+v3.2|v3.16)
 	PATH_M68=${PATH_M68_49}
 	PATH_MICROBLAZE=${PATH_MICROBLAZE_48}
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
