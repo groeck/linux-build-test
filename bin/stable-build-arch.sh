@@ -6,44 +6,49 @@ basedir=$(cd $(dirname $0); pwd)
 LOG=/tmp/log.$$
 BUILDDIR=/tmp/buildbot-builddir
 
-PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
+PATH_ALPHA=/opt/kernel/gcc-8.1.0-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
 PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
-PATH_ARC_48=/opt/kernel/arc/gcc-4.8.3/usr/bin
-PATH_ARC=/opt/kernel/arc/gcc-7.1.1/usr/bin
+# arc images don't build with gcc 8.1.0
+PATH_ARC=/opt/kernel/gcc-7.3.0-nolibc/arc-elf/bin
 PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
-PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
+PATH_C6X=/opt/kernel/gcc-8.1.0-nolibc/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
-PATH_H8300=/opt/kernel/h8300/gcc-5.1.0/usr/bin
+PATH_H8300=/opt/kernel/gcc-8.1.0-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
-PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
+PATH_IA64=/opt/kernel/gcc-8.1.0-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
-PATH_M68_49=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 PATH_M68=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
-PATH_MICROBLAZE_48=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
 PATH_MICROBLAZE=/opt/kernel/microblaze/gcc-6.4.0/bin
 PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
 PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
 PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
-PATH_NDS32=/opt/kernel/gcc-6.4.0-nolibc/nds32le-linux/bin
+PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-7.3.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
-PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
-PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
+PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
+PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_RISCV64=/opt/kernel/riscv64/gcc-7.2.0/bin
 PATH_SCORE=/opt/kernel/score/bin
-PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
-PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+PATH_S390=/opt/kernel/gcc-8.1.0-nolibc/s390-linux/bin
+PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
+# sparc images don't build with gcc 8.1.0
+PATH_SPARC=/opt/kernel/gcc-7.3.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
+PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
+
+PREFIX_ARC="arc-elf-"
+PREFIX_S390="s390-linux-"
+PREFIX_X86="x86_64-linux-"
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
@@ -51,17 +56,35 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2|v3.16)
-	PATH_M68=${PATH_M68_49}
-	PATH_MICROBLAZE=${PATH_MICROBLAZE_48}
+v3.2)
+	# 3.2 only supports gcc v5.x and older
+	PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
+	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+	PREFIX_ARC="arc-linux-"
+	PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
+	PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
+	PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
+	PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
+	PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
+	PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
+	PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
+	PREFIX_S390="s390x-linux-"
+	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 	PREFIX_X86="x86_64-poky-linux-"
 	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
 	;;
+v3.16|v3.18|v4.1|v4.4)
+	# sh4 supports recent compilers only starting with v4.9
+	# (see commit 940d4113f330)
+	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	# sparc images don't build with recent versions of gcc
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+	;;
 *)
-	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
-	PREFIX_X86="x86_64-linux-"
-	PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
+	# sparc images don't build with recent versions of gcc
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	;;
 esac
 
@@ -96,16 +119,9 @@ case ${ARCH} in
 	;;
     arc)
 	cmd=(${cmd_arc[*]})
-	PREFIX="arc-linux-"
-	case ${rel} in
-	v3.2|v3.10|v3.16|v3.18|v4.1)
-		PATH=${PATH_ARC_48}:${PATH}
-		;;
-	*)
-		# Original path first to pick up bison
-		PATH=${PATH}:${PATH_ARC}
-		;;
-	esac
+	PREFIX="${PREFIX_ARC}"
+	# Original path first to pick up bison
+	PATH=${PATH}:${PATH_ARC}
 	;;
     arcv2)
 	ARCH=arc
@@ -154,7 +170,7 @@ case ${ARCH} in
 	;;
     h8300)
 	cmd=(${cmd_h8300[*]})
-	PREFIX="h8300-elf-linux-newlib-"
+	PREFIX="h8300-linux-"
 	PATH=${PATH_H8300}:${PATH}
 	;;
     hexagon)
@@ -277,7 +293,7 @@ case ${ARCH} in
 	;;
     s390)
 	cmd=(${cmd_s390[*]})
-	PREFIX="s390x-linux-"
+	PREFIX=${PREFIX_S390}
 	PATH=${PATH_S390}:${PATH}
 	;;
     score)
@@ -313,6 +329,15 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	PREFIX=${PREFIX_X86}
+	case ${rel} in
+	v3.2|v3.16|v4.1)
+		# um fails to build with those releases
+		PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
+		PREFIX_X86="x86_64-poky-linux-"
+		;;
+	*)
+		;;
+	esac
 	PATH=${PATH_X86}:${PATH}
 	SUBARCH="x86_64"
 	;;
