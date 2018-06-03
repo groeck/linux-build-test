@@ -73,19 +73,6 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "v2.7" ]
-then
-    git clean -d -x -f -q
-    git checkout v2.7.0-local
-    ./configure --prefix=/opt/buildbot/qemu-install/v2.7 \
-	--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough
-    checkexit $?
-    make -j20 install
-    checkexit $?
-fi
-
 if [ -z "$1" -o "$1" = "v2.8" ]
 then
     dobuild v2.8.1-local v2.8 \
