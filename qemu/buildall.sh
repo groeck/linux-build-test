@@ -73,16 +73,6 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "riscv" ]
-then
-    dobuild master-local-riscv64 master-riscv \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough" \
-	"riscv64-softmmu riscv32-softmmu"
-    checkexit $?
-fi
-
 if [ -z "$1" -o "$1" = "v2.7" ]
 then
     git clean -d -x -f -q
@@ -144,6 +134,16 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "riscv" ]
+then
+    dobuild v3.0.0-local-riscv v3.0-riscv \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=riscv64-softmmu"
     checkexit $?
 fi
 
