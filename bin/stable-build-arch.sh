@@ -8,11 +8,11 @@ BUILDDIR=/tmp/buildbot-builddir
 
 PATH_ALPHA=/opt/kernel/gcc-8.1.0-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
-PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
-PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
-# arc images don't build with gcc 8.1.0
-PATH_ARC=/opt/kernel/gcc-7.3.0-nolibc/arc-elf/bin
-PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
+PATH_ARM=/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin
+PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
+# arc images don't build with gcc 8.1.0 / 7.3.0 from kernel.org
+PATH_ARC=/opt/kernel/arc/gcc-7.3.0/usr/bin
+PATH_ARCV2=/opt/kernel/arcv2/gcc-7.3.0/usr/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-8.1.0-nolibc/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
@@ -31,11 +31,11 @@ PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-7.3.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
-PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
+PATH_OPENRISC=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
-PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-PATH_RISCV64=/opt/kernel/riscv64/gcc-7.2.0/bin
+PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-8.1.0-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
@@ -46,7 +46,9 @@ PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
 PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
 
-PREFIX_ARC="arc-elf-"
+PREFIX_ARC="arc-linux-"
+PREFIX_ARM="arm-linux-gnueabi-"
+PREFIX_PPC=powerpc64-linux-
 PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
 
@@ -54,19 +56,29 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
+configcmd="olddefconfig"
+
 # Older releases don't like gcc 6+
 case ${rel} in
 v3.2)
+	# 3.2 doesn't know about olddefconfig
+	configcmd="oldnoconfig"
 	# 3.2 only supports gcc v5.x and older
 	PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+	PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
 	PREFIX_ARC="arc-linux-"
+	PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
+	PREFIX_ARM="arm-poky-linux-gnueabi-"
 	PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
 	PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
 	PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
 	PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
+	PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
 	PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
 	PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
+	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+	PREFIX_PPC="powerpc64-poky-linux-"
 	PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
 	PREFIX_S390="s390x-linux-"
 	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
@@ -75,16 +87,36 @@ v3.2)
 	PREFIX_X86="x86_64-poky-linux-"
 	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
 	;;
-v3.16|v3.18|v4.1|v4.4)
+v3.16|v3.18)
+	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
+	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+	# ppc needs old compiler up to and including v3.18
+	# (see commit c2ce6f9f3dc0)
+	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+	PREFIX_PPC="powerpc64-poky-linux-"
 	# sh4 supports recent compilers only starting with v4.9
 	# (see commit 940d4113f330)
 	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	# sparc images don't build with recent versions of gcc
+	# sparc images prior to v4.14 don't build with recent versions of gcc
+	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+	;;
+v4.1|v4.4)
+	# arc needs old gcc up to v4.1.y (see commit a6416f57ce57)
+	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+	# sh4 supports recent compilers only starting with v4.9
+	# (see commit 940d4113f330)
+	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	# sparc images prior to v4.14 don't build with recent versions of gcc
+	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
+	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+	;;
+v4.9)
+	# sparc images prior to v4.14 don't build with recent versions of gcc
+	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	;;
 *)
-	# sparc images don't build with recent versions of gcc
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	;;
 esac
 
@@ -132,7 +164,7 @@ case ${ARCH} in
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
-	PREFIX="arm-poky-linux-gnueabi-"
+	PREFIX=${PREFIX_ARM}
 	PATH=${PATH_ARM}:${PATH}
 	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
@@ -194,12 +226,12 @@ case ${ARCH} in
 	PATH=${PATH_M32R}:${PATH}
 	;;
     m68k)
-    	cmd=(${cmd_m68k[*]})
+	cmd=(${cmd_m68k[*]})
 	PREFIX="m68k-linux-"
 	PATH=${PATH_M68}:${PATH}
 	;;
     m68k_nommu)
-    	cmd=(${cmd_m68k_nommu[*]})
+	cmd=(${cmd_m68k_nommu[*]})
 	PREFIX="m68k-linux-"
 	PATH=${PATH_M68}:${PATH}
 	ARCH=m68k
@@ -273,7 +305,7 @@ case ${ARCH} in
 	;;
     powerpc)
 	cmd=(${cmd_powerpc[*]})
-	PREFIX="powerpc64-poky-linux-"
+	PREFIX="${PREFIX_PPC}"
 	PATH=${PATH_PPC}:${PATH}
 	;;
     riscv)
@@ -328,14 +360,14 @@ case ${ARCH} in
 	;;
     um)
 	cmd=(${cmd_um[*]})
-	PREFIX=${PREFIX_X86}
 	case ${rel} in
 	v3.2|v3.16|v4.1)
 		# um fails to build with those releases
 		PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-		PREFIX_X86="x86_64-poky-linux-"
+		PREFIX="x86_64-poky-linux-"
 		;;
 	*)
+		PREFIX="${PREFIX_X86}"
 		;;
 	esac
 	PATH=${PATH_X86}:${PATH}
@@ -399,6 +431,29 @@ do
 	done
 
 	rm -f .config
+
+	# perf build is special. Use host gcc and build based on defconfig.
+	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
+	    make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>&1
+	    if [ $? -ne 0 ]; then
+		echo "failed (config) - skipping"
+	    else
+		make ARCH=${ARCH} O=${BUILDDIR} ${cmd[$i]} >/dev/null 2>/tmp/buildlog.$$
+		if [ $? -ne 0 ]; then
+		    echo "failed"
+		    echo "--------------"
+		    echo "Error log:"
+		    cat /tmp/buildlog.$$
+		    echo "--------------"
+		    errors=$(expr ${errors} + 1)
+		else
+		    echo "passed"
+		fi
+	    fi
+	    i=$(expr $i + 1)
+	    continue
+	fi
+
 	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
@@ -421,10 +476,10 @@ do
 		. ${basedir}/branches/${BRANCH}/setup.sh ${ARCH} ${BRANCH} ${BUILDDIR}
 	fi
 
-	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} oldnoconfig >/dev/null 2>&1
+	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} "${configcmd}" >/dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
-	        echo "failed (oldnoconfig) - skipping"
+	        echo "failed (${configcmd}) - skipping"
 	 	i=$(expr $i + 1)
 	 	continue
 	fi
