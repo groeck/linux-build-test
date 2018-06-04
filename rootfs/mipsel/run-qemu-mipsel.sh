@@ -9,19 +9,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.2)
-	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
-	# qemu v2.12 fails to boot
-	QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-mipsel}
-	PREFIX=mips-poky-linux-
-	;;
-*)
-	PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips-linux/bin
-	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
-	PREFIX=mips-linux-
-	;;
-esac
+PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips-linux/bin
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
+PREFIX=mips-linux-
 
 # machine specific information
 ARCH=mips

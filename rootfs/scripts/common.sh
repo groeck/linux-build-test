@@ -111,7 +111,7 @@ setup_config()
     then
 	patch_defconfig .config ${fixup}
 	target="olddefconfig"
-	if [[ "${rel}" = "v3.2" || "${rel}" = "v3.16" ]]; then
+	if [[ "${rel}" = "v3.16" ]]; then
 	    target="oldconfig"
 	fi
 	make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null

@@ -60,33 +60,6 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.2)
-	# 3.2 doesn't know about olddefconfig
-	configcmd="oldnoconfig"
-	# 3.2 only supports gcc v5.x and older
-	PATH_ALPHA=/opt/kernel/gcc-4.6.3-nolibc/alpha-linux/bin
-	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
-	PATH_ARCV2=/opt/kernel/arcv2/gcc-4.8.5/usr/bin
-	PREFIX_ARC="arc-linux-"
-	PATH_ARM=/opt/poky/1.7/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
-	PREFIX_ARM="arm-poky-linux-gnueabi-"
-	PATH_C6X=/opt/kernel/gcc-5.2.0/c6x-elf/bin
-	PATH_IA64=/opt/kernel/gcc-4.6.3-nolibc/ia64-linux/bin
-	PATH_M68=/opt/kernel/gcc-4.9.0-nolibc/m68k-linux/bin
-	PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
-	PATH_OPENRISC=/opt/kernel/gcc-5.4.0-nolibc/bin
-	PATH_PARISC=/opt/kernel/gcc-4.6.3-nolibc/hppa-linux/bin
-	PATH_PARISC64=/opt/kernel/gcc-4.9.0-nolibc/hppa64-linux/bin
-	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-	PREFIX_PPC="powerpc64-poky-linux-"
-	PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
-	PREFIX_S390="s390x-linux-"
-	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
-	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-	PREFIX_X86="x86_64-poky-linux-"
-	PATH_XTENSA=/opt/kernel/xtensa/gcc-4.9.2-dc233c/usr/bin
-	;;
 v3.16|v3.18)
 	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
@@ -101,7 +74,7 @@ v3.16|v3.18)
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	;;
-v4.1|v4.4)
+v4.4)
 	# arc needs old gcc up to v4.1.y (see commit a6416f57ce57)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
 	# sh4 supports recent compilers only starting with v4.9
@@ -282,7 +255,7 @@ case ${ARCH} in
     openrisc)
 	cmd=(${cmd_openrisc[*]})
 	case ${rel} in
-	v3.2|v3.10|v3.16|v3.18|v4.1|v4.4|v4.9)
+	v3.16|v3.18|v4.4|v4.9)
 		PREFIX="or32-linux-"
 		PATH=${PATH_OPENRISC_45}:${PATH}
 		;;
@@ -361,7 +334,7 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	case ${rel} in
-	v3.2|v3.16|v4.1)
+	v3.16)
 		# um fails to build with those releases
 		PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 		PREFIX="x86_64-poky-linux-"

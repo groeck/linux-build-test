@@ -97,16 +97,8 @@ doit()
 	PATH=${PATH_M68}:${PATH}
 	;;
     m68k_nommu)
-	# kludge to work around nommu build problems in 3.0 and 3.2 kernels
-    	cmd=(${cmd_m68k_nommu[*]})
-	if [ "${rel}" = "v3.0" -o "${rel}" = "v3.2" ]
-	then
-		PREFIX="m68k-uclinux-"
-		PATH=${PATH_M68_NOMMU}:${PATH}
-	else
-		PREFIX="m68k-linux-"
-		PATH=${PATH_M68}:${PATH}
-	fi
+	PREFIX="m68k-linux-"
+	PATH=${PATH_M68}:${PATH}
 	ARCH=m68k
         ;;
     microblaze)

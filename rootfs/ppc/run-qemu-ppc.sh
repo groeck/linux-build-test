@@ -18,9 +18,6 @@ QEMU_MACH=mac99
 
 PATH=${PATH_PPC}:${PATH}
 
-skip_32="powerpc:44x/bamboo_defconfig powerpc:44x/virtex5_defconfig \
-	powerpc:mpc85xx_defconfig powerpc:mpc85xx_smp_defconfig"
-
 patch_defconfig()
 {
     local defconfig=$1

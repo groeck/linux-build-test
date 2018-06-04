@@ -63,10 +63,6 @@ cmd_unicore32=(defconfig allnoconfig)
 
 # build to skip
 
-skip_32="alpha:allnoconfig arm:allnoconfig arm:allmodconfig \
-	m68k:allnoconfig microblaze:allnoconfig mips:allmodconfig \
-	openrisc:allnoconfig parisc:allnoconfig sparc32:allmodconfig \
-	xtensa:defconfig xtensa:allmodconfig xtensa:allnoconfig"
 skip_316="m68k:allnoconfig"
 skip_318="m68k:allnoconfig"
 skip_44="cris:allnoconfig"

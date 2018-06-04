@@ -40,29 +40,12 @@ progdir=$(cd $(dirname $0); pwd)
 # a patch (8bba8303b059, "ARM: imx_v4_v5_defconfig: Select
 # CONFIG_MACH_IMX25_DT") to be applied.
 
-skip_32="arm:beagle:omap2plus_defconfig \
-	arm:beaglexm:omap2plus_defconfig \
-	arm:imx25-pdk:imx_v4_v5_defconfig \
-	arm:integratorcp:integrator_defconfig \
-	arm:kzm:imx_v6_v7_defconfig \
-	arm:mainstone:mainstone_defconfig \
-	arm:overo:omap2plus_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:sabrelite:imx_v6_v7_defconfig \
-	arm:sabrelite:multi_v7_defconfig \
-	arm:versatileab:versatile_defconfig \
-	arm:versatilepb:versatile_defconfig \
-	arm:vexpress-a9:vexpress_defconfig \
-	arm:vexpress-a15:vexpress_defconfig \
-	arm:vexpress-a15-a7:vexpress_defconfig"
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
-skip_41="arm:realview-pbx-a9:realview_defconfig \
-	arm:versatilepb-scsi:versatile_defconfig"
 skip_44="arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig"
 
@@ -260,10 +243,7 @@ runkernel()
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	# KALLSYMS_EXTRA_PASS is needed for earlier kernels (3.2, 3.4) due to
-	# a bug in kallsyms which would be too difficult to back-port.
-	# See upstream commits f6537f2f0e and 7122c3e915.
-	dosetup ${ARCH} ${PREFIX} "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" ${fixup}
+	dosetup ${ARCH} ${PREFIX} ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then

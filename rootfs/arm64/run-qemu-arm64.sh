@@ -25,12 +25,6 @@ PATH=${PATH}:${PATH_ARM64}
 
 # Xilinx boards don't work on v3.x kernels
 # Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx)
-skip_32="xlnx-zcu102:smp:defconfig:initrd \
-	xlnx-zcu102:nosmp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs \
-	virt:smp:defconfig:rootfs \
-	virt:nosmp:defconfig:rootfs"
 skip_316="xlnx-zcu102:smp:defconfig:initrd \
 	xlnx-zcu102:nosmp:defconfig:initrd \
 	xlnx-zcu102:smp:defconfig:rootfs \
@@ -43,10 +37,6 @@ skip_318="xlnx-zcu102:smp:defconfig:initrd \
 	xlnx-zcu102:nosmp:defconfig:rootfs \
 	virt:smp:defconfig:rootfs \
 	virt:nosmp:defconfig:rootfs"
-skip_41="virt:smp:defconfig:rootfs \
-	virt:nosmp:defconfig:rootfs \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs"
 skip_44="virt:smp:defconfig:rootfs \
 	virt:nosmp:defconfig:rootfs \
 	xlnx-zcu102:smp:defconfig:rootfs \

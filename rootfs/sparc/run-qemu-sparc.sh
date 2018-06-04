@@ -13,15 +13,7 @@ ARCH=sparc32
 rootfs=hda.sqf
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.2)
-	# Old kernels crash with newer compilers
-	PATH_SPARC=/opt/kernel/gcc-4.6.3-nolibc/sparc64-linux/bin
-	;;
-*)
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
-	;;
-esac
+PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
 

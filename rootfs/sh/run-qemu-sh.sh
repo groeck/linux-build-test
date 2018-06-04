@@ -11,14 +11,7 @@ ARCH=sh
 rootfs=rootfs.ext2
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.2)
-	PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
-	;;
-*)
-	PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	;;
-esac
+PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
 
 PATH=${PATH_SH}:${PATH}
 

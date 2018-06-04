@@ -10,18 +10,9 @@ dir=$(cd $(dirname $0); pwd)
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.2)
-	PATH_MIPS=/opt/kernel/gcc-4.6.3-nolibc/mips64-linux/bin
-	PREFIX=mips64-linux-
-	cpu=""
-	;;
-*)
-	PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
-	PREFIX=mips-linux-
-	cpu="-cpu 5KEc"
-	;;
-esac
+PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
+PREFIX=mips-linux-
+cpu="-cpu 5KEc"
 
 # machine specific information
 rootfs=core-image-minimal-qemumips64.ext3
