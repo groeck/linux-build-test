@@ -40,6 +40,7 @@ patch_defconfig()
 
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
     # 64 bit build
 
