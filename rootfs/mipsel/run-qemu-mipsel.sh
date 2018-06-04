@@ -12,6 +12,7 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.2)
 	PATH_MIPS=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
+	# qemu v2.12 fails to boot
 	QEMU=${QEMU:-${QEMU_V29_BIN}/qemu-system-mipsel}
 	PREFIX=mips-poky-linux-
 	;;
