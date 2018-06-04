@@ -8,7 +8,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_V210_BIN}/qemu-system-sparc64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc64}
 
 PREFIX=sparc64-linux-
 ARCH=sparc64
@@ -24,21 +24,17 @@ patch_defconfig()
     local defconfig=$1
     local smp=$2
 
-    # Configure SMP as requested, enable DEVTMPFS, and enable VIRTIO
+    # Configure SMP as requested, enable DEVTMPFS,
+    # and enable ATA instead of IDE.
 
     sed -i -e '/CONFIG_SMP/d' ${defconfig}
     sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-    sed -i -e '/VIRTIO/d' ${defconfig}
+    sed -i -e '/IDE/d' ${defconfig}
     echo "
 CONFIG_DEVTMPFS=y
-CONFIG_VIRTIO=y
-CONFIG_VIRTIO_MENU=y
-CONFIG_VIRTIO_PCI=y
-CONFIG_VIRTIO_BLK=y
-CONFIG_VIRTIO_NET=y
-CONFIG_VIRTIO_BALLOON=y
-CONFIG_VIRTIO_CONSOLE=y
-CONFIG_SCSI_VIRTIO=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_ATA=y
+CONFIG_PATA_CMD64X=y
     " >> ${defconfig}
 
     if [ "${smp}" = "nosmp" ]
@@ -95,11 +91,9 @@ runkernel()
 
     ${QEMU} -M ${mach} -cpu "${cpu}" \
 	-m 512 \
-	-drive file=${rootfs},if=none,id=hd,format=raw \
-	-device virtio-blk-pci,disable-modern=on,drive=hd \
-	-device virtio-net-pci,disable-modern=on \
+	-drive file=${rootfs},if=ide,format=raw \
 	-kernel arch/sparc/boot/image -no-reboot \
-	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0 doreboot" \
+	-append "root=/dev/sda init=/sbin/init.sh console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
