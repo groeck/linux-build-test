@@ -16,7 +16,6 @@ dir=$(cd $(dirname $0); pwd)
 
 kernelrelease=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
 
-QEMU_V212=${QEMU_V212:-${QEMU_V212_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -169,7 +168,7 @@ runkernel()
 	waitflag="manual"
 	;;
     "raspi3")
-	${QEMU_V212} -M ${mach} \
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm64/boot/Image -no-reboot \
 	    --append "${initcli} console=ttyAMA0,115200" \
 	    ${diskcmd} \
