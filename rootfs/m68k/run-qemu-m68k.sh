@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_V211_BIN}/qemu-system-m68k}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 PREFIX=m68k-linux-
 ARCH=m68k
 PATH_M68K=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
