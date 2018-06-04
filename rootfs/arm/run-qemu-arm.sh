@@ -19,7 +19,7 @@ QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 # arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
 # arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
 # arm:z2:pxa_defconfig
-QEMU=${QEMU:-${QEMU_V211_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
