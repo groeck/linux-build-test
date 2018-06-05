@@ -34,7 +34,10 @@ PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
-PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+# hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
+# PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+PATH_PPC=/opt/kernel/gcc-6.4.0-nolibc/powerpc64-linux/bin
+# PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-8.1.0-nolibc/s390-linux/bin
@@ -49,6 +52,7 @@ PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
 PREFIX_ARC="arc-linux-"
 PREFIX_ARM="arm-linux-gnueabi-"
 PREFIX_PPC=powerpc64-linux-
+# PREFIX_PPC="powerpc64-poky-linux-"
 PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
 
@@ -67,25 +71,10 @@ v3.16|v3.18)
 	# (see commit c2ce6f9f3dc0)
 	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 	PREFIX_PPC="powerpc64-poky-linux-"
-	# sh4 supports recent compilers only starting with v4.9
+	# sh4 supports recent compilers only starting with v4.4
 	# (see commit 940d4113f330)
 	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	# sparc images prior to v4.14 don't build with recent versions of gcc
-	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
-	;;
-v4.4)
-	# arc needs old gcc up to v4.1.y (see commit a6416f57ce57)
-	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
-	# sh4 supports recent compilers only starting with v4.9
-	# (see commit 940d4113f330)
-	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	# sparc images prior to v4.14 don't build with recent versions of gcc
-	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
-	;;
-v4.9)
-	# sparc images prior to v4.14 don't build with recent versions of gcc
+	# sparc images prior to v4.4 don't build with recent versions of gcc
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
 	;;
