@@ -329,12 +329,12 @@ runkernel()
 	    > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
-	    -monitor null -nographic \
+	    -monitor null -nographic ${dtbcmd} \
 	    > ${logfile} 2>&1 &
 	pid=$!
 	;;
@@ -420,7 +420,7 @@ runkernel()
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "ast2500-evb")
+    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc")
 	${QEMU} -M ${mach} \
 		-nodefaults -nographic -serial stdio -monitor none \
 		-kernel arch/arm/boot/zImage -no-reboot \
@@ -514,24 +514,26 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
 
-# Disabled by default for now due to warnings from uart driver (qemu 2.6, 2.7).
-# Underlying problem is that cprman is not implemented in qemu. The uart
-# clock is derived from it, and reports a clock rate of 0.
+runkernel multi_v7_defconfig cubieboard "" 128 \
+	core-image-minimal-qemuarm.cpio manual "" sun4i-a10-cubieboard.dtb
+retcode=$((${retcode} + $?))
 
-if [ ${runall} -eq 1 ]
-then
+# Disabled by default for now due to warnings from uart driver (qemu 2.6
+# to 2.12). The underlying problem is that cprman is not implemented in qemu.
+# The uart clock is derived from it, and reports a clock rate of 0.
+# With upstream kernel v4.17 and qemu v2.12, the emulation crashes with
+# a "Division by zero" error in bcm2835_probe().
+
+if [ ${runall} -eq 1 ]; then
     runkernel multi_v7_defconfig raspi2 "" "" \
 	core-image-minimal-qemuarm.ext3 manual raspi2 bcm2836-rpi-2-b.dtb
     retcode=$((${retcode} + $?))
 fi
 
 # highbank boots with updated qemu, but generates warnings to the console
-# due to ignored SMC calls. Also, the highbank dts file uses CPU IDs
-# starting with 0x900, which isn't supported by qemu. As a result, the boot
-# CPU is not detected, which causes a warning in kernels prior to v3.14.
+# due to ignored SMC calls.
 
-if [ ${runall} -eq 1 ]
-then
+if [ ${runall} -eq 1 ]; then
     runkernel multi_v7_defconfig highbank cortex-a9 2G \
 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
     retcode=$((${retcode} + $?))
@@ -628,8 +630,26 @@ runkernel integrator_defconfig integratorcp "" 128 \
 	busybox-armv4.cpio automatic devtmpfs integratorcp.dtb
 retcode=$((${retcode} + $?))
 
+runkernel aspeed_g4_defconfig palmetto-bmc "" 512 \
+	busybox-armv4.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
+retcode=$((${retcode} + $?))
+
 runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
+
+runkernel aspeed_g5_defconfig romulus-bmc "" 512 \
+	busybox-armv4.cpio automatic "" aspeed-bmc-opp-romulus.dtb
+retcode=$((${retcode} + $?))
+
+if [ ${runall} -eq 1 ]; then
+    # Generates runtime warning "sunxi_musb_ep_offset called with non 0 offset"
+    # which may be caused by qemu. The call originates from ep_config_from_hw(),
+    # which calls musb_read_fifosize(), which in turn calls the function
+    # with parameter MUSB_FIFOSIZE=0x0f.
+    runkernel sunxi_defconfig cubieboard "" 128 \
+	core-image-minimal-qemuarm.cpio manual "" sun4i-a10-cubieboard.dtb
+    retcode=$((${retcode} + $?))
+fi
 
 exit ${retcode}
