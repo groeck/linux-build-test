@@ -243,7 +243,7 @@ runkernel()
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	dosetup ${ARCH} ${PREFIX} ${rootfs} ${defconfig} "" ${fixup}
+	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then
@@ -364,7 +364,7 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "sabrelite" )
+    "sabrelite" | "mcimx7d-sabre" )
 	${QEMU} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
@@ -487,6 +487,10 @@ retcode=$((${retcode} + $?))
 runkernel multi_v7_defconfig sabrelite "" 256 \
 	core-image-minimal-qemuarm.cpio manual "" imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
+
+# runkernel multi_v7_defconfig mcimx7d-sabre "" 256 \
+# 	core-image-minimal-qemuarm.cpio manual "" imx7d-sdb.dtb
+# retcode=$((${retcode} + $?))
 
 runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
