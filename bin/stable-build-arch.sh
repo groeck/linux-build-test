@@ -65,6 +65,9 @@ configcmd="olddefconfig"
 # Older releases don't like gcc 6+
 case ${rel} in
 v3.16|v3.18)
+	# Various errors and warnings with more recent compilers
+	# (including gcc 7.3.0)
+	PATH_ALPHA=/opt/kernel/gcc-5.5.0-nolibc/alpha-linux/bin
 	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
 	# ppc needs old compiler up to and including v3.18
@@ -72,11 +75,16 @@ v3.16|v3.18)
 	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 	PREFIX_PPC="powerpc64-poky-linux-"
 	# sh4 supports recent compilers only starting with v4.4
-	# (see commit 940d4113f330)
+	# (see commit 940d4113f330). Note that we can't use the kernel.org
+	# toolchain for gcc 5.5.0 either; it results in "'-m4-nofpu' is not
+	# supported ...".
 	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	# sparc images prior to v4.4 don't build with recent versions of gcc
+	# sparc images prior to v4.9 don't build with recent versions of gcc
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+	PATH_SPARC=/opt/kernel/gcc-5.5.0-nolibc/sparc64-linux/bin
+	;;
+v4.4)
+	PATH_SPARC=/opt/kernel/gcc-5.5.0-nolibc/sparc64-linux/bin
 	;;
 *)
 	;;
