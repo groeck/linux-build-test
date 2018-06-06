@@ -47,7 +47,9 @@ skip_318="arm:mainstone:mainstone_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_44="arm:realview-pbx-a9:realview_defconfig"
-skip_49="arm:ast2500-evb:aspeed_g5_defconfig"
+skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
+	arm:romulus-bmc:aspeed_g5_defconfig \
+	arm:palmetto-bmc:aspeed_g4_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
