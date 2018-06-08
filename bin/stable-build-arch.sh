@@ -74,12 +74,14 @@ v3.16|v3.18)
 	# (see commit c2ce6f9f3dc0)
 	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 	PREFIX_PPC="powerpc64-poky-linux-"
+	PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
+	PREFIX_S390="s390x-linux-"
 	# sh4 supports recent compilers only starting with v4.4
 	# (see commit 940d4113f330). Note that we can't use the kernel.org
 	# toolchain for gcc 5.5.0 either; it results in "'-m4-nofpu' is not
 	# supported ...".
-	# PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	PATH_SH4=/opt/kernel/gcc-6.4.0-nolibc/sh4-linux/bin
+	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	# PATH_SH4=/opt/kernel/gcc-6.4.0-nolibc/sh4-linux/bin
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
