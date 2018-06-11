@@ -1,2 +1,3 @@
-isapc fails to run for SMP configurations.
-IDE would need to be enabled, but then there are interrupt timeouts.
+isapc fails to run for both SMP and non-SMP configurations.
+CONFIG_IDE would need to be enabled to be able to use it, but then there
+are interrupt timeouts.

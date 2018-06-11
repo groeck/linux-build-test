@@ -9,7 +9,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
-ARCH=x86
+ARCH=i386
 
 # Older releases don't like gcc 6+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
@@ -26,20 +26,38 @@ esac
 
 PATH=${PATH_X86}:${PATH}
 
-cached_defconfig=""
+cached_config=""
+
+patch_defconfig()
+{
+    local defconfig=$1
+    local fixup=$2
+
+    if [[ "${fixup}" = "nosmp" ]]; then
+	sed -i -e '/CONFIG_SMP/d' ${defconfig}
+    fi
+}
 
 runkernel()
 {
     local defconfig=$1
-    local cpu=$2
-    local mach=$3
+    local fixup=$2
+    local cpu=$3
+    local mach=$4
+    local rootfs=$5
     local drive
     local pid
     local retcode
-    local rootfs=rootfs.ext2
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
-    local build="${ARCH}:${cpu}:${mach}:${defconfig}"
+    local build="${ARCH}:${cpu}:${mach}:${defconfig}:${fixup}"
+    local config="${defconfig}:${fixup}"
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
     if [ -n "${_cpu}" -a "${_cpu}" != "${cpu}" ]
         then
@@ -61,41 +79,32 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if [ "${cached_defconfig}" != "${defconfig}" ]
+    if [ "${cached_config}" != "${config}" ]
     then
-	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig}
+	dosetup "${ARCH}" "${PREFIX}" "" "${rootfs}" "${defconfig}" "" "${fixup}"
 	if [ $? -ne 0 ]
 	then
 	    return 1
 	fi
-	cached_defconfig=${defconfig}
+	cached_config=${config}
+    else
+	setup_rootfs "${rootfs}" ""
     fi
 
     echo -n "running ..."
 
-    case "${mach}" in
-    pc)
-	drive=hda
-	usb="-usb -device usb-wacom-tablet"
-	;;
-    q35)
-	drive=sda
-	usb="-usb -device usb-wacom-tablet"
-	;;
-    isapc)
-	drive=hda
-	usb=""
-	;;
-    *)
-        echo "failed (unsupported machine type ${mach})"
-	return 1
-	;;
-    esac
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+    else
+	initcli="root=/dev/sda rw"
+	diskcmd="-drive file=${rootfs},if=ide,format=raw"
+    fi
 
     ${QEMU} -kernel arch/x86/boot/bzImage \
-	-M ${mach} -cpu ${cpu} ${usb} -no-reboot -m 256 \
-	-drive file=${rootfs},format=raw,if=ide \
-	--append "root=/dev/${drive} rw mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
+	-M ${mach} -cpu ${cpu} -usb -no-reboot -m 256 \
+	${diskcmd} \
+	--append "${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
@@ -108,25 +117,29 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_x86_pc_defconfig Broadwell q35
+runkernel defconfig smp Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_defconfig Skylake-Client q35
+runkernel defconfig smp Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_defconfig SandyBridge q35
+runkernel defconfig smp SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_defconfig Haswell pc
+runkernel defconfig smp Haswell pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_defconfig Nehalem q35
+runkernel defconfig smp Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_defconfig phenom pc
+runkernel defconfig smp phenom pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_nosmp_defconfig core2duo q35
+runkernel defconfig smp Opteron_G5 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_nosmp_defconfig Conroe isapc
+runkernel defconfig smp Westmere q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_nosmp_defconfig Opteron_G1 pc
+runkernel defconfig nosmp core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel qemu_x86_pc_nosmp_defconfig n270 isapc
+runkernel defconfig nosmp Conroe pc rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig nosmp Opteron_G1 pc rootfs.cpio
+retcode=$((${retcode} + $?))
+runkernel defconfig nosmp n270 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
