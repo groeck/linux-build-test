@@ -144,7 +144,7 @@ runkernel defconfig smp EPYC-IBPB q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Skylake-Client q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Skylake-Server q35 rootfs.cpio
+runkernel defconfig smp Opteron_G3 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp Opteron_G4 pc rootfs.ext2
 retcode=$((${retcode} + $?))
