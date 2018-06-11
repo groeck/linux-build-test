@@ -110,7 +110,7 @@ runkernel()
 	fi
     done
 
-    if [ "${cached_build}" != "${buildconfig}" ]; then
+    if [ "${cached_config}" != "${buildconfig}" ]; then
 	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -ne 0 ]; then
@@ -119,7 +119,7 @@ runkernel()
 	    fi
 	    return 1
 	fi
-	cached_build="${buildconfig}"
+	cached_config="${buildconfig}"
     else
 	setup_rootfs "${rootfs}" ""
     fi
