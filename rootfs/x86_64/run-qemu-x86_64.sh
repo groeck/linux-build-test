@@ -36,7 +36,7 @@ runkernel()
     local drive
     local pid
     local retcode
-    local rootfs=core-image-minimal-qemux86-64.ext3
+    local rootfs=rootfs.ext2
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}"
