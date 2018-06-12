@@ -25,9 +25,9 @@ machine=$1
 config=$2
 devtree=$3
 
-PREFIX=arm-poky-linux-gnueabi-
+PREFIX="arm-linux-gnueabi-"
 ARCH=arm
-PATH_ARM=/opt/poky/1.8/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi
+PATH_ARM="/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
