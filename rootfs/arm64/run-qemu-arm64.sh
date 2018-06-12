@@ -19,7 +19,7 @@ kernelrelease=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | s
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
-PATH_ARM64=/opt/kernel/aarch64/gcc-7.2.0/bin
+PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
 
 PATH=${PATH}:${PATH_ARM64}
 
