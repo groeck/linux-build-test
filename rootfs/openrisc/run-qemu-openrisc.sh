@@ -5,10 +5,10 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-or1k}
-PREFIX=or1k-linux-uclibc-
+PREFIX=or1k-linux-
 ARCH=openrisc
 rootfs=busybox-openrisc.cpio
-PATH_OR32=/opt/kernel/or1k/gcc-4.9.0/bin
+PATH_OR32=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
 
 PATH=${PATH_OR32}:${PATH}
 
