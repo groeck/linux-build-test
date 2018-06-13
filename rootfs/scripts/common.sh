@@ -3,7 +3,7 @@
 # Common variables used for waiting
 
 LOOPTIME=5	# Wait time before checking status
-MAXTIME=120	# Maximum wait time for qemu session to complete
+MAXTIME=150	# Maximum wait time for qemu session to complete
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
