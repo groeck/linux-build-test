@@ -13,7 +13,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc64}
 PREFIX=sparc64-linux-
 ARCH=sparc64
 rootfs=simple-root-filesystem-sparc.ext3
-PATH_SPARC=/opt/kernel/gcc-4.9.0-nolibc/sparc64-linux/bin
+PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
 
