@@ -15,6 +15,7 @@ fi
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 # Failures seen with qemu v2.9:
 # arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
 # arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
@@ -44,8 +45,9 @@ skip_318="arm:mainstone:mainstone_defconfig \
 skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
+	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:romulus-bmc:aspeed_g5_defconfig \
-	arm:palmetto-bmc:aspeed_g4_defconfig"
+	arm:witherspoon-bmc:aspeed_g5_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
@@ -412,8 +414,8 @@ runkernel()
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc")
-	${QEMU} -M ${mach} \
+    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
+	${QEMU_MASTER} -M ${mach} \
 		-nodefaults -nographic -serial stdio -monitor none \
 		-kernel arch/arm/boot/zImage -no-reboot \
 		${dtbcmd} \
@@ -616,6 +618,10 @@ retcode=$((${retcode} + $?))
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
+retcode=$((${retcode} + $?))
+
+runkernel aspeed_g5_defconfig witherspoon-bmc "" 512 \
+	busybox-armv4.cpio automatic "" aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 
 runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
