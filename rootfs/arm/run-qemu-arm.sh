@@ -33,13 +33,6 @@ PATH=${PATH_ARM}:${PATH}
 
 progdir=$(cd $(dirname $0); pwd)
 
-# multi_v7_defconfig only exists starting with v3.10.
-# versatileab/versatilepb need different binaries prior to 3.14.
-# beagle in 3.14 dumps a warning message to the console.
-# imx25-pdk passes reliably starting with 3.12. 3.10 would require
-# a patch (8bba8303b059, "ARM: imx_v4_v5_defconfig: Select
-# CONFIG_MACH_IMX25_DT") to be applied.
-
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
