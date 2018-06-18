@@ -41,12 +41,15 @@ progdir=$(cd $(dirname $0); pwd)
 # CONFIG_MACH_IMX25_DT") to be applied.
 
 skip_316="arm:mainstone:mainstone_defconfig \
+	arm:raspi2:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
+	arm:raspi2:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
-skip_44="arm:realview-pbx-a9:realview_defconfig"
+skip_44="arm:raspi2:multi_v7_defconfig \
+	arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
 	arm:romulus-bmc:aspeed_g5_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig"
@@ -59,13 +62,6 @@ patch_defconfig()
 {
     local defconfig=$1
     local fixup=$2
-
-    # explicitly disable HW random generator for raspi2
-    # (results in runtime hangup).
-    if [ "${fixup}" = "raspi2" ]
-    then
-	sed -i -e '/CONFIG_HW_RANDOM/d' ${defconfig}
-    fi
 
     # explicitly disable fdt for some tests
     if [ "${fixup}" = "nofdt" ]
@@ -334,6 +330,7 @@ runkernel()
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -d unimp,guest_errors \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
 	    -monitor null -nographic ${dtbcmd} \
@@ -520,17 +517,9 @@ runkernel multi_v7_defconfig cubieboard "" 128 \
 	core-image-minimal-qemuarm.cpio manual "" sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 
-# Disabled by default for now due to warnings from uart driver (qemu 2.6
-# to 2.12). The underlying problem is that cprman is not implemented in qemu.
-# The uart clock is derived from it, and reports a clock rate of 0.
-# With upstream kernel v4.17 and qemu v2.12, the emulation crashes with
-# a "Division by zero" error in bcm2835_probe().
-
-if [ ${runall} -eq 1 ]; then
-    runkernel multi_v7_defconfig raspi2 "" "" \
-	core-image-minimal-qemuarm.ext3 manual raspi2 bcm2836-rpi-2-b.dtb
-    retcode=$((${retcode} + $?))
-fi
+runkernel multi_v7_defconfig raspi2 "" "" \
+	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
+retcode=$((${retcode} + $?))
 
 # highbank boots with updated qemu, but generates warnings to the console
 # due to ignored SMC calls.
