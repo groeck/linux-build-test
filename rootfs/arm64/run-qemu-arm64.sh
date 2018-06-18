@@ -158,12 +158,12 @@ runkernel()
 	waitflag="manual"
 	;;
     "raspi3")
-	${QEMU} -M ${mach} \
+	${QEMU} -M ${mach} -m 1024 \
 	    -kernel arch/arm64/boot/Image -no-reboot \
-	    --append "${initcli} console=ttyAMA0,115200" \
+	    --append "${initcli} console=ttyS1,115200" \
 	    ${diskcmd} \
 	    ${dtbcmd} \
-	    -nographic -monitor null -serial stdio \
+	    -nographic -monitor null -serial null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
 	waitflag="manual"
@@ -199,9 +199,14 @@ retcode=$((${retcode} + $?))
 runkernel xlnx-zcu102 defconfig smp rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
 
+runkernel raspi3 defconfig smp rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+retcode=$((${retcode} + $?))
+
 if [ ${runall} -eq 1 ]; then
-    runkernel raspi3 defconfig smp rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
-    retcode=$((${retcode} + $?))
+    # Crashes in mmc access
+    # sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware interrupt.
+    # possibly due to missing clock subsystem implementation or due to
+    # bad clock frequencies.
     runkernel raspi3 defconfig smp rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((${retcode} + $?))
 fi
