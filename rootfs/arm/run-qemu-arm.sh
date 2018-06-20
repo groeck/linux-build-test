@@ -48,6 +48,7 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:romulus-bmc:aspeed_g5_defconfig \
 	arm:witherspoon-bmc:aspeed_g5_defconfig"
+skip_414="arm:witherspoon-bmc:aspeed_g5_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
