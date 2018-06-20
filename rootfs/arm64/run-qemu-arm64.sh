@@ -25,23 +25,27 @@ PATH=${PATH}:${PATH_ARM64}
 
 # Xilinx boards don't work on v3.x kernels
 # Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx)
-skip_316="xlnx-zcu102:smp:defconfig:initrd \
+skip_316="raspi3:smp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:initrd \
 	xlnx-zcu102:nosmp:defconfig:initrd \
 	xlnx-zcu102:smp:defconfig:rootfs \
 	xlnx-zcu102:nosmp:defconfig:rootfs \
 	virt:smp:defconfig:rootfs \
 	virt:nosmp:defconfig:rootfs"
-skip_318="xlnx-zcu102:smp:defconfig:initrd \
+skip_318="raspi3:smp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:initrd \
 	xlnx-zcu102:nosmp:defconfig:initrd \
 	xlnx-zcu102:smp:defconfig:rootfs \
 	xlnx-zcu102:nosmp:defconfig:rootfs \
 	virt:smp:defconfig:rootfs \
 	virt:nosmp:defconfig:rootfs"
-skip_44="virt:smp:defconfig:rootfs \
+skip_44="raspi3:smp:defconfig:initrd \
+	virt:smp:defconfig:rootfs \
 	virt:nosmp:defconfig:rootfs \
 	xlnx-zcu102:smp:defconfig:rootfs \
 	xlnx-zcu102:nosmp:defconfig:rootfs"
-skip_49="xlnx-zcu102:smp:defconfig:rootfs \
+skip_49="raspi3:smp:defconfig:initrd \
+	xlnx-zcu102:smp:defconfig:rootfs \
 	xlnx-zcu102:nosmp:defconfig:rootfs"
 
 patch_defconfig()
