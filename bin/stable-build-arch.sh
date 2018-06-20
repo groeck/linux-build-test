@@ -411,8 +411,19 @@ do
 	    if [ $? -ne 0 ]; then
 		echo "failed (config) - skipping"
 	    else
-		make ARCH=${ARCH} O=${BUILDDIR} ${cmd[$i]} >/dev/null 2>/tmp/buildlog.$$
-		if [ $? -ne 0 ]; then
+		case ${rel} in
+		    "v3.16"|"v3.18")
+			cd "${cmd[$i]}"
+			make ARCH=${ARCH} O="${BUILDDIR}" >/dev/null 2>/tmp/buildlog.$$
+			rv=$?
+			cd ../..
+			;;
+		    *)
+			make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>/tmp/buildlog.$$
+			rv=$?
+			;;
+		esac
+		if [ ${rv} -ne 0 ]; then
 		    echo "failed"
 		    echo "--------------"
 		    echo "Error log:"
