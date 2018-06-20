@@ -124,6 +124,16 @@ then
     checkexit $?
 fi
 
+if [ -z "$1" -o "$1" = "an385" ]
+then
+    dobuild master-local-an385 master-an385 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=arm-softmmu"
+    checkexit $?
+fi
+
 if [ -z "$1" -o "$1" = "riscv" ]
 then
     dobuild v3.0.0-local-riscv v3.0-riscv \
