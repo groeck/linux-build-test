@@ -1,8 +1,8 @@
 #!/bin/bash
 
-dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
-. ${dir}/../scripts/common.sh
+progdir=$(cd $(dirname $0); pwd)
+. ${progdir}/../scripts/config.sh
+. ${progdir}/../scripts/common.sh
 
 runall=0
 if [ "$1" = "-a" ]
@@ -26,13 +26,16 @@ machine=$1
 config=$2
 devtree=$3
 
-PREFIX="arm-linux-gnueabi-"
 ARCH=arm
+
+PREFIX="arm-linux-gnueabi-"
+PREFIX_M3="arm-linux-"
+
 PATH_ARM="/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin"
+# Cortex-M3 (thumb) needs binutils 2.28 or earlier
+PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
-PATH=${PATH_ARM}:${PATH}
-
-progdir=$(cd $(dirname $0); pwd)
+PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:raspi2:multi_v7_defconfig \
@@ -144,7 +147,7 @@ patch_defconfig()
     # imx25 and realview need initrd support
 
     if [ "${fixup}" = "imx25" -o "${fixup}" = "realview_eb" -o \
-	 "${fixup}" = "realview_pb" ]
+	 "${fixup}" = "realview_pb" -o "${fixup}" = "initrd" ]
     then
 	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
 	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
@@ -198,8 +201,13 @@ runkernel()
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s
-    local build=${ARCH}:${mach}:${defconfig}
-    local pbuild=${build}
+    local prefix="${PREFIX}"
+    local build="${ARCH}:${mach}:${defconfig}"
+    local pbuild="${build}"
+
+    if [[ "${cpu}" == "cortex-m3" ]]; then
+	prefix="${PREFIX_M3}"
+    fi
 
     if [ -n "${ddtb}" ]
     then
@@ -237,7 +245,7 @@ runkernel()
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	dosetup ${ARCH} ${prefix} "" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then
@@ -277,6 +285,16 @@ runkernel()
     fi
 
     case ${mach} in
+    "mps2-an385")
+	${QEMU_MASTER} -M ${mach} \
+	    -bios "${progdir}/mps2-boot.axf" \
+	    -kernel vmlinux \
+	    -initrd ${rootfs} \
+	    ${dtbcmd} \
+	    -nographic -monitor null -serial stdio \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	;;
     "raspi2")
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -631,6 +649,10 @@ retcode=$((${retcode} + $?))
 
 runkernel aspeed_g5_defconfig romulus-bmc "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-bmc-opp-romulus.dtb
+retcode=$((${retcode} + $?))
+
+runkernel mps2_defconfig "mps2-an385" "cortex-m3" "" \
+	rootfs-arm-m3.cpio manual initrd mps2-an385.dtb
 retcode=$((${retcode} + $?))
 
 if [ ${runall} -eq 1 ]; then
