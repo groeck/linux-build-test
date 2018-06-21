@@ -163,5 +163,7 @@ runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig smpdev bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" busybox-ppc.cpio vmlinux
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
