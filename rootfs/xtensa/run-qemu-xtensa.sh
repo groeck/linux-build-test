@@ -56,8 +56,8 @@ patch_defconfig()
 runkernel()
 {
     local defconfig=$1
-    local dts="$2.dts"
-    local dtb="$2.dtb"
+    local dts="arch/xtensa/boot/dts/$2.dts"
+    local dtb="arch/xtensa/boot/dts/$2.dtb"
     local cpu=$3
     local mach=$4
     local mem=$5
@@ -83,11 +83,11 @@ runkernel()
     fi
 
     case "${mach}" in
-    lx60|kc705|ml605)
+    "lx60"|"kc705"|"ml605")
 	PATH=${PATH_XTENSA}:${PATH}
 	cmdline="earlycon=uart8250,mmio32,0xfd050020,115200n8"
 	;;
-    kc705-nommu)
+    "kc705-nommu")
 	PATH=${PATH}:${PATH_XTENSA_DE212}
 	cmdline="earlycon=uart8250,mmio32,0x9d050020,115200n8 \
 		memmap=256M@0x60000000"
@@ -111,9 +111,7 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
-    if [ -n "${dts}" -a -e "arch/xtensa/boot/dts/${dts}" ]
-    then
-	dts="arch/xtensa/boot/dts/${dts}"
+    if [ -e "${dts}" ]; then
 	dtbcmd="-dtb ${dtb}"
 	if [ ! -e "${dtb}" ]; then
 	    dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
