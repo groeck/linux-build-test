@@ -58,19 +58,10 @@ setup_rootfs()
     fi
 }
 
-# Automatically determine if dynamic root file system
-# setup is supported.
-
-setup_rootfs_auto()
-{
-    setup_rootfs "$1" "$(echo $1 | grep cpio)"
-}
-
 setup_config()
 {
-    local ARCH=$1
-    local defconfig=$2
-    local fixup=$3
+    local defconfig=$1
+    local fixup=$2
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
     local progdir=$(cd $(dirname $0); pwd)
     local arch
@@ -137,7 +128,19 @@ dosetup()
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s
-    local build=${ARCH}:${defconfig}
+    local build="${ARCH}:${defconfig}"
+
+    while getopts de:f: opt
+    do
+        case ${opt} in
+	d) dynamic="yes";;
+	e) EXTRAS="${OPTARG}";;
+	f) fixup="${OPTARG}";;
+	*) ;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
 
     for s in ${skip[*]}
     do
@@ -150,7 +153,7 @@ dosetup()
 
     doclean ${ARCH}
 
-    setup_config ${ARCH} ${defconfig} ${fixup}
+    setup_config "${defconfig}" "${fixup}"
     rv=$?
     if [ ${rv} -ne 0 ]
     then
