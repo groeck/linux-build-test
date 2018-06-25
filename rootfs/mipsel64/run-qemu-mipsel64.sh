@@ -79,9 +79,6 @@ runkernel()
     local build="mipsel64:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup}"
     local wait="automatic"
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-    local tmp="skip_${rel}"
-    local skip=(${!tmp})
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -103,15 +100,8 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    for s in ${skip[*]}; do
-	if [ "$s" = "${build}" ]; then
-	    echo "skipped"
-	    return 0
-	fi
-    done
-
     if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -b "${build}" -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -ne 0 ]; then
 	    if [ ${retcode} -eq 2 ]; then
