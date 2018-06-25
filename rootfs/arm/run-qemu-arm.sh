@@ -197,9 +197,6 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-    local tmp="skip_${rel}"
-    local skip=(${!tmp})
     local s
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}"
@@ -234,18 +231,9 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    for s in ${skip[*]}
-    do
-	if [ "$s" = "${build}" ]
-	then
-	    echo "skipped"
-	    return 0
-	fi
-    done
-
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -b "${build}" -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then
