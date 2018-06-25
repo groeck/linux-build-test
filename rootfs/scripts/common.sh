@@ -44,15 +44,26 @@ doclean()
 
 setup_rootfs()
 {
-    local rootfs=$1
-    local dynamic=$2
+    local dynamic=""
     local progdir=$(cd $(dirname $0); pwd)
+
+    while getopts d opt
+    do
+	case ${opt} in
+	d) dynamic="yes";;
+	*) ;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    local rootfs=$1
 
     if [ -n "${rootfs}" ]
     then
 	if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
 	    fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
-        else
+	else
 	    cp ${progdir}/${rootfs} .
 	fi
     fi
@@ -130,8 +141,8 @@ dosetup()
 
     while getopts b:de:f: opt
     do
-        case ${opt} in
-	d) dynamic="yes";;
+	case ${opt} in
+	d) dynamic="-d";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
 	b) build="${OPTARG}";;
@@ -168,7 +179,7 @@ dosetup()
 	return ${rv}
     fi
 
-    setup_rootfs "${rootfs}" "${dynamic}"
+    setup_rootfs ${dynamic} "${rootfs}"
 
     make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
     retcode=$?

@@ -88,7 +88,7 @@ runkernel()
 	fi
 	cached_config=${config}
     else
-	setup_rootfs "${rootfs}" ""
+	setup_rootfs "${rootfs}"
     fi
 
     echo -n "running ..."
