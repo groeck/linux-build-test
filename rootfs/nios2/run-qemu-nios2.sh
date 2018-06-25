@@ -59,7 +59,7 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    dosetup ${rootfs} ${defconfig} "" fixup
+    dosetup -f fixup "${rootfs}" "${defconfig}"
     retcode=$?
     if [ ${retcode} -ne 0 ]
     then

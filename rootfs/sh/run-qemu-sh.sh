@@ -33,7 +33,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${rootfs} ${defconfig} "" fixup
+    dosetup -f fixup "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]
     then
 	return 1

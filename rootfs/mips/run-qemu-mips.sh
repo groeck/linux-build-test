@@ -70,7 +70,7 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    dosetup ${rootfs} ${defconfig} "" ${fixup}
+    dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]
     then
 	return 1

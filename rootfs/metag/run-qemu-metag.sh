@@ -40,7 +40,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${rootfs} ${defconfig} "" fixup
+    dosetup -f fixup "${rootfs}" "${defconfig}"
     retcode=$?
     if [ ${retcode} -eq 2 ]
     then

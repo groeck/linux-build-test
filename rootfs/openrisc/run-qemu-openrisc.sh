@@ -44,7 +44,7 @@ runkernel()
     then
         sed -i -e 's/elf32-or32/elf32-or1k/g' arch/openrisc/kernel/vmlinux.lds.S
     fi
-    dosetup ${rootfs} ${defconfig} "" fixup
+    dosetup -f fixup "${rootfs}" "${defconfig}"
     retcode=$?
     if [ ${fixup} -ne 0 ]
     then

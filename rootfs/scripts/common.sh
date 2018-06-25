@@ -100,7 +100,7 @@ setup_config()
 
     if [ -n "${fixup}" ]
     then
-	patch_defconfig .config ${fixup}
+	patch_defconfig .config "${fixup}"
 	target="olddefconfig"
 	if [[ "${rel}" = "v3.16" ]]; then
 	    target="oldconfig"
@@ -116,10 +116,6 @@ setup_config()
 
 dosetup()
 {
-    local rootfs=$1
-    local defconfig=$2
-    local dynamic=$3
-    local fixup=$4
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
     local tmprootfs=/tmp/rootfs.$$
@@ -128,8 +124,9 @@ dosetup()
     local skip=(${!tmp})
     local s
     local build="${ARCH}:${defconfig}"
+    local EXTRAS=""
+    local fixup=""
 
-    EXTRAS=""
     while getopts de:f: opt
     do
         case ${opt} in
@@ -141,6 +138,10 @@ dosetup()
     done
 
     shift $(($OPTIND - 1))
+
+    local rootfs=$1
+    local defconfig=$2
+    local dynamic=$3
 
     for s in ${skip[*]}
     do
