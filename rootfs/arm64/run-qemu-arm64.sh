@@ -14,8 +14,6 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-kernelrelease=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -76,8 +74,6 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${fixup}:${defconfig}"
-    local tmp="skip_${kernelrelease}"
-    local skip=(${!tmp})
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -108,16 +104,8 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    for s in ${skip[*]}
-    do
-	if [ "$s" = "${build}" ]; then
-	    echo "skipped"
-	    return 0
-	fi
-    done
-
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -b "${build}" -d -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -eq 2 ]; then
 	    return 0
