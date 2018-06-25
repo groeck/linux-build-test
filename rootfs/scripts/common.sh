@@ -128,12 +128,13 @@ dosetup()
     local fixup=""
     local dynamic=""
 
-    while getopts de:f: opt
+    while getopts b:de:f: opt
     do
         case ${opt} in
 	d) dynamic="yes";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
+	b) build="${OPTARG}";;
 	*) ;;
 	esac
     done
