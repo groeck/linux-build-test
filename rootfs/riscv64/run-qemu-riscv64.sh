@@ -47,7 +47,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}" dynamic
+	dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"
 	if [ $? -ne 0 ]; then
 	    return 1
 	fi

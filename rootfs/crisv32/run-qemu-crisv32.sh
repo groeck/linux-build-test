@@ -22,7 +22,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup ${rootfs} ${defconfig} dynamic
+    dosetup -d ${rootfs} ${defconfig}
     if [ $? -ne 0 ]
     then
 	return 1

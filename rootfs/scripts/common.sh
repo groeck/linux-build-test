@@ -126,6 +126,7 @@ dosetup()
     local build="${ARCH}:${defconfig}"
     local EXTRAS=""
     local fixup=""
+    local dynamic=""
 
     while getopts de:f: opt
     do
@@ -141,7 +142,6 @@ dosetup()
 
     local rootfs=$1
     local defconfig=$2
-    local dynamic=$3
 
     for s in ${skip[*]}
     do
