@@ -109,7 +109,7 @@ runkernel()
 
     if [ "${cached_defconfig}" != "${defconfig}:${cpu}" ]
     then
-        dosetup "" ${rootfs} ${defconfig} "" ${fixup}
+        dosetup ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
         if [ ${retcode} -ne 0 ]
         then

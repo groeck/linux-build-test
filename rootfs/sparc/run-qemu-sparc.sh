@@ -70,7 +70,7 @@ runkernel()
 
     if [ "${defconfig}_${smp}" != "${cached_defconfig}" ]
     then
-        dosetup "" ${rootfs} ${defconfig} "" ${smp}
+        dosetup ${rootfs} ${defconfig} "" ${smp}
         if [ $? -ne 0 ]
         then
 	    return 1

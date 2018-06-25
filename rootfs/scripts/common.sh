@@ -116,11 +116,10 @@ setup_config()
 
 dosetup()
 {
-    local EXTRAS=$1
-    local rootfs=$2
-    local defconfig=$3
-    local dynamic=$4
-    local fixup=$5
+    local rootfs=$1
+    local defconfig=$2
+    local dynamic=$3
+    local fixup=$4
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
     local tmprootfs=/tmp/rootfs.$$
@@ -130,6 +129,7 @@ dosetup()
     local s
     local build="${ARCH}:${defconfig}"
 
+    EXTRAS=""
     while getopts de:f: opt
     do
         case ${opt} in

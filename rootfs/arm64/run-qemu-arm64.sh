@@ -117,7 +117,7 @@ runkernel()
     done
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	dosetup "" ${rootfs} ${defconfig} generic ${fixup}
+	dosetup ${rootfs} ${defconfig} generic ${fixup}
 	retcode=$?
 	if [ ${retcode} -eq 2 ]; then
 	    return 0

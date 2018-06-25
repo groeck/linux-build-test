@@ -49,7 +49,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup "KALLSYMS_EXTRA_PASS=1" ${rootfs} ${defconfig} "" fixup
+	dosetup ${rootfs} ${defconfig} "" fixup
 	if [ $? -ne 0 ]; then
 	    return 1
 	fi
