@@ -26,8 +26,6 @@ PATH_XTENSA_TOOLS=/opt/buildbot/bin/xtensa
 
 PATH=${PATH_XTENSA_TOOLS}:${PATH}
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-
 cached_defconfig=""
 
 patch_defconfig()
@@ -71,8 +69,6 @@ runkernel()
     local fixup="${cpu}"
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local cmdline
-    local tmp="skip_${rel}"
-    local skip=(${!tmp})
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
     then
@@ -100,26 +96,19 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    for s in ${skip[*]}; do
-	if [ "$s" = "${pbuild}" ]; then
-	    echo "skipped"
-	    return 0
-	fi
-    done
-
     if [ "${cached_defconfig}" != "${defconfig}:${cpu}" ]
     then
-        dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -b "${pbuild}" -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
-        if [ ${retcode} -ne 0 ]
-        then
-	    if [ ${retcode} -eq 2 ]
-	    then
-	        return 0
+	if [ ${retcode} -ne 0 ]; then
+	    if [ ${retcode} -eq 2 ]; then
+		return 0
 	    fi
 	    return 1
-        fi
+	fi
 	cached_defconfig="${defconfig}:${cpu}"
+    else
+	setup_rootfs "${rootfs}"
     fi
 
     if [ -n "${dts}" -a -e "arch/xtensa/boot/dts/${dts}" ]
