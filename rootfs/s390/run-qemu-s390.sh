@@ -66,7 +66,7 @@ runkernel()
 		-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
     fi
 
-    ${QEMU} -kernel vmlinux \
+    ${QEMU} -kernel arch/s390/boot/bzImage \
         ${diskcmd} \
 	-append "${initcli} doreboot" \
 	-m 512 \
