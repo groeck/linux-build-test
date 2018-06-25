@@ -28,7 +28,7 @@ devtree=$3
 
 ARCH=arm
 
-PREFIX="arm-linux-gnueabi-"
+PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
 PATH_ARM="/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin"
@@ -201,12 +201,12 @@ runkernel()
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s
-    local prefix="${PREFIX}"
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}"
 
+    PREFIX="${PREFIX_A}"
     if [[ "${cpu}" == "cortex-m3" ]]; then
-	prefix="${PREFIX_M3}"
+	PREFIX="${PREFIX_M3}"
     fi
 
     if [ -n "${ddtb}" ]
@@ -245,7 +245,7 @@ runkernel()
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	dosetup ${ARCH} ${prefix} "" ${rootfs} ${defconfig} "" ${fixup}
+	dosetup "" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then

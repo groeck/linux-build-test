@@ -56,7 +56,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" fixup
+	dosetup "" ${rootfs} ${defconfig} "" fixup
 	if [ $? -ne 0 ]; then
 	    return 1
 	fi

@@ -81,7 +81,7 @@ runkernel()
 
     if [ "${cached_config}" != "${config}" ]
     then
-	dosetup "${ARCH}" "${PREFIX}" "" "${rootfs}" "${defconfig}" "" "${fixup}"
+	dosetup "" "${rootfs}" "${defconfig}" "" "${fixup}"
 	if [ $? -ne 0 ]
 	then
 	    return 1

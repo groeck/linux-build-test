@@ -108,7 +108,7 @@ runkernel()
     echo -n "Building ${msg} ... "
 
     if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup ${ARCH} ${PREFIX} "" ${rootfs} ${defconfig} "" ${fixup}
+	dosetup "" ${rootfs} ${defconfig} "" ${fixup}
 	retcode=$?
 	if [ ${retcode} -ne 0 ]; then
 	    if [ ${retcode} -eq 2 ]; then

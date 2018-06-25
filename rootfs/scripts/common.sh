@@ -125,13 +125,11 @@ setup_config()
 
 dosetup()
 {
-    local ARCH=$1
-    local PREFIX=$2
-    local EXTRAS=$3
-    local rootfs=$4
-    local defconfig=$5
-    local dynamic=$6
-    local fixup=$7
+    local EXTRAS=$1
+    local rootfs=$2
+    local defconfig=$3
+    local dynamic=$4
+    local fixup=$5
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
     local tmprootfs=/tmp/rootfs.$$
