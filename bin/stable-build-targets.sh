@@ -69,9 +69,6 @@ skip_44="cris:allnoconfig"
 
 # fixups
 
-# I40E/mips builds are broken in v4.16
-fixup_mips_416=("/CONFIG_I40E/d")
-
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
