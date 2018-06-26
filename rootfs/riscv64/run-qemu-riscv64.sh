@@ -56,6 +56,11 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip "${rootfs}"
+	rootfs="${rootfs%.gz}"
+    fi
+
     echo -n "running ..."
 
     ${QEMU} -M virt -m 512M -no-reboot \
@@ -81,7 +86,7 @@ echo
 retcode=0
 runkernel virt defconfig devtmpfs rootfs.cpio
 retcode=$((retcode + $?))
-runkernel virt defconfig devtmpfs rootfs.ext2
+runkernel virt defconfig devtmpfs rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
