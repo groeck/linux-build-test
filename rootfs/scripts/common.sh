@@ -44,9 +44,10 @@ doclean()
 
 setup_rootfs()
 {
-    local dynamic=""
     local progdir=$(cd $(dirname $0); pwd)
+    local dynamic=""
 
+    OPTIND=1
     while getopts d opt
     do
 	case ${opt} in
@@ -55,7 +56,7 @@ setup_rootfs()
 	esac
     done
 
-    shift $(($OPTIND - 1))
+    shift $((OPTIND - 1))
 
     local rootfs=$1
 
@@ -125,20 +126,35 @@ setup_config()
     return 0
 }
 
+checkskip()
+{
+    local build=$1
+    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+    local tmp="skip_${rel}"
+    local skip=(${!tmp})
+    local s
+
+    for s in ${skip[*]}; do
+        if [ "$s" = "${build}" ]; then
+	    echo "skipped"
+	    return 2
+	fi
+    done
+    return 0
+}
+
 dosetup()
 {
     local retcode
     local logfile=/tmp/qemu.setup.$$.log
     local tmprootfs=/tmp/rootfs.$$
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
-    local tmp="skip_${rel}"
-    local skip=(${!tmp})
-    local s
     local build="${ARCH}:${defconfig}"
     local EXTRAS=""
     local fixup=""
     local dynamic=""
 
+    OPTIND=1
     while getopts b:de:f: opt
     do
 	case ${opt} in
@@ -150,19 +166,14 @@ dosetup()
 	esac
     done
 
-    shift $(($OPTIND - 1))
+    shift $((OPTIND - 1))
 
     local rootfs=$1
     local defconfig=$2
 
-    for s in ${skip[*]}
-    do
-        if [ "$s" = "${build}" ]
-	then
-	    echo "skipped"
-	    return 2
-	fi
-    done
+    if ! checkskip "${build}"; then
+	return 2
+    fi
 
     doclean ${ARCH}
 

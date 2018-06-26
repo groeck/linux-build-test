@@ -231,9 +231,13 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
+
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]
     then
-	dosetup -b "${build}" -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -eq 2 ]
 	then
