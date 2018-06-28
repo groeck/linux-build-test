@@ -15,6 +15,8 @@ PATH=${PATH_MICROBLAZE}:${PATH}
 runkernel()
 {
     local defconfig=$1
+    local mach=$2
+    local console=$3
     local pid
     local retcode
     local waitlist=("Machine restart" "Boot successful" "Rebooting")
@@ -30,10 +32,10 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -M petalogix-s3adsp1800 \
+    ${QEMU} -M ${mach} \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "${rootfs}" \
-	-append "rdinit=/sbin/init console=ttyUL0,115200" \
+	-append "rdinit=/sbin/init console=${console},115200" \
 	-monitor none -nographic \
 	> ${logfile} 2>&1 &
 
@@ -48,6 +50,6 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_microblaze_defconfig
+runkernel qemu_microblaze_defconfig petalogix-s3adsp1800 ttyUL0
 
 exit $?
