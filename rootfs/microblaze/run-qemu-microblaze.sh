@@ -32,7 +32,9 @@ runkernel()
 
     ${QEMU} -M petalogix-s3adsp1800 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
-	-append "console=ttyUL0,115200" -nographic \
+	-initrd "${rootfs}" \
+	-append "rdinit=/sbin/init console=ttyUL0,115200" \
+	-monitor none -nographic \
 	> ${logfile} 2>&1 &
 
     pid=$!
