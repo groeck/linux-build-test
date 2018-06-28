@@ -32,11 +32,11 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -M ${mach} \
+    ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "${rootfs}" \
 	-append "rdinit=/sbin/init console=${console},115200" \
-	-monitor none -nographic \
+	-monitor none -serial stdio -nographic \
 	> ${logfile} 2>&1 &
 
     pid=$!
@@ -50,6 +50,10 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+retcode=0
 runkernel qemu_microblaze_defconfig petalogix-s3adsp1800 ttyUL0
+retcode=$((retcode + $?))
+runkernel qemu_microblaze_ml605_defconfig petalogix-ml605 ttyS0
+retcode=$((retcode + $?))
 
-exit $?
+exit ${retcode}
