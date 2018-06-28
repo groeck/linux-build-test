@@ -69,7 +69,7 @@ or
 
 then:
 make clean
-make PREFIX=/opt/buildbot install
+make INSTALL_PREFIX=/opt/buildbot install
 
 ---
 arc:
