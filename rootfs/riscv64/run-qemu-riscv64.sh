@@ -34,14 +34,14 @@ runkernel()
     local initcli
     local diskcmd
 
-    if [[ "${rootfs}" == *cpio ]]; then
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
 	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
+	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
 	initcli="root=/dev/vda rw"
-	diskcmd="-drive file=${rootfs},format=raw,id=hd0 -device virtio-blk-device,drive=hd0"
+	diskcmd="-drive file=${rootfs%.gz},format=raw,id=hd0 -device virtio-blk-device,drive=hd0"
     fi
 
     echo -n "Building ${build} ... "
@@ -57,7 +57,7 @@ runkernel()
     fi
 
     if [[ "${rootfs}" == *.gz ]]; then
-	gunzip "${rootfs}"
+	gunzip -f "${rootfs}"
 	rootfs="${rootfs%.gz}"
     fi
 
