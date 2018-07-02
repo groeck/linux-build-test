@@ -4,12 +4,14 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
 
 PREFIX=hppa-linux-
 ARCH=parisc
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
 PATH=${PATH}:${PATH_PARISC}
 
@@ -75,6 +77,7 @@ echo
 retcode=0
 runkernel defconfig rootfs.cpio.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig rootfs.ext2.gz
 retcode=$((retcode + $?))
 
