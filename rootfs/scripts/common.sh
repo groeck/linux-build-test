@@ -9,6 +9,28 @@ MAXTIME=150	# Maximum wait time for qemu session to complete
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
+checkstate()
+{
+    if [[ ${testbuild} != 0 && $1 != 0 ]]; then
+	exit $1
+    fi
+}
+
+# Parse arguments and set global flags.
+# The caller has to execute "shift $((OPTIND - 1).
+parse_args()
+{
+	testbuild=0
+	runall=0
+	while getopts at opt; do
+	case ${opt} in
+	a)	runall=1;;
+	t)	testbuild=1;;
+	*)	echo "Bad option ${opt}"; exit 1;;
+	esac
+	done
+}
+
 dokill()
 {
 	local pid=$1
