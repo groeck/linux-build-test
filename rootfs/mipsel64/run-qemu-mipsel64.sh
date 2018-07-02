@@ -101,7 +101,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     if ! checkskip "${build}"; then
-	return 2;
+	return 0;
     fi
 
     if [ "${cached_config}" != "${buildconfig}" ]; then
