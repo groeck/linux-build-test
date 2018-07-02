@@ -102,7 +102,7 @@ fi
 
 if [ -z "$1" -o "$1" = "v2.11" ]
 then
-    dobuild v2.11.1-local v2.11 \
+    dobuild v2.11.2-local v2.11 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough"
