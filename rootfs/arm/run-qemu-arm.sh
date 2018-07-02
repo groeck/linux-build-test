@@ -4,12 +4,8 @@ progdir=$(cd $(dirname $0); pwd)
 . ${progdir}/../scripts/config.sh
 . ${progdir}/../scripts/common.sh
 
-runall=0
-if [ "$1" = "-a" ]
-then
-    runall=1
-    shift
-fi
+parse_args "$@"
+shift $((OPTIND - 1))
 
 # Some zynq images fail to run with qemu v2.7
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
@@ -452,80 +448,101 @@ echo
 runkernel versatile_defconfig versatilepb-scsi "" 128 \
 	core-image-minimal-qemuarm.ext3 auto versatile versatile-pb.dtb
 retcode=$?
+checkstate ${retcode}
 
 runkernel versatile_defconfig versatileab "" 128 \
 	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-ab.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" 128 \
 	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-pb.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel vexpress_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto regulator vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel vexpress_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto regulator vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
 	core-image-minimal-qemuarm.cpio manual imx25 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig kzm "" 128 \
 	core-image-minimal-qemuarm.cpio manual imx6
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig sabrelite "" 256 \
 	core-image-minimal-qemuarm.cpio manual imx6 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig beagle "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig beaglexm "" 512 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle-xm.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig overo "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig sabrelite "" 256 \
 	core-image-minimal-qemuarm.cpio manual "" imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # runkernel multi_v7_defconfig mcimx7d-sabre "" 256 \
 # 	core-image-minimal-qemuarm.cpio manual "" imx7d-sdb.dtb
 # retcode=$((${retcode} + $?))
+# checkstate ${retcode}
 
 runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" 256 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc702.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zc706.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" zynq-zed.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" 128 \
 	core-image-minimal-qemuarm.cpio manual "" sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig raspi2 "" "" \
 	core-image-minimal-qemuarm.ext3 manual "" bcm2836-rpi-2-b.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # highbank boots with updated qemu, but generates warnings to the console
 # due to ignored SMC calls.
@@ -534,118 +551,147 @@ if [ ${runall} -eq 1 ]; then
     runkernel multi_v7_defconfig highbank cortex-a9 2G \
 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 runkernel multi_v7_defconfig midway "" 2G \
 	core-image-minimal-qemuarm.cpio auto devtmpfs ecx-2000.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel exynos_defconfig smdkc210 "" 128 \
 	core-image-minimal-qemuarm.cpio manual cpuidle exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel omap2plus_defconfig beagle "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel omap2plus_defconfig beaglexm "" 512 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle-xm.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel omap2plus_defconfig overo "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel realview_defconfig realview-pb-a8 "" 512 \
 	busybox-arm.cpio auto realview_pb arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel realview_defconfig realview-pbx-a9 "" "" \
 	busybox-arm.cpio auto realview_pb arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb cortex-a8 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb \
 	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
 	core-image-minimal-qemuarm.cpio manual realview_eb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel mainstone_defconfig mainstone "" "" \
 	core-image-minimal-qemuarm.cpio automatic pxa
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel spitz_defconfig akita "" "" \
 	core-image-minimal-qemuarm.cpio automatic pxa
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel spitz_defconfig spitz "" "" \
 	core-image-minimal-qemuarm.cpio automatic pxa
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig akita "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig borzoi "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig mainstone "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig spitz "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig tosa "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig z2 "" "" \
 	core-image-minimal-qemuarm.cpio automatic nofdt
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel collie_defconfig collie "" "" \
 	busybox-armv4.cpio manual collie
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel integrator_defconfig integratorcp "" 128 \
 	busybox-armv4.cpio automatic devtmpfs integratorcp.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig witherspoon-bmc "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" 512 \
 	busybox-armv4.cpio automatic "" aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel mps2_defconfig "mps2-an385" "cortex-m3" "" \
 	rootfs-arm-m3.cpio manual initrd mps2-an385.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
     # Generates runtime warning "sunxi_musb_ep_offset called with non 0 offset"
@@ -655,6 +701,7 @@ if [ ${runall} -eq 1 ]; then
     runkernel sunxi_defconfig cubieboard "" 128 \
 	core-image-minimal-qemuarm.cpio manual "" sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 exit ${retcode}
