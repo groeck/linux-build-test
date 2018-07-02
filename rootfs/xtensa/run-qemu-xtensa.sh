@@ -97,7 +97,7 @@ runkernel()
     echo -n "Building ${pbuild} ... "
 
     if ! checkskip "${pbuild}"; then
-	return 2;
+	return 0;
     fi
 
     if [ "${cached_defconfig}" != "${defconfig}:${cpu}" ]
