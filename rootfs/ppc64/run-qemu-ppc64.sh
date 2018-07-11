@@ -8,6 +8,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 mach=$1
 variant=$2
+boottype=$3
 
 # machine specific information
 # PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
@@ -78,14 +79,17 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local buildconfig="${machine}:${defconfig}:${fixup}"
-    local msg="${ARCH}:${machine}:${defconfig}"
+    local msg="${machine}:${defconfig}:${fixup}"
     local initcli
     local diskcmd
+    local _boottype
 
     if [[ "${rootfs}" == *cpio ]]; then
 	msg+=":initrd"
+	_boottype="initrd"
     else
 	msg+=":rootfs"
+	_boottype="rootfs"
     fi
 
     if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
@@ -102,6 +106,12 @@ runkernel()
     if [ -n "${variant}" -a "${fixup}" != "${variant}" ]
     then
 	echo "Skipping ${msg} ... "
+	return 0
+    fi
+
+    if [ -n "${boottype}" -a "${boottype}" != "${_boottype}" ]
+    then
+	echo "Skipping ${msg} ... [${boottype} ${_boottype}]"
 	return 0
     fi
 
