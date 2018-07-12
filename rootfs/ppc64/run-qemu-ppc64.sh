@@ -4,7 +4,7 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
+QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc64}
 
 mach=$1
 variant=$2
@@ -43,6 +43,11 @@ patch_defconfig()
     local fixup
 
     for fixup in ${fixups}; do
+	if [ "${fixup}" = "e5500" ]; then
+	    echo "CONFIG_E5500_CPU=y" >> ${defconfig}
+	    echo "CONFIG_PPC_QEMU_E500=y" >> ${defconfig}
+	fi
+
 	if [ "${fixup}" = "little" ]; then
 	    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
 	    sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
@@ -159,15 +164,27 @@ runkernel()
     else
 	local hddev="sda"
 	local iftype="scsi"
-	if [[ "${machine}" = "mac99" ]]; then
+	case "${machine}" in
+	mac99)
 	    iftype="ide"
 	    grep -q "CONFIG_IDE=y" .config >/dev/null 2>&1
 	    if [[ $? -eq 0 ]]; then
 		hddev="hda"
 	    fi
-	fi
+	    diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
+	    ;;
+	ppce500)
+	    # We need to instantiate network and Ethernet devices explicitly
+	    # for this machine.
+	    diskcmd="-device e1000e"
+	    diskcmd+=" -device lsi53c895a -device scsi-hd,drive=d0"
+	    diskcmd+=" -drive file=$(basename ${rootfs}),if=${iftype},format=raw,id=d0"
+	    ;;
+	*)
+	    diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
+	    ;;
+	esac
 	initcli="root=/dev/${hddev} rw"
-	diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
     fi
 
     mem=1G
@@ -205,10 +222,10 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig devtmpfs pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig devtmpfs:little pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
@@ -221,6 +238,12 @@ retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
 	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
+retcode=$((${retcode} + $?))
+runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.cpio.gz auto
+retcode=$((${retcode} + $?))
+runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel powernv_defconfig devtmpfs powernv POWER8 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
