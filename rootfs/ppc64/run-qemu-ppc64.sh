@@ -39,7 +39,13 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
-    if [ "${fixup}" = "devtmpfs" ]
+    if [ "${fixup}" = "devtmpfs_le" ]; then
+	sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+	sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
+	echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
+    fi
+
+    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "devtmpfs_le" ]
     then
 	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
 	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
@@ -79,10 +85,14 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local buildconfig="${machine}:${defconfig}:${fixup}"
-    local msg="${machine}:${defconfig}:${fixup}"
+    local msg="${machine}:${defconfig}"
     local initcli
     local diskcmd
     local _boottype
+
+    if [ -n "${fixup}" ]; then
+	msg+=":${fixup}"
+    fi
 
     if [[ "${rootfs}" == *cpio ]]; then
 	msg+=":initrd"
@@ -90,11 +100,6 @@ runkernel()
     else
 	msg+=":rootfs"
 	_boottype="rootfs"
-    fi
-
-    if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
-    then
-	msg="${msg}:${fixup}"
     fi
 
     if [ -n "${mach}" -a "${mach}" != "${machine}" ]
@@ -111,7 +116,7 @@ runkernel()
 
     if [ -n "${boottype}" -a "${boottype}" != "${_boottype}" ]
     then
-	echo "Skipping ${msg} ... [${boottype} ${_boottype}]"
+	echo "Skipping ${msg} ..."
 	return 0
     fi
 
@@ -192,6 +197,12 @@ runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 	rootfs.ext2 auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig devtmpfs_le pseries POWER8 hvc0 vmlinux \
+	rootfs-el.cpio auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig devtmpfs_le pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2 auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
