@@ -146,6 +146,8 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
+    rootfs=$(basename "${rootfs}")
+
     if [[ "${rootfs}" == *.gz ]]; then
 	gunzip -f "${rootfs}"
 	rootfs="${rootfs%.gz}"
@@ -160,7 +162,7 @@ runkernel()
 
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd $(basename ${rootfs})"
+	diskcmd="-initrd ${rootfs}"
     else
 	local hddev="sda"
 	local iftype="scsi"
@@ -171,17 +173,17 @@ runkernel()
 	    if [[ $? -eq 0 ]]; then
 		hddev="hda"
 	    fi
-	    diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
+	    diskcmd="-drive file=${rootfs},if=${iftype},format=raw"
 	    ;;
 	ppce500)
 	    # We need to instantiate network and Ethernet devices explicitly
 	    # for this machine.
 	    diskcmd="-device e1000e"
 	    diskcmd+=" -device lsi53c895a -device scsi-hd,drive=d0"
-	    diskcmd+=" -drive file=$(basename ${rootfs}),if=${iftype},format=raw,id=d0"
+	    diskcmd+=" -drive file=${rootfs},if=${iftype},format=raw,id=d0"
 	    ;;
 	*)
-	    diskcmd="-drive file=$(basename ${rootfs}),if=${iftype},format=raw"
+	    diskcmd="-drive file=${rootfs},if=${iftype},format=raw"
 	    ;;
 	esac
 	initcli="root=/dev/${hddev} rw"
@@ -233,11 +235,11 @@ runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
-	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
+	../ppc/rootfs.cpio.gz auto "dt_compatible=fsl,,P5020DS"
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
-	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
+	../ppc/rootfs.cpio.gz auto "dt_compatible=fsl,,P5020DS"
 retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto

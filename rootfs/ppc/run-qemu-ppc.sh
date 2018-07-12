@@ -26,13 +26,13 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	if [ "${fixup}" = "devtmpfs" ]; then
-            echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
 	fi
 	if [ "${fixup}" = "nosmp" ]; then
-            echo "CONFIG_SMP=n" >> ${defconfig}
+	    echo "CONFIG_SMP=n" >> ${defconfig}
 	fi
 	if [ "${fixup}" = "smp" ]; then
-            echo "CONFIG_SMP=y" >> ${defconfig}
+	    echo "CONFIG_SMP=y" >> ${defconfig}
 	fi
     done
 }
@@ -95,12 +95,18 @@ runkernel()
 	    return 1
 	fi
 	cached_defconfig="${defconfig}_${fixup}"
+    else
+	setup_rootfs "${rootfs}"
+    fi
+
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip -f "${rootfs}"
+	rootfs="${rootfs%.gz}"
     fi
 
     echo -n "running ..."
 
-    if [ "${rootfs}" = "core-image-minimal-qemuppc.ext3" ]
-    then
+    if [[ "${rootfs}" == *ext2 ]]; then
 	${QEMU} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
 	    -drive file=${rootfs},format=raw,if=ide \
 	    -usb -usbdevice wacom-tablet -no-reboot -m 128 \
@@ -133,27 +139,27 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 core-image-minimal-qemuppc.ext3 \
+runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 core-image-minimal-qemuppc.ext3 \
+runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc_book3s_defconfig smp mac99 G4 core-image-minimal-qemuppc.ext3 \
+runkernel qemu_ppc_book3s_defconfig smp mac99 G4 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" busybox-ppc.cpio \
+runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" rootfs.cpio.gz \
 	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "" mpc8544ds "" rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "" mpc8544ds "" rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
+runkernel 44x/bamboo_defconfig devtmpfs bamboo "" rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" busybox-ppc.cpio vmlinux
+runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" busybox-ppc.cpio vmlinux
+runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
