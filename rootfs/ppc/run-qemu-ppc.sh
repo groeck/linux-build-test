@@ -25,6 +25,11 @@ patch_defconfig()
     local fixup
 
     for fixup in ${fixups}; do
+	if [ "${fixup}" = "zilog" ]; then
+	    echo "CONFIG_SERIAL_PMACZILOG=y" >> ${defconfig}
+	    echo "CONFIG_SERIAL_PMACZILOG_TTYS=n" >> ${defconfig}
+	    echo "CONFIG_SERIAL_PMACZILOG_CONSOLE=y" >> ${defconfig}
+	fi
 	if [ "${fixup}" = "devtmpfs" ]; then
 	    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
 	fi
@@ -45,22 +50,27 @@ runkernel()
     local fixup=$2
     local mach=$3
     local cpu=$4
-    local rootfs=$5
-    local kernel=$6
-    local dts=$7
-    local dtb
+    local tty=$5
+    local rootfs=$6
+    local kernel=$7
+    local dts=$8
+    local dtbcmd=""
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local smp
-    local pbuild
+    local pbuild="${mach}:${defconfig}"
+    local diskcmd
+    local cli
 
     if [ -n "${fixup}" ]; then
-	smp=":${fixup}"
+	pbuild="${pbuild}:${fixup}"
     fi
-
-    pbuild="${ARCH}:${mach}${smp}:${defconfig}"
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
+	pbuild+=":rootfs"
+    else
+	pbuild+=":initrd"
+    fi
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
     then
@@ -106,26 +116,33 @@ runkernel()
 
     echo -n "running ..."
 
-    if [[ "${rootfs}" == *ext2 ]]; then
-	${QEMU} -kernel ${kernel} -M ${mach} -cpu ${cpu} \
-	    -drive file=${rootfs},format=raw,if=ide \
-	    -usb -usbdevice wacom-tablet -no-reboot -m 128 \
-	    --append "root=/dev/hda rw mem=128M console=ttyS0 console=tty doreboot" \
-	    -nographic > ${logfile} 2>&1 &
-    else
-	dtbcmd=""
-	if [ -n "${dts}" -a -e "${dts}" ]
-	then
-	    dtb=$(echo ${dts} | sed -e 's/\.dts/\.dtb/')
-	    dtbcmd="-dtb ${dtb}"
-	    dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
-	fi
-	${QEMU} -kernel ${kernel} -M ${mach} -no-reboot -m 256 \
-	    --append "rdinit=/sbin/init console=ttyS0 console=tty doreboot" \
-	    ${dtbcmd} -monitor none -nographic \
-	    -initrd ${rootfs} > ${logfile} 2>&1 &
+    if [[ -n "${cpu}" ]]; then
+	cpu="-cpu ${cpu}"
     fi
 
+    if [ -n "${dts}" -a -e "${dts}" ]; then
+	local dtb="${dts/.dts/.dtb}"
+	dtbcmd="-dtb ${dtb}"
+	dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
+    fi
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	diskcmd="-initrd ${rootfs}"
+	cli="rdinit=/sbin/init"
+    else
+	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	local rootdev="sda"
+	if grep -q "CONFIG_IDE=y" .config; then
+	    rootdev=hda
+	fi
+	cli="root=/dev/${rootdev} rw"
+    fi
+
+    ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
+	${diskcmd} \
+	${dtbcmd} \
+	--append "${cli} mem=256M console=${tty}" \
+	-monitor none -nographic > ${logfile} 2>&1 &
     pid=$!
 
     dowait ${pid} ${logfile} automatic waitlist[@]
@@ -139,27 +156,31 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc_book3s_defconfig smp mac99 G4 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig smp mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" rootfs.cpio.gz \
+runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" ttyS0 rootfs.cpio.gz \
 	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "" mpc8544ds "" rootfs.cpio.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "" mpc8544ds "" rootfs.cpio.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs bamboo "" rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig devtmpfs bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" rootfs.cpio.gz vmlinux
+runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig devtmpfs:zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig devtmpfs:zilog mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
