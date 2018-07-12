@@ -21,29 +21,20 @@ PATH=${PATH_PPC}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    # Enable DEVTMPFS, SMP as requested
-
-    if [ "${fixup}" = "devtmpfs" ]
-    then
-        sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-        echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    elif [ "${fixup}" = "nosmp" ]
-    then
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        echo "# CONFIG_SMP is not set" >> ${defconfig}
-    elif [ "${fixup}" = "smp" ]
-    then
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        echo "CONFIG_SMP=y" >> ${defconfig}
-    elif [ "${fixup}" = "smpdev" ]
-    then
-        sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-        echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-        sed -i -e '/CONFIG_SMP/d' ${defconfig}
-        echo "CONFIG_SMP=y" >> ${defconfig}
-    fi
+    for fixup in ${fixups}; do
+	if [ "${fixup}" = "devtmpfs" ]; then
+            echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	fi
+	if [ "${fixup}" = "nosmp" ]; then
+            echo "CONFIG_SMP=n" >> ${defconfig}
+	fi
+	if [ "${fixup}" = "smp" ]; then
+            echo "CONFIG_SMP=y" >> ${defconfig}
+	fi
+    done
 }
 
 cached_defconfig=""
@@ -65,8 +56,7 @@ runkernel()
     local smp
     local pbuild
 
-    if [ -n "${fixup}" -a "${fixup}" != "devtmpfs" ]
-    then
+    if [ -n "${fixup}" ]; then
 	smp=":${fixup}"
     fi
 
@@ -161,7 +151,7 @@ runkernel mpc85xx_smp_defconfig "" mpc8544ds "" busybox-ppc.cpio arch/powerpc/bo
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig devtmpfs bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig smpdev bamboo "" busybox-ppc.cpio vmlinux
+runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" busybox-ppc.cpio vmlinux
 retcode=$((${retcode} + $?))
