@@ -94,7 +94,7 @@ runkernel()
 	msg+=":${fixup}"
     fi
 
-    if [[ "${rootfs}" == *cpio ]]; then
+    if [[ "${rootfs%gz}" == *cpio ]]; then
 	msg+=":initrd"
 	_boottype="initrd"
     else
@@ -134,6 +134,11 @@ runkernel()
 	cached_config="${buildconfig}"
     else
 	setup_rootfs "${rootfs}"
+    fi
+
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip -f "${rootfs}"
+	rootfs="${rootfs%.gz}"
     fi
 
     echo -n "running ..."
@@ -184,25 +189,25 @@ echo "Build reference: $(git describe)"
 echo
 
 runkernel qemu_ppc64_book3s_defconfig nosmp mac99 ppc64 ttyS0 vmlinux \
-	rootfs.cpio manual
+	rootfs.cpio.gz manual
 retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
-	rootfs.cpio manual
+	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
-	rootfs.ext2 manual
+	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
-	rootfs.cpio auto
+	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
-	rootfs.ext2 auto
+runkernel pseries_defconfig devtmpfs pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig devtmpfs_le pseries POWER9 hvc0 vmlinux \
+	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs_le pseries POWER8 hvc0 vmlinux \
-	rootfs-el.cpio auto
-retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs_le pseries POWER8 hvc0 vmlinux \
-	rootfs-el.ext2 auto
+	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
@@ -213,7 +218,7 @@ runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
 	../ppc/busybox-ppc.cpio auto "dt_compatible=fsl,,P5020DS"
 retcode=$((${retcode} + $?))
 runkernel powernv_defconfig devtmpfs powernv POWER8 hvc0 \
-	arch/powerpc/boot/zImage.epapr rootfs-el.cpio manual
+	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
