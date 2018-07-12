@@ -11,7 +11,6 @@ variant=$2
 boottype=$3
 
 # machine specific information
-# PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
 ARCH=powerpc
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
@@ -31,40 +30,46 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_316="powerpc:powernv_defconfig"
-skip_318="powerpc:powernv_defconfig"
+skip_316="powernv:powernv_defconfig:devtmpfs \
+	pseries:pseries_defconfig:devtmpfs:little"
+skip_318="powernv:powernv_defconfig:devtmpfs \
+	pseries:pseries_defconfig:devtmpfs:little"
+skip_44="pseries:pseries_defconfig:devtmpfs:little"
 
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    if [ "${fixup}" = "devtmpfs_le" ]; then
-	sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
-	sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
-	echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
-    fi
+    for fixup in ${fixups}; do
+	if [ "${fixup}" = "little" ]; then
+	    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+	    sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
+	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
+	fi
 
-    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "devtmpfs_le" ]
-    then
-	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-    elif [ "${fixup}" = "nosmp" ]
-    then
-	sed -i -e '/CONFIG_SMP/d' ${defconfig}
-	echo "# CONFIG_SMP is not set" >> ${defconfig}
-    elif [ "${fixup}" = "smp4" ]
-    then
-	sed -i -e '/CONFIG_SMP/d' ${defconfig}
-	sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
-	echo "CONFIG_SMP=y" >> ${defconfig}
-	echo "CONFIG_NR_CPUS=4" >> ${defconfig}
-    elif [ "${fixup}" = "smp" ]
-    then
-	sed -i -e '/CONFIG_SMP/d' ${defconfig}
-	echo "CONFIG_SMP=y" >> ${defconfig}
-    fi
+	if [ "${fixup}" = "devtmpfs" ]; then
+	    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
+	    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+	    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+	fi
+
+	if [ "${fixup}" = "nosmp" ]; then
+	    sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	    echo "# CONFIG_SMP is not set" >> ${defconfig}
+	fi
+
+        if [ "${fixup}" = "cpu4" ]; then
+	    sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
+	    echo "CONFIG_NR_CPUS=4" >> ${defconfig}
+	fi
+
+        if [ "${fixup}" = "smp" ]; then
+	    sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	    echo "CONFIG_SMP=y" >> ${defconfig}
+        fi
+    done
 }
 
 cached_config=""
@@ -94,7 +99,7 @@ runkernel()
 	msg+=":${fixup}"
     fi
 
-    if [[ "${rootfs%gz}" == *cpio ]]; then
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	msg+=":initrd"
 	_boottype="initrd"
     else
@@ -123,7 +128,7 @@ runkernel()
     echo -n "Building ${msg} ... "
 
     if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -f "${fixup}" -b "${buildconfig}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -ne 0 ]; then
 	    if [ ${retcode} -eq 2 ]; then
@@ -191,22 +196,22 @@ echo
 runkernel qemu_ppc64_book3s_defconfig nosmp mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$?
-runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp4 mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs_le pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs_le pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
