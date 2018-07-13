@@ -30,11 +30,16 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_316="powernv:powernv_defconfig:devtmpfs \
-	pseries:pseries_defconfig:devtmpfs:little"
-skip_318="powernv:powernv_defconfig:devtmpfs \
-	pseries:pseries_defconfig:devtmpfs:little"
-skip_44="pseries:pseries_defconfig:devtmpfs:little"
+skip_316="powerpc:powernv:powernv_defconfig:devtmpfs:initrd \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:rootfs \
+	powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
+	powerpc:pseries:pseries_defconfig:devtmpfs:little:rootfs"
+skip_318="powerpc:powernv:powernv_defconfig:devtmpfs:initrd \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:rootfs \
+	powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
+	powerpc:pseries:pseries_defconfig:devtmpfs:little:rootfs"
+skip_44="powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
+	powerpc:pseries:pseries_defconfig:devtmpfs:little:rootfs"
 
 patch_defconfig()
 {
@@ -133,7 +138,7 @@ runkernel()
     echo -n "Building ${msg} ... "
 
     if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup -f "${fixup}" -b "${buildconfig}" "${rootfs}" "${defconfig}"
+	dosetup -f "${fixup}" -b "${msg}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -ne 0 ]; then
 	    if [ ${retcode} -eq 2 ]; then
@@ -143,6 +148,9 @@ runkernel()
 	fi
 	cached_config="${buildconfig}"
     else
+	if ! checkskip "${msg}"; then
+	    return 0
+	fi
 	setup_rootfs "${rootfs}"
     fi
 
