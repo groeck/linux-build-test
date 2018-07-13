@@ -71,6 +71,10 @@ skip_44="cris:allnoconfig"
 
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
+# s390 fails to build in 4.18-rc if gcc plugins are enabled,
+# and as of this writing it looks like it won't get fixed.
+fixup_s390=("s/CONFIG_GCC_PLUGINS=y/# CONFIG_GCC_PLUGINS is not set/")
+
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
