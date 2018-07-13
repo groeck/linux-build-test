@@ -31,11 +31,13 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 skip_316="powerpc:powernv:powernv_defconfig:devtmpfs:initrd \
-	powerpc:ppce500:corenet64_smp_defconfig:e5500:rootfs \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
 	powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
 	powerpc:pseries:pseries_defconfig:devtmpfs:little:rootfs"
 skip_318="powerpc:powernv:powernv_defconfig:devtmpfs:initrd \
-	powerpc:ppce500:corenet64_smp_defconfig:e5500:rootfs \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
+	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
 	powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
 	powerpc:pseries:pseries_defconfig:devtmpfs:little:rootfs"
 skip_44="powerpc:pseries:pseries_defconfig:devtmpfs:little:initrd \
@@ -99,7 +101,7 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
-    local buildconfig="${machine}:${defconfig}:${fixup}"
+    local buildconfig="${machine}:${defconfig}"
     local msg="${ARCH}:${machine}:${defconfig}"
     local initcli
     local diskcmd
@@ -107,6 +109,8 @@ runkernel()
 
     if [ -n "${fixup}" ]; then
 	msg+=":${fixup}"
+	local f="${fixup%:scsi}"
+	buildconfig+="${f%:sata}"
     fi
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
@@ -174,6 +178,8 @@ runkernel()
     else
 	local hddev="sda"
 	local iftype="scsi"
+	local id=""
+	local extra=""
 	case "${machine}" in
 	mac99)
 	    iftype="ide"
@@ -181,19 +187,23 @@ runkernel()
 	    if [[ $? -eq 0 ]]; then
 		hddev="hda"
 	    fi
-	    diskcmd="-drive file=${rootfs},if=${iftype},format=raw"
 	    ;;
 	ppce500)
-	    # We need to instantiate network and Ethernet devices explicitly
+	    # We need to instantiate network and disk devices explicitly
 	    # for this machine.
-	    diskcmd="-device e1000e"
-	    diskcmd+=" -device lsi53c895a -device scsi-hd,drive=d0"
-	    diskcmd+=" -drive file=${rootfs},if=${iftype},format=raw,id=d0"
+	    extra="-device e1000e "
+	    id=",id=d0"
+	    if [[ "${fixup}" == *:scsi ]]; then
+	        extra+="-device lsi53c895a -device scsi-hd,drive=d0"
+	    else
+	        extra+="-device sii3112 -device ide-hd,drive=d0"
+		iftype="ide"
+	    fi
 	    ;;
 	*)
-	    diskcmd="-drive file=${rootfs},if=${iftype},format=raw"
 	    ;;
 	esac
+	diskcmd="${extra} -drive file=${rootfs},if=${iftype},format=raw${id}"
 	initcli="root=/dev/${hddev} rw"
     fi
 
@@ -206,7 +216,7 @@ runkernel()
 	-kernel ${kernel} \
 	${diskcmd} \
 	-nographic -vga none -monitor null -no-reboot \
-	--append "${initcli} console=tty console=${console} doreboot" \
+	--append "${initcli} console=tty console=${console}" \
 	${dt_cmd} > ${logfile} 2>&1 &
 
     pid=$!
@@ -252,7 +262,10 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500:scsi ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel corenet64_smp_defconfig e5500:sata ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel powernv_defconfig devtmpfs powernv POWER8 hvc0 \
