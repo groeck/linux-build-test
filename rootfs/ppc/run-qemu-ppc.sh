@@ -59,7 +59,7 @@ runkernel()
     local retcode
     local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local pbuild="${mach}:${defconfig}"
+    local pbuild="${ARCH}:${mach}:${defconfig}"
     local diskcmd
     local cli
 
