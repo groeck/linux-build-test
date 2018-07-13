@@ -177,14 +177,12 @@ runkernel()
 	diskcmd="-initrd ${rootfs}"
     else
 	local hddev="sda"
-	local iftype="scsi"
-	local id=""
+	local iftype="if=scsi"
 	local extra=""
 	case "${machine}" in
 	mac99)
-	    iftype="ide"
-	    grep -q "CONFIG_IDE=y" .config >/dev/null 2>&1
-	    if [[ $? -eq 0 ]]; then
+	    iftype="if=ide"
+	    if grep -q "CONFIG_IDE=y" .config; then
 		hddev="hda"
 	    fi
 	    ;;
@@ -192,18 +190,17 @@ runkernel()
 	    # We need to instantiate network and disk devices explicitly
 	    # for this machine.
 	    extra="-device e1000e "
-	    id=",id=d0"
+	    iftype="id=d0"
 	    if [[ "${fixup}" == *:scsi ]]; then
 		extra+="-device lsi53c895a -device scsi-hd,drive=d0"
 	    else
 		extra+="-device sii3112 -device ide-hd,drive=d0"
-		iftype="ide"
 	    fi
 	    ;;
 	*)
 	    ;;
 	esac
-	diskcmd="${extra} -drive file=${rootfs},if=${iftype},format=raw${id}"
+	diskcmd="${extra} -drive file=${rootfs},format=raw,${iftype}"
 	initcli="root=/dev/${hddev} rw"
     fi
 

@@ -60,16 +60,20 @@ runkernel()
     local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${defconfig}"
+    local build="${defconfig}"
     local diskcmd
     local cli
 
     if [ -n "${fixup}" ]; then
 	pbuild="${pbuild}:${fixup}"
+	if [[ "${fixup}" != "sata" && "${fixup}" != "scsi" ]]; then
+	    build+="${fixup}"
+	fi
     fi
     if [[ "${rootfs%.gz}" == *cpio ]]; then
-	pbuild+=":rootfs"
-    else
 	pbuild+=":initrd"
+    else
+	pbuild+=":rootfs"
     fi
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
@@ -92,7 +96,7 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    if [ "${defconfig}_${fixup}" != "${cached_defconfig}" ]
+    if [ "${build}" != "${cached_defconfig}" ]
     then
 	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
 	retcode=$?
@@ -104,8 +108,11 @@ runkernel()
 	    fi
 	    return 1
 	fi
-	cached_defconfig="${defconfig}_${fixup}"
+	cached_defconfig="${build}"
     else
+	if ! checkskip "${build}"; then
+	    return 0
+	fi
 	setup_rootfs "${rootfs}"
     fi
 
@@ -130,11 +137,21 @@ runkernel()
 	diskcmd="-initrd ${rootfs}"
 	cli="rdinit=/sbin/init"
     else
-	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	local if="if=ide"
+	local extra=""
 	local rootdev="sda"
 	if grep -q "CONFIG_IDE=y" .config; then
 	    rootdev=hda
 	fi
+	if [[ "${fixup}" == *scsi* ]]; then
+	    if="id=d0"
+	    extra="-device lsi53c895a -device scsi-hd,drive=d0"
+	    rootdev="sda"
+	elif [[ "${fixup}" == *sata* ]]; then
+	    if="id=d0"
+	    extra="-device sii3112 -device ide-hd,drive=d0"
+	fi
+	diskcmd="${extra} -drive file=${rootfs},format=raw,${if}"
 	cli="root=/dev/${rootdev} rw"
     fi
 
@@ -170,7 +187,15 @@ runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" ttyS0 rootfs.cpio.gz \
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+runkernel mpc85xx_defconfig scsi mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+runkernel mpc85xx_defconfig sata mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+runkernel mpc85xx_smp_defconfig scsi mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+runkernel mpc85xx_smp_defconfig sata mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig devtmpfs bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
