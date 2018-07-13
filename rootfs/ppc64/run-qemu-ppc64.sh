@@ -95,7 +95,7 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local buildconfig="${machine}:${defconfig}:${fixup}"
-    local msg="${machine}:${defconfig}"
+    local msg="${ARCH}:${machine}:${defconfig}"
     local initcli
     local diskcmd
     local _boottype
