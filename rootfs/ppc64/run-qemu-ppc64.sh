@@ -72,15 +72,15 @@ patch_defconfig()
 	    echo "# CONFIG_SMP is not set" >> ${defconfig}
 	fi
 
-        if [ "${fixup}" = "cpu4" ]; then
+	if [ "${fixup}" = "cpu4" ]; then
 	    sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
 	    echo "CONFIG_NR_CPUS=4" >> ${defconfig}
 	fi
 
-        if [ "${fixup}" = "smp" ]; then
+	if [ "${fixup}" = "smp" ]; then
 	    sed -i -e '/CONFIG_SMP/d' ${defconfig}
 	    echo "CONFIG_SMP=y" >> ${defconfig}
-        fi
+	fi
     done
 }
 
@@ -194,9 +194,9 @@ runkernel()
 	    extra="-device e1000e "
 	    id=",id=d0"
 	    if [[ "${fixup}" == *:scsi ]]; then
-	        extra+="-device lsi53c895a -device scsi-hd,drive=d0"
+		extra+="-device lsi53c895a -device scsi-hd,drive=d0"
 	    else
-	        extra+="-device sii3112 -device ide-hd,drive=d0"
+		extra+="-device sii3112 -device ide-hd,drive=d0"
 		iftype="ide"
 	    fi
 	    ;;
