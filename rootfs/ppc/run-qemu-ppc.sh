@@ -18,6 +18,16 @@ QEMU_MACH=mac99
 
 PATH=${PATH_PPC}:${PATH}
 
+skip_316="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
+	powerpc:mpc8544ds:mpc85xx_defconfig:sata:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata:rootfs"
+
+skip_318="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
+	powerpc:mpc8544ds:mpc85xx_defconfig:sata:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata:rootfs"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -98,7 +108,7 @@ runkernel()
 
     if [ "${build}" != "${cached_defconfig}" ]
     then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
+	dosetup -f "${fixup}" -b "${pbuild}" "${rootfs}" "${defconfig}"
 	retcode=$?
 	if [ ${retcode} -ne 0 ]
 	then
@@ -110,7 +120,7 @@ runkernel()
 	fi
 	cached_defconfig="${build}"
     else
-	if ! checkskip "${build}"; then
+	if ! checkskip "${pbuild}"; then
 	    return 0
 	fi
 	setup_rootfs "${rootfs}"
