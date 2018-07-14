@@ -67,11 +67,9 @@ runkernel()
     local fixup=$3
     local rootfs=$4
     local dtb=$5
-    local ddtb=$(basename -s .dtb ""${dtb})
-    local dtbfile="arch/arm64/boot/dts/${dtb}"
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile=$(mktemp)
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${fixup}:${defconfig}"
 
@@ -81,10 +79,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    local pbuild="${ARCH}:${build}"
-    if [ -n "${ddtb}" ]; then
-	pbuild+=":${ddtb}"
-    fi
+    local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
 
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]; then
 	echo "Skipping ${pbuild} ... "
@@ -109,23 +104,12 @@ runkernel()
     fi
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -eq 2 ]; then
-	    return 0
-	fi
-	if [ ${retcode} -ne 0 ]; then
+	if ! dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"; then
 	    return 1
 	fi
 	cached_config="${defconfig}:${fixup}"
     else
 	setup_rootfs ${rootfs}
-    fi
-
-    # if we have a dtb file use it
-    local dtbcmd=""
-    if [ -n "${dtb}" -a -f "${dtbfile}" ]; then
-	dtbcmd="-dtb ${dtbfile}"
     fi
 
     if [[ "${rootfs}" == *cpio ]]; then
@@ -158,7 +142,7 @@ runkernel()
 	    -kernel arch/arm64/boot/Image -no-reboot \
 	    --append "${initcli} console=ttyS1,115200" \
 	    ${diskcmd} \
-	    ${dtbcmd} \
+	    ${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
 	    -nographic -monitor null -serial null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -167,7 +151,7 @@ runkernel()
     "xlnx-ep108"|"xlnx-zcu102")
 	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
 		-nographic -serial mon:stdio -monitor none -no-reboot \
-		${dtbcmd} \
+		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
 		${diskcmd} \
 		--append "${initcli} console=ttyPS0" \
 		> ${logfile} 2>&1 &
