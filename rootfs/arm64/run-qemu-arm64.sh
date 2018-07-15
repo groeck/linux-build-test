@@ -22,42 +22,51 @@ PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
 PATH=${PATH}:${PATH_ARM64}
 
 # Xilinx boards don't work on v3.x kernels
-# Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx)
-skip_316="raspi3:smp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:initrd \
-	xlnx-zcu102:nosmp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs \
-	virt:smp:defconfig:rootfs \
-	virt:nosmp:defconfig:rootfs"
-skip_318="raspi3:smp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:initrd \
-	xlnx-zcu102:nosmp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs \
-	virt:smp:defconfig:rootfs \
-	virt:nosmp:defconfig:rootfs"
-skip_44="raspi3:smp:defconfig:initrd \
-	virt:smp:defconfig:rootfs \
-	virt:nosmp:defconfig:rootfs \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs"
-skip_49="raspi3:smp:defconfig:initrd \
-	xlnx-zcu102:smp:defconfig:rootfs \
-	xlnx-zcu102:nosmp:defconfig:rootfs"
+# Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx).
+# Exceptions:
+# - virt:defconfig:smp:virtio:rootfs works from v4.4
+# - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-ep108 works from v4.4
+skip_316="raspi3:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:sata:rootfs \
+	xlnx-zcu102:defconfig:smp:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:initrd \
+	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
+	virt:defconfig:smp:usb:rootfs \
+	virt:defconfig:smp:virtio:rootfs \
+	virt:defconfig:nosmp:rootfs"
+skip_318="raspi3:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:sata:rootfs \
+	xlnx-zcu102:defconfig:smp:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:initrd \
+	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
+	virt:defconfig:smp:usb:rootfs \
+	virt:defconfig:smp:virtio:rootfs \
+	virt:defconfig:nosmp:rootfs"
+skip_44="raspi3:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
+	virt:defconfig:smp:usb:rootfs \
+	virt:defconfig:nosmp:rootfs"
+skip_49="raspi3:defconfig:smp:initrd \
+	xlnx-zcu102:defconfig:smp:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:sd:rootfs"
 
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    sed -i -e '/CONFIG_SMP/d' ${defconfig}
-
-    if [ "${fixup}" = "nosmp" ]; then
-	echo "# CONFIG_SMP is not set" >> ${defconfig}
-    else
-	echo "CONFIG_SMP=y" >> ${defconfig}
-    fi
+    for fixup in ${fixups}; do
+	if [ "${fixup}" = "nosmp" ]; then
+	    echo "CONFIG_SMP=n" >> ${defconfig}
+	fi
+	if [ "${fixup}" = "smp" ]; then
+	    echo "CONFIG_SMP=y" >> ${defconfig}
+	fi
+    done
 }
 
 runkernel()
@@ -71,7 +80,7 @@ runkernel()
     local retcode
     local logfile=$(mktemp)
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local build="${mach}:${fixup}:${defconfig}"
+    local build="${mach}:${defconfig}:${fixup}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -79,10 +88,18 @@ runkernel()
 	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
-	if [[ "${mach}" = "virt" ]]; then
+	if [[ "${fixup}" = *usb* ]]; then
 	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0 \
-		     -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
+	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
+	elif [[ "${fixup}" == *virtio* ]]; then
+	    initcli="root=/dev/vda rw"
+	    diskcmd="-device virtio-blk-pci,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
+	elif [[ "${fixup}" == *sata* ]]; then
+	    initcli="root=/dev/sda rw"
+	    diskcmd="-device ide-hd,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
 	else
 	    initcli="root=/dev/mmcblk0 rw rootwait"
 	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw"
@@ -113,11 +130,11 @@ runkernel()
 	return 0
     fi
 
-    if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
+    if [[ "${cached_config}" != "${defconfig}:${fixup%:*}" ]]; then
 	if ! dosetup -f "${fixup}" "${rootfs}" "${defconfig}"; then
 	    return 1
 	fi
-	cached_config="${defconfig}:${fixup}"
+	cached_config="${defconfig}:${fixup%:*}"
     else
 	setup_rootfs "${rootfs}"
     fi
@@ -133,6 +150,7 @@ runkernel()
     "virt")
 	${QEMU} -machine ${mach} -cpu cortex-a57 \
 		-machine type=virt -nographic -smp 1 -m 512 \
+		-monitor none \
 		-kernel arch/arm64/boot/Image -no-reboot \
 		${diskcmd} \
 		-append "console=ttyAMA0 ${initcli}" \
@@ -175,30 +193,34 @@ echo
 
 runkernel virt defconfig smp rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp rootfs.ext2.gz
-retcode=$((${retcode} + $?))
+runkernel virt defconfig smp:usb rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig smp:virtio rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
-retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig smp rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
 
 runkernel raspi3 defconfig smp rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 if [ ${runall} -eq 1 ]; then
     # Crashes in mmc access
     # sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware interrupt.
     # possibly due to missing clock subsystem implementation or due to
     # bad clock frequencies.
-    runkernel raspi3 defconfig smp rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
-    retcode=$((${retcode} + $?))
+    runkernel raspi3 defconfig smp:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((retcode + $?))
 fi
 
 runkernel virt defconfig nosmp rootfs.cpio.gz
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
-retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig nosmp rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
 
 exit ${retcode}
