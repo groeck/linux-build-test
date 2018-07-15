@@ -73,10 +73,20 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${fixup}:${defconfig}"
 
-    if [[ "${rootfs}" == *cpio ]]; then
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
+	if [[ "${mach}" = "virt" ]]; then
+	    initcli="root=/dev/sda rw rootwait"
+	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0 \
+		     -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
+	else
+	    initcli="root=/dev/mmcblk0 rw rootwait"
+	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw"
+        fi
     fi
 
     local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
@@ -104,24 +114,17 @@ runkernel()
     fi
 
     if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	if ! dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	if ! dosetup -f "${fixup}" "${rootfs}" "${defconfig}"; then
 	    return 1
 	fi
 	cached_config="${defconfig}:${fixup}"
     else
-	setup_rootfs ${rootfs}
+	setup_rootfs "${rootfs}"
     fi
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    elif [[ "${mach}" = "virt" ]]; then
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0 \
-		-drive file=${rootfs},format=raw,if=none,id=d0"
-    else
-	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd="-drive file=${rootfs},if=sd,format=raw"
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip -f "${rootfs}"
+	rootfs="${rootfs%.gz}"
     fi
 
     echo -n "running ..."
@@ -170,16 +173,16 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel virt defconfig smp rootfs.cpio
+runkernel virt defconfig smp rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp rootfs.ext2
+runkernel virt defconfig smp rootfs.ext2.gz
 retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig smp rootfs.cpio xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig smp rootfs.ext2 xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig smp rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
 
-runkernel raspi3 defconfig smp rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3 defconfig smp rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((${retcode} + $?))
 
 if [ ${runall} -eq 1 ]; then
@@ -187,15 +190,15 @@ if [ ${runall} -eq 1 ]; then
     # sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware interrupt.
     # possibly due to missing clock subsystem implementation or due to
     # bad clock frequencies.
-    runkernel raspi3 defconfig smp rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+    runkernel raspi3 defconfig smp rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((${retcode} + $?))
 fi
 
-runkernel virt defconfig nosmp rootfs.cpio
+runkernel virt defconfig nosmp rootfs.cpio.gz
 retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
-runkernel xlnx-zcu102 defconfig nosmp rootfs.ext2 xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig nosmp rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
