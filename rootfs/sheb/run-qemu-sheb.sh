@@ -47,17 +47,20 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
     local build="${ARCH}:${defconfig}"
 
-    if [[ "${rootfs}" == *cpio ]]; then
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
+	initcli="root=/dev/sda rw"
+	diskcmd="-drive file=${rootfs%.gz},if=ide,format=raw"
     fi
 
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -f fixup "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
+	if ! dosetup -f fixup "${rootfs}" "${defconfig}"; then
 	    return 1
 	fi
 	cached_config="${defconfig}"
@@ -65,18 +68,12 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
-    echo -n "running ..."
-
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	local hddev="sda"
-	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
-	[ $? -eq 0 ] && hddev="hda"
-	initcli="root=/dev/${hddev} rw"
-	diskcmd="-drive file=${rootfs},if=ide,format=raw"
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip -f "${rootfs}"
+	rootfs="${rootfs%.gz}"
     fi
+
+    echo -n "running ..."
 
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${diskcmd} \
@@ -95,9 +92,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel rts7751r2dplus_defconfig rootfs.cpio
+runkernel rts7751r2dplus_defconfig rootfs.cpio.gz
 retcode=$?
-runkernel rts7751r2dplus_defconfig rootfs.ext2
+runkernel rts7751r2dplus_defconfig rootfs.ext2.gz
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
