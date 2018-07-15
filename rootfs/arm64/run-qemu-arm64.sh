@@ -148,8 +148,8 @@ runkernel()
 
     case ${mach} in
     "virt")
-	${QEMU} -machine ${mach} -cpu cortex-a57 \
-		-machine type=virt -nographic -smp 1 -m 512 \
+	${QEMU} -M ${mach} -cpu cortex-a57 \
+		-nographic -smp 1 -m 512 \
 		-monitor none \
 		-kernel arch/arm64/boot/Image -no-reboot \
 		${diskcmd} \
