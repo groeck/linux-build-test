@@ -36,21 +36,24 @@ runkernel()
     local rootfs=$2
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile=$(mktemp)
     local waitlist=("Power down" "Boot successful" "Poweroff")
     local build="${ARCH}:${defconfig}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
+	initcli="root=/dev/sda"
+	diskcmd="-drive file=${rootfs%.gz},if=ide,format=raw"
     fi
 
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -f fixup "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
+	if ! dosetup -f fixup "${rootfs}" "${defconfig}"; then
 	    return 1
 	fi
 	cached_config="${defconfig}"
@@ -64,14 +67,6 @@ runkernel()
     fi
 
     echo -n "running ..."
-
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	initcli="root=/dev/sda"
-	diskcmd="-drive file=${rootfs},if=ide,format=raw"
-    fi
 
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${diskcmd} \
