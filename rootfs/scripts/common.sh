@@ -20,11 +20,13 @@ checkstate()
 # The caller has to execute "shift $((OPTIND - 1).
 parse_args()
 {
-	testbuild=0
+	nobuild=0
 	runall=0
-	while getopts at opt; do
+	testbuild=0
+	while getopts ant opt; do
 	case ${opt} in
 	a)	runall=1;;
+	n)	nobuild=1;;
 	t)	testbuild=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
@@ -175,6 +177,14 @@ dosetup()
     local EXTRAS=""
     local fixup=""
     local dynamic=""
+
+    # If nobuild is set, don't build image, just set up the root file
+    # system as needed. Assumes that the image was built already in
+    # a previous test run.
+    if [ ${nobuild:-0} -ne 0 ]; then
+	setup_rootfs ${dynamic} "${rootfs}"
+	return 0
+    fi
 
     OPTIND=1
     while getopts b:de:f: opt
