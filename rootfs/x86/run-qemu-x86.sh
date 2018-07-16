@@ -104,7 +104,7 @@ runkernel()
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} -usb -no-reboot -m 256 \
 	${diskcmd} \
-	--append "${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
+	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
