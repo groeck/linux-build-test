@@ -1,18 +1,15 @@
 #!/bin/bash
 
-runall=0
-if [ "$1" = "-a" ]; then
-    runall=1
-    shift
-fi
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
 
 machine=$1
 option=$2
 config=$3
-
-dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
-. ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
@@ -161,7 +158,7 @@ runkernel()
     "raspi3")
 	${QEMU} -M ${mach} -m 1024 \
 	    -kernel arch/arm64/boot/Image -no-reboot \
-	    --append "${initcli} console=ttyS1,115200" \
+	    --append "earlycon=uart8250,mmio32,0x3f215040 ${initcli} console=ttyS1,115200" \
 	    ${diskcmd} \
 	    ${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
 	    -nographic -monitor null -serial null -serial stdio \
