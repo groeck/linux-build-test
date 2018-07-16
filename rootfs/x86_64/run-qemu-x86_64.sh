@@ -105,7 +105,7 @@ runkernel()
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} ${kvm} -usb -no-reboot ${mem} \
 	${diskcmd} \
-	--append "${initcli} console=ttyS0 console=tty doreboot" \
+	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
 
     pid=$!
