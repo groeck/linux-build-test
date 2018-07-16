@@ -287,7 +287,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    --append "root=/dev/mmcblk0 rootwait rw earlyprintk console=ttyAMA0 doreboot" \
+	    --append "earlycon=pl011,0x3f201000 root=/dev/mmcblk0 rootwait rw console=ttyAMA0 doreboot" \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
