@@ -11,7 +11,7 @@ shift $((OPTIND - 1))
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
+QEMU_V30=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 # Failures seen with qemu v2.9:
 # arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
 # arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
@@ -274,7 +274,7 @@ runkernel()
 
     case ${mach} in
     "mps2-an385")
-	${QEMU_MASTER} -M ${mach} \
+	${QEMU_V30} -M ${mach} \
 	    -bios "${progdir}/mps2-boot.axf" \
 	    -kernel vmlinux \
 	    -initrd ${rootfs} \
@@ -422,7 +422,7 @@ runkernel()
 	pid=$!
 	;;
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
-	${QEMU_MASTER} -M ${mach} \
+	${QEMU_V30} -M ${mach} \
 		-nodefaults -nographic -serial stdio -monitor none \
 		-kernel arch/arm/boot/zImage -no-reboot \
 		${dtbcmd} \

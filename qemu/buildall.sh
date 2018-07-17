@@ -124,13 +124,12 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "an385" ]
+if [ -z "$1" -o "$1" = "v3.0" ]
 then
-    dobuild master-local-an385 master-an385 \
+    dobuild v3.0.0-local v3.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough \
-	--target-list=arm-softmmu"
+	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
 
