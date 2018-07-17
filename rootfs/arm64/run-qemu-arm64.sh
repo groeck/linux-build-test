@@ -24,6 +24,7 @@ PATH=${PATH}:${PATH_ARM64}
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-ep108 works from v4.4
 skip_316="raspi3:defconfig:smp:initrd \
+	raspi3:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:initrd \
 	xlnx-zcu102:defconfig:smp:sata:rootfs \
 	xlnx-zcu102:defconfig:smp:sd:rootfs \
@@ -33,6 +34,7 @@ skip_316="raspi3:defconfig:smp:initrd \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_318="raspi3:defconfig:smp:initrd \
+	raspi3:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:initrd \
 	xlnx-zcu102:defconfig:smp:sata:rootfs \
 	xlnx-zcu102:defconfig:smp:sd:rootfs \
@@ -42,11 +44,13 @@ skip_318="raspi3:defconfig:smp:initrd \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_44="raspi3:defconfig:smp:initrd \
+	raspi3:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
 	virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_49="raspi3:defconfig:smp:initrd \
+	raspi3:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs"
 
@@ -203,15 +207,8 @@ retcode=$((retcode + $?))
 
 runkernel raspi3 defconfig smp rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-
-if [ ${runall} -eq 1 ]; then
-    # Crashes in mmc access
-    # sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware interrupt.
-    # possibly due to missing clock subsystem implementation or due to
-    # bad clock frequencies.
-    runkernel raspi3 defconfig smp:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
-    retcode=$((retcode + $?))
-fi
+runkernel raspi3 defconfig smp:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp rootfs.cpio.gz
 retcode=$((retcode + $?))
