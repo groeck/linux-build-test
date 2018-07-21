@@ -21,11 +21,13 @@ checkstate()
 parse_args()
 {
 	nobuild=0
+	dodebug=0
 	runall=0
 	testbuild=0
-	while getopts ant opt; do
+	while getopts adnt opt; do
 	case ${opt} in
 	a)	runall=1;;
+	d)	dodebug=1;;
 	n)	nobuild=1;;
 	t)	testbuild=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
