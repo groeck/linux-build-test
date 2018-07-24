@@ -22,36 +22,18 @@ PATH=${PATH}:${PATH_ARM64}
 # Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx).
 # Exceptions:
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
-# - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-ep108 works from v4.4
-skip_316="raspi3:defconfig:smp:initrd \
-	raspi3:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:smp:initrd \
-	xlnx-zcu102:defconfig:smp:sata:rootfs \
-	xlnx-zcu102:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:initrd \
-	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
-	virt:defconfig:smp:usb:rootfs \
+# - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
+skip_316="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:nosmp:rootfs"
-skip_318="raspi3:defconfig:smp:initrd \
-	raspi3:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:smp:initrd \
-	xlnx-zcu102:defconfig:smp:sata:rootfs \
-	xlnx-zcu102:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:initrd \
-	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
-	virt:defconfig:smp:usb:rootfs \
+skip_318="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:nosmp:rootfs"
-skip_44="raspi3:defconfig:smp:initrd \
-	raspi3:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:smp:sd:rootfs \
+skip_44="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
 	virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:nosmp:rootfs"
-skip_49="raspi3:defconfig:smp:initrd \
-	raspi3:defconfig:smp:sd:rootfs \
-	xlnx-zcu102:defconfig:smp:sd:rootfs \
+skip_49="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs"
 
 patch_defconfig()
@@ -102,8 +84,12 @@ runkernel()
 	    diskcmd="-device ide-hd,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
 	else
+	    local index=0
+	    if [[ "${fixup}" == *sd1* ]]; then
+		index=1
+	    fi
 	    initcli="root=/dev/mmcblk0 rw rootwait"
-	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw"
+	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw,index=${index}"
         fi
     fi
 
@@ -121,6 +107,11 @@ runkernel()
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    if [[ -n "${dtb}" && ! -e "arch/arm64/boot/dts/${dtb}" ]]; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -170,12 +161,12 @@ runkernel()
 	pid=$!
 	waitflag="manual"
 	;;
-    "xlnx-ep108"|"xlnx-zcu102")
+    "xlnx-zcu102")
 	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
-		-nographic -serial mon:stdio -monitor none -no-reboot \
+		-nographic -serial stdio -monitor none -no-reboot \
 		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
 		${diskcmd} \
-		--append "${initcli} console=ttyPS0" \
+		--append "${initcli} console=ttyPS0 earlycon=cdns,mmio,0xFF000000,115200n8" \
 		> ${logfile} 2>&1 &
 	pid=$!
 	waitflag="automatic"
@@ -204,6 +195,12 @@ runkernel xlnx-zcu102 defconfig smp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig smp:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp:sata rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
 
 runkernel raspi3 defconfig smp rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
@@ -215,6 +212,10 @@ retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig nosmp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
 retcode=$((retcode + $?))
 
 exit ${retcode}
