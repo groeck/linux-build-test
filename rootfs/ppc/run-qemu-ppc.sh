@@ -1,12 +1,16 @@
 #!/bin/bash
 
+progdir=$(cd $(dirname $0); pwd)
+. ${progdir}/../scripts/config.sh
+. ${progdir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
 machine=$1
 variant=$2
 config=$3
 
-dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
-. ${dir}/../scripts/common.sh
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
@@ -165,10 +169,19 @@ runkernel()
 	cli="root=/dev/${rootdev} rw"
     fi
 
+    case "${mach}" in
+    sam460ex)
+	earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
+	;;
+    *)
+        earlycon=""
+	;;
+    esac
+
     ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
 	${diskcmd} \
 	${dtbcmd} \
-	--append "${cli} mem=256M console=${tty}" \
+	--append "${cli} ${earlycon} mem=256M console=${tty}" \
 	-monitor none -nographic > ${logfile} 2>&1 &
     pid=$!
 
