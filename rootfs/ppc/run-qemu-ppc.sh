@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 progdir=$(cd $(dirname $0); pwd)
 . ${progdir}/../scripts/config.sh
 . ${progdir}/../scripts/common.sh
@@ -53,6 +55,16 @@ patch_defconfig()
 	if [ "${fixup}" = "smp" ]; then
 	    echo "CONFIG_SMP=y" >> ${defconfig}
 	fi
+	if [ "${fixup}" = "scsi[AM53C974]" ]; then
+	    echo "CONFIG_SCSI=y" >> ${defconfig}
+	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+	    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+	fi
+	if [ "${fixup}" = "usbdisk" ]; then
+	    echo "CONFIG_SCSI=y" >> ${defconfig}
+	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+	    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+	fi
     done
 }
 
@@ -80,12 +92,14 @@ runkernel()
 
     if [ -n "${fixup}" ]; then
 	pbuild="${pbuild}:${fixup}"
-	if [[ "${fixup}" != "sata" && "${fixup}" != "scsi" ]]; then
+	# ignore basic scsi/sata build qualifiers for build cache
+	if [[ ${fixup} != "sata" && ${fixup} != "scsi" ]]; then
 	    build+="${fixup}"
 	fi
     fi
     if [[ "${rootfs%.gz}" == *cpio ]]; then
-	pbuild+=":initrd"
+	# For initrd builds, disk build qualifiers are irrelevant for the user
+	pbuild="${pbuild%:+(sata|usbdisk|scsi*)}:initrd"
     else
 	pbuild+=":rootfs"
     fi
@@ -127,6 +141,7 @@ runkernel()
 	if ! checkskip "${pbuild}"; then
 	    return 0
 	fi
+	echo -n "[cached] "
 	setup_rootfs "${rootfs}"
     fi
 
@@ -153,20 +168,29 @@ runkernel()
     else
 	local if="if=ide"
 	local extra=""
+	local extracli=""
 	local rootdev="sda"
 	if grep -q "CONFIG_IDE=y" .config; then
 	    rootdev=hda
 	fi
-	if [[ "${fixup}" == *scsi* ]]; then
+	if [[ "${fixup}" == *scsi ]]; then
 	    if="id=d0"
 	    extra="-device lsi53c895a -device scsi-hd,drive=d0"
+	    rootdev="sda"
+	elif [[ "${fixup}" == *scsi\[AM53C974\] ]]; then
+	    if="id=d0"
+	    extra="-device am53c974 -device scsi-hd,drive=d0"
 	    rootdev="sda"
 	elif [[ "${fixup}" == *sata* ]]; then
 	    if="id=d0"
 	    extra="-device sii3112 -device ide-hd,drive=d0"
+	elif [[ "${fixup}" == *usbdisk* ]]; then
+	    if="id=d0"
+	    extra="-device usb-storage,drive=d0"
+	    extracli="rootwait"
 	fi
 	diskcmd="${extra} -drive file=${rootfs},format=raw,${if}"
-	cli="root=/dev/${rootdev} rw"
+	cli="root=/dev/${rootdev} rw ${extracli}"
     fi
 
     case "${mach}" in
@@ -178,6 +202,7 @@ runkernel()
 	;;
     bamboo|mpc8544ds)
 	# Not needed
+        earlycon=""
 	;;
     *)
         earlycon=""
@@ -230,11 +255,19 @@ runkernel mpc85xx_smp_defconfig scsi mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powe
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig sata mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+# specify scsi[AM53C974] for initrd to avoid rebuilding the image.
+runkernel 44x/bamboo_defconfig "devtmpfs:scsi[AM53C974]" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig devtmpfs:smp bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig "devtmpfs:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig devtmpfs sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig "devtmpfs:smp:scsi[AM53C974]"  bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/bamboo_defconfig "devtmpfs:smp:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+# specify usbdisk for initrd to avoid rebuilding the image.
+runkernel 44x/canyonlands_defconfig devtmpfs:usbdisk sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig devtmpfs:usbdisk sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig devtmpfs:zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
