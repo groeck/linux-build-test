@@ -173,10 +173,18 @@ runkernel()
     sam460ex)
 	earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	;;
+    virtex-ml507)
+	earlycon="earlycon"
+	;;
+    bamboo|mpc8544ds)
+	# Not needed
+	;;
     *)
         earlycon=""
 	;;
     esac
+
+    [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
 	${diskcmd} \
@@ -184,6 +192,8 @@ runkernel()
 	--append "${cli} ${earlycon} mem=256M console=${tty}" \
 	-monitor none -nographic > ${logfile} 2>&1 &
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
