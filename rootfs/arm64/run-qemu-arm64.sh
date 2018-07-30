@@ -50,13 +50,19 @@ patch_defconfig()
 	    echo "CONFIG_SMP=y" >> ${defconfig}
 	fi
     done
+
+    # Always enable SCSI controller drivers and NVME
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
 }
 
 runkernel()
 {
     local mach=$1
     local defconfig=$2
-    local fixup=$3
+    local fixup="$3"
     local rootfs=$4
     local dtb=$5
     local pid
@@ -83,6 +89,25 @@ runkernel()
 	    initcli="root=/dev/sda rw"
 	    diskcmd="-device ide-hd,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
+	elif [[ "${fixup}" == *nvme* ]]; then
+	    initcli="root=/dev/nvme0n1 rw"
+	    diskcmd="-device nvme,serial=foo,drive=d0 \
+		-drive file=${rootfs%.gz},if=none,format=raw,id=d0"
+	elif [[ "${fixup}" == *scsi* ]]; then
+	    initcli="root=/dev/sda rw"
+	    case "${fixup##*:}" in
+	    "scsi[DC395]")
+		device="dc390"
+		;;
+	    "scsi[AM53C974]")
+		device="am53c974"
+		;;
+	    "scsi[MEGASAS]")
+		device="megasas-gen2"
+		;;
+	    esac
+	    diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
+		     -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
 	else
 	    local index=0
 	    if [[ "${fixup}" == *sd1* ]]; then
@@ -90,7 +115,7 @@ runkernel()
 	    fi
 	    initcli="root=/dev/mmcblk0 rw rootwait"
 	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw,index=${index}"
-        fi
+	fi
     fi
 
     local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
@@ -111,7 +136,7 @@ runkernel()
 	return 0
     fi
 
-    if [[ -n "${dtb}" && ! -e "arch/arm64/boot/dts/${dtb}" ]]; then
+    if [[ -n "${dtb}" && ! -e "arch/arm64/boot/dts/${dtb/.dtb/.dts}" ]]; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -140,6 +165,7 @@ runkernel()
 
     case ${mach} in
     "virt")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -cpu cortex-a57 \
 		-nographic -smp 1 -m 512 \
 		-monitor none \
@@ -148,9 +174,11 @@ runkernel()
 		-append "console=ttyAMA0 ${initcli}" \
 		> ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	waitflag="manual"
 	;;
     "raspi3")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -m 1024 \
 	    -kernel arch/arm64/boot/Image -no-reboot \
 	    --append "earlycon=uart8250,mmio32,0x3f215040 ${initcli} console=ttyS1,115200" \
@@ -159,9 +187,11 @@ runkernel()
 	    -nographic -monitor null -serial null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	waitflag="manual"
 	;;
     "xlnx-zcu102")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
 		-nographic -serial stdio -monitor none -no-reboot \
 		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
@@ -169,6 +199,7 @@ runkernel()
 		--append "${initcli} console=ttyPS0 earlycon=cdns,mmio,0xFF000000,115200n8" \
 		> ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	waitflag="automatic"
 	;;
     esac
@@ -189,6 +220,15 @@ runkernel virt defconfig smp:usb rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel virt defconfig smp:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[DC395]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[AM53C974]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+
 runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig smp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
