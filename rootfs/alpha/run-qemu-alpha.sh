@@ -20,15 +20,20 @@ PATH=${PATH_ALPHA}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
+    local fixup=$2
 
     # Enable BLK_DEV_INITRD
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
     # Enable DEVTMPFS
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+
+    # Enable SCSI controllers
+    # Note: CONFIG_SCSI_SYM53C8XX_2=y doesn't work
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
 }
 
 cached_config=""
@@ -36,7 +41,8 @@ cached_config=""
 runkernel()
 {
     local defconfig=$1
-    local rootfs=$2
+    local fixup=$2
+    local rootfs=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
@@ -46,13 +52,16 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
+        if [[ "${fixup}" == scsi* ]]; then
+	    build+=":${fixup}"
+	fi
 	build+=":rootfs"
     fi
 
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -f fixup "${rootfs}" "${defconfig}"
+	dosetup -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"
 	if [ $? -ne 0 ]; then
 	    return 1
 	fi
@@ -66,6 +75,21 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
+    elif [[ "${fixup}" == scsi* ]]; then
+	initcli="root=/dev/sda rw"
+	case "${fixup}" in
+	"scsi[DC395]")
+	    device="dc390"
+	    ;;
+	"scsi[AM53C974]")
+	    device="am53c974"
+	    ;;
+	"scsi[MEGASAS]")
+	    device="megasas-gen2"
+	    ;;
+	esac
+	diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
+		-drive file=${rootfs},if=none,format=raw,id=d0"
     else
 	local hddev="sda"
 	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
@@ -95,9 +119,15 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel defconfig busybox-alpha.cpio
+runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
-runkernel defconfig rootfs.ext2
+runkernel defconfig sata rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig "scsi[AM53C974]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig "scsi[DC390]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${rv}
