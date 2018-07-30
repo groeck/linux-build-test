@@ -34,6 +34,9 @@ patch_defconfig()
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+
+    # Enable NVME support
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
 }
 
 cached_config=""
@@ -90,6 +93,10 @@ runkernel()
 	esac
 	diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
 		-drive file=${rootfs},if=none,format=raw,id=d0"
+    elif [[ "${fixup}" == "nvme" ]]; then
+	initcli="root=/dev/nvme0n1 rw"
+	diskcmd="-device nvme,serial=foo,drive=d0 \
+		-drive file=${rootfs},if=none,format=raw,id=d0"
     else
 	local hddev="sda"
 	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
@@ -129,5 +136,11 @@ runkernel defconfig "scsi[DC390]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Results in WARNING on reboot
+    runkernel defconfig "nvme" rootfs.ext2
+    retcode=$((${retcode} + $?))
+fi
 
 exit ${rv}
