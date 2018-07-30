@@ -17,6 +17,12 @@ PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
 
 PATH=${PATH_ALPHA}:${PATH}
 
+skip_316="alpha:defconfig:scsi[AM53C974]:rootfs \
+	alpha:defconfig:scsi[DC390]:rootfs"
+
+skip_318="alpha:defconfig:scsi[AM53C974]:rootfs \
+	alpha:defconfig:scsi[DC390]:rootfs"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -62,6 +68,10 @@ runkernel()
     fi
 
     echo -n "Building ${build} ... "
+
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
 
     if [ "${cached_config}" != "${defconfig}" ]; then
 	dosetup -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"
