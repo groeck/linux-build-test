@@ -4,6 +4,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
 
 PREFIX=alpha-linux-
@@ -71,14 +74,18 @@ runkernel()
 	diskcmd="-drive file=${rootfs},if=ide,format=raw"
     fi
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
 	${diskcmd} \
 	-append "${initcli} console=ttyS0" \
 	-m 128M -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} auto waitlist[@]
     retcode=$?
     rm -f ${logfile}
