@@ -4,6 +4,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
@@ -38,8 +41,20 @@ runkernel()
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
+    local build="${ARCH}:${defconfig}"
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+	build+=":initrd"
+    else
+	initcli="root=/dev/vda rw"
+	diskcmd="-drive file=${rootfs},format=raw,if=none,id=d0 \
+		-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
+	build+=":rootfs"
+    fi
+
+    echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
 	dosetup -f fixup "${rootfs}" "${defconfig}"
@@ -57,22 +72,17 @@ runkernel()
 
     echo -n "running ..."
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	initcli="root=/dev/vda rw"
-	diskcmd="-drive file=${rootfs},format=raw,if=none,id=d0 \
-		-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
-    fi
+    [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel arch/s390/boot/bzImage \
         ${diskcmd} \
 	-append "${initcli} doreboot" \
 	-m 512 \
 	-nographic -monitor null --no-reboot > ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} manual waitlist[@]
     retcode=$?
     rm -f ${logfile}
