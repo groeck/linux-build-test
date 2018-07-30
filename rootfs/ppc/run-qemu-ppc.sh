@@ -141,7 +141,6 @@ runkernel()
 	if ! checkskip "${pbuild}"; then
 	    return 0
 	fi
-	echo -n "[cached] "
 	setup_rootfs "${rootfs}"
     fi
 
