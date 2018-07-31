@@ -26,6 +26,7 @@ PATH=${PATH}:${PATH_ARM64}
 skip_316="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:smp:nvme:rootfs \
+	virt:defconfig:smp:mmc:rootfs \
 	virt:defconfig:smp:scsi[DC395]:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
@@ -33,6 +34,7 @@ skip_316="virt:defconfig:smp:usb:rootfs \
 skip_318="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:smp:nvme:rootfs \
+	virt:defconfig:smp:mmc:rootfs \
 	virt:defconfig:smp:scsi[DC395]:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
@@ -69,6 +71,11 @@ patch_defconfig()
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+
+    # Always enable MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
 }
 
 runkernel()
@@ -102,6 +109,10 @@ runkernel()
 	    initcli="root=/dev/sda rw"
 	    diskcmd="-device ide-hd,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
+	elif [[ "${fixup}" == *mmc* ]]; then
+	    initcli="root=/dev/mmcblk0 rw rootwait"
+	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
 	elif [[ "${fixup}" == *nvme* ]]; then
 	    initcli="root=/dev/nvme0n1 rw"
 	    diskcmd="-device nvme,serial=foo,drive=d0 \
@@ -234,6 +245,8 @@ retcode=$((retcode + $?))
 runkernel virt defconfig smp:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig smp:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
