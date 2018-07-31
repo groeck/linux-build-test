@@ -54,6 +54,14 @@ patch_defconfig()
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+
+    # Always enable MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # Enable USB-UAS (USB Attached SCSI)
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 runkernel()
@@ -116,13 +124,22 @@ runkernel()
 	initcli="root=/dev/sda rw"
 	if [[ "${fixup}" == *sata ]]; then
 	    diskcmd="-drive file=${rootfs},if=ide,format=raw"
+	elif [[ "${fixup}" == *mmc* ]]; then
+	    initcli="root=/dev/mmcblk0 rw rootwait"
+	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	    diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
 	elif [[ "${fixup}" == *nvme ]]; then
 	    initcli="root=/dev/nvme0n1 rw"
 	    diskcmd="-device nvme,serial=foo,drive=d0 \
 		-drive file=${rootfs},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == *usbdisk ]]; then
+	elif [[ "${fixup}" == *usb ]]; then
 	    initcli="root=/dev/sda rw rootwait"
 	    diskcmd="-device usb-storage,drive=d0 \
+		-drive file=${rootfs},if=none,format=raw,id=d0"
+	elif [[ "${fixup}" == *usb-uas ]]; then
+	    initcli="root=/dev/sda rw rootwait"
+	    diskcmd="-device usb-uas,id=uas \
+		-device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0 \
 		-drive file=${rootfs},if=none,format=raw,id=d0"
 	elif [[ "${fixup##*:}" == scsi* ]]; then
 	    case "${fixup##*:}" in
@@ -191,11 +208,13 @@ runkernel defconfig smp:scsi[DC395] Opteron_G1 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Opteron_G5 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usbdisk EPYC-IBPB q35 rootfs.ext2
+runkernel defconfig smp:usb EPYC-IBPB q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig smp:mmc EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Skylake-Client q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usbdisk Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp:usb-uas Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Opteron_G3 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
