@@ -25,15 +25,28 @@ PATH=${PATH}:${PATH_ARM64}
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
 skip_316="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
+	virt:defconfig:smp:nvme:rootfs \
+	virt:defconfig:smp:scsi[DC395]:rootfs \
+	virt:defconfig:smp:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_318="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
+	virt:defconfig:smp:nvme:rootfs \
+	virt:defconfig:smp:scsi[DC395]:rootfs \
+	virt:defconfig:smp:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_44="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
 	virt:defconfig:smp:usb:rootfs \
+	virt:defconfig:smp:scsi[DC395]:rootfs \
+	virt:defconfig:smp:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
 	virt:defconfig:nosmp:rootfs"
-skip_49="xlnx-zcu102:defconfig:smp:sd:rootfs \
+skip_49="raspi3:defconfig:smp:initrd \
+	raspi3:defconfig:smp:sd:rootfs \
+	xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs"
 
 patch_defconfig()
