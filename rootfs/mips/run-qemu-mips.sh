@@ -1,11 +1,14 @@
 #!/bin/bash
 
-config=$1
-variant=$2
-
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
+config=$1
+variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips}
 
@@ -87,13 +90,17 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	-drive file=${rootfs},format=raw,if=ide \
 	-vga cirrus -usb -device usb-wacom-tablet -no-reboot -m 128 \
 	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \
 	-nographic -monitor none > ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
     rm -f ${logfile}
