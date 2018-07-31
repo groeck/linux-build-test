@@ -55,6 +55,8 @@ patch_defconfig()
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
 
     # Always enable MMC/SDHCI support
     echo "CONFIG_MMC=y" >> ${defconfig}
@@ -143,6 +145,7 @@ runkernel()
 		-device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0 \
 		-drive file=${rootfs},if=none,format=raw,id=d0"
 	elif [[ "${fixup##*:}" == scsi* ]]; then
+	    local wwn
 	    case "${fixup##*:}" in
 	    "scsi[53C810]")
 		device="lsi53c810"
@@ -162,9 +165,15 @@ runkernel()
 	    "scsi[MEGASAS2]")
 		device="megasas-gen2"
 		;;
+	    "scsi[FUSION]")
+		device="mptsas1068"
+		# wwn (World Wide Name) is mandatory for this device
+		wwn="0x5000c50015ea71ac"
+		;;
 	    esac
-	    diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
+	    diskcmd="-device ${device}"
+	    diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
+	    diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	fi
     fi
 
@@ -222,13 +231,13 @@ runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig smp:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
+retcode=$((${retcode} + $?))
 runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:sata Opteron_G2 pc rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel defconfig smp:nvme Opteron_G5 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
