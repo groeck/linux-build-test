@@ -18,10 +18,10 @@ PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
 PATH=${PATH_ALPHA}:${PATH}
 
 skip_316="alpha:defconfig:scsi[AM53C974]:rootfs \
-	alpha:defconfig:scsi[DC390]:rootfs"
+	alpha:defconfig:scsi[DC395]:rootfs"
 
 skip_318="alpha:defconfig:scsi[AM53C974]:rootfs \
-	alpha:defconfig:scsi[DC390]:rootfs"
+	alpha:defconfig:scsi[DC395]:rootfs"
 
 patch_defconfig()
 {
@@ -142,7 +142,7 @@ runkernel defconfig sata rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[AM53C974]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig "scsi[DC390]" rootfs.ext2
+runkernel defconfig "scsi[DC395]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
