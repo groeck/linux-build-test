@@ -53,6 +53,7 @@ patch_defconfig()
     echo "CONFIG_SCSI_LOWLEVEL=y" >> ${defconfig}
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
 
     # Always enable MMC/SDHCI support
@@ -143,6 +144,12 @@ runkernel()
 		-drive file=${rootfs},if=none,format=raw,id=d0"
 	elif [[ "${fixup##*:}" == scsi* ]]; then
 	    case "${fixup##*:}" in
+	    "scsi[53C810]")
+		device="lsi53c810"
+		;;
+	    "scsi[53C895A]")
+		device="lsi53c895a"
+		;;
 	    "scsi[DC395]")
 		device="dc390"
 		;;
@@ -150,6 +157,9 @@ runkernel()
 		device="am53c974"
 		;;
 	    "scsi[MEGASAS]")
+		device="megasas"
+		;;
+	    "scsi[MEGASAS2]")
 		device="megasas-gen2"
 		;;
 	    esac
@@ -194,33 +204,37 @@ runkernel defconfig smp:sata Broadwell-noTSX q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[DC395] SandyBridge q35 rootfs.ext2
+runkernel defconfig smp:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[AM53C974] Haswell q35 rootfs.ext2
+runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[MEGASAS] core2duo pc rootfs.ext2
+runkernel defconfig smp:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:nvme Nehalem q35 rootfs.ext2
+runkernel defconfig smp:scsi[DC395] Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:sata phenom pc rootfs.ext2
+runkernel defconfig smp:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[DC395] Opteron_G1 q35 rootfs.ext2
+runkernel defconfig smp:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Opteron_G5 q35 rootfs.cpio
+runkernel defconfig smp:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb EPYC-IBPB q35 rootfs.ext2
+runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:mmc EPYC pc rootfs.ext2
+runkernel defconfig smp:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Skylake-Client q35 rootfs.cpio
+runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb-uas Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Opteron_G3 q35 rootfs.cpio
+runkernel defconfig smp:sata Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig nosmp:scsi[AM53C974] Opteron_G4 pc rootfs.ext2
+runkernel defconfig smp:nvme Opteron_G5 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig nosmp:scsi[MEGASAS] IvyBridge q35 rootfs.ext2
+runkernel defconfig smp:usb core2duo q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig nosmp:sata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
