@@ -46,6 +46,12 @@ patch_defconfig()
 
     # Enable NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # Enable USB support
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 cached_config=""
@@ -64,9 +70,7 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-        if [[ "${fixup}" == scsi* || "${fixup}" == "nvme" ]]; then
-	    build+=":${fixup}"
-	fi
+	build+=":${fixup}"
 	build+=":rootfs"
     fi
 
@@ -91,6 +95,15 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
+    elif [[ "${fixup}" = *usb ]]; then
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+    elif [[ "${fixup}" == *usb-uas ]]; then
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
     elif [[ "${fixup}" == scsi* ]]; then
 	initcli="root=/dev/sda rw"
 	local wwn
@@ -158,6 +171,10 @@ echo
 runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
 runkernel defconfig sata rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig usb rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig usb-uas rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[AM53C974]" rootfs.ext2
 retcode=$((${retcode} + $?))
