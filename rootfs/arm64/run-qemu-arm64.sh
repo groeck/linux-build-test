@@ -66,16 +66,24 @@ patch_defconfig()
 	fi
     done
 
-    # Always enable SCSI controller drivers and NVME
+    # NVME
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # SCSI controller drivers
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
 
-    # Always enable MMC/SDHCI support
+    # MMC/SDHCI support
     echo "CONFIG_MMC=y" >> ${defconfig}
     echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
     echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+     # USB-UAS (USB Attached SCSI)
+     echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 runkernel()
@@ -97,29 +105,41 @@ runkernel()
 	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
-	if [[ "${fixup}" = *usb* ]]; then
+	if [[ "${fixup}" = *usb ]]; then
 	    initcli="root=/dev/sda rw rootwait"
 	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == *virtio* ]]; then
+	 elif [[ "${fixup}" == *usb-uas ]]; then
+	    initcli="root=/dev/sda rw rootwait"
+	    diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	    diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
+	elif [[ "${fixup}" == *virtio ]]; then
 	    initcli="root=/dev/vda rw"
 	    diskcmd="-device virtio-blk-pci,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == *sata* ]]; then
+	elif [[ "${fixup}" == *sata ]]; then
 	    initcli="root=/dev/sda rw"
 	    diskcmd="-device ide-hd,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
-	elif [[ "${fixup}" == *mmc* ]]; then
+	elif [[ "${fixup}" == *mmc ]]; then
 	    initcli="root=/dev/mmcblk0 rw rootwait"
 	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
-	elif [[ "${fixup}" == *nvme* ]]; then
+	elif [[ "${fixup}" == *nvme ]]; then
 	    initcli="root=/dev/nvme0n1 rw"
 	    diskcmd="-device nvme,serial=foo,drive=d0 \
 		-drive file=${rootfs%.gz},if=none,format=raw,id=d0"
 	elif [[ "${fixup}" == *scsi* ]]; then
 	    initcli="root=/dev/sda rw"
+	    local wwn
 	    case "${fixup##*:}" in
+	    "scsi[53C810]")
+		device="lsi53c810"
+		;;
+	    "scsi[53C895A]")
+		device="lsi53c895a"
+		;;
 	    "scsi[DC395]")
 		device="dc390"
 		;;
@@ -127,11 +147,20 @@ runkernel()
 		device="am53c974"
 		;;
 	    "scsi[MEGASAS]")
+		device="megasas"
+		;;
+	    "scsi[MEGASAS2]")
 		device="megasas-gen2"
 		;;
+	    "scsi[FUSION]")
+		device="mptsas1068"
+		# wwn (World Wide Name) is mandatory for this device
+		wwn="0x5000c50015ea71ac"
+		;;
 	    esac
-	    diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
-		     -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
+	    diskcmd="-device ${device}"
+	    diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
+	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
 	else
 	    local index=0
 	    if [[ "${fixup}" == *sd1* ]]; then
@@ -242,6 +271,8 @@ runkernel virt defconfig smp rootfs.cpio.gz
 retcode=$?
 runkernel virt defconfig smp:usb rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel virt defconfig smp:usb-uas rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel virt defconfig smp:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:nvme rootfs.ext2.gz
@@ -253,6 +284,14 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[MEGASAS2]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[53C810]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[53C895A]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
