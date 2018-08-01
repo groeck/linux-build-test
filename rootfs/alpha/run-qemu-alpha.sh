@@ -36,10 +36,13 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
     # Enable SCSI controllers
-    # Note: CONFIG_SCSI_SYM53C8XX_2=y doesn't work
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
+    # broken
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
 
     # Enable NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
@@ -61,7 +64,7 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-        if [[ "${fixup}" == scsi* ]]; then
+        if [[ "${fixup}" == scsi* || "${fixup}" == "nvme" ]]; then
 	    build+=":${fixup}"
 	fi
 	build+=":rootfs"
@@ -90,7 +93,14 @@ runkernel()
 	diskcmd="-initrd ${rootfs}"
     elif [[ "${fixup}" == scsi* ]]; then
 	initcli="root=/dev/sda rw"
+	local wwn
 	case "${fixup}" in
+	"scsi[53C810]")
+	    device="lsi53c810"
+	    ;;
+	"scsi[53C895A]")
+	    device="lsi53c895a"
+	    ;;
 	"scsi[DC395]")
 	    device="dc390"
 	    ;;
@@ -98,11 +108,20 @@ runkernel()
 	    device="am53c974"
 	    ;;
 	"scsi[MEGASAS]")
+	    device="megasas"
+	    ;;
+	"scsi[MEGASAS2]")
 	    device="megasas-gen2"
 	    ;;
+	"scsi[FUSION]")
+	    device="mptsas1068"
+	    # wwn (World Wide Name) is mandatory for this device
+	    wwn="0x5000c50015ea71ac"
+	    ;;
 	esac
-	diskcmd="-device "${device}" -device scsi-hd,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
+	diskcmd="-device ${device}"
+	diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
     elif [[ "${fixup}" == "nvme" ]]; then
 	initcli="root=/dev/nvme0n1 rw"
 	diskcmd="-device nvme,serial=foo,drive=d0 \
@@ -146,11 +165,27 @@ runkernel defconfig "scsi[DC395]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig "scsi[MEGASAS2]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig "scsi[FUSION]" rootfs.ext2
+retcode=$((${retcode} + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    # Results in WARNING on reboot
-    runkernel defconfig "nvme" rootfs.ext2
+    # broken
+    # CACHE TEST FAILED: host wrote 1, chip read 0.
+    # CACHE TEST FAILED: chip wrote 2, host read 0.
+    # sym0: CACHE INCORRECTLY CONFIGURED.
+    # sym0: giving up ...
+    # WARNING: CPU: 0 PID: 1 at ./include/linux/dma-mapping.h:541 ___free_dma_mem_cluster+0x184/0x1a0
+    runkernel defconfig "scsi[53C810]" rootfs.ext2
+    retcode=$((${retcode} + $?))
+    # sym0: SCSI BUS has been reset.
+    # sym0: unexpected disconnect
+    runkernel defconfig "scsi[53C895A]" rootfs.ext2
     retcode=$((${retcode} + $?))
 fi
+
+runkernel defconfig "nvme" rootfs.ext2
+retcode=$((${retcode} + $?))
 
 exit ${rv}
