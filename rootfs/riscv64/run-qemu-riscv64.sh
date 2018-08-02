@@ -56,10 +56,7 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
-    if [[ "${rootfs}" == *.gz ]]; then
-	gunzip -f "${rootfs}"
-	rootfs="${rootfs%.gz}"
-    fi
+    rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
 
