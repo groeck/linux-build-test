@@ -105,74 +105,8 @@ runkernel()
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+=":rootfs"
-	if [[ "${fixup}" = *usb ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == *usb-uas ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
-	    diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == *virtio ]]; then
-	    initcli="root=/dev/vda rw"
-	    diskcmd="-device virtio-blk-pci,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == *sata ]]; then
-	    initcli="root=/dev/sda rw"
-	    diskcmd="-device ide-hd,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},id=d0,format=raw"
-	elif [[ "${fixup}" == *mmc ]]; then
-	    initcli="root=/dev/mmcblk0 rw rootwait"
-	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
-	elif [[ "${fixup}" == *nvme ]]; then
-	    initcli="root=/dev/nvme0n1 rw"
-	    diskcmd="-device nvme,serial=foo,drive=d0 \
-		-drive file=${rootfs%.gz},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == *scsi* ]]; then
-	    initcli="root=/dev/sda rw"
-	    local wwn
-	    case "${fixup##*:}" in
-	    "scsi[53C810]")
-		device="lsi53c810"
-		;;
-	    "scsi[53C895A]")
-		device="lsi53c895a"
-		;;
-	    "scsi[DC395]")
-		device="dc390"
-		;;
-	    "scsi[AM53C974]")
-		device="am53c974"
-		;;
-	    "scsi[MEGASAS]")
-		device="megasas"
-		;;
-	    "scsi[MEGASAS2]")
-		device="megasas-gen2"
-		;;
-	    "scsi[FUSION]")
-		device="mptsas1068"
-		# wwn (World Wide Name) is mandatory for this device
-		wwn="0x5000c50015ea71ac"
-		;;
-	    esac
-	    diskcmd="-device ${device}"
-	    diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
-	else
-	    local index=0
-	    if [[ "${fixup}" == *sd1* ]]; then
-		index=1
-	    fi
-	    initcli="root=/dev/mmcblk0 rw rootwait"
-	    diskcmd="-drive file=${rootfs%.gz},if=sd,format=raw,index=${index}"
-	fi
     fi
 
     local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
@@ -213,12 +147,13 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
-    if [[ "${rootfs}" == *.gz ]]; then
-	gunzip -f "${rootfs}"
-	rootfs="${rootfs%.gz}"
-    fi
+    rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
+    fi
 
     case ${mach} in
     "virt")
