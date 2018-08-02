@@ -1,11 +1,14 @@
 #!/bin/bash
 
-config=$1
-variant=$2
-
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
+config=$1
+variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
@@ -25,7 +28,8 @@ PATH=${PATH_MIPS}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
     # Enable DEVTMPFS
 
@@ -34,31 +38,25 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
     # 64 bit build
-
-    sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
-    sed -i -e '/CONFIG_32BIT/d' ${defconfig}
-    sed -i -e '/CONFIG_64BIT/d' ${defconfig}
+    echo "CONFIG_32BIT=n" >> ${defconfig}
+    echo "CONFIG_CPU_MIPS32_R1=n" >> ${defconfig}
     echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
     echo "CONFIG_64BIT=y" >> ${defconfig}
 
     # Build a big endian image
-
-    sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
-    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
 
-    # Enable SMP if requested
-
-    sed -i -e '/CONFIG_MIPS_MT_SMP/d' ${defconfig}
-    sed -i -e '/CONFIG_SCHED_SMT/d' ${defconfig}
-    sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
-
-    if [ "${fixup}" = "smp" ]
-    then
-        echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
-        echo "CONFIG_SCHED_SMT=y" >> ${defconfig}
-        echo "CONFIG_NR_CPUS=8" >> ${defconfig}
-    fi
+    for fixup in ${fixups}; do
+	if [[ "${fixup}" == "smp" ]]; then
+	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
+	    echo "CONFIG_SCHED_SMT=y" >> ${defconfig}
+	    echo "CONFIG_NR_CPUS=8" >> ${defconfig}
+	elif [[ "${fixup}" == "nosmp" ]]; then
+	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
+	    echo "CONFIG_SCHED_SMT=n" >> ${defconfig}
+	fi
+    done
 }
 
 runkernel()
@@ -67,7 +65,8 @@ runkernel()
     local fixup=$2
     local pid
     local retcode
-    local mountdir="/dev/sda"
+    local initcli="root=/dev/sda rw"
+    local diskcmd="-drive file=${rootfs},format=raw,if=ide"
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
     local build="mips64:${defconfig}:${fixup}"
@@ -98,19 +97,22 @@ runkernel()
     grep "CONFIG_ATA=y" .config >/dev/null 2>&1
     if [ $? -ne 0 ]
     then
-	mountdir="/dev/hda"
+	initcli="root=/dev/hda rw"
     fi
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	${cpu} \
-	-drive file=${rootfs},format=raw,if=ide \
-	-vga cirrus -usb -device usb-wacom-tablet -no-reboot -m 128 \
-	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \
+	${diskcmd} \
+	-vga cirrus -no-reboot -m 128 \
+	--append "${initcli} mem=128M console=ttyS0 console=tty ${extracli} doreboot" \
 	-nographic > ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
