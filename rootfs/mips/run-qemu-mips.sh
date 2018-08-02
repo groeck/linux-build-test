@@ -27,26 +27,50 @@ PATH=${PATH_MIPS}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    # Enable DEVTMPFS
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    # Enable BLK_DEV_INITRD for initrd support
-    # sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-    # echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
     # Build a big endian image
-    sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
-    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
 
-    sed -i -e '/CONFIG_MIPS_MT_SMP/d' ${defconfig}
-    if [ "${fixup}" = "smp" ]
-    then
-        echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
-    fi
+    # MMC/SDHCI
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # SCSI
+    echo "CONFIG_SCSI=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+
+    # NVME
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # USB
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+
+    for fixup in ${fixups}; do
+	if [[ "${fixup}" == "smp" ]]; then
+	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
+	elif [[ "${fixup}" == "nosmp" ]]; then
+	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
+	fi
+    done
 }
+
+cached_config=""
 
 runkernel()
 {
@@ -55,9 +79,10 @@ runkernel()
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
-    local mountdir="/dev/sda"
     local waitlist=("Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}:${fixup}"
+    local initcli
+    local diskcmd
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
@@ -73,29 +98,52 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-    if [ $? -ne 0 ]
-    then
-	return 1
-    fi
-
-    # The actual configuration determines if the root file system
-    # is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-    # CONFIG_ATA is enabled in kernel version 4.1 and later.
-    grep "CONFIG_ATA=y" .config >/dev/null 2>&1
-    if [ $? -ne 0 ]
-    then
-	mountdir="/dev/hda"
+    if [ "${cached_config}" != "${defconfig}${fixup%:*}" ]; then
+	if ! dosetup -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	    return 1
+	fi
+	cached_config="${defconfig}${fixup%:*}"
+    else
+	setup_rootfs "${rootfs}"
     fi
 
     echo -n "running ..."
 
+    if [[ "${fixup}" == *sata ]]; then
+	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	local hddev="hda"
+	# The actual configuration determines if the root file system
+	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
+	# CONFIG_ATA is enabled in kernel version 4.1 and later.
+	if grep -q "CONFIG_ATA=y" .config; then
+	    hddev="sda"
+	fi
+	initcli="root=/dev/${hddev} rw"
+    elif [[ "${fixup}" == *mmc ]]; then
+	initcli="root=/dev/mmcblk0 rw rootwait"
+	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+    elif [[ "${fixup}" == *nvme ]]; then
+	initcli="root=/dev/nvme0n1 rw"
+	diskcmd="-device nvme,serial=foo,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+    elif [[ "${fixup}" = *usb ]]; then
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+    elif [[ "${fixup}" == *usb-uas ]]; then
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+    fi
+
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
-	-drive file=${rootfs},format=raw,if=ide \
-	-vga cirrus -usb -device usb-wacom-tablet -no-reboot -m 128 \
-	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty ${extracli} doreboot" \
+	${diskcmd} \
+	-vga cirrus -no-reboot -m 128 \
+	--append "${initcli} mem=128M console=ttyS0 console=tty ${extracli} doreboot" \
 	-nographic -monitor none > ${logfile} 2>&1 &
     pid=$!
 
@@ -110,9 +158,21 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig nosmp
+runkernel malta_defconfig nosmp:sata
 retcode=$?
-runkernel malta_defconfig smp
-retcode=$((${retcode} + $?))
+runkernel malta_defconfig smp:sata
+retcode=$((retcode + $?))
+if [[ ${runall} -eq 1 ]]; then
+    # Kernel bug detected[#1]: Workqueue: nvme-reset-wq nvme_reset_work
+    # (in nvme_pci_reg_read64)
+    runkernel malta_defconfig smp:nvme
+    retcode=$((retcode + $?))
+fi
+runkernel malta_defconfig smp:usb
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:usb-uas
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:mmc
+retcode=$((retcode + $?))
 
 exit ${retcode}
