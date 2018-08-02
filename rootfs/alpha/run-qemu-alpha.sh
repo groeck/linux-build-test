@@ -92,59 +92,8 @@ runkernel()
 
     echo -n "running ..."
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    elif [[ "${fixup}" = *usb ]]; then
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-    elif [[ "${fixup}" == *usb-uas ]]; then
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
-	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-    elif [[ "${fixup}" == scsi* ]]; then
-	initcli="root=/dev/sda rw"
-	local wwn
-	case "${fixup}" in
-	"scsi[53C810]")
-	    device="lsi53c810"
-	    ;;
-	"scsi[53C895A]")
-	    device="lsi53c895a"
-	    ;;
-	"scsi[DC395]")
-	    device="dc390"
-	    ;;
-	"scsi[AM53C974]")
-	    device="am53c974"
-	    ;;
-	"scsi[MEGASAS]")
-	    device="megasas"
-	    ;;
-	"scsi[MEGASAS2]")
-	    device="megasas-gen2"
-	    ;;
-	"scsi[FUSION]")
-	    device="mptsas1068"
-	    # wwn (World Wide Name) is mandatory for this device
-	    wwn="0x5000c50015ea71ac"
-	    ;;
-	esac
-	diskcmd="-device ${device}"
-	diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-    elif [[ "${fixup}" == "nvme" ]]; then
-	initcli="root=/dev/nvme0n1 rw"
-	diskcmd="-device nvme,serial=foo,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
-    else
-	local hddev="sda"
-	grep -q CONFIG_IDE=y .config >/dev/null 2>&1
-	[ $? -eq 0 ] && hddev="hda"
-	initcli="root=/dev/${hddev} rw"
-	diskcmd="-drive file=${rootfs},if=ide,format=raw"
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
@@ -202,7 +151,7 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((${retcode} + $?))
 fi
 
-runkernel defconfig "nvme" rootfs.ext2
+runkernel defconfig nvme rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${rv}
