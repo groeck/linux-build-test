@@ -24,10 +24,12 @@ parse_args()
 	dodebug=0
 	runall=0
 	testbuild=0
-	while getopts adnt opt; do
+	extracli=""
+	while getopts ae:dnt opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=1;;
+	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
 	t)	testbuild=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
