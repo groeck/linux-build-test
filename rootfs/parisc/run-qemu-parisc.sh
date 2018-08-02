@@ -61,77 +61,11 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("reboot: Restarting system" "Boot successful" "Requesting system reboot")
     local build="${ARCH}:${defconfig}"
-    local initcli
-    local diskcmd
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs%.gz}"
     else
 	build+="${fixup:+:${fixup}}:rootfs"
-	if [[ "${fixup}" == "sata" ]]; then
-	    initcli="root=/dev/sda rw"
-	    diskcmd="-device cmd646-ide,id=ata"
-	    diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == "mmc" ]]; then
-	    initcli="root=/dev/mmcblk0 rw rootwait"
-	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
-	elif [[ "${fixup}" == "usb" ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	elif [[ "${fixup}" == "usb-uas" ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
-	    diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == "nvme" ]]; then
-	    initcli="root=/dev/nvme0n1 rw"
-	    diskcmd="-device nvme,serial=foo,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,format=raw,id=d0"
-	else # scsi
-	    initcli="root=/dev/sda"
-	    local wwn
-	    local device
-	    local if
-	    local id
-	    case "${fixup}" in
-	    "scsi")
-		# default (53C810)
-		if="scsi"
-		;;
-	    "scsi[53C895A]")
-		device="lsi53c895a"
-		;;
-	    "scsi[DC395]")
-		device="dc390"
-		;;
-	    "scsi[AM53C974]")
-		device="am53c974"
-		;;
-	    "scsi[MEGASAS]")
-		device="megasas"
-		;;
-	    "scsi[MEGASAS2]")
-		device="megasas-gen2"
-		;;
-	    "scsi[FUSION]")
-		device="mptsas1068"
-		# wwn (World Wide Name) is mandatory for this device
-		wwn="0x5000c50015ea71ac"
-		;;
-	    esac
-	    diskcmd=""
-	    if [[ -n "${device}" ]]; then
-		diskcmd="-device ${device}"
-		diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
-		id="d0"
-	    fi
-	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=${if:-none}${id:+,id=${id}}"
-	fi
     fi
 
     if [ -n "${_fixup}" -a "${_fixup}" != "${fixup}" ]
@@ -141,6 +75,10 @@ runkernel()
     fi
 
     echo -n "Building ${build} ... "
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
+    fi
 
     if [ "${cached_config}" != "${defconfig}" ]; then
 	dosetup -f fixup "${rootfs}" "${defconfig}"
@@ -152,10 +90,7 @@ runkernel()
 	setup_rootfs "${rootfs}"
     fi
 
-    if [[ "${rootfs}" == *.gz ]]; then
-	gunzip -f "${rootfs}"
-	rootfs="${rootfs%.gz}"
-    fi
+    rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
 
