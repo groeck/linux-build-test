@@ -73,6 +73,10 @@ runkernel()
 	    diskcmd="-device cmd646-ide,id=ata"
 	    diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0"
+	elif [[ "${fixup}" == "mmc" ]]; then
+	    initcli="root=/dev/mmcblk0 rw rootwait"
+	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},format=raw,if=none,id=d0"
 	elif [[ "${fixup}" == "usb" ]]; then
 	    initcli="root=/dev/sda rw rootwait"
 	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
@@ -168,6 +172,9 @@ echo
 
 retcode=0
 runkernel defconfig "" rootfs.cpio.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nvme rootfs.ext2.gz
