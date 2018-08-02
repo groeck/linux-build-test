@@ -37,6 +37,135 @@ parse_args()
 	done
 }
 
+# Set globals diskcmd and initcli variables
+# using common fixup strings.
+# Supports:
+# - initrd / rootfs separation
+# - mmc/sd
+# - sata
+# - nvme
+# - ata/sata
+# - scsi
+# - usb
+# - usb-uas
+common_diskcmd()
+{
+    local fixup=$1
+    local rootfs="${2%.gz}"
+
+    initcli="root=/dev/sda rw"	# override as needed
+    diskcmd=""
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	diskcmd="-initrd ${rootfs}"
+	return 0
+    fi
+
+    case "${fixup}" in
+    "mmc"|"sd")
+	initcli="root=/dev/mmcblk0 rw rootwait"
+	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+	;;
+    "mmc1"|"sd1")
+	initcli="root=/dev/mmcblk0 rw rootwait"
+	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0,index=1"
+	;;
+    "nvme")
+	initcli="root=/dev/nvme0n1 rw"
+	diskcmd="-device nvme,serial=foo,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    "ata")	# standard ide/ata/sata drive provided by platform
+	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	local hddev="hda"
+	# The actual configuration determines if the root file system
+	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
+	if grep -q "CONFIG_ATA=y" .config; then
+	    hddev="sda"
+	fi
+	initcli="root=/dev/${hddev} rw"
+	;;
+    "sata")	# generic sata drive provided by CMD464 PCI controller
+	diskcmd="-device cmd646-ide,id=ata"
+	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-uas")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    scsi*)
+	local id
+	local device
+	local wwn
+	local if
+
+	case "${fixup}" in
+	"scsi")	# Standard SCSI controller provided by platform
+	    if="scsi"
+	    ;;
+	"scsi[53C810]")
+	    device="lsi53c810"
+	    id="d0"
+	    ;;
+	"scsi[53C895A]")
+	    device="lsi53c895a"
+	    id="d0"
+	    ;;
+	"scsi[DC395]")
+	    device="dc390"
+	    id="d0"
+	    ;;
+	"scsi[AM53C974]")
+	    device="am53c974"
+	    id="d0"
+	    ;;
+	"scsi[MEGASAS]")
+	    device="megasas"
+	    id="d0"
+	    ;;
+	"scsi[MEGASAS2]")
+	    device="megasas-gen2"
+	    id="d0"
+	    ;;
+	"scsi[FUSION]")
+	    device="mptsas1068"
+	    # wwn (World Wide Name) is mandatory for this device
+	    wwn="0x5000c50015ea71ac"
+	    id="d0"
+	    ;;
+	*)
+	    echo "failed (config)"
+	    return 1
+	    ;;
+	esac
+	diskcmd="${device:+-device ${device}}"
+	diskcmd+=" ${id:+-device scsi-hd,drive=${id}${wwn:+,wwn=${wwn}}}"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${id:+,id=${id}}"
+	;;
+    "virtio")
+	initcli="root=/dev/vda rw"
+	diskcmd="-device virtio-blk-pci,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    *)
+	echo "failed (config)"
+	return 1
+	;;
+    esac
+    return 0
+}
+
 dokill()
 {
 	local pid=$1
@@ -95,6 +224,9 @@ setup_rootfs()
 	else
 	    cp ${progdir}/${rootfs} .
 	fi
+    fi
+    if [[ "${rootfs}" == *.gz ]]; then
+	gunzip -f $(basename "${rootfs}")
     fi
 }
 
