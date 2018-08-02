@@ -194,10 +194,12 @@ runkernel()
 
     case "${mach}" in
     sam460ex)
-	earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
+	# Fails with v4.4.y
+	# earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	;;
     virtex-ml507)
-	earlycon="earlycon"
+	# fails with v4.4.y
+	# earlycon="earlycon"
 	;;
     bamboo|mpc8544ds)
 	# Not needed
