@@ -91,16 +91,11 @@ runkernel()
 	return 1
     fi
 
-    # The actual configuration determines if the root file system
-    # is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-    # CONFIG_ATA is enabled in kernel version 4.1 and later.
-    grep "CONFIG_ATA=y" .config >/dev/null 2>&1
-    if [ $? -ne 0 ]
-    then
-	initcli="root=/dev/hda rw"
-    fi
-
     echo -n "running ..."
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
+    fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
@@ -123,9 +118,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig nosmp
+runkernel malta_defconfig nosmp:ata
 retcode=$?
-runkernel malta_defconfig smp
-retcode=$((${retcode} + $?))
+runkernel malta_defconfig smp:ata
+retcode=$((retcode + $?))
 
 exit ${retcode}
