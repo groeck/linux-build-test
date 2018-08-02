@@ -42,9 +42,13 @@ skip_318="virt:defconfig:smp:usb:rootfs \
 skip_44="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
 	virt:defconfig:smp:usb:rootfs \
+	virt:defconfig:smp:usb-uas:rootfs \
 	virt:defconfig:smp:scsi[DC395]:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp:scsi[MEGASAS2]:rootfs \
+	virt:defconfig:smp:scsi[53C810]:rootfs \
+	virt:defconfig:smp:scsi[53C895A]:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_49="raspi3:defconfig:smp:initrd \
 	raspi3:defconfig:smp:sd:rootfs \
