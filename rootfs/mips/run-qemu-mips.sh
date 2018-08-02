@@ -81,8 +81,6 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}:${fixup}"
-    local initcli
-    local diskcmd
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
@@ -109,33 +107,8 @@ runkernel()
 
     echo -n "running ..."
 
-    if [[ "${fixup}" == *sata ]]; then
-	diskcmd="-drive file=${rootfs},format=raw,if=ide"
-	local hddev="hda"
-	# The actual configuration determines if the root file system
-	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-	# CONFIG_ATA is enabled in kernel version 4.1 and later.
-	if grep -q "CONFIG_ATA=y" .config; then
-	    hddev="sda"
-	fi
-	initcli="root=/dev/${hddev} rw"
-    elif [[ "${fixup}" == *mmc ]]; then
-	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
-    elif [[ "${fixup}" == *nvme ]]; then
-	initcli="root=/dev/nvme0n1 rw"
-	diskcmd="-device nvme,serial=foo,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-    elif [[ "${fixup}" = *usb ]]; then
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-    elif [[ "${fixup}" == *usb-uas ]]; then
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
-	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
@@ -158,9 +131,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig nosmp:sata
+runkernel malta_defconfig nosmp:ata
 retcode=$?
-runkernel malta_defconfig smp:sata
+runkernel malta_defconfig smp:ata
 retcode=$((retcode + $?))
 if [[ ${runall} -eq 1 ]]; then
     # Kernel bug detected[#1]: Workqueue: nvme-reset-wq nvme_reset_work
@@ -173,6 +146,20 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig smp:usb-uas
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:mmc
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[53C810]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[53C895A]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[DC395]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[AM53C974]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[MEGASAS]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[MEGASAS2]
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[FUSION]
 retcode=$((retcode + $?))
 
 exit ${retcode}
