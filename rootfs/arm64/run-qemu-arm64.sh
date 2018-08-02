@@ -86,8 +86,8 @@ patch_defconfig()
     echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
     echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
 
-     # USB-UAS (USB Attached SCSI)
-     echo "CONFIG_USB_UAS=y" >> ${defconfig}
+    # USB-UAS (USB Attached SCSI)
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 runkernel()
@@ -113,7 +113,7 @@ runkernel()
 	    initcli="root=/dev/sda rw rootwait"
 	    diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
 	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
-	 elif [[ "${fixup}" == *usb-uas ]]; then
+	elif [[ "${fixup}" == *usb-uas ]]; then
 	    initcli="root=/dev/sda rw rootwait"
 	    diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
 	    diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
