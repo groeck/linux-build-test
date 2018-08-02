@@ -120,61 +120,8 @@ runkernel()
 
     echo -n "running ..."
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	initcli="root=/dev/sda rw"
-	if [[ "${fixup}" == *sata ]]; then
-	    diskcmd="-drive file=${rootfs},if=ide,format=raw"
-	elif [[ "${fixup}" == *mmc* ]]; then
-	    initcli="root=/dev/mmcblk0 rw rootwait"
-	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	    diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
-	elif [[ "${fixup}" == *nvme ]]; then
-	    initcli="root=/dev/nvme0n1 rw"
-	    diskcmd="-device nvme,serial=foo,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == *usb ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-device usb-storage,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
-	elif [[ "${fixup}" == *usb-uas ]]; then
-	    initcli="root=/dev/sda rw rootwait"
-	    diskcmd="-device usb-uas,id=uas \
-		-device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0 \
-		-drive file=${rootfs},if=none,format=raw,id=d0"
-	elif [[ "${fixup##*:}" == scsi* ]]; then
-	    local wwn
-	    case "${fixup##*:}" in
-	    "scsi[53C810]")
-		device="lsi53c810"
-		;;
-	    "scsi[53C895A]")
-		device="lsi53c895a"
-		;;
-	    "scsi[DC395]")
-		device="dc390"
-		;;
-	    "scsi[AM53C974]")
-		device="am53c974"
-		;;
-	    "scsi[MEGASAS]")
-		device="megasas"
-		;;
-	    "scsi[MEGASAS2]")
-		device="megasas-gen2"
-		;;
-	    "scsi[FUSION]")
-		device="mptsas1068"
-		# wwn (World Wide Name) is mandatory for this device
-		wwn="0x5000c50015ea71ac"
-		;;
-	    esac
-	    diskcmd="-device ${device}"
-	    diskcmd+=" -device scsi-hd,drive=d0${wwn:+,wwn=${wwn}}"
-	    diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-	fi
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     kvm=""
@@ -209,7 +156,7 @@ retcode=0
 
 # runkernel defconfig kvm64 q35
 # retcode=$((${retcode} + $?))
-runkernel defconfig smp:sata Broadwell-noTSX q35 rootfs.ext2
+runkernel defconfig smp:ata Broadwell-noTSX q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
@@ -237,13 +184,13 @@ runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:sata Opteron_G2 pc rootfs.ext2
+runkernel defconfig smp:ata Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig nosmp:sata Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:ata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
