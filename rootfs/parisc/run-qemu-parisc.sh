@@ -1,5 +1,7 @@
 #!/bin/bash
 
+_fixup=$1
+
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
@@ -72,7 +74,7 @@ runkernel()
 	    initcli="root=/dev/sda rw"
 	    diskcmd="-device cmd646-ide,id=ata"
 	    diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
-	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0"
+	    diskcmd+=" -drive file=${rootfs%.gz},if=none,id=d0,format=raw"
 	elif [[ "${fixup}" == "mmc" ]]; then
 	    initcli="root=/dev/mmcblk0 rw rootwait"
 	    diskcmd="-device sdhci-pci -device sd-card,drive=d0"
@@ -132,6 +134,12 @@ runkernel()
 	fi
     fi
 
+    if [ -n "${_fixup}" -a "${_fixup}" != "${fixup}" ]
+    then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
     echo -n "Building ${build} ... "
 
     if [ "${cached_config}" != "${defconfig}" ]; then
@@ -171,7 +179,7 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel defconfig "" rootfs.cpio.gz
+runkernel defconfig initrd rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig mmc rootfs.ext2.gz
