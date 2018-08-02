@@ -95,7 +95,7 @@ runkernel()
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	-drive file=${rootfs},format=raw,if=ide \
 	-vga cirrus -usb -device usb-wacom-tablet -no-reboot -m 128 \
-	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty doreboot" \
+	--append "root=${mountdir} rw mem=128M console=ttyS0 console=tty ${extracli} doreboot" \
 	-nographic -monitor none > ${logfile} 2>&1 &
     pid=$!
 
