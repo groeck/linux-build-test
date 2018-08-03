@@ -4,6 +4,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
 # PREFIX=sh4-linux-
 PREFIX=sh4eb-linux-
@@ -72,14 +75,18 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${diskcmd} \
 	-append "${initcli} console=ttySC1,115200 noiotrap" \
 	-serial null -serial stdio -monitor null -nographic \
 	-no-reboot \
 	> ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
     rm -f ${logfile}
