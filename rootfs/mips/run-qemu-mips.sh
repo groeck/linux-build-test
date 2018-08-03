@@ -150,9 +150,9 @@ if [[ ${runall} -eq 1 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:usb rootfs.ext2.gz
+runkernel malta_defconfig smp:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-uas rootfs.ext2.gz
+runkernel malta_defconfig smp:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
