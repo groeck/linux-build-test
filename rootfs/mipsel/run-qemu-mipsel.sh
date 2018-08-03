@@ -35,6 +35,30 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
+    # MMC/SDHCI
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # SCSI
+    echo "CONFIG_SCSI=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+
+    # NVME
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # USB
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
 	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
@@ -50,7 +74,7 @@ runkernel()
 {
     local cpu=$1
     local defconfig=$2
-    local fixup=$3
+    local fixup="$3"
     local rootfs=$4
     local pid
     local retcode
@@ -125,13 +149,43 @@ echo
 
 runkernel 24Kf malta_defconfig smp:ata rootfs.cpio.gz
 retcode=$?
-runkernel 24Kf malta_defconfig smp:ata rootfs-mipselr1.ext2
+runkernel 24Kf malta_defconfig smp:ata rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel mips32r6-generic malta_qemu_32r6_defconfig smp:ata rootfs-mipselr6.ext2
+if [[ ${runall} -ne 0 ]]; then
+    # Kernel bug detected[#1]:
+    # Workqueue: nvme-reset-wq nvme_reset_work
+    runkernel 24Kf malta_defconfig smp:nvme rootfs-mipselr1.ext2.gz
+    retcode=$((retcode + $?))
+fi
+
+runkernel 24Kf malta_defconfig smp:usb rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24Kc malta_defconfig smp:usb-uas rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24KEc malta_defconfig smp:mmc rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 34Kf malta_defconfig smp:scsi[53C810] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 74Kf malta_defconfig smp:scsi[53C895A] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel M14Kc malta_defconfig smp:scsi[DC395] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig smp:scsi[AM53C974] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig smp:scsi[MEGASAS] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig smp:scsi[MEGASAS2] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig smp:scsi[FUSION] rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
+
+runkernel mips32r6-generic malta_qemu_32r6_defconfig smp:ata rootfs-mipselr6.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel 24Kf malta_defconfig nosmp:ata rootfs.cpio.gz
+retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig nosmp:ata rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
