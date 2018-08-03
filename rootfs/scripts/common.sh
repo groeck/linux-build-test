@@ -108,7 +108,8 @@ common_diskcmd()
 	;;
     "usb-xhci")
 	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
+	diskcmd="-usb -device qemu-xhci,id=xhci"
+	diskcmd+=" -device usb-storage,bus=xhci.0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb")
@@ -118,7 +119,8 @@ common_diskcmd()
 	;;
     "usb-uas-xhci")
 	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	diskcmd="-usb -device qemu-xhci,id=xhci"
+	diskcmd+=" -device usb-uas,bus=xhci.0,id=uas"
 	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
