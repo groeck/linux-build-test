@@ -25,17 +25,37 @@ patch_defconfig()
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
     # Enable BLK_DEV_INITRD
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
     # Enable DEVTMPFS
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
 
     # Build a big endian image
-    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
+    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+
+    # NVME support
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # USB support
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+
+    # MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # SCSI controller drivers
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
 }
 
 cached_config=""
