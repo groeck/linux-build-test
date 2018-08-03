@@ -4,6 +4,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
@@ -65,14 +68,18 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${diskcmd} \
 	-append "${initcli} console=ttySC1,115200 noiotrap doreboot" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
 	-nographic -monitor null \
 	> ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
     rm -f ${logfile}

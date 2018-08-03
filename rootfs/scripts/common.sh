@@ -41,13 +41,19 @@ parse_args()
 # using common fixup strings.
 # Supports:
 # - initrd / rootfs separation
-# - mmc/sd
-# - sata
+# - mmc/sd/sd1
+#   Difference: mmc instantiates sdhci-pci; sd/sd1 doesn't. 
+#   sd1 instantiates the drive at index 1.
+# - ata/sata/sata-cmd646
+#   Difference: sata instantiates ide-hd, ata doesn't.
+#   sata-cmd646 also instantiates cmd-646 (a PCI sata/ide controller)
 # - nvme
 # - ata/sata
 # - scsi
-# - usb
-# - usb-uas
+# - usb, usb-xhci
+#   Difference: usb-xhci enables usb and instantiates qemu-xhci
+# - usb-uas, usb-uas-xhci
+#   Difference: same as above.
 common_diskcmd()
 {
     local fixup=$1
@@ -63,15 +69,18 @@ common_diskcmd()
     fi
 
     case "${fixup}" in
-    "mmc"|"sd")
+    "mmc")
 	initcli="root=/dev/mmcblk0 rw rootwait"
 	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
 	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
 	;;
-    "mmc1"|"sd1")
+    "sd")	# similar to mmc, but does not need sdhci-pci
 	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0,index=1"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=sd"
+	;;
+    "sd1")	# sd at index 1
+	initcli="root=/dev/mmcblk0 rw rootwait"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=sd,index=1"
 	;;
     "nvme")
 	initcli="root=/dev/nvme0n1 rw"
@@ -88,19 +97,34 @@ common_diskcmd()
 	fi
 	initcli="root=/dev/${hddev} rw"
 	;;
-    "sata")	# generic sata drive provided by CMD464 PCI controller
+    "sata-cmd646")	# generic sata drive provided by CMD646 PCI controller
 	diskcmd="-device cmd646-ide,id=ata"
 	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
-    "usb")
+    "sata")	# generic sata drive, pre-existing bus
+	diskcmd+=" -device ide-hd,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-xhci")
 	initcli="root=/dev/sda rw rootwait"
 	diskcmd="-usb -device qemu-xhci -device usb-storage,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
-    "usb-uas")
+    "usb")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device usb-storage,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-uas-xhci")
 	initcli="root=/dev/sda rw rootwait"
 	diskcmd="-usb -device qemu-xhci -device usb-uas,id=uas"
+	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    "usb-uas")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-device usb-uas,id=uas"
 	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
