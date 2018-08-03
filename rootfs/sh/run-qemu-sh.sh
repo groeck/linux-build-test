@@ -122,13 +122,11 @@ retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-if [[ ${runall} -ne 0 ]]; then
-    # usb technically works. However, it defaults to ohci, which generates
-    # a large number of warning tracebacks due to disabled interrupts and
-    # missing DMA coherence masks.
-    runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
-    retcode=$((retcode + $?))
-fi
+# Note: usb defaults to ohci, which generates a large number
+# of warning tracebacks due to disabled interrupts and
+# missing DMA coherence masks.
+runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
+retcode=$((retcode + $?))
 
 runkernel rts7751r2dplus_defconfig usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
