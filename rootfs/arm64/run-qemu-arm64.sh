@@ -23,7 +23,7 @@ PATH=${PATH}:${PATH_ARM64}
 # Exceptions:
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
-skip_316="virt:defconfig:smp:usb:rootfs \
+skip_316="virt:defconfig:smp:usb-xhci:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:smp:nvme:rootfs \
 	virt:defconfig:smp:mmc:rootfs \
@@ -31,7 +31,7 @@ skip_316="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
 	virt:defconfig:nosmp:rootfs"
-skip_318="virt:defconfig:smp:usb:rootfs \
+skip_318="virt:defconfig:smp:usb-xhci:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:smp:nvme:rootfs \
 	virt:defconfig:smp:mmc:rootfs \
@@ -41,8 +41,8 @@ skip_318="virt:defconfig:smp:usb:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_44="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
-	virt:defconfig:smp:usb:rootfs \
-	virt:defconfig:smp:usb-uas:rootfs \
+	virt:defconfig:smp:usb-xhci:rootfs \
+	virt:defconfig:smp:usb-uas-xhci:rootfs \
 	virt:defconfig:smp:scsi[DC395]:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
@@ -208,9 +208,9 @@ echo
 
 runkernel virt defconfig smp rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp:usb rootfs.ext2.gz
+runkernel virt defconfig smp:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:usb-uas rootfs.ext2.gz
+runkernel virt defconfig smp:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
