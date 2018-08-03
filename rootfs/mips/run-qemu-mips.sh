@@ -17,7 +17,6 @@ PATH_MIPS=/opt/kernel/mips/gcc-5.4.0/usr/bin
 PREFIX=mips-linux-
 
 # machine specific information
-rootfs=busybox-mips.ext3
 ARCH=mips
 KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
@@ -76,11 +75,19 @@ runkernel()
 {
     local defconfig=$1
     local fixup=$2
+    local rootfs=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
-    local build="${ARCH}:${defconfig}:${fixup}"
+    local build="${ARCH}:${defconfig}"
+
+    if [[ "${rootfs}" == *.cpio* ]]; then
+	build+=":initrd"
+    else
+	build+=":${fixup}"
+	build+=":rootfs"
+    fi
 
     if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
@@ -131,35 +138,44 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig nosmp:ata
-retcode=$?
-runkernel malta_defconfig smp:ata
+runkernel malta_defconfig smp:ata rootfs.cpio.gz
 retcode=$((retcode + $?))
+runkernel malta_defconfig smp:ata rootfs.ext2.gz
+retcode=$((retcode + $?))
+
 if [[ ${runall} -eq 1 ]]; then
     # Kernel bug detected[#1]: Workqueue: nvme-reset-wq nvme_reset_work
     # (in nvme_pci_reg_read64)
-    runkernel malta_defconfig smp:nvme
+    runkernel malta_defconfig smp:nvme rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
-runkernel malta_defconfig smp:usb
+
+runkernel malta_defconfig smp:usb rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-uas
+runkernel malta_defconfig smp:usb rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:mmc
+runkernel malta_defconfig smp:usb-uas rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[53C810]
+runkernel malta_defconfig smp:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[53C895A]
+runkernel malta_defconfig smp:scsi[53C810] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[DC395]
+runkernel malta_defconfig smp:scsi[53C895A] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[AM53C974]
+runkernel malta_defconfig smp:scsi[DC395] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS]
+runkernel malta_defconfig smp:scsi[AM53C974] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS2]
+runkernel malta_defconfig smp:scsi[MEGASAS] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[FUSION]
+runkernel malta_defconfig smp:scsi[MEGASAS2] rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel malta_defconfig smp:scsi[FUSION] rootfs.ext2.gz
+retcode=$((retcode + $?))
+
+runkernel malta_defconfig nosmp:ata rootfs.cpio.gz
+retcode=$?
+runkernel malta_defconfig nosmp:ata rootfs.ext2.gz
+retcode=$?
 
 exit ${retcode}
