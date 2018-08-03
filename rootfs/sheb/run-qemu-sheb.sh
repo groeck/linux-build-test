@@ -63,7 +63,8 @@ cached_config=""
 runkernel()
 {
     local defconfig=$1
-    local rootfs=$2
+    local fixup=$2
+    local rootfs=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
@@ -72,12 +73,8 @@ runkernel()
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs%.gz}"
     else
-	build+=":rootfs"
-	initcli="root=/dev/sda rw"
-	diskcmd="-drive file=${rootfs%.gz},if=ide,format=raw"
+	build+=":${fixup}:rootfs"
     fi
 
     echo -n "Building ${build} ... "
@@ -94,6 +91,10 @@ runkernel()
     rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
+    fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
@@ -116,9 +117,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel rts7751r2dplus_defconfig rootfs.cpio.gz
+runkernel rts7751r2dplus_defconfig "" rootfs.cpio.gz
 retcode=$?
-runkernel rts7751r2dplus_defconfig rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
