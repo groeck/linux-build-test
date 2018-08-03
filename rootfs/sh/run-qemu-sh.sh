@@ -95,7 +95,7 @@ runkernel()
 
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${diskcmd} \
-	-append "${initcli} console=ttySC1,115200 noiotrap doreboot" \
+	-append "${initcli} console=ttySC1,115200 noiotrap" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
 	-nographic -monitor null \
 	> ${logfile} 2>&1 &
