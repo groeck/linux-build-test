@@ -123,7 +123,7 @@ checkstate ${retcode}
 runkernel defconfig nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig sata rootfs.ext2.gz
+runkernel defconfig sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig scsi rootfs.ext2.gz
