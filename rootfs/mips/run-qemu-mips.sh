@@ -152,8 +152,6 @@ fi
 
 runkernel malta_defconfig smp:usb rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb rootfs.ext2.gz
-retcode=$((retcode + $?))
 runkernel malta_defconfig smp:usb-uas rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:mmc rootfs.ext2.gz
