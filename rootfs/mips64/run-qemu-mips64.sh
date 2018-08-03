@@ -175,9 +175,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:usb rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:usb-xhci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-uas rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:usb-uas-xhci rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:scsi[53C810] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
