@@ -483,19 +483,16 @@ dowait()
     echo " ${msg}"
 
     dolog=${retcode}
-    grep "\[ cut here \]" ${logfile} >/dev/null 2>&1
-    if [ $? -eq 0 ]
-    then
+    if grep -q "\[ cut here \]" ${logfile}; then
 	dolog=1
     fi
-    grep "dump_stack" ${logfile} >/dev/null 2>&1
-    if [ $? -eq 0 ]
-    then
+    if grep -q "\[ end trace [0-9a-f]* \]" ${logfile}; then
 	dolog=1
     fi
-    grep "stack backtrace" ${logfile} >/dev/null 2>&1
-    if [ $? -eq 0 ]
-    then
+    if grep -q "dump_stack" ${logfile}; then
+	dolog=1
+    fi
+    if grep -q "stack backtrace" ${logfile}; then
 	dolog=1
     fi
 
