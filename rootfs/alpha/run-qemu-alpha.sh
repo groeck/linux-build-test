@@ -119,11 +119,11 @@ echo
 
 runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
-runkernel defconfig sata rootfs.ext2
+runkernel defconfig ata rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig usb rootfs.ext2
+runkernel defconfig usb-xhci rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig usb-uas rootfs.ext2
+runkernel defconfig usb-uas-xhci rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig "scsi[AM53C974]" rootfs.ext2
 retcode=$((${retcode} + $?))
