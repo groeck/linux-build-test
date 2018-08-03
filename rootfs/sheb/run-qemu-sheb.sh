@@ -24,16 +24,16 @@ patch_defconfig()
     # Drop command line overwrite
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
-    # Enable BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-    # Enable DEVTMPFS
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
     # Build a big endian image
     echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+
+    # DEVTMPFS
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+
+    # BLK_DEV_INITRD
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
     # NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
@@ -67,7 +67,7 @@ runkernel()
     local rootfs=$3
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile=$(mktemp)
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
     local build="${ARCH}:${defconfig}"
 
@@ -117,9 +117,11 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+retcode=0
+
 runkernel rts7751r2dplus_defconfig "" rootfs.cpio.gz
-retcode=$?
+retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 exit ${retcode}
