@@ -138,13 +138,8 @@ runkernel()
 	return 0
     fi
 
-    if [[ "${cached_config}" != "${defconfig}:${fixup%:*}" ]]; then
-	if ! dosetup -f "${fixup}" "${rootfs}" "${defconfig}"; then
-	    return 1
-	fi
-	cached_config="${defconfig}:${fixup%:*}"
-    else
-	setup_rootfs "${rootfs}"
+    if ! dosetup -f "${fixup}" -c "${defconfig}:${fixup%:*}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     rootfs="${rootfs%.gz}"
