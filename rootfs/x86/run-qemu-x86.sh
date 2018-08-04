@@ -26,8 +26,6 @@ esac
 
 PATH=${PATH_X86}:${PATH}
 
-cached_config=""
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -79,16 +77,8 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if [ "${cached_config}" != "${config}" ]
-    then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]
-	then
-	    return 1
-	fi
-	cached_config=${config}
-    else
-	setup_rootfs "${rootfs}"
+    if ! dosetup -c "${config}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     echo -n "running ..."
