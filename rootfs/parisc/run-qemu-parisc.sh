@@ -17,8 +17,6 @@ ARCH=parisc
 PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
 PATH=${PATH}:${PATH_PARISC}
 
-cached_config=""
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -82,14 +80,9 @@ runkernel()
 	return 1
     fi
 
-    if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -f fixup "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
-	    return 1
-	fi
-	cached_config="${defconfig}"
-    else
-	setup_rootfs "${rootfs}"
+    dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"
+    if [ $? -ne 0 ]; then
+	return 1
     fi
 
     rootfs="${rootfs%.gz}"
