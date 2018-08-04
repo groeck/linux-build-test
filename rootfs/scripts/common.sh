@@ -131,7 +131,7 @@ common_diskcmd()
 	;;
     "usb-hub")
 	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-device usb-hub,bus=usb-bus.0,port=2"
+	diskcmd="-usb -device usb-hub,bus=usb-bus.0,port=2"
 	diskcmd+="-device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
@@ -151,7 +151,7 @@ common_diskcmd()
 	;;
     "usb-uas")
 	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-device usb-uas,id=uas"
+	diskcmd="-usb -device usb-uas,id=uas"
 	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
