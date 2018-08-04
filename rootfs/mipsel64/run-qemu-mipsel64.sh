@@ -64,8 +64,6 @@ patch_defconfig()
     fi
 }
 
-cached_config=""
-
 runkernel()
 {
     local defconfig=$1
@@ -104,18 +102,13 @@ runkernel()
 	return 0;
     fi
 
-    if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -ne 0 ]; then
-	    if [ ${retcode} -eq 2 ]; then
-		return 0
-	    fi
-	    return 1
+    dosetup -c "${buildconfig}" -f "${fixup}" "${rootfs}" "${defconfig}"
+    retcode=$?
+    if [ ${retcode} -ne 0 ]; then
+	if [ ${retcode} -eq 2 ]; then
+	    return 0
 	fi
-	cached_config="${buildconfig}"
-    else
-	setup_rootfs "${rootfs}"
+	return 1
     fi
 
     echo -n "running ..."
