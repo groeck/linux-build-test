@@ -61,8 +61,6 @@ patch_defconfig()
     echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
-cached_config=""
-
 runkernel()
 {
     local defconfig=$1
@@ -87,14 +85,9 @@ runkernel()
 	return 0
     fi
 
-    if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
-	    return 1
-	fi
-	cached_config="${defconfig}"
-    else
-	setup_rootfs "${rootfs}"
+    dosetup -f "${fixup:-fixup}" -c "${defconfig}" "${rootfs}" "${defconfig}"
+    if [ $? -ne 0 ]; then
+	return 1
     fi
 
     echo -n "running ..."
