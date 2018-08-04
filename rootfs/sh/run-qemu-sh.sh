@@ -35,6 +35,8 @@ patch_defconfig()
 
     # USB support
     echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
     echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
     echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
     echo "CONFIG_USB_UAS=y" >> ${defconfig}
@@ -128,7 +130,13 @@ retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
 retcode=$((retcode + $?))
 
+runkernel rts7751r2dplus_defconfig usb-ohci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-uas-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
