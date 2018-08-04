@@ -51,8 +51,6 @@ skip_414="arm:witherspoon-bmc:aspeed_g5_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
-cached_config=""
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -231,23 +229,14 @@ runkernel()
 	return 0
     fi
 
-    if [ "${cached_config}" != "${defconfig}:${fixup}" ]
-    then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -eq 2 ]
-	then
-	    return 0
-	fi
-	if [ ${retcode} -ne 0 ]
-	then
-	    return 1
-	fi
-    else
-	setup_rootfs ${rootfs}
+    dosetup -f "${fixup}" -c "${defconfig}:${fixup}" "${rootfs}" "${defconfig}"
+    retcode=$?
+    if [ ${retcode} -eq 2 ]; then
+	return 0
     fi
-
-    cached_config="${defconfig}:${fixup}"
+    if [ ${retcode} -ne 0 ]; then
+	return 1
+    fi
 
     echo -n "running ..."
 
