@@ -58,8 +58,6 @@ patch_defconfig()
     echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
 }
 
-cached_config=""
-
 runkernel()
 {
     local defconfig=$1
@@ -79,13 +77,8 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if [ "${cached_config}" != "${defconfig}" ]; then
-	if ! dosetup -f fixup "${rootfs}" "${defconfig}"; then
-	    return 1
-	fi
-	cached_config="${defconfig}"
-    else
-	setup_rootfs "${rootfs}"
+    if ! dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     rootfs="${rootfs%.gz}"
