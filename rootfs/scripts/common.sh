@@ -405,7 +405,7 @@ dosetup()
 
     if [[ -n "${cached_config}" && "${cached_config}" == "${__cached_config}" ]]; then
 	if [[ ${__cached_results} -ne 0 ]]; then
-	    echo "${__cached_reason}"
+	    echo "${__cached_reason} (cached)"
 	    return ${__cached_results}
 	fi
 	setup_rootfs ${dynamic} "${rootfs}"
