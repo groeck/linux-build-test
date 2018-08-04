@@ -50,6 +50,8 @@ patch_defconfig()
     # Enable USB support
     echo "CONFIG_USB=y" >> ${defconfig}
     echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
     echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
     echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
@@ -121,7 +123,13 @@ runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
 runkernel defconfig ata rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig usb-ohci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig usb-ehci rootfs.ext2
+retcode=$((${retcode} + $?))
 runkernel defconfig usb-xhci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig usb-uas-ehci rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig usb-uas-xhci rootfs.ext2
 retcode=$((${retcode} + $?))
