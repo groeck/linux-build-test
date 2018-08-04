@@ -40,6 +40,8 @@ patch_defconfig()
     echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
 
     # USB
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
     echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
     echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
 
@@ -152,10 +154,16 @@ if [[ ${runall} -ne 0 ]]; then
     checkstate ${retcode}
 fi
 
-runkernel defconfig usb rootfs.ext2.gz
+runkernel defconfig usb-ohci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel defconfig usb-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel defconfig usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig usb-uas rootfs.ext2.gz
+runkernel defconfig usb-uas-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel defconfig usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
