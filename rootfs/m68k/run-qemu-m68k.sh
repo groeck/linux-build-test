@@ -35,8 +35,6 @@ patch_defconfig()
     fi
 }
 
-cached_config=""
-
 runkernel()
 {
     local mach=$1
@@ -58,14 +56,9 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if [ "${cached_config}" != "${defconfig}" ]; then
-	dosetup -d -f "${mach}" "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
-		return 1
-	fi
-	cached_config="${defconfig}"
-    else
-	setup_rootfs "${rootfs}"
+    dosetup -c "${defconfig}" -d -f "${mach}" "${rootfs}" "${defconfig}"
+    if [ $? -ne 0 ]; then
+	return 1
     fi
 
     if [[ "${rootfs}" == *cpio ]]; then
