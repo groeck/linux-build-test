@@ -304,7 +304,7 @@ setup_config()
     if [ -e ${progdir}/${defconfig} ]
     then
 	mkdir -p arch/${arch}/configs
-        cp ${progdir}/${defconfig} arch/${arch}/configs
+	cp ${progdir}/${defconfig} arch/${arch}/configs
     fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null
@@ -340,7 +340,7 @@ checkskip()
     local s
 
     for s in ${skip[*]}; do
-        if [ "$s" = "${build}" ]; then
+	if [ "$s" = "${build}" ]; then
 	    echo "skipped"
 	    return 2
 	fi
@@ -348,9 +348,13 @@ checkskip()
     return 0
 }
 
+__cached_config=""
+__cached_results=0
+__cached_reason=""
+
 dosetup()
 {
-    local retcode
+    local rv
     local logfile=/tmp/qemu.setup.$$.log
     local tmprootfs=/tmp/rootfs.$$
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
@@ -358,6 +362,7 @@ dosetup()
     local EXTRAS=""
     local fixup=""
     local dynamic=""
+    local cached_config=""
 
     # If nobuild is set, don't build image, just set up the root file
     # system as needed. Assumes that the image was built already in
@@ -368,13 +373,14 @@ dosetup()
     fi
 
     OPTIND=1
-    while getopts b:de:f: opt
+    while getopts c:b:de:f: opt
     do
 	case ${opt} in
+	b) build="${OPTARG}";;
+	c) cached_config="${OPTARG}";;
 	d) dynamic="-d";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
-	b) build="${OPTARG}";;
 	*) ;;
 	esac
     done
@@ -385,8 +391,24 @@ dosetup()
     local defconfig=$2
 
     if ! checkskip "${build}"; then
+	# Don't update build cache information in this case because we
+	# didn't do anything. Don't clear the cache either because it
+	# might still be useful for a later build.
 	return 2
     fi
+
+    if [[ -n "${cached_config}" && "${cached_config}" == "${__cached_config}" ]]; then
+	if [[ ${__cached_results} -ne 0 ]]; then
+	    echo "${__cached_reason}"
+	    return ${__cached_results}
+	fi
+	setup_rootfs ${dynamic} "${rootfs}"
+	return 0
+    fi
+
+    __cached_config="${cached_config}"
+    __cached_results=0
+    __cached_reason=""
 
     doclean ${ARCH}
 
@@ -396,19 +418,22 @@ dosetup()
     then
 	if [ ${rv} -eq 1 ]
 	then
-	    echo "failed (config)"
+	    __cached_reason="failed (config)"
 	else
-	    echo "skipped"
+	    __cached_reason="skipped"
 	fi
+	echo "${__cached_reason}"
+	__cached_results=${rv}
 	return ${rv}
     fi
 
     setup_rootfs ${dynamic} "${rootfs}"
 
     make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
-    retcode=$?
-    if [ ${retcode} -ne 0 ]
+    rv=$?
+    if [ ${rv} -ne 0 ]
     then
+	__cached_reason="failed"
 	echo "failed"
 	echo "------------"
 	echo "Error log:"
@@ -418,7 +443,8 @@ dosetup()
 
     rm -f ${logfile}
 
-    return ${retcode}
+    __cached_results=${rv}
+    return ${rv}
 }
 
 dowait()
@@ -466,8 +492,8 @@ dowait()
 	    egrep "^machine restart" ${logfile} >/dev/null 2>&1
 	    if [ $? -ne 0 ]
 	    then
-	        msg="failed (crashed)"
-	        retcode=1
+		msg="failed (crashed)"
+		retcode=1
 	    fi
 	    dokill ${pid}
 	    break
