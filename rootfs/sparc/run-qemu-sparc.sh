@@ -17,8 +17,6 @@ PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
 
-cached_defconfig=""
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -68,14 +66,8 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if [ "${defconfig}_${smp}" != "${cached_defconfig}" ]
-    then
-        dosetup -f "${smp}" "${rootfs}" "${defconfig}"
-        if [ $? -ne 0 ]
-        then
-	    return 1
-        fi
-	cached_defconfig="${defconfig}_${smp}"
+    if ! dosetup -c "${defconfig}:${smp}" -f "${smp}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     if [ -n "${noapcflag}" ]
