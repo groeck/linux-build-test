@@ -50,7 +50,7 @@ parse_args()
 # - nvme
 # - ata/sata
 # - scsi
-# - usb, usb-xhci
+# - usb, usb-xhci, usb-ehci
 #   Difference: usb-xhci enables usb and instantiates qemu-xhci
 # - usb-uas, usb-uas-xhci
 #   Difference: same as above.
@@ -106,6 +106,18 @@ common_diskcmd()
 	diskcmd+=" -device ide-hd,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
+    "usb-ohci")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device pci-ohci,id=ohci"
+	diskcmd+=" -device usb-storage,bus=ohci.0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-ehci")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device usb-ehci,id=ehci"
+	diskcmd+=" -device usb-storage,bus=ehci.0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
     "usb-xhci")
 	initcli="root=/dev/sda rw rootwait"
 	diskcmd="-usb -device qemu-xhci,id=xhci"
@@ -116,6 +128,13 @@ common_diskcmd()
 	initcli="root=/dev/sda rw rootwait"
 	diskcmd="-usb -device usb-storage,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-uas-ehci")
+	initcli="root=/dev/sda rw rootwait"
+	diskcmd="-usb -device usb-ehci,id=ehci"
+	diskcmd+=" -device usb-uas,bus=ehci.0,id=uas"
+	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "usb-uas-xhci")
 	initcli="root=/dev/sda rw rootwait"
