@@ -28,8 +28,6 @@ esac
 
 PATH=${PATH_X86}:${PATH}
 
-cached_config=""
-
 skip_316="defconfig:smp:scsi[AM53C974] \
 	defconfig:smp:scsi[DC395] \
 	defconfig:nosmp:scsi[AM53C974] \
@@ -107,15 +105,8 @@ runkernel()
 	return 0
     fi
 
-    if [ "${cached_config}" != "${config}" ]
-    then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
-	    return 1
-	fi
-	cached_config="${config}"
-    else
-	setup_rootfs "${rootfs}"
+    if ! dosetup -c  "${config}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     echo -n "running ..."
