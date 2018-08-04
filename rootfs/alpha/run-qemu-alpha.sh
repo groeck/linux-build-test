@@ -44,6 +44,11 @@ patch_defconfig()
     # broken
     echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
 
+    # MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
     # Enable NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
 
@@ -122,6 +127,8 @@ echo
 runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
 runkernel defconfig ata rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig mmc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig usb-ohci rootfs.ext2
 retcode=$((${retcode} + $?))
