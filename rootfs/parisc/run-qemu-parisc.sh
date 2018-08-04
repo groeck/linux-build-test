@@ -1,13 +1,13 @@
 #!/bin/bash
 
-_fixup=$1
-
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
 parse_args "$@"
 shift $((OPTIND - 1))
+
+_fixup=$1
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
 
