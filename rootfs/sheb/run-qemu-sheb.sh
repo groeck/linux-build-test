@@ -124,4 +124,45 @@ retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
 retcode=$((retcode + $?))
 
+if [[ ${runall} -ne 0 ]]; then
+    # Most likely those are all PCI bus endianness translation issues.
+    # SD card does not instantiate
+    runkernel rts7751r2dplus_defconfig mmc rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # nvme nvme0: Device not ready; aborting initialisation
+    # nvme nvme0: Removing after probe failure status: -19
+    runkernel rts7751r2dplus_defconfig nvme rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # sm501 sm501: incorrect device id a0000105
+    # sm501: probe of sm501 failed with error -22
+    runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # xhci_hcd 0000:00:01.0: can't setup: -12
+    # xhci_hcd 0000:00:01.0: USB bus 1 deregistered
+    runkernel rts7751r2dplus_defconfig usb-xhci rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig usb-uas-xhci rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # sym0: CACHE INCORRECTLY CONFIGURED.
+    # sym0: giving up ...
+    runkernel rts7751r2dplus_defconfig "scsi[53C810]" rootfs.ext2.gz
+    retcode=$((${retcode} + $?))
+    runkernel rts7751r2dplus_defconfig "scsi[53C895A]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # hang (scsi command aborts/timeouts)
+    runkernel rts7751r2dplus_defconfig "scsi[DC395]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig "scsi[AM53C974]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # Hang after "megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state"
+    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS2]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    # mptbase: ioc0: ERROR - Enable Diagnostic mode FAILED! (00h)
+    runkernel rts7751r2dplus_defconfig "scsi[FUSION]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+fi
+
+
 exit ${retcode}
