@@ -26,8 +26,6 @@ PATH_XTENSA_TOOLS=/opt/buildbot/bin/xtensa
 
 PATH=${PATH_XTENSA_TOOLS}:${PATH}
 
-cached_defconfig=""
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -100,19 +98,8 @@ runkernel()
 	return 0;
     fi
 
-    if [ "${cached_defconfig}" != "${defconfig}:${cpu}" ]
-    then
-	dosetup -f "${fixup}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -ne 0 ]; then
-	    if [ ${retcode} -eq 2 ]; then
-		return 0
-	    fi
-	    return 1
-	fi
-	cached_defconfig="${defconfig}:${cpu}"
-    else
-	setup_rootfs "${rootfs}"
+    if ! dosetup -c "${defconfig}:${cpu}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     if [ -e "${dts}" ]; then
