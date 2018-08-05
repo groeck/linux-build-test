@@ -132,7 +132,7 @@ common_diskcmd()
     "usb-hub")
 	initcli="root=/dev/sda rw rootwait"
 	diskcmd="-usb -device usb-hub,bus=usb-bus.0,port=2"
-	diskcmd+="-device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
+	diskcmd+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-uas-ehci")
