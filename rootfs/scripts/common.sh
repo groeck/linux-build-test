@@ -97,7 +97,16 @@ common_diskcmd()
 	fi
 	initcli="root=/dev/${hddev} rw"
 	;;
-    "sata-cmd646")	# generic sata drive provided by CMD646 PCI controller
+    "sata-sii3112")
+	# generic sata drive provided by SII3112 SATA controller
+	# Available on ppc
+	diskcmd="-device sii3112,id=ata"
+	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "sata-cmd646")
+	# generic sata drive provided by CMD646 PCI ATA/SATA controller
+	# Available on alpha, parisc, sparc64
 	diskcmd="-device cmd646-ide,id=ata"
 	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
