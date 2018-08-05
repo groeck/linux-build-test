@@ -23,6 +23,10 @@ QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
 
+skip_318="mipsel:M14Kc:malta_defconfig:smp:scsi[DC395]:rootfs \
+	mipsel:24Kf:malta_defconfig:smp:scsi[AM53C974]:rootfs \
+	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:smp:ata:rootfs"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -107,6 +111,10 @@ runkernel()
     fi
 
     echo -n "Building ${build} ... "
+
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
 
     if ! dosetup -c "${buildconfig}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
