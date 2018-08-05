@@ -32,12 +32,17 @@ skip_316="virt:defconfig:smp:usb-xhci:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_318="virt:defconfig:smp:usb-xhci:rootfs \
+	virt:defconfig:smp:usb-uas-xhci:rootfs \
 	virt:defconfig:smp:virtio:rootfs \
 	virt:defconfig:smp:nvme:rootfs \
 	virt:defconfig:smp:mmc:rootfs \
 	virt:defconfig:smp:scsi[DC395]:rootfs \
 	virt:defconfig:smp:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp:scsi[MEGASAS2]:rootfs \
+	virt:defconfig:smp:scsi[53C810]:rootfs \
+	virt:defconfig:smp:scsi[53C895A]:rootfs \
+	virt:defconfig:smp:scsi[FUSION]:rootfs \
 	virt:defconfig:nosmp:rootfs"
 skip_44="xlnx-zcu102:defconfig:smp:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
