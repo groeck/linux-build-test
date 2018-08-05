@@ -25,14 +25,18 @@ QEMU_MACH=mac99
 PATH=${PATH_PPC}:${PATH}
 
 skip_316="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_defconfig:sata:rootfs \
+	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
 	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata:rootfs"
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs"
 
 skip_318="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_defconfig:sata:rootfs \
+	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
 	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata:rootfs"
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi[MEGASAS2]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs"
 
 patch_defconfig()
 {
@@ -46,26 +50,48 @@ patch_defconfig()
 	    echo "CONFIG_SERIAL_PMACZILOG_TTYS=n" >> ${defconfig}
 	    echo "CONFIG_SERIAL_PMACZILOG_CONSOLE=y" >> ${defconfig}
 	fi
-	if [ "${fixup}" = "devtmpfs" ]; then
-	    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-	fi
 	if [ "${fixup}" = "nosmp" ]; then
 	    echo "CONFIG_SMP=n" >> ${defconfig}
 	fi
 	if [ "${fixup}" = "smp" ]; then
 	    echo "CONFIG_SMP=y" >> ${defconfig}
 	fi
-	if [ "${fixup}" = "scsi[AM53C974]" ]; then
-	    echo "CONFIG_SCSI=y" >> ${defconfig}
-	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-	    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-	fi
-	if [ "${fixup}" = "usbdisk" ]; then
-	    echo "CONFIG_SCSI=y" >> ${defconfig}
-	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-	    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-	fi
     done
+
+    # Enable BLK_DEV_INITRD
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+    # devtmpfs
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+
+    # MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # NVME
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # SCSI/USB
+    echo "CONFIG_SCSI=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+
+    # SCSI
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
+
+    # USB
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 cached_defconfig=""
@@ -87,19 +113,18 @@ runkernel()
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${defconfig}"
     local build="${defconfig}"
-    local diskcmd
-    local cli
 
     if [ -n "${fixup}" ]; then
 	pbuild="${pbuild}:${fixup}"
-	# ignore basic scsi/sata build qualifiers for build cache
-	if [[ ${fixup} != "sata" && ${fixup} != "scsi" ]]; then
+	# ignore disk build qualifiers for build cache
+	if [[ "${fixup##*:}" != sata* && "${fixup##*:}" != scsi* &&
+	      "${fixup##*:}" != usb* && "${fixup##*:}" != "nvme" &&
+	      "${fixup##*:}" != "mmc" ]]; then
 	    build+="${fixup}"
 	fi
     fi
     if [[ "${rootfs%.gz}" == *cpio ]]; then
-	# For initrd builds, disk build qualifiers are irrelevant for the user
-	pbuild="${pbuild%:+(sata|usbdisk|scsi*)}:initrd"
+	pbuild+=":initrd"
     else
 	pbuild+=":rootfs"
     fi
@@ -124,24 +149,12 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    if [ "${build}" != "${cached_defconfig}" ]
-    then
-	dosetup -f "${fixup}" -b "${pbuild}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -ne 0 ]
-	then
-	    if [ ${retcode} -eq 2 ]
-	    then
-		return 0
-	    fi
-	    return 1
-	fi
-	cached_defconfig="${build}"
-    else
-	if ! checkskip "${pbuild}"; then
-	    return 0
-	fi
-	setup_rootfs "${rootfs}"
+    if ! checkskip "${pbuild}"; then
+	return 0
+    fi
+
+    if ! dosetup -c "${build}" -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     rootfs="${rootfs%.gz}"
@@ -158,35 +171,8 @@ runkernel()
 	dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
     fi
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	diskcmd="-initrd ${rootfs}"
-	cli="rdinit=/sbin/init"
-    else
-	local if="if=ide"
-	local extra=""
-	local extracli=""
-	local rootdev="sda"
-	if grep -q "CONFIG_IDE=y" .config; then
-	    rootdev=hda
-	fi
-	if [[ "${fixup}" == *scsi ]]; then
-	    if="id=d0"
-	    extra="-device lsi53c895a -device scsi-hd,drive=d0"
-	    rootdev="sda"
-	elif [[ "${fixup}" == *scsi\[AM53C974\] ]]; then
-	    if="id=d0"
-	    extra="-device am53c974 -device scsi-hd,drive=d0"
-	    rootdev="sda"
-	elif [[ "${fixup}" == *sata* ]]; then
-	    if="id=d0"
-	    extra="-device sii3112 -device ide-hd,drive=d0"
-	elif [[ "${fixup}" == *usbdisk* ]]; then
-	    if="id=d0"
-	    extra="-device usb-storage,drive=d0"
-	    extracli="rootwait"
-	fi
-	diskcmd="${extra} -drive file=${rootfs},format=raw,${if}"
-	cli="root=/dev/${rootdev} rw ${extracli}"
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     case "${mach}" in
@@ -212,7 +198,7 @@ runkernel()
     ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
 	${diskcmd} \
 	${dtbcmd} \
-	--append "${cli} ${earlycon} mem=256M console=${tty}" \
+	--append "${initcli} ${earlycon} mem=256M console=${tty}" \
 	-monitor none -nographic > ${logfile} 2>&1 &
     pid=$!
 
@@ -229,47 +215,71 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig nosmp mac99 G4 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp:ata mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig nosmp g3beige G3 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp:ata g3beige G3 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc_book3s_defconfig smp mac99 G4 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig smp:ata mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig devtmpfs virtex-ml507 "" ttyS0 rootfs.cpio.gz \
+runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
 	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig scsi mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig sata mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig sata-sii3112 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+runkernel mpc85xx_defconfig mmc mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((${retcode} + $?))
+if [[ ${runall} -ne 0 ]]; then
+    # nvme nvme0: I/O 23 QID 0 timeout, completion polled
+    runkernel mpc85xx_defconfig nvme mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+fi
 runkernel mpc85xx_smp_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig scsi mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig sata mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-# specify scsi[AM53C974] for initrd to avoid rebuilding the image.
-runkernel 44x/bamboo_defconfig "devtmpfs:scsi[AM53C974]" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel mpc85xx_smp_defconfig sata-sii3112 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "devtmpfs:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "devtmpfs:smp:scsi[AM53C974]"  bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig "scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "devtmpfs:smp:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig smp bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-# specify usbdisk for initrd to avoid rebuilding the image.
-runkernel 44x/canyonlands_defconfig devtmpfs:usbdisk sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:scsi[DC395]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig devtmpfs:usbdisk sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig devtmpfs:zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
+if [[ ${runall} -ne 0 ]]; then
+    # megaraid_sas 0000:00:02.0: Command pool empty!
+    # Unable to handle kernel paging request for data at address 0x00000000
+    # Faulting instruction address: 0xc024a5c8
+    # Oops: Kernel access of bad area, sig: 11 [#1]
+    # NIP [c024a5c8] megasas_issue_init_mfi+0x20/0x138
+    runkernel 44x/bamboo_defconfig "smp:scsi[MEGASAS]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+    retcode=$((${retcode} + $?))
+fi
+runkernel 44x/bamboo_defconfig "smp:scsi[FUSION]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig devtmpfs:zilog mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:mmc" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/bamboo_defconfig "smp:nvme" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig "" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig usb sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog:ata mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
