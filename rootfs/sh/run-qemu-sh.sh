@@ -119,15 +119,17 @@ retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # usb defaults to ohci based on sm501-ohci driver, which generates
-    # a large number of warning tracebacks due to disabled interrupts
-    # (missing HCD_BH flag in ohci-sm501 driver) and a missing DMA
-    # coherence mask.
+    # a large number of warning tracebacks due to disabled interrupts in
+    # OHCI interrupt handling (missing HCD_BH flag in ohci-sm501 driver)
+    # and a missing DMA coherence mask.
     # Says Alan Stern:
     # "Unfortunately, one must not simply turn on this flag.  Doing so will
     #  violate some of the documented requirements for scheduling of periodic
     #  transfers.  Significantly deeper changes to the OHCI driver are
     #  necessary before the flag is set."
     runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig usb-hub rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
 
