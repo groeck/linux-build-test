@@ -303,5 +303,13 @@ runkernel pmac32_defconfig zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:ata mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog:usb mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog:mmc mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog:nvme mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog:scsi[DC395] mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
