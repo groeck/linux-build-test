@@ -33,7 +33,6 @@ skip_318="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
 	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
 	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
 	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi[MEGASAS2]:rootfs \
 	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
 	powerpc:bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
 	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs"
@@ -239,10 +238,13 @@ if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
     runkernel mpc85xx_defconfig nvme mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
+    # timeout, no error message
+    runkernel mpc85xx_smp_defconfig scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
 fi
 runkernel mpc85xx_smp_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig scsi[DC395] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
