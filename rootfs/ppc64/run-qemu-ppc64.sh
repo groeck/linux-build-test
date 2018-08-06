@@ -231,10 +231,33 @@ retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp:cpu4:ata mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4:mmc mac99 ppc64 ttyS0 vmlinux \
+	rootfs.ext2.gz manual
+retcode=$((${retcode} + $?))
+if [[ ${runall} -ne 0 ]]; then
+    # Traceback:
+    # irq 30: nobody cared (try booting with the "irqpoll" option)
+    # during reboot
+    runkernel qemu_ppc64_book3s_defconfig smp:cpu4:nvme mac99 ppc64 ttyS0 vmlinux \
+	rootfs.ext2.gz manual
+    retcode=$((${retcode} + $?))
+fi
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
+	rootfs.ext2.gz manual
+retcode=$((${retcode} + $?))
 runkernel pseries_defconfig "" pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig scsi pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig mmc pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig nvme pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little pseries POWER9 hvc0 vmlinux \
