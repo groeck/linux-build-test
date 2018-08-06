@@ -165,7 +165,6 @@ common_diskcmd()
 	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     scsi*)
-	local id
 	local device
 	local wwn
 	local if
@@ -176,42 +175,35 @@ common_diskcmd()
 	    ;;
 	"scsi[53C810]")
 	    device="lsi53c810"
-	    id="d0"
 	    ;;
 	"scsi[53C895A]")
 	    device="lsi53c895a"
-	    id="d0"
 	    ;;
 	"scsi[DC395]")
 	    device="dc390"
-	    id="d0"
 	    ;;
 	"scsi[AM53C974]")
 	    device="am53c974"
-	    id="d0"
 	    ;;
 	"scsi[MEGASAS]")
 	    device="megasas"
-	    id="d0"
 	    ;;
 	"scsi[MEGASAS2]")
 	    device="megasas-gen2"
-	    id="d0"
 	    ;;
 	"scsi[FUSION]")
 	    device="mptsas1068"
 	    # wwn (World Wide Name) is mandatory for this device
 	    wwn="0x5000c50015ea71ac"
-	    id="d0"
 	    ;;
 	*)
 	    echo "failed (config)"
 	    return 1
 	    ;;
 	esac
-	diskcmd="${device:+-device ${device}}"
-	diskcmd+=" ${id:+-device scsi-hd,drive=${id}${wwn:+,wwn=${wwn}}}"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${id:+,id=${id}}"
+	diskcmd="${device:+-device ${device},id=scsi}"
+	diskcmd+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${device:+,id=d0}"
 	;;
     "virtio")
 	initcli="root=/dev/vda rw"
@@ -418,6 +410,7 @@ dosetup()
 	    return ${__cached_results}
 	fi
 	setup_rootfs ${dynamic} "${rootfs}"
+        [[ ${dodebug} -ne 0 ]] && echo -n "[cached] "
 	return 0
     fi
 
