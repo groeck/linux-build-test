@@ -279,6 +279,26 @@ runkernel 44x/canyonlands_defconfig "" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig usb sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig mmc sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig nvme sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig scsi[53C895A] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig scsi[AM53C974] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig scsi[DC395] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+runkernel 44x/canyonlands_defconfig scsi[FUSION] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+retcode=$((${retcode} + $?))
+if [[ ${runall} -ne 0 ]]; then
+    # megaraid_sas 0002:00:02.0: Command pool empty!
+    # Unable to handle kernel paging request for data at address 0x00000000
+    runkernel 44x/canyonlands_defconfig scsi[MEGASAS] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+    retcode=$((${retcode} + $?))
+    runkernel 44x/canyonlands_defconfig scsi[MEGASAS2] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+    retcode=$((${retcode} + $?))
+fi
 runkernel pmac32_defconfig zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:ata mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
