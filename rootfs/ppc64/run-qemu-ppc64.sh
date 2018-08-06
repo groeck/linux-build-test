@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
@@ -7,11 +9,10 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-ppc64}
-
 mach=$1
 variant=$2
-boottype=$3
+
+QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-ppc64}
 
 # machine specific information
 ARCH=powerpc
@@ -59,35 +60,62 @@ patch_defconfig()
 	fi
 
 	if [ "${fixup}" = "little" ]; then
-	    sed -i -e '/CONFIG_CPU_BIG_ENDIAN/d' ${defconfig}
-	    sed -i -e '/CONFIG_CPU_LITTLE_ENDIAN/d' ${defconfig}
+	    echo "CONFIG_CPU_BIG_ENDIAN=n" >> ${defconfig}
 	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
 	fi
 
-	if [ "${fixup}" = "devtmpfs" ]; then
-	    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-	    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-	    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-	fi
-
 	if [ "${fixup}" = "nosmp" ]; then
-	    sed -i -e '/CONFIG_SMP/d' ${defconfig}
-	    echo "# CONFIG_SMP is not set" >> ${defconfig}
-	fi
-
-	if [ "${fixup}" = "cpu4" ]; then
-	    sed -i -e '/CONFIG_NR_CPUS/d' ${defconfig}
-	    echo "CONFIG_NR_CPUS=4" >> ${defconfig}
+	    echo "CONFIG_SMP=n" >> ${defconfig}
 	fi
 
 	if [ "${fixup}" = "smp" ]; then
-	    sed -i -e '/CONFIG_SMP/d' ${defconfig}
 	    echo "CONFIG_SMP=y" >> ${defconfig}
 	fi
-    done
-}
 
-cached_config=""
+	if [ "${fixup}" = "cpu4" ]; then
+	    echo "CONFIG_NR_CPUS=4" >> ${defconfig}
+	fi
+
+    done
+
+    # Enable BLK_DEV_INITRD
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+
+    # devtmpfs
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+
+    # MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
+
+    # NVME
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
+
+    # SATA
+    echo "CONFIG_SATA_SIL=y" >> ${defconfig}
+
+    # SCSI/USB
+    echo "CONFIG_SCSI=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+
+    # SCSI
+    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
+    echo "CONFIG_FUSION=y" >> ${defconfig}
+    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
+
+    # USB
+    echo "CONFIG_USB=y" >> ${defconfig}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
+    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
+    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+}
 
 runkernel()
 {
@@ -99,29 +127,24 @@ runkernel()
     local kernel=$6
     local rootfs=$7
     local reboot=$8
-    local dt=$9
+    local dt_cmd="${9:+-machine ${9}}"
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local buildconfig="${machine}:${defconfig}"
     local msg="${ARCH}:${machine}:${defconfig}"
-    local initcli
-    local diskcmd
-    local _boottype
 
     if [ -n "${fixup}" ]; then
 	msg+=":${fixup}"
-	local f="${fixup%:scsi}"
-	buildconfig+="${f%:sata}"
+	local f="${fixup%@(scsi*|ata|sata*|mmc|nvme)}"
+	buildconfig+="${f%:}"
     fi
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	msg+=":initrd"
-	_boottype="initrd"
     else
 	msg+=":rootfs"
-	_boottype="rootfs"
     fi
 
     if [ -n "${mach}" -a "${mach}" != "${machine}" ]
@@ -136,75 +159,31 @@ runkernel()
 	return 0
     fi
 
-    if [ -n "${boottype}" -a "${boottype}" != "${_boottype}" ]
-    then
-	echo "Skipping ${msg} ..."
+    echo -n "Building ${msg} ... "
+
+    if ! checkskip "${msg}"; then
 	return 0
     fi
 
-    echo -n "Building ${msg} ... "
-
-    if [ "${cached_config}" != "${buildconfig}" ]; then
-	dosetup -f "${fixup}" -b "${msg}" "${rootfs}" "${defconfig}"
-	retcode=$?
-	if [ ${retcode} -ne 0 ]; then
-	    if [ ${retcode} -eq 2 ]; then
-		return 0
-	    fi
-	    return 1
-	fi
-	cached_config="${buildconfig}"
-    else
-	if ! checkskip "${msg}"; then
-	    return 0
-	fi
-	setup_rootfs "${rootfs}"
+    if ! dosetup -c "${buildconfig}" -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
     fi
 
     rootfs=$(basename "${rootfs%.gz}")
 
     echo -n "running ..."
 
-    dt_cmd=""
-    if [ -n "${dt}" ]; then
-	dt_cmd="-machine ${dt}"
-    fi
-
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	local hddev="sda"
-	local iftype="if=scsi"
-	local extra=""
-	case "${machine}" in
-	mac99)
-	    iftype="if=ide"
-	    if grep -q "CONFIG_IDE=y" .config; then
-		hddev="hda"
-	    fi
-	    ;;
-	ppce500)
-	    # We need to instantiate network and disk devices explicitly
-	    # for this machine.
-	    extra="-device e1000e "
-	    iftype="id=d0"
-	    if [[ "${fixup}" == *:scsi ]]; then
-		extra+="-device lsi53c895a -device scsi-hd,drive=d0"
-	    else
-		extra+="-device sii3112 -device ide-hd,drive=d0"
-	    fi
-	    ;;
-	*)
-	    ;;
-	esac
-	diskcmd="${extra} -drive file=${rootfs},format=raw,${iftype}"
-	initcli="root=/dev/${hddev} rw"
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     mem=1G
     if [[ "${machine}" = "powernv" ]]; then
 	mem=2G
+    fi
+
+    if [[ "${machine}" == "ppce500" ]]; then
+	diskcmd+=" -device e1000e"
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
@@ -234,19 +213,34 @@ retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4:ata mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig "" pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs:little pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig little pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig devtmpfs:little pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little:scsi pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:sata-sii3112 pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:scsi[FUSION] pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:mmc pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
@@ -260,13 +254,19 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:scsi ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500:nvme ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:sata ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig devtmpfs powernv POWER8 hvc0 \
+runkernel corenet64_smp_defconfig e5500:scsi[53C895A] ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel corenet64_smp_defconfig e5500:sata-sii3112 ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig "" powernv POWER8 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((${retcode} + $?))
 
