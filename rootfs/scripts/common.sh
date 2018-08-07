@@ -83,7 +83,7 @@ common_diskcmd()
 	diskcmd+=" -drive file=${rootfs},format=raw,if=sd,index=1"
 	;;
     "nvme")
-	initcli="root=/dev/nvme0n1 rw"
+	initcli="root=/dev/nvme0n1 rw rootwait"
 	diskcmd="-device nvme,serial=foo,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
