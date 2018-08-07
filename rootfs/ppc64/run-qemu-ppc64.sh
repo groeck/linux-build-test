@@ -37,6 +37,7 @@ dir=$(cd $(dirname $0); pwd)
 skip_316="powerpc:powernv:powernv_defconfig:initrd \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
+	powerpc:pseries:pseries_defconfig:sata-sii3112:rootfs \
 	powerpc:pseries:pseries_defconfig:little:initrd \
 	powerpc:pseries:pseries_defconfig:little:scsi:rootfs \
 	powerpc:pseries:pseries_defconfig:little:sata-sii3112:rootfs \
@@ -47,6 +48,7 @@ skip_316="powerpc:powernv:powernv_defconfig:initrd \
 skip_318="powerpc:powernv:powernv_defconfig:initrd \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
+	powerpc:pseries:pseries_defconfig:sata-sii3112:rootfs \
 	powerpc:pseries:pseries_defconfig:little:initrd \
 	powerpc:pseries:pseries_defconfig:little:scsi:rootfs \
 	powerpc:pseries:pseries_defconfig:little:sata-sii3112:rootfs \
@@ -54,13 +56,16 @@ skip_318="powerpc:powernv:powernv_defconfig:initrd \
 	powerpc:pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
 	powerpc:pseries:pseries_defconfig:little:mmc:rootfs \
 	powerpc:pseries:pseries_defconfig:little:nvme:rootfs"
-skip_44="powerpc:pseries:pseries_defconfig:little:initrd \
+skip_44="powerpc:pseries:pseries_defconfig:sata-sii3112:rootfs \
+	powerpc:pseries:pseries_defconfig:little:initrd \
 	powerpc:pseries:pseries_defconfig:little:scsi:rootfs \
 	powerpc:pseries:pseries_defconfig:little:sata-sii3112:rootfs \
 	powerpc:pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
 	powerpc:pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
 	powerpc:pseries:pseries_defconfig:little:mmc:rootfs \
 	powerpc:pseries:pseries_defconfig:little:nvme:rootfs"
+skip_49="powerpc:pseries:pseries_defconfig:sata-sii3112:rootfs \
+	powerpc:pseries:pseries_defconfig:little:sata-sii3112:rootfs"
 
 patch_defconfig()
 {
