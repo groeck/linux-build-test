@@ -4,6 +4,9 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 PREFIX=m68k-linux-
 ARCH=m68k
@@ -82,14 +85,17 @@ runkernel()
 	qemu="${QEMU_V211_M68K_BIN}/qemu-system-m68k"
     fi
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${qemu} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
 	${diskcmd} \
 	-append "${initcli} console=ttyS0,115200" \
 	> ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} manual waitlist[@]
     retcode=$?
