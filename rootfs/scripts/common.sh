@@ -196,6 +196,13 @@ common_diskcmd()
 	    # wwn (World Wide Name) is mandatory for this device
 	    wwn="0x5000c50015ea71ac"
 	    ;;
+	"scsi[virtio]")
+	    device="virtio-scsi-device"
+	    ;;
+	"scsi[virtio-ccw]")
+	    # s390 only
+	    device="virtio-scsi-ccw,devno=fe.0.0001"
+	    ;;
 	*)
 	    echo "failed (config)"
 	    return 1
@@ -204,6 +211,12 @@ common_diskcmd()
 	diskcmd="${device:+-device ${device},id=scsi}"
 	diskcmd+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
 	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${device:+,id=d0}"
+	;;
+    "virtio-blk-ccw")
+	# s390 only
+	initcli="root=/dev/vda rw"
+	diskcmd="-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio-blk")
 	initcli="root=/dev/vda rw"
