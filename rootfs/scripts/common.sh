@@ -205,6 +205,11 @@ common_diskcmd()
 	diskcmd+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
 	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${device:+,id=d0}"
 	;;
+    "virtio-blk")
+	initcli="root=/dev/vda rw"
+	diskcmd="-device virtio-blk-device,drive=d0"
+	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
     "virtio")
 	initcli="root=/dev/vda rw"
 	diskcmd="-device virtio-blk-pci,drive=d0"
