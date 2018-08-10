@@ -29,36 +29,38 @@ patch_defconfig()
     sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
     sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
     echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
+
+    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${defconfig}
 }
 
 runkernel()
 {
     local defconfig=$1
-    local rootfs=$2
+    local fixup=$2
+    local rootfs=$3
     local pid
     local retcode
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}"
 
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
     else
-	initcli="root=/dev/vda rw"
-	diskcmd="-drive file=${rootfs},format=raw,if=none,id=d0 \
-		-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
-	build+=":rootfs"
+	build+="${fixup:+:${fixup}}:rootfs"
     fi
 
     echo -n "Building ${build} ... "
 
-    if ! dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     echo -n "running ..."
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
+    fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
@@ -80,9 +82,11 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel defconfig busybox-s390.cpio
+runkernel defconfig "" rootfs.cpio.gz
 retcode=$?
-runkernel defconfig rootfs.s390.ext2
+runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
+retcode=$((${retcode} + $?))
+runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
