@@ -4,6 +4,9 @@ progdir=$(cd $(dirname "$0"); pwd)
 . "${progdir}/../scripts/config.sh"
 . "${progdir}/../scripts/common.sh"
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
 QEMU=${QEMU:-${QEMU_RISCV_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
@@ -28,37 +31,35 @@ runkernel()
     local rootfs=$4
     local pid
     local retcode
-    local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
+    local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
     local logfile="$(mktemp)"
     local build="${mach}:${defconfig}"
-    local initcli
-    local diskcmd
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs%.gz}"
     else
-	build+=":rootfs"
-	initcli="root=/dev/vda rw"
-	diskcmd="-drive file=${rootfs%.gz},format=raw,id=hd0 -device virtio-blk-device,drive=hd0"
+	build+=":${fixup}:rootfs"
     fi
 
     echo -n "Building ${build} ... "
 
-    if [ "${cached_config}" != "${defconfig}:${fixup}" ]; then
-	dosetup -d -f "${fixup}" "${rootfs}" "${defconfig}"
-	if [ $? -ne 0 ]; then
-	    return 1
-	fi
-	cached_config="${defconfig}:${fixup}"
-    else
-	setup_rootfs "${rootfs}"
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
+
+    if ! dosetup -c "${defconfig}" -d -f "${fixup}" "${rootfs}" "${defconfig}"; then
+	return 1
+    fi
+
+    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+	return 1
     fi
 
     rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
+
+    [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -M virt -m 512M -no-reboot \
 	-bios "${progdir}/bbl" \
@@ -68,10 +69,11 @@ runkernel()
 	-append "${initcli} earlycon console=ttyS0,115200" \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
-
     pid=$!
 
-    dowait ${pid} ${logfile} manual waitlist[@]
+    [[ ${dodebug} -ne 0 ]] && set +x
+
+    dowait ${pid} ${logfile} automatic waitlist[@]
     retcode=$?
     rm -f ${logfile}
     return ${retcode}
@@ -81,9 +83,9 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel virt defconfig devtmpfs rootfs.cpio
+runkernel virt defconfig "" rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig devtmpfs rootfs.ext2.gz
+runkernel virt defconfig virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
