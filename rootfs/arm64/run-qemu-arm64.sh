@@ -81,6 +81,8 @@ patch_defconfig()
     # SCSI controller drivers
     echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
     echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
+    echo "CONFIG_SCSI_VIRTIO=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${defconfig}
     echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
     echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
     echo "CONFIG_FUSION=y" >> ${defconfig}
@@ -231,6 +233,10 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:scsi[virtio]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig "smp:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
