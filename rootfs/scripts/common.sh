@@ -199,6 +199,9 @@ common_diskcmd()
 	"scsi[virtio]")
 	    device="virtio-scsi-device"
 	    ;;
+	"scsi[virtio-pci]")
+	    device="virtio-scsi-pci"
+	    ;;
 	"scsi[virtio-ccw]")
 	    # s390 only
 	    device="virtio-scsi-ccw,devno=fe.0.0001"
