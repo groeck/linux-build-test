@@ -216,6 +216,10 @@ runkernel virt defconfig smp:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel virt defconfig smp:virtio-pci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig smp:virtio-blk rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel virt defconfig smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:mmc rootfs.ext2.gz
@@ -235,8 +239,6 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:scsi[virtio]" rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel virt defconfig "smp:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
