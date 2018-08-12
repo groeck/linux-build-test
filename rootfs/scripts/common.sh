@@ -226,10 +226,14 @@ common_diskcmd()
 	diskcmd="-device virtio-blk-device,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
-    "virtio")
+    "virtio-pci")
 	initcli="root=/dev/vda rw"
 	diskcmd="-device virtio-blk-pci,drive=d0"
 	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "virtio")
+	initcli="root=/dev/vda rw"
+	diskcmd+=" -drive file=${rootfs},if=virtio,format=raw"
 	;;
     *)
 	echo "failed (config)"
