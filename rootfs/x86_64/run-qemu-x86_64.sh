@@ -189,7 +189,9 @@ runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:virtio core2duo q35 rootfs.ext2
+runkernel defconfig smp:virtio-pci core2duo q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig smp:virtio Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
