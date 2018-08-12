@@ -44,8 +44,9 @@ patch_defconfig()
     local fixup=$2
 
     if [[ "${fixup}" = "nosmp" ]]; then
-	sed -i -e '/CONFIG_SMP/d' ${defconfig}
+	echo "CONFIG_SMP=n" >> ${defconfig}
     fi
+
     # Always enable SCSI controller drivers and NVME
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
     echo "CONFIG_SCSI_LOWLEVEL=y" >> ${defconfig}
@@ -63,6 +64,17 @@ patch_defconfig()
 
     # Enable USB-UAS (USB Attached SCSI)
     echo "CONFIG_USB_UAS=y" >> ${defconfig}
+
+    # Virtualization
+    echo "CONFIG_VIRTIO=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_PCI=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_BALLOON=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_MMIO=y" >> ${defconfig}
+    echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_BLK=y" >> ${defconfig}
+    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${defconfig}
+    echo "CONFIG_SCSI_VIRTIO=y" >> ${defconfig}
 }
 
 runkernel()
@@ -175,10 +187,11 @@ runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:ata Opteron_G2 pc rootfs.ext2
+runkernel defconfig smp:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb core2duo q35 rootfs.ext2
+runkernel defconfig smp:virtio core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:ata Opteron_G4 q35 rootfs.ext2
