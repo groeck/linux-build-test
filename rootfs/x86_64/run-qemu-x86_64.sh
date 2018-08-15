@@ -41,11 +41,14 @@ skip_318="defconfig:smp:scsi[AM53C974] \
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    if [[ "${fixup}" = "nosmp" ]]; then
+    for fixup in ${fixups}; do
+      if [[ "${fixup}" = "nosmp" ]]; then
 	echo "CONFIG_SMP=n" >> ${defconfig}
-    fi
+      fi
+    done
 
     # Always enable SCSI controller drivers and NVME
     echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
