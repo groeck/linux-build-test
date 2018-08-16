@@ -167,11 +167,11 @@ common_diskcmd()
     scsi*)
 	local device
 	local wwn
-	local if
+	local iface
 
 	case "${fixup}" in
 	"scsi")	# Standard SCSI controller provided by platform
-	    if="scsi"
+	    iface="scsi"
 	    ;;
 	"scsi[53C810]")
 	    device="lsi53c810"
@@ -213,7 +213,7 @@ common_diskcmd()
 	esac
 	diskcmd="${device:+-device ${device},id=scsi}"
 	diskcmd+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=${if:-none}${device:+,id=d0}"
+	diskcmd+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
 	;;
     "virtio-blk-ccw")
 	# s390 only
