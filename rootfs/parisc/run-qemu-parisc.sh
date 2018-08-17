@@ -21,31 +21,6 @@ patch_defconfig()
 {
     local defconfig=$1
 
-    # NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # SCSI controller drivers
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-
-    # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # USB
-    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-
-    # USB-UAS (USB Attached SCSI)
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
-
     # ATA
     echo "CONFIG_ATA=y" >> ${defconfig}
     echo "CONFIG_PATA_CMD64X=y" >> ${defconfig}
@@ -76,11 +51,7 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
-
-    dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"
+    dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]; then
 	return 1
     fi
@@ -92,7 +63,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel vmlinux -no-reboot \
-	${diskcmd} \
+	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 ${extracli}" \
 	-nographic -monitor null > ${logfile} 2>&1 &
     pid=$!
