@@ -644,7 +644,7 @@ dosetup()
 	__setup_fragment "${fragment}" "${fixups}"
     fi
 
-    __setup_config "${defconfig}" "${fragment}" "${fixup}"
+    __setup_config "${defconfig}" "${fragment}" "${fixup:-${fixups}}"
     rv=$?
     [ -n "${fragment}" ] && rm -f "${fragment}"
     if [ ${rv} -ne 0 ]
