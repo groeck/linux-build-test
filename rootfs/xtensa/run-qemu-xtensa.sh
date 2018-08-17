@@ -70,6 +70,8 @@ runkernel()
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local cmdline
 
+    addtmpfile "${logfile}"
+
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
     then
 	echo "Skipping ${pbuild} ... "
@@ -128,7 +130,6 @@ runkernel()
     then
 	cat ${logfile}
     fi
-    rm -f ${logfile}
     return ${retcode}
 }
 
