@@ -32,36 +32,9 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
     # Build a big endian image
     echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
-
-    # MMC/SDHCI
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # SCSI
-    echo "CONFIG_SCSI=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-
-    # NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # USB
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
@@ -78,17 +51,16 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(mktemp)"
     local waitlist=("Boot successful" "Rebooting")
-    local build="${ARCH}:${defconfig}"
-    local cache="${defconfig}${fixup%:*}"
+    local build="${ARCH}:${defconfig}:${fixup}"
+    local cache="${defconfig}${fixup//smp*/smp}"
+
+    addtmpfile "${logfile}"
 
     if [[ "${rootfs}" == *.cpio* ]]; then
-	build+=":${fixup%:*}"
 	build+=":initrd"
     else
-	build+=":${fixup}"
 	build+=":rootfs"
     fi
 
@@ -110,20 +82,16 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -f "${fixup}" -c "${cache}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -F "${fixup}" -c "${cache}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     echo -n "running ..."
 
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
-
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
-	${diskcmd} \
+	${extra_params} \
 	-vga cirrus -no-reboot -m 128 \
 	--append "${initcli} mem=128M console=ttyS0 console=tty ${extracli}" \
 	-nographic -monitor none > ${logfile} 2>&1 &
@@ -132,15 +100,13 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig smp:ata rootfs.cpio.gz
+runkernel malta_defconfig smp rootfs.cpio.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:ata rootfs.ext2.gz
 retcode=$((retcode + $?))
@@ -173,7 +139,7 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig smp:scsi[FUSION] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nosmp:ata rootfs.cpio.gz
+runkernel malta_defconfig nosmp rootfs.cpio.gz
 retcode=$?
 runkernel malta_defconfig nosmp:ata rootfs.ext2.gz
 retcode=$?
