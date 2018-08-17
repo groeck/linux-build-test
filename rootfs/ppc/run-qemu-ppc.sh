@@ -111,11 +111,12 @@ runkernel()
     local dts=$8
     local dtbcmd=""
     local pid
-    local retcode
     local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${defconfig}"
     local build="${defconfig}"
+
+    addtmpfile "${logfile}"
 
     if [ -n "${fixup}" ]; then
 	pbuild="${pbuild}:${fixup}"
@@ -208,9 +209,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
