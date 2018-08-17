@@ -40,44 +40,7 @@ skip_318="defconfig:smp:scsi[AM53C974] \
 
 patch_defconfig()
 {
-    local defconfig=$1
-    local fixups=${2//:/ }
-    local fixup
-
-    for fixup in ${fixups}; do
-      if [[ "${fixup}" = "nosmp" ]]; then
-	echo "CONFIG_SMP=n" >> ${defconfig}
-      fi
-    done
-
-    # Always enable SCSI controller drivers and NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-    echo "CONFIG_SCSI_LOWLEVEL=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-
-    # Always enable MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # Enable USB-UAS (USB Attached SCSI)
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
-
-    # Virtualization
-    echo "CONFIG_VIRTIO=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_PCI=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_BALLOON=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_MMIO=y" >> ${defconfig}
-    echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_BLK=y" >> ${defconfig}
-    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${defconfig}
-    echo "CONFIG_SCSI_VIRTIO=y" >> ${defconfig}
+    : # nothing to do
 }
 
 runkernel()
@@ -94,9 +57,9 @@ runkernel()
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}:${fixup}"
     local build="${defconfig}:${fixup}"
-    local config="${defconfig}:${fixup%:*}"
+    local config="${defconfig}:${fixup//smp*/smp}"
 
-    if [[ "${rootfs}" == *cpio ]]; then
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
     else
 	pbuild+=":rootfs"
@@ -120,15 +83,11 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c  "${config}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c  "${config}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     echo -n "running ..."
-
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
 
     kvm=""
     mem="-m 256"
@@ -142,7 +101,7 @@ runkernel()
 
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot ${mem} \
-	${diskcmd} \
+	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
     pid=$!
@@ -164,37 +123,37 @@ retcode=0
 # retcode=$((${retcode} + $?))
 runkernel defconfig smp:ata Broadwell-noTSX q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp2:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb SandyBridge q35 rootfs.ext2
+runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[DC395] Conroe q35 rootfs.ext2
+runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
+runkernel defconfig smp2:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp4:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
+runkernel defconfig smp2:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
+runkernel defconfig smp4:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
+runkernel defconfig smp2 Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:virtio-pci core2duo q35 rootfs.ext2
+runkernel defconfig smp2:virtio-pci core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:virtio Broadwell q35 rootfs.ext2
+runkernel defconfig smp4:virtio Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
