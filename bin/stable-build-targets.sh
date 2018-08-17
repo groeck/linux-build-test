@@ -63,8 +63,8 @@ cmd_unicore32=(defconfig allnoconfig)
 
 # build to skip
 
-skip_316="m68k:allnoconfig"
-skip_318="m68k:allnoconfig"
+skip_316="m68k:allnoconfig tools/perf"
+skip_318="m68k:allnoconfig tools/perf"
 skip_44="cris:allnoconfig"
 
 # fixups
