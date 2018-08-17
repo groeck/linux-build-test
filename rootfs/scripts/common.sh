@@ -2,6 +2,26 @@
 
 shopt -s extglob
 
+__tmpfiles=()
+
+addtmpfile()
+{
+    __tmpfiles+=($1)
+}
+
+__cleanup()
+{
+    rv=$?
+
+    if [[ -n "${__tmpfiles[*]}" ]]; then
+	rm -f ${__tmpfiles[*]}
+    fi
+
+    exit ${rv}
+}
+
+trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT
+
 # Common variables used for waiting
 
 LOOPTIME=5	# Wait time before checking status
@@ -514,6 +534,8 @@ __setup_fragment()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${fragment}
 
     # SCSI and SCSI controller drivers
+    echo "CONFIG_SCSI=y" >> ${fragment}
+    echo "CONFIG_BLK_DEV_SD=y" >> ${fragment}
     echo "CONFIG_SCSI_LOWLEVEL=y" >> ${fragment}
     echo "CONFIG_SCSI_DC395x=y" >> ${fragment}
     echo "CONFIG_SCSI_AM53C974=y" >> ${fragment}
@@ -574,7 +596,7 @@ __cached_reason=""
 dosetup()
 {
     local rv
-    local logfile="$(mktemp)"
+    local logfile="$(mktemp /tmp/build.XXXXX)"
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
     local build="${ARCH}:${defconfig}"
     local EXTRAS=""
@@ -583,6 +605,8 @@ dosetup()
     local dynamic=""
     local cached_config=""
     local fragment=""
+
+    addtmpfile "${logfile}"
 
     OPTIND=1
     while getopts c:b:de:f:F: opt
@@ -640,13 +664,13 @@ dosetup()
     doclean ${ARCH}
 
     if [ -n "${fixups}" ]; then
-	fragment="$(mktemp)"
+	fragment="$(mktemp /tmp/fragment.XXXXX)"
+	addtmpfile "${fragment}"
 	__setup_fragment "${fragment}" "${fixups}"
     fi
 
     __setup_config "${defconfig}" "${fragment}" "${fixup:-${fixups}}"
     rv=$?
-    [ -n "${fragment}" ] && rm -f "${fragment}"
     if [ ${rv} -ne 0 ]
     then
 	if [ ${rv} -eq 1 ]
@@ -673,8 +697,6 @@ dosetup()
 	cat ${logfile}
 	echo "------------"
     fi
-
-    rm -f ${logfile}
 
     __cached_results=${rv}
     return ${rv}
