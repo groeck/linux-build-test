@@ -81,6 +81,8 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${defconfig}:${fixup}"
 
+    addtmpfile "${logfile}"
+
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
     else
@@ -168,7 +170,6 @@ runkernel()
     dowait ${pid} ${logfile} ${waitflag} waitlist[@]
     retcode=$?
 
-    rm -f ${logfile}
     return ${retcode}
 }
 
