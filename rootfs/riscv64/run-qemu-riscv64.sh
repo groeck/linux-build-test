@@ -30,10 +30,11 @@ runkernel()
     local fixup=$3
     local rootfs=$4
     local pid
-    local retcode
     local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
     local logfile="$(mktemp)"
     local build="${mach}:${defconfig}"
+
+    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -74,9 +75,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
