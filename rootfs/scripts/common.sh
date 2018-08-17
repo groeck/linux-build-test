@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s extglob
+
 # Common variables used for waiting
 
 LOOPTIME=5	# Wait time before checking status
@@ -37,12 +39,298 @@ parse_args()
 	done
 }
 
+__common_scsicmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+    local device
+    local wwn
+    local iface
+
+    case "${fixup}" in
+    "scsi")	# Standard SCSI controller provided by platform
+	iface="scsi"
+	;;
+    "scsi[53C810]")
+	device="lsi53c810"
+	;;
+    "scsi[53C895A]")
+	device="lsi53c895a"
+	;;
+    "scsi[DC395]")
+	device="dc390"
+	;;
+    "scsi[AM53C974]")
+	device="am53c974"
+	;;
+    "scsi[MEGASAS]")
+	device="megasas"
+	;;
+    "scsi[MEGASAS2]")
+	device="megasas-gen2"
+	;;
+    "scsi[FUSION]")
+	device="mptsas1068"
+	# wwn (World Wide Name) is mandatory for this device
+	wwn="0x5000c50015ea71ac"
+	;;
+    "scsi[virtio]")
+	device="virtio-scsi-device"
+	;;
+    "scsi[virtio-pci]")
+	device="virtio-scsi-pci"
+	;;
+    "scsi[virtio-ccw]")
+	# s390 only
+	device="virtio-scsi-ccw,devno=fe.0.0001"
+	;;
+    *)
+	;;
+    esac
+
+    initcli+=" root=/dev/sda rw"
+    extra_params+=" ${device:+-device ${device},id=scsi}"
+    extra_params+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
+    extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
+}
+
+__common_usbcmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+
+    case "${fixup}" in
+    "usb-ohci")
+	extra_params+=" -usb -device pci-ohci,id=ohci"
+	extra_params+=" -device usb-storage,bus=ohci.0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-ehci")
+	extra_params+=" -usb -device usb-ehci,id=ehci"
+	extra_params+=" -device usb-storage,bus=ehci.0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-xhci")
+	extra_params+=" -usb -device qemu-xhci,id=xhci"
+	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb")
+	extra_params+=" -usb -device usb-storage,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-hub")
+	extra_params+=" -usb -device usb-hub,bus=usb-bus.0,port=2"
+	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "usb-uas-ehci")
+	extra_params+=" -usb -device usb-ehci,id=ehci"
+	extra_params+=" -device usb-uas,bus=ehci.0,id=uas"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    "usb-uas-xhci")
+	extra_params+=" -usb -device qemu-xhci,id=xhci"
+	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    "usb-uas")
+	extra_params+=" -usb -device usb-uas,id=uas"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    *)
+	;;
+    esac
+
+    initcli+=" root=/dev/sda rw rootwait"
+}
+
+__common_virtcmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+
+    case "${fixup}" in
+    "virtio-blk-ccw")
+	# s390 only
+	extra_params+=" -device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "virtio-blk")
+	extra_params+=" -device virtio-blk-device,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "virtio-pci")
+	extra_params+=" -device virtio-blk-pci,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "virtio")
+	extra_params+=" -drive file=${rootfs},if=virtio,format=raw"
+	;;
+    *)
+	;;
+    esac
+
+    initcli+=" root=/dev/vda rw"
+}
+
+__common_mmccmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+
+    case "${fixup}" in
+    "mmc")
+	initcli+=" root=/dev/mmcblk0 rw rootwait"
+	extra_params+=" -device sdhci-pci -device sd-card,drive=d0"
+	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+	;;
+    "sd")	# similar to mmc, but does not need sdhci-pci
+	initcli+=" root=/dev/mmcblk0 rw rootwait"
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
+	;;
+    "sd1")	# sd at index 1
+	initcli+=" root=/dev/mmcblk0 rw rootwait"
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=1"
+	;;
+    *)
+	;;
+    esac
+
+    initcli+=" root=/dev/mmcblk0 rw rootwait"
+}
+
+__common_satacmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+
+    case "${fixup}" in
+    "sata-sii3112")
+	# generic sata drive provided by SII3112 SATA controller
+	# Available on ppc
+	extra_params+=" -device sii3112,id=ata"
+	extra_params+=" -device ide-hd,bus=ata.0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "sata-cmd646")
+	# generic sata drive provided by CMD646 PCI ATA/SATA controller
+	# Available on alpha, parisc, sparc64
+	extra_params+=" -device cmd646-ide,id=ata"
+	extra_params+=" -device ide-hd,bus=ata.0,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "sata")	# generic sata drive, pre-existing bus
+	extra_params+=" -device ide-hd,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    *)
+	;;
+    esac
+
+    initcli+=" root=/dev/sda rw"
+}
+
+__common_diskcmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+
+    case "${fixup}" in
+    "ata")	# standard ide/ata/sata drive provided by platform
+	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
+	local hddev="hda"
+	# The actual configuration determines if the root file system
+	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
+	if grep -q "CONFIG_ATA=y" .config; then
+	    hddev="sda"
+	fi
+	initcli+=" root=/dev/${hddev} rw"
+	;;
+    "mmc"|"sd"|"sd1")
+	__common_mmccmd "${fixup}" "${rootfs}"
+	;;
+    "nvme")
+	initcli+=" root=/dev/nvme0n1 rw rootwait"
+	extra_params+=" -device nvme,serial=foo,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	;;
+    "sata-sii3112"|"sata-cmd646"|"sata")
+	__common_satacmd "${fixup}" "${rootfs}"
+	;;
+    scsi*)
+	__common_scsicmd "${fixup}" "${rootfs}"
+	;;
+    usb*)
+	__common_usbcmd "${fixup}" "${rootfs}"
+	;;
+    virtio*)
+	__common_virtcmd "${fixup}" "${rootfs}"
+	;;
+    *)
+	;;
+    esac
+}
+
+__common_fixup()
+{
+    local fixup="${1}"
+    local rootfs="${2}"
+
+    case "${fixup}" in
+    "mmc"|"sd"|"sd1"|"nvme"|\
+    "ata"|sata*|usb*|scsi*|virtio*)
+	__common_diskcmd "${fixup}" "${rootfs}"
+	;;
+    pci*)
+	# __common_pcicmd "${fixup}" "${rootfs}"
+	;;
+    net*)
+	# __common_netcmd "${fixup}" "${rootfs}"
+	;;
+    smp[1-9])
+	extra_params+=" -smp ${fixup#smp}"
+	;;
+    *)
+	;;
+    esac
+}
+
+# Handle common fixups.
+# Populate "initcli" and "extra_params".
+__common_fixups()
+{
+    local fixups="${1//:/ }"
+    local rootfs="${2%.gz}"
+    local fixup
+
+    initcli=""
+    extra_params=""
+
+    if [[ "${rootfs}" == *cpio ]]; then
+	initcli="rdinit=/sbin/init"
+	extra_params="-initrd ${rootfs}"
+	rootfs=""
+    fi
+
+    for fixup in ${fixups}; do
+	__common_fixup "${fixup}" "${rootfs}"
+    done
+
+    # trim leading whitespace
+    initcli="${initcli##*( )}"
+    extra_params="${extra_params##*( )}"
+}
+
 # Set globals diskcmd and initcli variables
 # using common fixup strings.
 # Supports:
 # - initrd / rootfs separation
 # - mmc/sd/sd1
-#   Difference: mmc instantiates sdhci-pci; sd/sd1 doesn't. 
+#   Difference: mmc instantiates sdhci-pci; sd/sd1 doesn't.
 #   sd1 instantiates the drive at index 1.
 # - ata/sata/sata-cmd646
 #   Difference: sata instantiates ide-hd, ata doesn't.
@@ -59,188 +347,19 @@ common_diskcmd()
     local fixup=$1
     local rootfs="${2%.gz}"
 
-    initcli="root=/dev/sda rw"	# override as needed
-    diskcmd=""
-
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
 	return 0
     fi
 
-    case "${fixup}" in
-    "mmc")
-	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd="-device sdhci-pci -device sd-card,drive=d0"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=none,id=d0"
-	;;
-    "sd")	# similar to mmc, but does not need sdhci-pci
-	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=sd"
-	;;
-    "sd1")	# sd at index 1
-	initcli="root=/dev/mmcblk0 rw rootwait"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=sd,index=1"
-	;;
-    "nvme")
-	initcli="root=/dev/nvme0n1 rw rootwait"
-	diskcmd="-device nvme,serial=foo,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-	;;
-    "ata")	# standard ide/ata/sata drive provided by platform
-	diskcmd="-drive file=${rootfs},format=raw,if=ide"
-	local hddev="hda"
-	# The actual configuration determines if the root file system
-	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-	if grep -q "CONFIG_ATA=y" .config; then
-	    hddev="sda"
-	fi
-	initcli="root=/dev/${hddev} rw"
-	;;
-    "sata-sii3112")
-	# generic sata drive provided by SII3112 SATA controller
-	# Available on ppc
-	diskcmd="-device sii3112,id=ata"
-	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "sata-cmd646")
-	# generic sata drive provided by CMD646 PCI ATA/SATA controller
-	# Available on alpha, parisc, sparc64
-	diskcmd="-device cmd646-ide,id=ata"
-	diskcmd+=" -device ide-hd,bus=ata.0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "sata")	# generic sata drive, pre-existing bus
-	diskcmd+=" -device ide-hd,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb-ohci")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device pci-ohci,id=ohci"
-	diskcmd+=" -device usb-storage,bus=ohci.0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb-ehci")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device usb-ehci,id=ehci"
-	diskcmd+=" -device usb-storage,bus=ehci.0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb-xhci")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci,id=xhci"
-	diskcmd+=" -device usb-storage,bus=xhci.0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device usb-storage,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb-hub")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device usb-hub,bus=usb-bus.0,port=2"
-	diskcmd+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "usb-uas-ehci")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device usb-ehci,id=ehci"
-	diskcmd+=" -device usb-uas,bus=ehci.0,id=uas"
-	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-	;;
-    "usb-uas-xhci")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device qemu-xhci,id=xhci"
-	diskcmd+=" -device usb-uas,bus=xhci.0,id=uas"
-	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-	;;
-    "usb-uas")
-	initcli="root=/dev/sda rw rootwait"
-	diskcmd="-usb -device usb-uas,id=uas"
-	diskcmd+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,format=raw,id=d0"
-	;;
-    scsi*)
-	local device
-	local wwn
-	local iface
-
-	case "${fixup}" in
-	"scsi")	# Standard SCSI controller provided by platform
-	    iface="scsi"
-	    ;;
-	"scsi[53C810]")
-	    device="lsi53c810"
-	    ;;
-	"scsi[53C895A]")
-	    device="lsi53c895a"
-	    ;;
-	"scsi[DC395]")
-	    device="dc390"
-	    ;;
-	"scsi[AM53C974]")
-	    device="am53c974"
-	    ;;
-	"scsi[MEGASAS]")
-	    device="megasas"
-	    ;;
-	"scsi[MEGASAS2]")
-	    device="megasas-gen2"
-	    ;;
-	"scsi[FUSION]")
-	    device="mptsas1068"
-	    # wwn (World Wide Name) is mandatory for this device
-	    wwn="0x5000c50015ea71ac"
-	    ;;
-	"scsi[virtio]")
-	    device="virtio-scsi-device"
-	    ;;
-	"scsi[virtio-pci]")
-	    device="virtio-scsi-pci"
-	    ;;
-	"scsi[virtio-ccw]")
-	    # s390 only
-	    device="virtio-scsi-ccw,devno=fe.0.0001"
-	    ;;
-	*)
-	    echo "failed (config)"
-	    return 1
-	    ;;
-	esac
-	diskcmd="${device:+-device ${device},id=scsi}"
-	diskcmd+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
-	diskcmd+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
-	;;
-    "virtio-blk-ccw")
-	# s390 only
-	initcli="root=/dev/vda rw"
-	diskcmd="-device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "virtio-blk")
-	initcli="root=/dev/vda rw"
-	diskcmd="-device virtio-blk-device,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "virtio-pci")
-	initcli="root=/dev/vda rw"
-	diskcmd="-device virtio-blk-pci,drive=d0"
-	diskcmd+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "virtio")
-	initcli="root=/dev/vda rw"
-	diskcmd+=" -drive file=${rootfs},if=virtio,format=raw"
-	;;
-    *)
-	echo "failed (config)"
-	return 1
-	;;
-    esac
-    return 0
+    extra_params=""
+    initcli=""
+    __common_diskcmd "${fixup}" "${rootfs}"
+    diskcmd="${extra_params}"
+    if [ -z "${initcli}" ]; then
+	initcli="root=/dev/sda rw"
+    fi
 }
 
 dokill()
@@ -307,10 +426,11 @@ setup_rootfs()
     fi
 }
 
-setup_config()
+__setup_config()
 {
-    local defconfig=$1
-    local fixup=$2
+    local defconfig="$1"
+    local fragment="$2"
+    local fixup="$3"
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
     local progdir=$(cd $(dirname $0); pwd)
     local arch
@@ -333,34 +453,101 @@ setup_config()
 	arch=${ARCH};;
     esac
 
-    if [ -e ${progdir}/${defconfig} ]
-    then
+    if [ -e ${progdir}/${defconfig} ]; then
 	mkdir -p arch/${arch}/configs
 	cp ${progdir}/${defconfig} arch/${arch}/configs
     fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null
-    if [ $? -ne 0 ]
-    then
+    if [ $? -ne 0 ]; then
 	return 2
     fi
 
     # the configuration is in .config
 
-    if [ -n "${fixup}" ]
-    then
+    if [ -n "${fragment}" ]; then
+	cat "${fragment}" >> .config
+    fi
+
+    if [ -n "${fixup}" ]; then
 	patch_defconfig .config "${fixup}"
+    fi
+    if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
 	if [[ "${rel}" = "v3.16" ]]; then
 	    target="oldconfig"
 	fi
-	make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null
-	if [ $? -ne 0 ]
-	then
+	if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null; then
 	    return 1
 	fi
     fi
     return 0
+}
+
+__setup_fragment()
+{
+    local fragment="$1"
+    local fixups="${2//:/ }"
+    local fixup
+
+    rm -f "${fragment}"
+    touch "${fragment}"
+
+    for fixup in ${fixups}; do
+	case "${fixup}" in
+	"nosmp")
+	    echo "CONFIG_SMP=n" >> ${fragment}
+	    ;;
+	smp*)
+	    echo "CONFIG_SMP=y" >> ${fragment}
+	    ;;
+	*)
+	    ;;
+	esac
+    done
+
+    # BLK_DEV_INITRD
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${fragment}
+
+    # DEVTMPFS
+    echo "CONFIG_DEVTMPFS=y" >> ${fragment}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${fragment}
+
+    # SCSI and SCSI controller drivers
+    echo "CONFIG_SCSI_LOWLEVEL=y" >> ${fragment}
+    echo "CONFIG_SCSI_DC395x=y" >> ${fragment}
+    echo "CONFIG_SCSI_AM53C974=y" >> ${fragment}
+    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${fragment}
+    echo "CONFIG_MEGARAID_SAS=y" >> ${fragment}
+    echo "CONFIG_FUSION=y" >> ${fragment}
+    echo "CONFIG_FUSION_SAS=y" >> ${fragment}
+
+    # MMC/SDHCI support
+    echo "CONFIG_MMC=y" >> ${fragment}
+    echo "CONFIG_MMC_SDHCI=y" >> ${fragment}
+    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${fragment}
+
+    # NVME support
+    echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
+
+    # USB support
+    echo "CONFIG_USB=y" >> ${fragment}
+    echo "CONFIG_USB_XHCI_HCD=y" >> ${fragment}
+    echo "CONFIG_USB_EHCI_HCD=y" >> ${fragment}
+    echo "CONFIG_USB_OHCI_HCD=y" >> ${fragment}
+    echo "CONFIG_USB_STORAGE=y" >> ${fragment}
+    echo "CONFIG_USB_UAS=y" >> ${fragment}
+
+    # Virtualization
+    echo "CONFIG_VIRTIO=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_PCI=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_BALLOON=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_MMIO=y" >> ${fragment}
+    echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
+    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
+    echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
 }
 
 checkskip()
@@ -387,25 +574,18 @@ __cached_reason=""
 dosetup()
 {
     local rv
-    local logfile=/tmp/qemu.setup.$$.log
-    local tmprootfs=/tmp/rootfs.$$
+    local logfile="$(mktemp)"
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
     local build="${ARCH}:${defconfig}"
     local EXTRAS=""
     local fixup=""
+    local fixups=""
     local dynamic=""
     local cached_config=""
-
-    # If nobuild is set, don't build image, just set up the root file
-    # system as needed. Assumes that the image was built already in
-    # a previous test run.
-    if [ ${nobuild:-0} -ne 0 ]; then
-	setup_rootfs ${dynamic} "${rootfs}"
-	return 0
-    fi
+    local fragment=""
 
     OPTIND=1
-    while getopts c:b:de:f: opt
+    while getopts c:b:de:f:F: opt
     do
 	case ${opt} in
 	b) build="${OPTARG}";;
@@ -413,6 +593,7 @@ dosetup()
 	d) dynamic="-d";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
+	F) fixups="${OPTARG}";;
 	*) ;;
 	esac
     done
@@ -421,6 +602,19 @@ dosetup()
 
     local rootfs=$1
     local defconfig=$2
+
+    # Fixups need to be done early, even if images are not built.
+    if [ -n "${fixups}" ]; then
+	__common_fixups "${fixups}" "${rootfs}"
+    fi
+
+    # If nobuild is set, don't build image, just set up the root file
+    # system as needed. Assumes that the image was built already in
+    # a previous test run.
+    if [ ${nobuild:-0} -ne 0 ]; then
+	setup_rootfs ${dynamic} "${rootfs}"
+	return 0
+    fi
 
     if ! checkskip "${build}"; then
 	# Don't update build cache information in this case because we
@@ -445,8 +639,14 @@ dosetup()
 
     doclean ${ARCH}
 
-    setup_config "${defconfig}" "${fixup}"
+    if [ -n "${fixups}" ]; then
+	fragment="$(mktemp)"
+	__setup_fragment "${fragment}" "${fixups}"
+    fi
+
+    __setup_config "${defconfig}" "${fragment}" "${fixup}"
     rv=$?
+    [ -n "${fragment}" ] && rm -f "${fragment}"
     if [ ${rv} -ne 0 ]
     then
 	if [ ${rv} -eq 1 ]
