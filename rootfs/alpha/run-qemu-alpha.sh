@@ -25,40 +25,7 @@ skip_318="alpha:defconfig:scsi[AM53C974]:rootfs \
 
 patch_defconfig()
 {
-    local defconfig=$1
-    local fixup=$2
-
-    # Enable BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-    # Enable DEVTMPFS
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # Enable SCSI controllers
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-    # broken
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-
-    # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # Enable NVME support
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # Enable USB support
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+    : # nothing to do
 }
 
 runkernel()
@@ -85,22 +52,18 @@ runkernel()
 	return 0
     fi
 
-    dosetup -f "${fixup:-fixup}" -c "${defconfig}" "${rootfs}" "${defconfig}"
+    dosetup -F "${fixup:-fixup}" -c "${defconfig}" "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]; then
 	return 1
     fi
 
     echo -n "running ..."
 
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
-
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
-	${diskcmd} \
+	${extra_params} \
 	-append "${initcli} console=ttyS0" \
 	-m 128M -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
