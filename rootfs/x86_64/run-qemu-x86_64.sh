@@ -29,12 +29,12 @@ esac
 PATH=${PATH_X86}:${PATH}
 
 skip_316="defconfig:smp:scsi[AM53C974] \
-	defconfig:smp:scsi[DC395] \
+	defconfig:smp4:scsi[DC395] \
 	defconfig:nosmp:scsi[AM53C974] \
 	defconfig:nosmp:scsi[DC395]"
 
 skip_318="defconfig:smp:scsi[AM53C974] \
-	defconfig:smp:scsi[DC395] \
+	defconfig:smp4:scsi[DC395] \
 	defconfig:nosmp:scsi[AM53C974] \
 	defconfig:nosmp:scsi[DC395]"
 
