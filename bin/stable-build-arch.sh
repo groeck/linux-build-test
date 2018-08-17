@@ -3,9 +3,6 @@
 basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
-LOG=/tmp/log.$$
-BUILDDIR=/tmp/buildbot-builddir
-
 PATH_ALPHA=/opt/kernel/gcc-8.1.0-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin
@@ -55,6 +52,18 @@ PREFIX_PPC=powerpc64-linux-
 # PREFIX_PPC="powerpc64-poky-linux-"
 PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
+
+BUILDDIR="$(mktemp -d /tmp/buildbot-builddir.XXXXX)"
+LOG="$(mktemp /tmp/buildlog.XXXXX)"
+
+trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT
+
+__cleanup()
+{
+    rv=$?
+    rm -rf ${BUILDDIR} ${LOG}
+    exit ${rv}
+}
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
@@ -386,8 +395,7 @@ if [ ${#fixup[*]} -gt 0 ]; then
     echo
 fi
 
-rm -rf ${BUILDDIR}
-mkdir -p ${BUILDDIR}
+rm -rf "${BUILDDIR}/*"
 
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
@@ -415,12 +423,12 @@ do
 		case ${rel} in
 		    "v3.16"|"v3.18")
 			cd "${cmd[$i]}"
-			make ARCH=${ARCH} O="${BUILDDIR}" >/dev/null 2>/tmp/buildlog.$$
+			make ARCH=${ARCH} O="${BUILDDIR}" >/dev/null 2>${LOG}
 			rv=$?
 			cd ../..
 			;;
 		    *)
-			make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>/tmp/buildlog.$$
+			make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>${LOG}
 			rv=$?
 			;;
 		esac
@@ -428,7 +436,7 @@ do
 		    echo "failed"
 		    echo "--------------"
 		    echo "Error log:"
-		    cat /tmp/buildlog.$$
+		    cat ${LOG}
 		    echo "--------------"
 		    errors=$(expr ${errors} + 1)
 		else
@@ -474,32 +482,29 @@ do
 	n=0
 	while true
 	do
-	  make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>/tmp/buildlog.$$
+	  make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>${LOG}
 	  if [ $? -eq 0 ]
 	  then
 	    echo "passed"
 	    break
 	  fi
-	  egrep "internal compiler error|Segmentation fault" /tmp/buildlog.$$ >/dev/null 2>&1
+	  grep -q -e "internal compiler error|Segmentation fault" ${LOG}
 	  if [ $? -ne 0 -o $n -gt 2 ]
 	  then
 	    echo "failed"
 	    echo "--------------"
 	    echo "Error log:"
-	    cat /tmp/buildlog.$$
+	    cat ${LOG}
 	    echo "--------------"
 	    errors=$(expr ${errors} + 1)
 	    break
 	  fi
 	  n=$(expr $n + 1)
 	done
-	rm -f /tmp/buildlog.$$
 done
 
-rm -rf ${BUILDDIR}
-
 # Clean up again to conserve disk space
-# git clean -d -f -x -q
+git clean -d -f -x -q
 
 echo
 echo "-----------------------"
