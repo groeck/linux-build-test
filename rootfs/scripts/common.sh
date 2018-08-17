@@ -327,6 +327,10 @@ __common_fixups()
     local rootfs="${2%.gz}"
     local fixup
 
+    if [[ -z "${fixups}" ]]; then
+	return
+    fi
+
     initcli=""
     extra_params=""
 
@@ -627,15 +631,11 @@ dosetup()
     local rootfs=$1
     local defconfig=$2
 
-    # Fixups need to be done early, even if images are not built.
-    if [ -n "${fixups}" ]; then
-	__common_fixups "${fixups}" "${rootfs}"
-    fi
-
     # If nobuild is set, don't build image, just set up the root file
     # system as needed. Assumes that the image was built already in
     # a previous test run.
     if [ ${nobuild:-0} -ne 0 ]; then
+	__common_fixups "${fixups}" "${rootfs}"
 	setup_rootfs ${dynamic} "${rootfs}"
 	return 0
     fi
@@ -652,6 +652,7 @@ dosetup()
 	    echo "${__cached_reason} (cached)"
 	    return ${__cached_results}
 	fi
+	__common_fixups "${fixups}" "${rootfs}"
 	setup_rootfs ${dynamic} "${rootfs}"
         [[ ${dodebug} -ne 0 ]] && echo -n "[cached] "
 	return 0
@@ -684,6 +685,7 @@ dosetup()
 	return ${rv}
     fi
 
+    __common_fixups "${fixups}" "${rootfs}"
     setup_rootfs ${dynamic} "${rootfs}"
 
     make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
