@@ -621,7 +621,7 @@ dosetup()
 	d) dynamic="-d";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
-	F) fixups="${OPTARG}";;
+	F) fixups="${OPTARG:-dummy}";;
 	*) ;;
 	esac
     done
