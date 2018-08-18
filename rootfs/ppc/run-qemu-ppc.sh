@@ -53,48 +53,7 @@ patch_defconfig()
 	    echo "CONFIG_SERIAL_PMACZILOG_TTYS=n" >> ${defconfig}
 	    echo "CONFIG_SERIAL_PMACZILOG_CONSOLE=y" >> ${defconfig}
 	fi
-	if [ "${fixup}" = "nosmp" ]; then
-	    echo "CONFIG_SMP=n" >> ${defconfig}
-	fi
-	if [ "${fixup}" = "smp" ]; then
-	    echo "CONFIG_SMP=y" >> ${defconfig}
-	fi
     done
-
-    # Enable BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-    # devtmpfs
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # SCSI/USB
-    echo "CONFIG_SCSI=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-
-    # SCSI
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-
-    # USB
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 cached_defconfig=""
@@ -113,40 +72,18 @@ runkernel()
     local pid
     local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local pbuild="${ARCH}:${mach}:${defconfig}"
-    local build="${defconfig}"
+    local pbuild="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|mmc|nvme))/}"
 
     addtmpfile "${logfile}"
 
-    if [ -n "${fixup}" ]; then
-	pbuild="${pbuild}:${fixup}"
-	# ignore disk build qualifiers for build cache
-	if [[ "${fixup##*:}" != sata* && "${fixup##*:}" != scsi* &&
-	      "${fixup##*:}" != usb* && "${fixup##*:}" != "nvme" &&
-	      "${fixup##*:}" != "mmc" ]]; then
-	    build+="${fixup}"
-	fi
-    fi
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
     else
 	pbuild+=":rootfs"
     fi
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
+    if ! match_params "${machine}%${mach}" "${variant}%${fixup}" "${config}%${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -157,11 +94,9 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${build}" -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${build}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
-
-    rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
 
@@ -173,10 +108,6 @@ runkernel()
 	local dtb="${dts/.dts/.dtb}"
 	dtbcmd="-dtb ${dtb}"
 	dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
-    fi
-
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
     fi
 
     case "${mach}" in
@@ -200,7 +131,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
-	${diskcmd} \
+	${extra_params} \
 	${dtbcmd} \
 	--append "${initcli} ${earlycon} mem=256M console=${tty}" \
 	-monitor none -nographic > ${logfile} 2>&1 &
