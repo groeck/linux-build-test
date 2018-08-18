@@ -576,6 +576,27 @@ __setup_fragment()
     echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
 }
 
+# match_params
+# match sets of strings separated by '%'.
+# The first string must be non-empty for a match,
+# and may include wildcards.
+# return 0 if match found, 1 otherwise
+match_params()
+{
+    local check
+
+    for check in $*
+    do
+	local _check=(${check//%/ })
+	if [[ -n "${_check[0]}" ]]; then
+	    if [[ "${_check[1]}" == ${_check[0]} ]]; then
+	        return 0
+	    fi
+	fi
+    done
+    return 1
+}
+
 checkskip()
 {
     local build=$1
