@@ -16,9 +16,7 @@ PATH=${PATH}:${PATH_RISCV}
 
 patch_defconfig()
 {
-	local defconfig=$1
-
-	echo "CONFIG_DEVTMPFS_MOUNT=y" >>"${defconfig}"
+    : # nothing to do
 }
 
 cached_config=""
@@ -32,14 +30,14 @@ runkernel()
     local pid
     local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
     local logfile="$(mktemp)"
-    local build="${mach}:${defconfig}"
+    local build="${mach}:${defconfig}${fixup:+:${fixup}}"
 
     addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":${fixup}:rootfs"
+	build+=":rootfs"
     fi
 
     echo -n "Building ${build} ... "
@@ -48,15 +46,9 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}" -d -f "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -d -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
-
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
-
-    rootfs="${rootfs%.gz}"
 
     echo -n "running ..."
 
@@ -66,8 +58,8 @@ runkernel()
 	-bios "${progdir}/bbl" \
 	-kernel vmlinux \
 	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
-	${diskcmd} \
-	-append "${initcli} earlycon console=ttyS0,115200" \
+	${extra_params} \
+	-append "${initcli} console=ttyS0,115200" \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
     pid=$!
