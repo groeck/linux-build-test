@@ -52,7 +52,7 @@ runkernel()
 	return 0
     fi
 
-    dosetup -F "${fixup:-fixup}" -c "${defconfig}" "${rootfs}" "${defconfig}"
+    dosetup -F "${fixup}" -c "${defconfig}" "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]; then
 	return 1
     fi
