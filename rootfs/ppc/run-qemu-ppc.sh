@@ -83,7 +83,7 @@ runkernel()
 	pbuild+=":rootfs"
     fi
 
-    if ! match_params "${machine}%${mach}" "${variant}%${fixup}" "${config}%${defconfig}"; then
+    if ! match_params "${machine}@${mach}" "${variant}@${fixup}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi

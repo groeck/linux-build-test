@@ -577,24 +577,26 @@ __setup_fragment()
 }
 
 # match_params
-# match sets of strings separated by '%'.
+# match sets of strings separated by '@'.
 # The first string must be non-empty for a match,
 # and may include wildcards.
 # return 0 if match found, 1 otherwise
 match_params()
 {
     local check
+    local rv=0
 
     for check in $*
     do
-	local _check=(${check//%/ })
-	if [[ -n "${_check[0]}" ]]; then
-	    if [[ "${_check[1]}" == ${_check[0]} ]]; then
-	        return 0
+	if [[ -n "${check%@*}" ]]; then
+	    local _check=(${check//@/ })
+	    if [[ "${_check[1]}" != ${_check[0]} ]]; then
+	        rv=1
+		break
 	    fi
 	fi
     done
-    return 1
+    return ${rv}
 }
 
 checkskip()
