@@ -7,7 +7,7 @@ progdir=$(cd $(dirname "$0"); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_RISCV_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
@@ -74,8 +74,10 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel virt defconfig "" rootfs.cpio.gz
-retcode=$((retcode + $?))
+if [[ ${runall} -ne 0 ]]; then
+    runkernel virt defconfig "" rootfs.cpio.gz
+    retcode=$((retcode + $?))
+fi
 runkernel virt defconfig virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
 
