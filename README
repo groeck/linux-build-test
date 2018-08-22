@@ -40,6 +40,21 @@ qemu-user
 qemu-utils
 u-boot-tools
 
+For perf:
+
+libaudit-dev
+libunwind-dev
+python-dev
+libiberty-dev
+liblzma-dev
+libnuma-dev
+libperl-dev
+systemtap-sdt-dev
+libdw-dev
+libslang2-dev
+libgtk2.0-de
+binutils-dev
+
 Ubuntu pre 14.04:
 	ia32-libs
 Ubuntu 14.04:
