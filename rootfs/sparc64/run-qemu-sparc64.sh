@@ -50,24 +50,12 @@ runkernel()
     local cpu="$3"
     local smp=$4
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build=${ARCH}:${mach}:${smp}:${defconfig}
 
+    if ! match_params "${machine}@${mach}" "${smpflag}@${smp}" "${config}@${defconfig}"; then
     if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${smpflag}" -a "${smpflag}" != "${smp}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
     then
 	echo "Skipping ${build} ... "
 	return 0
@@ -90,9 +78,7 @@ runkernel()
 
     pid=$!
     dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
