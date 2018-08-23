@@ -29,10 +29,8 @@ runkernel()
     local rootfs=$4
     local pid
     local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local build="${mach}:${defconfig}${fixup:+:${fixup}}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -74,10 +72,8 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-if [[ ${runall} -ne 0 ]]; then
-    runkernel virt defconfig "" rootfs.cpio.gz
-    retcode=$((retcode + $?))
-fi
+runkernel virt defconfig "" rootfs.cpio.gz
+retcode=$((retcode + $?))
 runkernel virt defconfig virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
 
