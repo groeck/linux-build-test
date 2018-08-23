@@ -64,14 +64,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
-    then
+    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
