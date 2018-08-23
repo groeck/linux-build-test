@@ -151,8 +151,7 @@ runkernel()
     local reboot=$8
     local dt_cmd="${9:+-machine ${9}}"
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local buildconfig="${machine}:${defconfig}"
     local msg="${ARCH}:${machine}:${defconfig}"
@@ -169,14 +168,7 @@ runkernel()
 	msg+=":rootfs"
     fi
 
-    if [ -n "${mach}" -a "${mach}" != "${machine}" ]
-    then
-	echo "Skipping ${msg} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${fixup}" != "${variant}" ]
-    then
+    if ! match_params "${mach}@${machine}" "${variant}@${fixup}"; then
 	echo "Skipping ${msg} ... "
 	return 0
     fi
@@ -221,9 +213,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} ${reboot} waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
