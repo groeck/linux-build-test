@@ -72,7 +72,7 @@ runkernel()
     local fixup=$4
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel64:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup}"
@@ -84,14 +84,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
-    then
+    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -151,9 +144,7 @@ runkernel()
     esac
 
     dowait ${pid} ${logfile} ${wait} waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
