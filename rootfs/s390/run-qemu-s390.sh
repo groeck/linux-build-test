@@ -32,11 +32,9 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local pid
-    local logfile=$(mktemp)
+    local logfile=$(__mktemp)
     local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
