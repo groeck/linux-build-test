@@ -37,18 +37,11 @@ runkernel()
     local dts=$3
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Machine restart")
     local pbuild="${ARCH}:${mach}:${defconfig}:${dts}"
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -86,9 +79,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
