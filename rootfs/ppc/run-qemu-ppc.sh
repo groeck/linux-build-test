@@ -70,12 +70,10 @@ runkernel()
     local dts=$8
     local dtbcmd=""
     local pid
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
     local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|mmc|nvme))/}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
