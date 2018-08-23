@@ -39,14 +39,6 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
-    # Enable DEVTMPFS
-
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
     # 64 bit build
     echo "CONFIG_32BIT=n" >> ${defconfig}
     echo "CONFIG_CPU_MIPS32_R1=n" >> ${defconfig}
@@ -60,30 +52,6 @@ patch_defconfig()
     # Build a big endian image
     echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
-
-    # MMC/SDHCI
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # SCSI
-    echo "CONFIG_SCSI=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-
-    # NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # USB
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
@@ -107,6 +75,7 @@ runkernel()
     local logfile=/tmp/runkernel-$$.log
     local waitlist=("Boot successful" "Rebooting")
     local build="mips64:${defconfig}"
+    local cache="${defconfig}${fixup//smp*/smp}"
 
     if [[ "${rootfs}" == *.cpio* ]]; then
 	build+=":initrd"
@@ -115,14 +84,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
-    then
+    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -133,7 +95,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}${fixup%:*}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${cache}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
@@ -168,7 +130,7 @@ echo
 
 retcode=0
 
-runkernel malta_defconfig smp:ata rootfs-n32.cpio.gz
+runkernel malta_defconfig smp rootfs-n32.cpio.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:ata rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
