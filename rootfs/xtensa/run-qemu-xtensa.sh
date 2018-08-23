@@ -64,22 +64,13 @@ runkernel()
     local rootfs=$6
     local pid
     local retcode
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local fixup="${cpu}"
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local cmdline
 
-    addtmpfile "${logfile}"
-
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
