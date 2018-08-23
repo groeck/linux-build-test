@@ -189,13 +189,11 @@ runkernel()
     local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local s
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}"
-
-    addtmpfile "${logfile}"
 
     PREFIX="${PREFIX_A}"
     if [[ "${cpu}" == "cortex-m3" ]]; then
