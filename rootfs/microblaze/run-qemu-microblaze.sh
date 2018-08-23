@@ -18,9 +18,8 @@ runkernel()
     local mach=$2
     local console=$3
     local pid
-    local retcode
     local waitlist=("Machine restart" "Boot successful" "Rebooting")
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
@@ -42,9 +41,7 @@ runkernel()
     pid=$!
 
     dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
