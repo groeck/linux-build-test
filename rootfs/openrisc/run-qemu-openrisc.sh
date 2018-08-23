@@ -30,7 +30,7 @@ runkernel()
     local defconfig=$1
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("MACHINE RESTART" "Boot successful" "Rebooting")
     local fixup=0
 
@@ -63,9 +63,7 @@ runkernel()
 
     pid=$!
     dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
