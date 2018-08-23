@@ -50,12 +50,10 @@ runkernel()
     local rootfs=$4
     local pid
     local retcode
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel:${cpu}:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup//smp*/smp}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -63,20 +61,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if [ -n "${_cpu}" -a "${_cpu}" != "${cpu}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${variant}" -a "${variant}" != "${fixup}" ]
-    then
+    if ! match_params "${_cpu}@${cpu}" "${config}@${defconfig}" "${variant}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
