@@ -7,9 +7,9 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-_cpu=$1
-_mach=$2
-_defconfig=$3
+_mach=$1
+_cpu=$2
+_variant=$3
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=i386
@@ -37,33 +37,7 @@ skip_318="defconfig:smp:scsi[AM53C974] \
 
 patch_defconfig()
 {
-    local defconfig=$1
-    local fixups=${2//:/ }
-    local fixup
-
-    for fixup in ${fixups}; do
-      if [[ "${fixup}" = "nosmp" ]]; then
-	echo "CONFIG_SMP=n" >> ${defconfig}
-      fi
-    done
-
-    # Always enable SCSI controller drivers and NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-    echo "CONFIG_SCSI_LOWLEVEL=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-
-    # Always enable MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # Enable USB-UAS (USB Attached SCSI)
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
+    : # Nothing to do
 }
 
 runkernel()
@@ -75,12 +49,11 @@ runkernel()
     local rootfs=$5
     local drive
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}:${fixup}"
     local build="${defconfig}:${fixup}"
-    local config="${defconfig}:${fixup%:*}"
+    local config="${defconfig}:${fixup//smp*/smp}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	pbuild+=":initrd"
@@ -88,21 +61,8 @@ runkernel()
 	pbuild+=":rootfs"
     fi
 
-    if [ -n "${_cpu}" -a "${_cpu}" != "${cpu}" ]
-        then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${_mach}" -a "${_mach}" != "${mach}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${_defconfig}" -a "${_defconfig}" != "${defconfig}" ]
-    then
-	echo "Skipping ${build} ... "
+    if ! match_params "${_cpu}@${cpu}" "${_mach}@${mach}" "${_variant}@${fixup}"; then
+	echo "Skipping ${pbuild} ... "
 	return 0
     fi
 
@@ -112,21 +72,17 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${config}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${config}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     echo -n "running ..."
 
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
-
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} -no-reboot -m 256 \
-	${diskcmd} \
+	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
     pid=$!
@@ -134,9 +90,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
@@ -146,21 +100,21 @@ retcode=0
 
 runkernel defconfig smp:ata Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp2:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb SandyBridge q35 rootfs.ext2
+runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[DC395] Conroe q35 rootfs.ext2
+runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[AM53C974] Nehalem q35 rootfs.ext2
+runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp2:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
