@@ -189,11 +189,13 @@ runkernel()
     local dtbfile="arch/arm/boot/dts/${dtb}"
     local pid
     local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local s
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}"
+
+    addtmpfile "${logfile}"
 
     PREFIX="${PREFIX_A}"
     if [[ "${cpu}" == "cortex-m3" ]]; then
@@ -205,20 +207,7 @@ runkernel()
 	pbuild="${build}:${ddtb}"
     fi
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${devtree}" -a "${devtree}" != "${ddtb}" ]
-    then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -426,9 +415,7 @@ runkernel()
     esac
 
     dowait ${pid} ${logfile} ${mode} waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
