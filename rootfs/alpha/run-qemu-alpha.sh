@@ -34,10 +34,11 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(mktemp)"
     local waitlist=("Boot successful" "Rebooting" "Restarting system")
     local build="${ARCH}:${defconfig}"
+
+    addtmpfile "${logfile}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -72,9 +73,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} auto waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
