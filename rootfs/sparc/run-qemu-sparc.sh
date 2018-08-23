@@ -46,20 +46,12 @@ runkernel()
     local smp=$3
     local noapcflag=$4
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local apc=""
     local build="${ARCH}:${mach}:${smp}:${defconfig}"
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
-	echo "Skipping ${build} ... "
-	return 0
-    fi
-
-    if [ -n "${smpflag}" -a "${smpflag}" != "${smp}" ]
-    then
+    if ! match_params "${machine}@${mach}" "${smpflag}@${smp}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -85,9 +77,7 @@ runkernel()
 
     pid=$!
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
