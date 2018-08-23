@@ -45,9 +45,8 @@ runkernel()
     local defconfig=$3
     local rootfs=$4
     local pid
-    local retcode
     local waitlist=("Rebooting" "Boot successful")
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local build="${mach}:${cpu}:${defconfig}"
     local qemu="${QEMU}"
 
@@ -98,9 +97,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
