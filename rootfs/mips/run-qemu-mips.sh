@@ -51,12 +51,10 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local pid
-    local logfile="$(mktemp)"
+    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}:${fixup}"
     local cache="${defconfig}${fixup//smp*/smp}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs}" == *.cpio* ]]; then
 	build+=":initrd"
