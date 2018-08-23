@@ -71,8 +71,7 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local pid
-    local retcode
-    local logfile=/tmp/runkernel-$$.log
+    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="mips64:${defconfig}"
     local cache="${defconfig}${fixup//smp*/smp}"
@@ -120,9 +119,7 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    rm -f ${logfile}
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
