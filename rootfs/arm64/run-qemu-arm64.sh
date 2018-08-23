@@ -78,11 +78,9 @@ runkernel()
     local dtb=$5
     local pid
     local retcode
-    local logfile=$(mktemp)
+    local logfile=$(__mktemp)
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${defconfig}:${fixup}"
-
-    addtmpfile "${logfile}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -92,18 +90,7 @@ runkernel()
 
     local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
 
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]; then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${option}" -a "${option}" != "${fixup}" ]; then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    if [ -n "${config}" -a "${config}" != "${defconfig}" ]
-    then
+    if ! match_params "${machine}@${mach}" "${option}@${fixup}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
