@@ -2,20 +2,21 @@
 
 shopt -s extglob
 
-__tmpfiles=()
+__logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 
 __addtmpfile()
 {
-    __tmpfiles+=($1)
+    echo "$1" >> "${__logfiles}"
 }
 
 __cleanup()
 {
     rv=$?
 
-    if [[ -n "${__tmpfiles[*]}" ]]; then
-	rm -f ${__tmpfiles[*]}
+    if [[ -s "${__logfiles}" ]]; then
+	rm -f $(cat "${__logfiles}")
     fi
+    rm -f "${__logfiles}"
 
     exit ${rv}
 }
@@ -323,6 +324,9 @@ __common_fixup()
 	;;
     smp[1-9])
 	extra_params+=" -smp ${fixup#smp}"
+	;;
+    efi)
+	extra_params+=" -bios /usr/share/ovmf/OVMF.fd"
 	;;
     *)
 	;;
