@@ -328,6 +328,9 @@ __common_fixup()
     efi)
 	extra_params+=" -bios /usr/share/ovmf/OVMF.fd"
 	;;
+    mem*)
+	extra_params+=" -m ${fixup#mem}"
+	;;
     *)
 	;;
     esac
