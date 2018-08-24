@@ -55,6 +55,10 @@ libslang2-dev
 libgtk2.0-de
 binutils-dev
 
+For efi boot support:
+
+ovmf
+
 Ubuntu pre 14.04:
 	ia32-libs
 Ubuntu 14.04:
