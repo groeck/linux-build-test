@@ -30,7 +30,7 @@ runkernel()
     local pid
     local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
     local logfile="$(__mktemp)"
-    local build="${mach}:${defconfig}${fixup:+:${fixup}}"
+    local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
