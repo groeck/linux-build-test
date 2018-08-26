@@ -28,15 +28,11 @@ esac
 
 PATH=${PATH_X86}:${PATH}
 
-skip_316="defconfig:smp:scsi[AM53C974] \
-	defconfig:smp4:scsi[DC395] \
-	defconfig:nosmp:scsi[AM53C974] \
-	defconfig:nosmp:scsi[DC395]"
+skip_316="defconfig:smp:mem512:scsi[AM53C974] \
+	defconfig:smp4:efi:mem256:scsi[DC395]"
 
-skip_318="defconfig:smp:scsi[AM53C974] \
-	defconfig:smp4:scsi[DC395] \
-	defconfig:nosmp:scsi[AM53C974] \
-	defconfig:nosmp:scsi[DC395]"
+skip_318="defconfig:smp:mem512:scsi[AM53C974] \
+	defconfig:smp4:efi:mem256:scsi[DC395]"
 
 patch_defconfig()
 {
@@ -82,17 +78,14 @@ runkernel()
     echo -n "running ..."
 
     kvm=""
-    mem="-m 256"
-    if [ "${cpu}" = "kvm64" ]
-    then
-	kvm="-enable-kvm -smp 4"
-	mem="-m 1024"
+    if [ "${cpu}" = "kvm64" ]; then
+	kvm="-enable-kvm"
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel arch/x86/boot/bzImage \
-	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot ${mem} \
+	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot \
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0 console=tty doreboot" \
 	-nographic > ${logfile} 2>&1 &
@@ -111,44 +104,45 @@ retcode=0
 
 # runkernel defconfig kvm64 q35
 # retcode=$((${retcode} + $?))
-runkernel defconfig smp:ata Broadwell-noTSX q35 rootfs.ext2
+runkernel defconfig smp:mem256:ata Broadwell-noTSX q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem512:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
+runkernel defconfig smp4:mem1G:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
+runkernel defconfig smp:efi:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:mem4G:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
+runkernel defconfig smp4:efi:mem256:scsi[DC395] Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[AM53C974] Nehalem q35 rootfs.ext2
+runkernel defconfig smp:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp4:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
+runkernel defconfig smp:efi:mem4G:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
+runkernel defconfig smp2:mem8G:scsi[FUSION] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
+# efi combined with scsi[FUSION] fails
+runkernel defconfig smp4:efi:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp phenom pc rootfs.cpio
+runkernel defconfig smp:mem512 phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2 Opteron_G1 q35 rootfs.cpio
+runkernel defconfig smp2:efi:mem1G Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
+runkernel defconfig smp:mem2G:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:virtio-pci core2duo q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem4G:virtio-pci core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:virtio Broadwell q35 rootfs.ext2
+runkernel defconfig smp4:mem8G:virtio Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
-runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
+runkernel defconfig nosmp:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig nosmp:ata Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:efi:mem512:ata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
