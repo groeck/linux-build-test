@@ -55,8 +55,6 @@ runkernel()
     local build=${ARCH}:${mach}:${smp}:${defconfig}
 
     if ! match_params "${machine}@${mach}" "${smpflag}@${smp}" "${config}@${defconfig}"; then
-    if [ -n "${machine}" -a "${machine}" != "${mach}" ]
-    then
 	echo "Skipping ${build} ... "
 	return 0
     fi
