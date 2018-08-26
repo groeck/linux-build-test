@@ -23,46 +23,34 @@ PATH=${PATH}:${PATH_ARM64}
 # Exceptions:
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
-skip_316="virt:defconfig:smp:usb-xhci:rootfs \
-	virt:defconfig:smp:virtio:rootfs \
-	virt:defconfig:smp:nvme:rootfs \
-	virt:defconfig:smp:mmc:rootfs \
-	virt:defconfig:smp:scsi[DC395]:rootfs \
-	virt:defconfig:smp:scsi[AM53C974]:rootfs \
-	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
-	virt:defconfig:smp:scsi[virtio]:rootfs \
-	virt:defconfig:nosmp:rootfs"
-skip_318="virt:defconfig:smp2:usb-xhci:rootfs \
-	virt:defconfig:smp4:usb-uas-xhci:rootfs \
-	virt:defconfig:smp6:virtio:rootfs \
-	virt:defconfig:smp8:virtio-pci:rootfs \
-	virt:defconfig:smp2:nvme:rootfs \
-	virt:defconfig:smp4:mmc:rootfs \
-	virt:defconfig:smp6:scsi[DC395]:rootfs \
-	virt:defconfig:smp8:scsi[AM53C974]:rootfs \
-	virt:defconfig:smp2:scsi[MEGASAS]:rootfs \
-	virt:defconfig:smp4:scsi[MEGASAS2]:rootfs \
-	virt:defconfig:smp6:scsi[53C810]:rootfs \
-	virt:defconfig:smp8:scsi[53C895A]:rootfs \
-	virt:defconfig:smp:scsi[FUSION]:rootfs \
-	virt:defconfig:smp:scsi[virtio]:rootfs \
-	virt:defconfig:nosmp:rootfs"
-skip_44="xlnx-zcu102:defconfig:smp2:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:sd:rootfs \
-	virt:defconfig:smp:usb-xhci:rootfs \
-	virt:defconfig:smp:usb-uas-xhci:rootfs \
-	virt:defconfig:smp:scsi[DC395]:rootfs \
-	virt:defconfig:smp:scsi[AM53C974]:rootfs \
-	virt:defconfig:smp:scsi[MEGASAS]:rootfs \
-	virt:defconfig:smp:scsi[MEGASAS2]:rootfs \
-	virt:defconfig:smp:scsi[53C810]:rootfs \
-	virt:defconfig:smp:scsi[53C895A]:rootfs \
-	virt:defconfig:smp:scsi[virtio]:rootfs \
-	virt:defconfig:nosmp:rootfs"
-skip_49="raspi3:defconfig:smp:initrd \
-	raspi3:defconfig:smp4:sd:rootfs \
-	xlnx-zcu102:defconfig:smp2:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:sd:rootfs"
+skip_316="virt:defconfig:smp:mem512:usb-xhci:rootfs \
+	virt:defconfig:smp:mem512:virtio:rootfs \
+	virt:defconfig:smp:mem512:nvme:rootfs \
+	virt:defconfig:smp:mem512:mmc:rootfs \
+	virt:defconfig:smp:mem512:scsi[DC395]:rootfs \
+	virt:defconfig:smp:mem512:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp:mem512:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp:mem512:scsi[virtio]:rootfs"
+skip_318="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
+	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
+	virt:defconfig:smp6:mem512:virtio:rootfs \
+	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
+	virt:defconfig:smp2:mem512:nvme:rootfs \
+	virt:defconfig:smp4:mem512:mmc:rootfs \
+	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
+	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp4:mem512:scsi[MEGASAS2]:rootfs \
+	virt:defconfig:smp6:mem512:scsi[53C810]:rootfs \
+	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
+	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs \
+	virt:defconfig:smp:mem512:scsi[virtio]:rootfs"
+skip_44="xlnx-zcu102:defconfig:smp2:mem2G:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
+skip_49="raspi3:defconfig:smp:mem1G:initrd \
+	raspi3:defconfig:smp4:mem1G:sd:rootfs \
+	xlnx-zcu102:defconfig:smp2:mem2G:sd:rootfs \
+	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
 patch_defconfig()
 {
@@ -118,7 +106,7 @@ runkernel()
     "virt")
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -cpu cortex-a57 \
-		-nographic -m 512 \
+		-nographic \
 		-monitor none \
 		-kernel arch/arm64/boot/Image -no-reboot \
 		${extra_params} \
@@ -130,7 +118,7 @@ runkernel()
 	;;
     "raspi3")
 	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -m 1024 \
+	${QEMU} -M ${mach} \
 	    -kernel arch/arm64/boot/Image -no-reboot \
 	    --append "earlycon=uart8250,mmio32,0x3f215040 ${initcli} console=ttyS1,115200" \
 	    ${extra_params} \
@@ -143,7 +131,7 @@ runkernel()
 	;;
     "xlnx-zcu102")
 	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image -m 2048 \
+	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image \
 		-nographic -serial stdio -monitor none -no-reboot \
 		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
 		${extra_params} \
@@ -164,66 +152,66 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel virt defconfig smp rootfs.cpio.gz
+runkernel virt defconfig smp:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:usb-uas-xhci rootfs.ext2.gz
+runkernel virt defconfig smp4:mem512:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp6:virtio rootfs.ext2.gz
+runkernel virt defconfig smp6:mem512:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp8:virtio-pci rootfs.ext2.gz
+runkernel virt defconfig smp8:mem512:virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:virtio-blk rootfs.ext2.gz
+runkernel virt defconfig smp:mem512:virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:nvme rootfs.ext2.gz
+runkernel virt defconfig smp2:mem512:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:mmc rootfs.ext2.gz
+runkernel virt defconfig smp4:mem512:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:scsi[DC395]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:mem512:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:scsi[AM53C974]" rootfs.ext2.gz
+runkernel virt defconfig "smp8:mem512:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:scsi[MEGASAS]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:mem512:scsi[MEGASAS]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:scsi[MEGASAS2]" rootfs.ext2.gz
+runkernel virt defconfig "smp4:mem512:scsi[MEGASAS2]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:scsi[53C810]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:mem512:scsi[53C810]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:scsi[53C895A]" rootfs.ext2.gz
+runkernel virt defconfig "smp8:mem512:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
+runkernel virt defconfig "smp:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:scsi[virtio]" rootfs.ext2.gz
-retcode=$((retcode + $?))
-
-runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp2:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp4:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp2:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp4:sata rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+runkernel virt defconfig "smp2:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel raspi3 defconfig smp rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel raspi3 defconfig smp4:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel xlnx-zcu102 defconfig smp2:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp2:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
 retcode=$((retcode + $?))
 
-runkernel virt defconfig nosmp rootfs.cpio.gz
+runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
+runkernel raspi3 defconfig smp4:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+
+runkernel virt defconfig nosmp:mem512 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
 retcode=$((retcode + $?))
 
 exit ${retcode}
