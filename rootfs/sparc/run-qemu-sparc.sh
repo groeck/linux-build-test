@@ -1,11 +1,14 @@
 #!/bin/bash
 
-machine=$1
-smpflag=$2
-
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
+machine=$1
+smpflag=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc}
 PREFIX=sparc64-linux-
@@ -69,13 +72,17 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/image -no-reboot \
 	-drive file=hda.sqf,if=scsi,format=raw \
 	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 ${apc} doreboot" \
 	-nographic > ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
