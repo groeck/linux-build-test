@@ -100,39 +100,39 @@ retcode=0
 
 runkernel defconfig smp:ata Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp2:efi32:nvme IvyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:efi32:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
+runkernel defconfig smp:efi32:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp2:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[MEGASAS] EPYC pc rootfs.ext2
+runkernel defconfig smp:efi32:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
+runkernel defconfig smp:efi32:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel defconfig smp Opteron_G1 q35 rootfs.cpio
+runkernel defconfig smp:efi32 Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:ata Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:usb core2duo q35 rootfs.ext2
+runkernel defconfig smp:efi32:usb core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig nosmp:ata Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:efi32:ata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:ata n270 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
