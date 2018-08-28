@@ -3,6 +3,8 @@
 shopt -s extglob
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
+__progdir="$(cd $(dirname $0); pwd)"
+__basedir="${__progdir}/.."
 
 __addtmpfile()
 {
@@ -310,7 +312,6 @@ __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
-    local progdir=$(cd $(dirname $0); pwd)
 
     case "${fixup}" in
     "mmc"|"sd"|"sd1"|"nvme"|\
@@ -327,10 +328,10 @@ __common_fixup()
 	extra_params+=" -smp ${fixup#smp}"
 	;;
     efi|efi64)
-	extra_params+=" -bios ${progdir}/../firmware/OVMF-pure-efi-64.fd"
+	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
 	;;
     efi32)
-	extra_params+=" -bios ${progdir}/../firmware/OVMF-pure-efi-32.fd"
+	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-32.fd"
 	;;
     mem*)
 	extra_params+=" -m ${fixup#mem}"
@@ -442,7 +443,6 @@ doclean()
 
 setup_rootfs()
 {
-    local progdir=$(cd $(dirname $0); pwd)
     local dynamic=""
 
     OPTIND=1
@@ -461,9 +461,9 @@ setup_rootfs()
     if [ -n "${rootfs}" ]
     then
 	if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
-	    fakeroot ${progdir}/../scripts/genrootfs.sh ${progdir} ${rootfs}
+	    fakeroot ${__basedir}/scripts/genrootfs.sh ${__progdir} ${rootfs}
 	else
-	    cp ${progdir}/${rootfs} .
+	    cp ${__progdir}/${rootfs} .
 	fi
     fi
     if [[ "${rootfs}" == *.gz ]]; then
@@ -477,7 +477,6 @@ __setup_config()
     local fragment="$2"
     local fixup="$3"
     local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-    local progdir=$(cd $(dirname $0); pwd)
     local arch
     local target
 
@@ -498,9 +497,9 @@ __setup_config()
 	arch=${ARCH};;
     esac
 
-    if [ -e ${progdir}/${defconfig} ]; then
+    if [ -e ${__progdir}/${defconfig} ]; then
 	mkdir -p arch/${arch}/configs
-	cp ${progdir}/${defconfig} arch/${arch}/configs
+	cp ${__progdir}/${defconfig} arch/${arch}/configs
     fi
 
     make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null
