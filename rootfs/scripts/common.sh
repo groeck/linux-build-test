@@ -310,6 +310,7 @@ __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
+    local progdir=$(cd $(dirname $0); pwd)
 
     case "${fixup}" in
     "mmc"|"sd"|"sd1"|"nvme"|\
@@ -325,8 +326,11 @@ __common_fixup()
     smp[1-9])
 	extra_params+=" -smp ${fixup#smp}"
 	;;
-    efi)
-	extra_params+=" -bios /usr/share/ovmf/OVMF.fd"
+    efi|efi64)
+	extra_params+=" -bios ${progdir}/../firmware/OVMF-pure-efi-64.fd"
+	;;
+    efi32)
+	extra_params+=" -bios ${progdir}/../firmware/OVMF-pure-efi-32.fd"
 	;;
     mem*)
 	extra_params+=" -m ${fixup#mem}"
