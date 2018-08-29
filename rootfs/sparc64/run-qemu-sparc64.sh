@@ -1,12 +1,15 @@
 #!/bin/bash
 
-machine=$1
-smpflag=$2
-config=$3
-
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
+machine=$1
+smpflag=$2
+config=$3
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc64}
 
@@ -67,14 +70,18 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
+
     ${QEMU} -M ${mach} -cpu "${cpu}" \
 	-m 512 \
 	-drive file=${rootfs},if=ide,format=raw \
 	-kernel arch/sparc/boot/image -no-reboot \
 	-append "root=/dev/sda init=/sbin/init.sh console=ttyS0 doreboot" \
 	-nographic > ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -ne 0 ]] && set +x
+
     dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
