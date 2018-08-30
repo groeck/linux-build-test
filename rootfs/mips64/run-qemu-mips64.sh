@@ -25,13 +25,13 @@ QEMU_MACH=malta
 PATH=${PATH_MIPS}:${PATH}
 
 skip_318="mips64:malta_defconfig:initrd \
-	mips64:malta_defconfig:smp:ata:rootfs \
+	mips64:malta_defconfig:smp:ide:rootfs \
 	mips64:malta_defconfig:smp:usb-xhci:rootfs \
 	mips64:malta_defconfig:smp:scsi[53C810]:rootfs \
 	mips64:malta_defconfig:smp:scsi[DC395]:rootfs \
 	mips64:malta_defconfig:smp:scsi[AM53C974]:rootfs \
 	mips64:malta_defconfig:smp:scsi[MEGASAS2]:rootfs \
-	mips64:malta_defconfig:nosmp:ata:rootfs"
+	mips64:malta_defconfig:nosmp:ide:rootfs"
 
 patch_defconfig()
 {
@@ -129,7 +129,7 @@ retcode=0
 
 runkernel malta_defconfig smp rootfs-n32.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:ata rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
@@ -164,7 +164,7 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig smp:scsi[FUSION] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nosmp:ata rootfs-n32.ext2.gz
+runkernel malta_defconfig nosmp:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig nosmp:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))

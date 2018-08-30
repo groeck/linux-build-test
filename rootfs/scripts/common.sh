@@ -273,7 +273,8 @@ __common_diskcmd()
     local rootfs="$2"
 
     case "${fixup}" in
-    "ata")	# standard ide/ata/sata drive provided by platform
+    "ata"|"ide")
+	# standard ide/ata/sata drive provided by platform
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
 	local hddev="hda"
 	# The actual configuration determines if the root file system

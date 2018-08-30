@@ -25,7 +25,7 @@ PATH=${PATH_MIPS}:${PATH}
 
 skip_318="mipsel:M14Kc:malta_defconfig:smp:scsi[DC395]:rootfs \
 	mipsel:24Kf:malta_defconfig:smp:scsi[AM53C974]:rootfs \
-	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:smp:ata:rootfs"
+	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:smp:ide:rootfs"
 
 patch_defconfig()
 {
@@ -99,7 +99,7 @@ echo
 
 runkernel 24Kf malta_defconfig smp rootfs.cpio.gz
 retcode=$?
-runkernel 24Kf malta_defconfig smp:ata rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig smp:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -130,12 +130,12 @@ retcode=$((retcode + $?))
 runkernel 24Kf malta_defconfig smp:scsi[FUSION] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel mips32r6-generic malta_qemu_32r6_defconfig smp:ata rootfs-mipselr6.ext2.gz
+runkernel mips32r6-generic malta_qemu_32r6_defconfig smp:ide rootfs-mipselr6.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel 24Kf malta_defconfig nosmp rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nosmp:ata rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nosmp:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

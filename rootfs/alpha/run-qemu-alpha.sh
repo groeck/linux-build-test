@@ -79,7 +79,7 @@ echo
 
 runkernel defconfig devtmpfs busybox-alpha.cpio
 rv=$?
-runkernel defconfig ata rootfs.ext2
+runkernel defconfig ide rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig mmc rootfs.ext2
 retcode=$((${retcode} + $?))

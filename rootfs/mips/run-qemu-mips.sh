@@ -99,7 +99,7 @@ echo
 
 runkernel malta_defconfig smp rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:ata rootfs.ext2.gz
+runkernel malta_defconfig smp:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -eq 1 ]]; then
@@ -132,7 +132,7 @@ retcode=$((retcode + $?))
 
 runkernel malta_defconfig nosmp rootfs.cpio.gz
 retcode=$?
-runkernel malta_defconfig nosmp:ata rootfs.ext2.gz
+runkernel malta_defconfig nosmp:ide rootfs.ext2.gz
 retcode=$?
 
 exit ${retcode}

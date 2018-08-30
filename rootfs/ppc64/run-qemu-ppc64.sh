@@ -225,7 +225,7 @@ retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4:ata mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:cpu4:ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp:cpu4:mmc mac99 ppc64 ttyS0 vmlinux \
