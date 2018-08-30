@@ -273,7 +273,12 @@ __common_diskcmd()
     local rootfs="$2"
 
     case "${fixup}" in
-    "ata"|"ide")
+    "ata")
+	# standard ata/sata drive provided by platform
+	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
+	initcli+=" root=/dev/sda rw"
+	;;
+    "ide")
 	# standard ide/ata/sata drive provided by platform
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
 	local hddev="hda"
