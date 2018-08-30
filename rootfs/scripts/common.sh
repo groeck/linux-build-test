@@ -321,7 +321,7 @@ __common_fixup()
 
     case "${fixup}" in
     "mmc"|"sd"|"sd1"|"nvme"|\
-    "ata"|sata*|usb*|scsi*|virtio*)
+    "ide"|"ata"|sata*|usb*|scsi*|virtio*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
     pci*)
