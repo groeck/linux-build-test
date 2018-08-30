@@ -40,7 +40,13 @@ runkernel()
     local pid
     local logfile="$(__mktemp)"
     local waitlist=("Power down" "Boot successful" "Poweroff")
-    local build=${ARCH}:${mach}:${fixup}:${defconfig}
+    local build="${ARCH}:${mach}:${fixup}"
+
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
+	build+=":initrd"
+    else
+	build+=":rootfs"
+    fi
 
     if ! match_params "${machine}@${mach}" "${_fixup}@${fixup}" "${config}@${defconfig}"; then
 	echo "Skipping ${build} ... "
