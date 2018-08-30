@@ -12,7 +12,7 @@ shift $((OPTIND - 1))
 mach=$1
 variant=$2
 
-QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-ppc64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 # machine specific information
 ARCH=powerpc

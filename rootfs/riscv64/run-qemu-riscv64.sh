@@ -7,7 +7,7 @@ progdir=$(cd $(dirname "$0"); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
