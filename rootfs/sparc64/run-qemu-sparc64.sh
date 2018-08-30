@@ -15,7 +15,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc64}
 
 PREFIX=sparc64-linux-
 ARCH=sparc64
-rootfs=simple-root-filesystem-sparc.ext3
+rootfs="rootfs.ext2.gz"
 PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
@@ -50,11 +50,10 @@ runkernel()
 {
     local defconfig=$1
     local mach=$2
-    local cpu="$3"
-    local smp=$4
+    local smp=$3
     local pid
     local logfile="$(__mktemp)"
-    local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local waitlist=("Power down" "Boot successful" "Poweroff")
     local build=${ARCH}:${mach}:${smp}:${defconfig}
 
     if ! match_params "${machine}@${mach}" "${smpflag}@${smp}" "${config}@${defconfig}"; then
@@ -72,30 +71,33 @@ runkernel()
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
-    ${QEMU} -M ${mach} -cpu "${cpu}" \
+    # Explicitly select TI UltraSparc IIi. Non-TI CPUs (including the default
+    # CPU for sun4v, Sun-UltraSparc-T1) result in a qemu crash or are stuck
+    # in an endless loop at poweroff/reboot.
+    ${QEMU} -M ${mach} -cpu "TI UltraSparc IIi" \
 	-m 512 \
-	-drive file=${rootfs},if=ide,format=raw \
+	-drive file=${rootfs%.gz},if=ide,format=raw \
 	-kernel arch/sparc/boot/image -no-reboot \
-	-append "root=/dev/sda init=/sbin/init.sh console=ttyS0 doreboot" \
-	-nographic > ${logfile} 2>&1 &
+	-append "root=/dev/sda console=ttyS0" \
+	-nographic -monitor none > ${logfile} 2>&1 &
     pid=$!
 
     [[ ${dodebug} -ne 0 ]] && set +x
 
-    dowait ${pid} ${logfile} manual waitlist[@]
+    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
 echo "Build reference: $(git describe)"
 echo
 
-runkernel sparc64_defconfig sun4u "TI UltraSparc IIi" smp
+runkernel sparc64_defconfig sun4u smp
 retcode=$?
-runkernel sparc64_defconfig sun4v "Fujitsu Sparc64 IV" smp
-retcode=$((${retcode} + $?))
-runkernel sparc64_defconfig sun4u "TI UltraSparc IIi" nosmp
-retcode=$((${retcode} + $?))
-runkernel sparc64_defconfig sun4v "Fujitsu Sparc64 IV" nosmp
-retcode=$((${retcode} + $?))
+runkernel sparc64_defconfig sun4v smp
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u nosmp
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4v nosmp
+retcode=$((retcode + $?))
 
 exit ${retcode}
