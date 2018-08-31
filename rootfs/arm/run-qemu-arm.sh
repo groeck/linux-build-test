@@ -297,7 +297,7 @@ runkernel()
         dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
-	${QEMU} -M ${mach} ${cpucmd} \
+	${QEMU_PXA} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
