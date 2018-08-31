@@ -23,14 +23,19 @@ PATH=${PATH}:${PATH_ARM64}
 # Exceptions:
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
-skip_316="virt:defconfig:smp:mem512:usb-xhci:rootfs \
-	virt:defconfig:smp:mem512:virtio:rootfs \
-	virt:defconfig:smp:mem512:nvme:rootfs \
-	virt:defconfig:smp:mem512:mmc:rootfs \
-	virt:defconfig:smp:mem512:scsi[DC395]:rootfs \
-	virt:defconfig:smp:mem512:scsi[AM53C974]:rootfs \
-	virt:defconfig:smp:mem512:scsi[MEGASAS]:rootfs \
-	virt:defconfig:smp:mem512:scsi[virtio]:rootfs"
+skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
+	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
+	virt:defconfig:smp6:mem512:virtio:rootfs \
+	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
+	virt:defconfig:smp2:mem512:nvme:rootfs \
+	virt:defconfig:smp4:mem512:mmc:rootfs \
+	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
+	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp4:mem512:scsi[virtio]:rootfs \
+	virt:defconfig:smp6:mem512:scsi[53C810]:rootfs \
+	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
+	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs"
 skip_318="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
 	virt:defconfig:smp6:mem512:virtio:rootfs \
