@@ -11,8 +11,6 @@ shift $((OPTIND - 1))
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
-# Avoid backtraces seen with qemu 3.0
-QEMU_PXA=${QEMU:-${QEMU_V212_BIN}/qemu-system-arm}
 # Failures seen with qemu v2.9:
 # arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
 # arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
@@ -283,7 +281,7 @@ runkernel()
         dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
-	${QEMU_PXA} -M ${mach} ${cpucmd} \
+	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
@@ -307,7 +305,7 @@ runkernel()
 	pid=$!
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
-	${QEMU_PXA} -M ${mach} ${cpucmd} \
+	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -d unimp,guest_errors \
 	    -initrd ${rootfs} \
