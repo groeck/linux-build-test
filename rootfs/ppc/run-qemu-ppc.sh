@@ -27,7 +27,14 @@ PATH=${PATH_PPC}:${PATH}
 skip_316="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
 	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
 	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs"
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
+	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
+	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
+	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
+	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
+	powerpc:mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
 
 skip_318="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
 	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
