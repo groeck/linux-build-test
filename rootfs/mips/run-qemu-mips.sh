@@ -23,6 +23,9 @@ QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
 
+skip_316="mips:malta_defconfig:smp:scsi[DC395]:rootfs \
+	mips:malta_defconfig:smp:scsi[AM53C974]:rootfs"
+
 skip_318="mips:malta_defconfig:smp:scsi[DC395]:rootfs \
 	mips:malta_defconfig:smp:scsi[AM53C974]:rootfs"
 
