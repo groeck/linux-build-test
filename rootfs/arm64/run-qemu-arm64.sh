@@ -32,6 +32,7 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
 	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
+	virt:defconfig:smp4:mem512:scsi[MEGASAS2]:rootfs \
 	virt:defconfig:smp4:mem512:scsi[virtio]:rootfs \
 	virt:defconfig:smp6:mem512:scsi[53C810]:rootfs \
 	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
