@@ -104,13 +104,15 @@ if [ -z "$1" -o "$1" = "v2.11" ]
 then
     dobuild v2.11.2-local v2.11 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
     dobuild v2.11.0-q800 v2.11-m68k \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--with-gtkabi=3.0 \
 	--target-list=m68k-softmmu"
     checkexit $?
 fi
@@ -119,7 +121,8 @@ if [ -z "$1" -o "$1" = "v2.12" ]
 then
     dobuild v2.12.1-local v2.12 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
@@ -128,7 +131,8 @@ if [ -z "$1" -o "$1" = "v3.0" ]
 then
     dobuild v3.0.0-local v3.0 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
@@ -136,7 +140,8 @@ fi
 if [ "$1" = "master" ]; then
     dobuild master-local master \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough \
 	--enable-debug --disable-strip"
     checkexit $?
