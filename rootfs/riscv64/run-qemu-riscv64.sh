@@ -7,6 +7,8 @@ progdir=$(cd $(dirname "$0"); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+_fixup="$1"
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
@@ -36,6 +38,11 @@ runkernel()
 	build+=":initrd"
     else
 	build+=":rootfs"
+    fi
+
+    if ! match_params "${_fixup}@${fixup}"; then
+	echo "Skipping ${build} ... "
+	return 0
     fi
 
     echo -n "Building ${build} ... "
