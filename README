@@ -55,9 +55,7 @@ libslang2-dev
 libgtk2.0-de
 binutils-dev
 
-For efi boot support:
-
-ovmf
+----
 
 Ubuntu pre 14.04:
 	ia32-libs
@@ -67,6 +65,17 @@ Ubuntu 14.04:
 make sure /bin/sh points to bash.
 
 sudo update-alternatives --install /bin/sh sh /bin/bash 99
+
+----
+
+Hacks when running Ubuntu 18.04 with qemu/gcc compiled on Ubuntu 16.04:
+
+cd /usr/lib
+sudo ln -s libmpfr.so libmpfr.so.4
+cd /usr/lib/x86_64-linux-gnu
+sudo ln -s libiscsi.so libiscsi.so.2
+
+Similar hacks will likely be needed for comparable situations.
 
 ---
 genfatfs:
