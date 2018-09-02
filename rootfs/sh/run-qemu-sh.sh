@@ -7,7 +7,9 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
+_fixup="$1"
+
+QEMU=${QEMU:-${QEMU_V212_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
 ARCH=sh
@@ -69,6 +71,11 @@ runkernel()
 	build+=":initrd"
     else
 	build+=":${fixup}:rootfs"
+    fi
+
+    if ! match_params "${_fixup}@${fixup}"; then
+	echo "Skipping ${build} ... "
+	return 0
     fi
 
     echo -n "Building ${build} ... "
