@@ -66,7 +66,9 @@ then
     ./configure --prefix=/opt/buildbot/qemu-install/v2.3.50-linaro \
 	--disable-user --disable-xen --disable-xen-pci-passthrough \
 	--disable-vnc-tls --disable-vnc-ws --disable-quorum \
+	--disable-vnc-png --with-gtkabi=3.0 \
 	--disable-docs --disable-werror \
+	--disable-curl \
 	--target-list=arm-softmmu
     checkexit $?
     make -j20 install
@@ -77,7 +79,8 @@ if [ -z "$1" -o "$1" = "v2.8" ]
 then
     dobuild v2.8.1-local v2.8 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
@@ -86,7 +89,8 @@ if [ -z "$1" -o "$1" = "v2.9" ]
 then
     dobuild v2.9.1-local v2.9 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
