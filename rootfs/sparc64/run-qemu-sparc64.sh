@@ -19,6 +19,12 @@ PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
 
+skip_316="sparc64:sun4u:smp:scsi[DC395]:rootfs
+	sparc64:sun4u:smp:scsi[AM53C974]:rootfs"
+
+skip_318="sparc64:sun4u:smp:scsi[DC395]:rootfs
+	sparc64:sun4u:smp:scsi[AM53C974]:rootfs"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -54,6 +60,10 @@ runkernel()
     fi
 
     echo -n "Building ${build} ... "
+
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
 
     if ! dosetup -c "${defconfig}:${fixup//smp*/smp}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
