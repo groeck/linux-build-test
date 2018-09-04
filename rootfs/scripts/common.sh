@@ -217,16 +217,13 @@ __common_mmccmd()
 
     case "${fixup}" in
     "mmc")
-	initcli+=" root=/dev/mmcblk0 rw rootwait"
 	extra_params+=" -device sdhci-pci${__pcibus} -device sd-card,drive=d0"
 	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
 	;;
     "sd")	# similar to mmc, but does not need sdhci-pci
-	initcli+=" root=/dev/mmcblk0 rw rootwait"
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
 	;;
     "sd1")	# sd at index 1
-	initcli+=" root=/dev/mmcblk0 rw rootwait"
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=1"
 	;;
     *)
