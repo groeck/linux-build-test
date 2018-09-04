@@ -87,7 +87,25 @@ runkernel sparc64_defconfig sun4u smp rootfs.cpio.gz
 retcode=$?
 runkernel sparc64_defconfig sun4u smp:ata rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:mmc rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:scsi[DC395] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:scsi[MEGASAS] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:scsi[AM53C974] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:usb-uas-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:virtio-pci rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4v smp:ata rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4v smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nosmp:ata rootfs.ext2.gz
 retcode=$((retcode + $?))
