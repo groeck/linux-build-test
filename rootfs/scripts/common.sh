@@ -122,7 +122,7 @@ __common_scsicmd()
     esac
 
     initcli+=" root=/dev/sda rw"
-    extra_params+=" ${device:+-device ${device},id=scsi}"
+    extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus}"
     extra_params+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
     extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
 }
@@ -134,17 +134,17 @@ __common_usbcmd()
 
     case "${fixup}" in
     "usb-ohci")
-	extra_params+=" -usb -device pci-ohci,id=ohci"
+	extra_params+=" -usb -device pci-ohci,id=ohci${__pcibus}"
 	extra_params+=" -device usb-storage,bus=ohci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-ehci")
-	extra_params+=" -usb -device usb-ehci,id=ehci"
+	extra_params+=" -usb -device usb-ehci,id=ehci${__pcibus}"
 	extra_params+=" -device usb-storage,bus=ehci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-xhci")
-	extra_params+=" -usb -device qemu-xhci,id=xhci"
+	extra_params+=" -usb -device qemu-xhci,id=xhci${__pcibus}"
 	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
@@ -158,13 +158,13 @@ __common_usbcmd()
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-uas-ehci")
-	extra_params+=" -usb -device usb-ehci,id=ehci"
+	extra_params+=" -usb -device usb-ehci,id=ehci${__pcibus}"
 	extra_params+=" -device usb-uas,bus=ehci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "usb-uas-xhci")
-	extra_params+=" -usb -device qemu-xhci,id=xhci"
+	extra_params+=" -usb -device qemu-xhci,id=xhci${__pcibus}"
 	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
@@ -197,7 +197,7 @@ __common_virtcmd()
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio-pci")
-	extra_params+=" -device virtio-blk-pci,drive=d0"
+	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio")
@@ -218,7 +218,7 @@ __common_mmccmd()
     case "${fixup}" in
     "mmc")
 	initcli+=" root=/dev/mmcblk0 rw rootwait"
-	extra_params+=" -device sdhci-pci -device sd-card,drive=d0"
+	extra_params+=" -device sdhci-pci${__pcibus} -device sd-card,drive=d0"
 	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
 	;;
     "sd")	# similar to mmc, but does not need sdhci-pci
@@ -272,6 +272,15 @@ __common_diskcmd()
     local fixup="$1"
     local rootfs="$2"
 
+    case "${ARCH}" in
+    sparc64)
+	__pcibus=",bus=pciB"
+	;;
+    *)
+	__pcibus=""
+	;;
+    esac
+
     case "${fixup}" in
     "ata")
 	# standard ata/sata drive provided by platform
@@ -294,7 +303,7 @@ __common_diskcmd()
 	;;
     "nvme")
 	initcli+=" root=/dev/nvme0n1 rw rootwait"
-	extra_params+=" -device nvme,serial=foo,drive=d0"
+	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "sata-sii3112"|"sata-cmd646"|"sata")
