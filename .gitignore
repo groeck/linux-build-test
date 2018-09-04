@@ -7,6 +7,7 @@ slave/twistd.*
 slave/master*
 slave/mmotm*
 slave/next*
+slave/testing
 master/qemu*
 master/twistd*.log*
 master/hwmon*
@@ -15,13 +16,15 @@ master/watchdog*
 master/stable*
 master/next*
 master/master*
+master/testing
 master/gitpoller-workdir/
 master/*.log
 master/queue-workdir*/
 master/staging-workdir/
-master/state.sqlite
+master/state.sqlite*
 master/templates/README.txt
 master/twistd.pid
+master/*.pyc
 crosstool-ng
 metag
 or1k
@@ -39,3 +42,4 @@ lib
 share
 genfatfs
 virtual
+virtualenv
