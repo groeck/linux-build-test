@@ -17,7 +17,7 @@ cmd_arm=(allmodconfig allnoconfig s3c2410_defconfig omap2plus_defconfig imx_v6_v
 	exynos_defconfig cm_x2xx_defconfig s5pv210_defconfig \
 	integrator_defconfig efm32_defconfig \
 	pxa910_defconfig clps711x_defconfig)
-cmd_arm64=(allnoconfig allmodconfig)
+cmd_arm64=(allnoconfig defconfig allmodconfig)
 cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig allnoconfig etrax-100lx_defconfig)
