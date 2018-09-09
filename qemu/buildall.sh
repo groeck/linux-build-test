@@ -53,6 +53,7 @@ then
     ./configure --prefix=/opt/buildbot/qemu-install/metag \
 	--disable-user --disable-xen --disable-xen-pci-passthrough \
 	--disable-vnc-tls --disable-werror --disable-docs \
+	--disable-vnc-png \
 	--target-list=meta-softmmu
     checkexit $?
     make -j20 install
