@@ -10,8 +10,8 @@ doit()
 	echo scp "$2" "$1":
 	scp "$2" "$1":
 	if [ $? -ne 0 ]; then
-		echo "scp failed"
-		exit 1
+		echo "Warning: scp to $1 failed!"
+		# exit 1
 	fi
 	ssh -t $1 /opt/buildbot/bin/install-gcc.sh $(basename $2)
 }
