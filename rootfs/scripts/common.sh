@@ -358,7 +358,7 @@ __common_fixup()
 __common_fixups()
 {
     local fixups="${1//:/ }"
-    local rootfs="${2%.gz}"
+    local rootfs="$(basename ${2%.gz})"
     local fixup
 
     if [[ -z "${fixups}" ]]; then
@@ -378,6 +378,7 @@ __common_fixups()
 	__common_fixup "${fixup}" "${rootfs}"
     done
 
+    initcli+=" panic=-1"
     # trim leading whitespace
     initcli="${initcli##*( )}"
     extra_params="${extra_params##*( )}"
@@ -548,6 +549,42 @@ __setup_fragment()
 
     rm -f "${fragment}"
     touch "${fragment}"
+
+    # debug options
+    echo "CONFIG_EXPERT=y" >> ${fragment}
+    echo "CONFIG_DEBUG_KERNEL" >> ${fragment}
+    echo "CONFIG_LOCK_DEBUGGING_SUPPORT" >> ${fragment}
+    echo "CONFIG_DEBUG_RT_MUTEXES=y" >> ${fragment}
+    echo "CONFIG_DEBUG_SPINLOCK=y" >> ${fragment}
+    echo "CONFIG_DEBUG_MUTEXES=y" >> ${fragment}
+    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y" >> ${fragment}
+    echo "CONFIG_DEBUG_LOCK_ALLOC=y" >> ${fragment}
+    echo "CONFIG_DEBUG_LOCKDEP=y" >> ${fragment}
+    echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
+
+    # selftests
+    echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
+    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
+    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
+    echo "CONFIG_TEST_UUID=y" >> ${fragment}
+    # takes too long
+    # echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
+
+    echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
+    echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_TEST_SORT=y" >> ${fragment}
+    echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
+    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_DEBUG_RODATA_TEST=y" >> ${fragment}
+    echo "CONFIG_DMATEST=y" >> ${fragment}
+    echo "CONFIG_USB_TEST=y" >> ${fragment}
+    echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
+    echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
+    echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
+    echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
