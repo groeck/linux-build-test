@@ -34,7 +34,7 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_316="powerpc:mac99:qemu_ppc64_book3s_defconfig:smp:cpu4:scsi[DC395]:rootfs \
+skip_316="powerpc:mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	powerpc:powernv:powernv_defconfig:initrd \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
@@ -46,7 +46,7 @@ skip_316="powerpc:mac99:qemu_ppc64_book3s_defconfig:smp:cpu4:scsi[DC395]:rootfs 
 	powerpc:pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
 	powerpc:pseries:pseries_defconfig:little:mmc:rootfs \
 	powerpc:pseries:pseries_defconfig:little:nvme:rootfs"
-skip_318="powerpc:mac99:qemu_ppc64_book3s_defconfig:smp:cpu4:scsi[DC395]:rootfs \
+skip_318="powerpc:mac99:qemu_ppc64_book3s_defconfig:mp4:scsi[DC395]:rootfs \
 	powerpc:powernv:powernv_defconfig:initrd \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	powerpc:ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
@@ -86,58 +86,10 @@ patch_defconfig()
 	    echo "CONFIG_CPU_BIG_ENDIAN=n" >> ${defconfig}
 	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
 	fi
-
-	if [ "${fixup}" = "nosmp" ]; then
-	    echo "CONFIG_SMP=n" >> ${defconfig}
-	fi
-
-	if [ "${fixup}" = "smp" ]; then
-	    echo "CONFIG_SMP=y" >> ${defconfig}
-	fi
-
-	if [ "${fixup}" = "cpu4" ]; then
-	    echo "CONFIG_NR_CPUS=4" >> ${defconfig}
-	fi
-
     done
 
-    # Enable BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-    # devtmpfs
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # NVME
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # SATA
+    # extra SATA config
     echo "CONFIG_SATA_SIL=y" >> ${defconfig}
-
-    # SCSI/USB
-    echo "CONFIG_SCSI=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-
-    # SCSI
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
-
-    # USB
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_EHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_OHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
 }
 
 runkernel()
@@ -159,8 +111,7 @@ runkernel()
 
     if [ -n "${fixup}" ]; then
 	msg+=":${fixup}"
-	local f="${fixup%@(scsi*|ata|sata*|mmc|nvme)}"
-	buildconfig+="${f%:}"
+	buildconfig+="${fixup//smp*/smp}"
     fi
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
@@ -180,17 +131,11 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${buildconfig}" -f "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${buildconfig}" -F "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
-
-    rootfs=$(basename "${rootfs%.gz}")
 
     echo -n "running ..."
-
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
 
     mem=1G
     if [[ "${machine}" = "powernv" ]]; then
@@ -205,7 +150,7 @@ runkernel()
 
     ${QEMU} -M ${machine} -cpu ${cpu} -m ${mem} \
 	-kernel ${kernel} \
-	${diskcmd} \
+	${extra_params} \
 	-nographic -vga none -monitor null -no-reboot \
 	--append "${initcli} console=tty console=${console}" \
 	${dt_cmd} > ${logfile} 2>&1 &
@@ -223,24 +168,24 @@ echo
 runkernel qemu_ppc64_book3s_defconfig nosmp mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$?
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4 mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4:ide mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # Traceback:
     # irq 30: nobody cared (try booting with the "irqpoll" option)
     # during reboot
-    runkernel qemu_ppc64_book3s_defconfig smp:cpu4:nvme mac99 ppc64 ttyS0 vmlinux \
+    runkernel qemu_ppc64_book3s_defconfig smp:nvme mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
     retcode=$((${retcode} + $?))
 fi
-runkernel qemu_ppc64_book3s_defconfig smp:cpu4:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig "" pseries POWER8 hvc0 vmlinux \
