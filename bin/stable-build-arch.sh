@@ -9,7 +9,7 @@ PATH_ARM=/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
 # arc images don't build with gcc 8.1.0 / 7.3.0 from kernel.org
 PATH_ARC=/opt/kernel/arc/gcc-7.3.0/usr/bin
-PATH_ARCV2=/opt/kernel/arcv2/gcc-7.3.0/usr/bin
+PATH_ARCV2=/opt/kernel/arcv2/gcc-8.2.0/usr/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-8.1.0-nolibc/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
