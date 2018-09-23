@@ -172,6 +172,9 @@ patch_defconfig()
 	sed -i -e '/CONFIG_MACH_REALVIEW_PBA8/d' ${defconfig}
 	echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
     fi
+
+    # Always build PXA watchdog into kernel
+    sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
 }
 
 runkernel()
@@ -269,6 +272,7 @@ runkernel()
 	pid=$!
 	;;
     "collie")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -276,11 +280,13 @@ runkernel()
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "mainstone")
         dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -290,11 +296,13 @@ runkernel()
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "z2")
         dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -303,8 +311,10 @@ runkernel()
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -d unimp,guest_errors \
@@ -313,6 +323,7 @@ runkernel()
 	    -monitor null -nographic ${dtbcmd} \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "overo" | "beagle" | "beaglexm")
 	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
@@ -371,6 +382,7 @@ runkernel()
     "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | \
     "highbank" | "midway" | "integratorcp")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} ${memcmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
@@ -378,6 +390,7 @@ runkernel()
 	    -serial stdio -monitor null -nographic \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "versatilepb-scsi" )
 	${QEMU} -M versatilepb -m 128 \
@@ -389,14 +402,17 @@ runkernel()
 	pid=$!
 	;;
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1 doreboot" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 		-nodefaults -nographic -serial stdio -monitor none \
 		-kernel arch/arm/boot/zImage -no-reboot \
@@ -405,6 +421,7 @@ runkernel()
 		-initrd ${rootfs} \
 		> ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     *)
 	echo "Missing build recipe for machine ${mach}"
