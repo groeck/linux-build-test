@@ -37,7 +37,19 @@ skip_318="defconfig:smp6:scsi[AM53C974] \
 
 patch_defconfig()
 {
-    : # Nothing to do
+    local defconfig=$1
+    local fixups=${2//:/ }
+    local fixup
+
+    for fixup in ${fixups}; do
+	case "${fixup}" in
+	pae)
+	    echo "CONFIG_HIGHMEM64G=y" >> ${defconfig}
+	    ;;
+	*)
+	    ;;
+	esac
+    done
 }
 
 runkernel()
@@ -130,11 +142,19 @@ runkernel defconfig smp:ata Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:efi32:usb core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig pae:smp Penryn pc rootfs.cpio
+retcode=$((${retcode} + $?))
+runkernel defconfig pae:smp:efi32:usb Westmere pc rootfs.ext2
+retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:usb Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:efi32:ata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:ata n270 q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig pae:nosmp:nvme pentium3 q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig pae:nosmp:efi32:mmc coreduo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
