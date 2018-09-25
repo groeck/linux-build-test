@@ -27,6 +27,9 @@ patch_defconfig()
 
     # broken for this architecture
     echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
+    echo "CONFIG_TORTURE_TEST=n" >> ${defconfig}
+    echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
+    echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
 }
 
 runkernel()
