@@ -563,28 +563,37 @@ __setup_fragment()
     echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
 
     # selftests
-    echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
-    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
-    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
-    echo "CONFIG_TEST_UUID=y" >> ${fragment}
-    # takes too long
-    # echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
-
-    echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
     echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
     echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_TEST_SORT=y" >> ${fragment}
-    echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
-    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
+    echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
     echo "CONFIG_DEBUG_RODATA_TEST=y" >> ${fragment}
+    echo "CONFIG_DEBUG_TLBFLUSH=y" >> ${fragment}
     echo "CONFIG_DMATEST=y" >> ${fragment}
+    echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
+    echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
+    echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
+    echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
+    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
+    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
+    echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
+    echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
+    echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+    echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
+    echo "CONFIG_TEST_BITMAP=y" >> ${fragment}
+    echo "CONFIG_TEST_FIRMWARE=y" >> ${fragment}
+    # takes too long
+    # echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
+    echo "CONFIG_TEST_SORT=y" >> ${fragment}
+    echo "CONFIG_TEST_SYSCTL=y" >> ${fragment}
+    echo "CONFIG_TEST_UUID=y" >> ${fragment}
+    echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
     echo "CONFIG_USB_TEST=y" >> ${fragment}
     echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
     echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
-    echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
-    echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
+    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
