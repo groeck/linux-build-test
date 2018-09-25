@@ -72,6 +72,12 @@ patch_defconfig()
 	    echo "CONFIG_SCHED_SMT=n" >> ${defconfig}
 	fi
     done
+
+    # Any of the following result in crashes due to lack of memory,
+    # at least with v3.18.y.
+    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=n" >> ${defconfig}
+    echo "CONFIG_DEBUG_LOCK_ALLOC=n" >> ${defconfig}
+    echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
 }
 
 runkernel()
@@ -120,8 +126,8 @@ runkernel()
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	${cpu} \
 	${diskcmd} \
-	-vga cirrus -no-reboot -m 128 \
-	--append "${initcli} mem=128M console=ttyS0 console=tty ${extracli}" \
+	-vga cirrus -no-reboot -m 256 \
+	--append "${initcli} mem=256M console=ttyS0 console=tty ${extracli}" \
 	-nographic > ${logfile} 2>&1 &
     pid=$!
 
