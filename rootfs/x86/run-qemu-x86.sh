@@ -11,7 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
+QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-i386}
 ARCH=i386
 
 # Older releases don't like gcc 6+
@@ -96,7 +96,9 @@ runkernel()
 	-M ${mach} -cpu ${cpu} -no-reboot -m 256 \
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
-	-nographic > ${logfile} 2>&1 &
+	-nographic \
+	-d unimp,guest_errors,cpu_reset \
+	> ${logfile} 2>&1 &
     pid=$!
 
     [[ ${dodebug} -ne 0 ]] && set +x
