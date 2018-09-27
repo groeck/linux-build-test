@@ -34,23 +34,23 @@ runkernel()
     local pid
     local logfile="$(__mktemp)"
     local waitlist=("reboot: Restarting system" "Boot successful" "Requesting system reboot")
-    local build="${ARCH}:${defconfig}"
+    local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
+    local cache="${defconfig}:${fixup//smp*/smp}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+="${fixup:+:${fixup}}:rootfs"
+	build+=":rootfs"
     fi
 
-    if [ -n "${_fixup}" -a "${_fixup}" != "${fixup}" ]
-    then
+    if ! match_params "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
 
     echo -n "Building ${build} ... "
 
-    dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"
+    dosetup -c "${cache}" -F "${fixup}" "${rootfs}" "${defconfig}"
     if [ $? -ne 0 ]; then
 	return 1
     fi
@@ -76,55 +76,75 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+# run initial set of tests with SMP enabled.
+# Multi-core boots take a long time to boot, so don't test with more
+# than one CPU until qemu has been improved.
+
 retcode=0
-runkernel defconfig initrd rootfs.cpio.gz
+runkernel defconfig smp rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig mmc rootfs.ext2.gz
+runkernel defconfig smp:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nvme rootfs.ext2.gz
+runkernel defconfig smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig sata-cmd646 rootfs.ext2.gz
+runkernel defconfig smp:sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig scsi rootfs.ext2.gz
+runkernel defconfig smp:scsi rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "scsi[53C895A]" rootfs.ext2.gz
+runkernel defconfig "smp:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "scsi[DC395]" rootfs.ext2.gz
+runkernel defconfig "smp:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "scsi[AM53C974]" rootfs.ext2.gz
+runkernel defconfig "smp:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # panic: arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map.
-    runkernel defconfig "scsi[MEGASAS]" rootfs.ext2.gz
+    runkernel defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig "scsi[MEGASAS2]" rootfs.ext2.gz
+    runkernel defconfig "smp:scsi[MEGASAS2]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig "scsi[FUSION]" rootfs.ext2.gz
+    runkernel defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 
-runkernel defconfig usb-ohci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel defconfig usb-ehci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel defconfig usb-xhci rootfs.ext2.gz
+# Run remaining tests with SMP disabled
+runkernel defconfig nosmp:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig usb-uas-ehci rootfs.ext2.gz
+runkernel defconfig nosmp:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel defconfig usb-uas-xhci rootfs.ext2.gz
+checkstate ${retcode}
+runkernel defconfig nosmp:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nosmp:usb-uas-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nosmp:usb-uas-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+# duplicate some of the previous tests, with SMP disabled
+runkernel defconfig nosmp rootfs.cpio.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nosmp:mmc rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nosmp:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
 
 exit ${retcode}
