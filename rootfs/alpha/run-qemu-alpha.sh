@@ -7,6 +7,8 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+option=$1
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
 
 PREFIX=alpha-linux-
@@ -43,6 +45,11 @@ runkernel()
     else
 	build+=":${fixup}"
 	build+=":rootfs"
+    fi
+
+   if ! match_params "${option}@${fixup}"; then
+	echo "Skipping ${build} ... "
+	return 0
     fi
 
     echo -n "Building ${build} ... "
