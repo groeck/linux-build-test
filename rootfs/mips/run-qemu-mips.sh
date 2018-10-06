@@ -86,8 +86,8 @@ runkernel()
 
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	${extra_params} \
-	-vga cirrus -no-reboot -m 128 \
-	--append "${initcli} mem=128M console=ttyS0 console=tty ${extracli}" \
+	-vga cirrus -no-reboot -m 256 \
+	--append "${initcli} mem=256M console=ttyS0 console=tty ${extracli}" \
 	-nographic -monitor none > ${logfile} 2>&1 &
     pid=$!
 
