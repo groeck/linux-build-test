@@ -14,9 +14,9 @@ QEMU=${QEMU:-${QEMU_V212_BIN}/qemu-system-sh4}
 PREFIX=sh4-linux-
 ARCH=sh
 
-PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
 
-PATH=${PATH_SH}:${PATH}
+PATH=${PATH}:${PATH_SH}
 
 patch_defconfig()
 {
