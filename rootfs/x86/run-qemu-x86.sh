@@ -11,7 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-i386}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=i386
 
 # Older releases don't like gcc 6+
@@ -50,6 +50,10 @@ patch_defconfig()
 	    ;;
 	esac
     done
+
+    # Causes problems on shutdown (lack of reboot message)
+    echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
+    echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
 }
 
 runkernel()
@@ -97,7 +101,7 @@ runkernel()
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
 	-nographic \
-	-d unimp,guest_errors,cpu_reset \
+	-d unimp,guest_errors \
 	> ${logfile} 2>&1 &
     pid=$!
 
@@ -122,10 +126,14 @@ runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp2:efi32:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
-retcode=$((${retcode} + $?))
+
+# if [[ ${runall} -ne 0 ]]; then
+  runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
+  retcode=$((${retcode} + $?))
+  runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
+  retcode=$((${retcode} + $?))
+# fi
+
 runkernel defconfig smp:efi32:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp2:scsi[53C895A] Skylake-Server q35 rootfs.ext2
