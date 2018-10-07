@@ -39,7 +39,7 @@ cmd_mips_24=(defconfig allmodconfig allnoconfig bcm47xx_defconfig bcm63xx_defcon
 	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
 cmd_mips_25=(defconfig)	# allnoconfig fails with binutils 2.25
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
-cmd_nds32=(defconfig allnoconfig)
+cmd_nds32=(defconfig allnoconfig allmodconfig)
 cmd_nios2=(allnoconfig 3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig)
 cmd_parisc=(defconfig allnoconfig allmodconfig generic-32bit_defconfig)
@@ -66,6 +66,7 @@ cmd_unicore32=(defconfig allnoconfig)
 skip_316="m68k:allnoconfig i386:tools/perf x86_64:tools/perf"
 skip_318="m68k:allnoconfig i386:tools/perf x86_64:tools/perf"
 skip_44="cris:allnoconfig"
+skip_418="nds32:allmodconfig"
 
 # fixups
 
