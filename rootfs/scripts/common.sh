@@ -572,7 +572,8 @@ __setup_fragment()
     echo "CONFIG_DMATEST=y" >> ${fragment}
     echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
     echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
-    echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
+    # known broken and won't get fixed in stable releases
+    # echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
     echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
     echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
     echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
