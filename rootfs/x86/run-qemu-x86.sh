@@ -35,6 +35,8 @@ skip_316="defconfig:smp6:scsi[AM53C974] \
 skip_318="defconfig:smp6:scsi[AM53C974] \
 	defconfig:smp4:scsi[DC395]"
 
+skip_44="defconfig:smp4:scsi[DC395]"
+
 patch_defconfig()
 {
     local defconfig=$1
