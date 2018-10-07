@@ -36,7 +36,11 @@ skip_318="defconfig:smp:mem512:scsi[AM53C974] \
 
 patch_defconfig()
 {
-    : # nothing to do
+    local defconfig=$1
+
+    # Causes problems on shutdown (lack of reboot message)
+    echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
+    echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
 }
 
 runkernel()
@@ -114,10 +118,14 @@ runkernel defconfig smp:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp2:efi:mem4G:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel defconfig smp:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
-retcode=$((${retcode} + $?))
+
+# if [ ${runall} -eq 1 ]; then
+  runkernel defconfig smp4:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
+  retcode=$((${retcode} + $?))
+  runkernel defconfig smp:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
+  retcode=$((${retcode} + $?))
+# fi
+
 runkernel defconfig smp2:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
