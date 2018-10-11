@@ -561,6 +561,7 @@ __setup_fragment()
     echo "CONFIG_DEBUG_LOCK_ALLOC=y" >> ${fragment}
     echo "CONFIG_DEBUG_LOCKDEP=y" >> ${fragment}
     echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
+    echo "CONFIG_DEBUG_LIST=y" >> ${fragment}
 
     # selftests
     echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
