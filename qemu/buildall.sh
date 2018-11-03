@@ -146,7 +146,6 @@ if [ "$1" = "master" ]; then
     dobuild master-local master \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough \
 	--enable-debug --disable-strip"
     checkexit $?
