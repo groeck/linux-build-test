@@ -11,6 +11,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
 # PREFIX=sh4-linux-
 PREFIX=sh4eb-linux-
 ARCH=sh
+DISPARCH=sheb
 # PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
 # PATH_SH=/opt/kernel/gcc-7.3.0-nolibc/sh4-linux/bin
 PATH_SH=/opt/kernel/sh4eb/gcc-6.3.0/usr/bin
@@ -66,7 +67,7 @@ runkernel()
     local pid
     local logfile=$(__mktemp)
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
-    local build="${ARCH}:${defconfig}"
+    local build="${DISPARCH}:${defconfig}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
