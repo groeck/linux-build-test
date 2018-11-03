@@ -93,11 +93,12 @@ populate_image()
     mkdir -p ${tmpdir}
 
     echo "[ Extracting to ${tmpdir} ]"
-    echo ${rootfs} | grep cpio >/dev/null 2>&1
-    if [ $? -eq 0 ]
-    then
-    	d=$(pwd)
-	(cd ${tmpdir} ; cpio -i < $d/${rootfs})
+    if [[ "${rootfs}" = *cpio ]]; then
+	local prefix=""
+	if [[ "${rootfs}" != /* ]]; then
+	    prefix="$(pwd)"
+	fi
+	(cd ${tmpdir} ; cpio -i < "${prefix}/${rootfs}")
     else
         tar xaf ${rootfs} -C ${tmpdir}
     fi
