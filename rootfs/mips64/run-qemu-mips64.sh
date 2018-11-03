@@ -113,19 +113,13 @@ runkernel()
 	return 1
     fi
 
-    rootfs="${rootfs%.gz}"
-
     echo -n "running ..."
-
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
-	return 1
-    fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	${cpu} \
-	${diskcmd} \
+	${extra_params} \
 	-vga cirrus -no-reboot -m 256 \
 	--append "${initcli} mem=256M console=ttyS0 console=tty ${extracli}" \
 	-nographic > ${logfile} 2>&1 &
