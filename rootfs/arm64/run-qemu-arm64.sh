@@ -104,8 +104,6 @@ runkernel()
 	return 1
     fi
 
-    rootfs="${rootfs%.gz}"
-
     echo -n "running ..."
 
     case ${mach} in
