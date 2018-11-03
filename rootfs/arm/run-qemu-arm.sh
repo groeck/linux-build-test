@@ -226,6 +226,7 @@ runkernel()
     if [ ${retcode} -ne 0 ]; then
 	return 1
     fi
+    rootfs="$(rootfsname ${rootfs})"
 
     echo -n "running ..."
 
@@ -265,6 +266,7 @@ runkernel()
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    --append "earlycon=pl011,0x3f201000 root=/dev/mmcblk0 rootwait rw console=ttyAMA0 doreboot" \
 	    ${dtbcmd} \
@@ -338,6 +340,7 @@ runkernel()
 	fi
 	${QEMU_LINARO} -M ${mach} \
 	    ${memcmd} -clock unix -no-reboot \
+	    -snapshot \
 	    -drive file=sd.img,format=raw,if=sd,cache=writeback \
 	    -device usb-mouse -device usb-kbd \
 	    -serial stdio -monitor none -nographic \
@@ -374,6 +377,7 @@ runkernel()
     "xilinx-zynq-a9")
 	${QEMU_ZYNQ} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0 doreboot" \
 	    -nographic -monitor none -serial null -serial stdio \
@@ -397,6 +401,7 @@ runkernel()
     "versatilepb-scsi" )
 	${QEMU} -M versatilepb -m 128 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=scsi \
 	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" \
 	    -nographic -serial stdio -monitor null \
@@ -407,6 +412,7 @@ runkernel()
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
+	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1 doreboot" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
@@ -418,6 +424,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 		-nodefaults -nographic -serial stdio -monitor none \
 		-kernel arch/arm/boot/zImage -no-reboot \
+		-snapshot \
 		${dtbcmd} \
 		-append "rdinit=/sbin/init console=ttyS4,115200 earlyprintk doreboot" \
 		-initrd ${rootfs} \

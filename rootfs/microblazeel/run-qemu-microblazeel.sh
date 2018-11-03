@@ -32,7 +32,7 @@ runkernel()
 
     ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
-	-initrd ${rootfs} \
+	-initrd "$(rootfsname ${rootfs})" \
 	-append "rdinit=/sbin/init console=${console},115200" \
 	-monitor none -serial stdio -nographic \
 	> ${logfile} 2>&1 &

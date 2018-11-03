@@ -4,6 +4,7 @@ shopt -s extglob
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
+__cachedir="/var/cache/buildbot/$(basename ${__progdir})"
 __basedir="${__progdir}/.."
 
 __addtmpfile()
@@ -358,7 +359,7 @@ __common_fixup()
 __common_fixups()
 {
     local fixups="${1//:/ }"
-    local rootfs="$(basename ${2%.gz})"
+    local rootfs="$2"
     local fixup
 
     if [[ -z "${fixups}" ]]; then
@@ -366,10 +367,11 @@ __common_fixups()
     fi
 
     initcli=""
-    extra_params=""
+    extra_params="-snapshot"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
+	# initrd doesn't need snapshot
 	extra_params="-initrd ${rootfs}"
 	rootfs=""
     fi
@@ -403,8 +405,8 @@ __common_fixups()
 #   Difference: same as above.
 common_diskcmd()
 {
-    local fixup=$1
-    local rootfs="${2%.gz}"
+    local fixup="$1"
+    local rootfs="$2"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
@@ -454,6 +456,12 @@ doclean()
 	fi
 }
 
+rootfsname()
+{
+    rootfs="$(basename $1)"
+    echo "${__cachedir}/${rootfs%.gz}"
+}
+
 setup_rootfs()
 {
     local dynamic=""
@@ -470,18 +478,42 @@ setup_rootfs()
     shift $((OPTIND - 1))
 
     local rootfs=$1
+    local rootfspath="${__progdir}/${rootfs}"
+    local destfile="$(rootfsname ${rootfs})"
 
-    if [ -n "${rootfs}" ]
-    then
-	if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
-	    fakeroot ${__basedir}/scripts/genrootfs.sh ${__progdir} ${rootfs}
-	else
-	    cp ${__progdir}/${rootfs} .
-	fi
+    mkdir -p "${__cachedir}"
+
+    # Do nothing if file checksums exist and match.
+    # Checksums are copied, not regenerated, so that should always work even
+    # if the destination has been decompressed or dynamically modified.
+    if cmp -s "${rootfspath}.md5" "${destfile}.md5"; then
+	echo "${destfile}"
+	return
     fi
+
+    # If we get here, clean up the cache first.
+    rm -f "${destfile}" "${destfile}.md5"
+
+    cp "${rootfspath}" "${__cachedir}"
     if [[ "${rootfs}" == *.gz ]]; then
-	gunzip -f $(basename "${rootfs}")
+	gunzip -f "${destfile}.gz"
+	rootfs="${rootfs%.gz}"
     fi
+
+    if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
+	fakeroot ${__basedir}/scripts/genrootfs.sh "${__progdir}" "${destfile}"
+    fi
+
+    if [[ -e "${rootfspath}.md5" ]]; then
+	cp "${rootfspath}.md5" "${destfile}.md5"
+    fi
+
+    # Cached files must not be modified.
+    chmod 444 "${destfile}"
+    if [[ -e "${destfile}.md5" ]]; then
+	chmod 444 "${destfile}.md5"
+    fi
+    echo "${destfile}"
 }
 
 __setup_config()
@@ -735,8 +767,8 @@ dosetup()
     # system as needed. Assumes that the image was built already in
     # a previous test run.
     if [ ${nobuild:-0} -ne 0 ]; then
+	rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
 	__common_fixups "${fixups}" "${rootfs}"
-	setup_rootfs ${dynamic} "${rootfs}"
 	return 0
     fi
 
@@ -752,8 +784,8 @@ dosetup()
 	    echo "${__cached_reason} (cached)"
 	    return ${__cached_results}
 	fi
+	rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
 	__common_fixups "${fixups}" "${rootfs}"
-	setup_rootfs ${dynamic} "${rootfs}"
         [[ ${dodebug} -ne 0 ]] && echo -n "[cached] "
 	return 0
     fi
@@ -784,8 +816,8 @@ dosetup()
 	return ${rv}
     fi
 
+    rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
     __common_fixups "${fixups}" "${rootfs}"
-    setup_rootfs ${dynamic} "${rootfs}"
 
     make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} >/dev/null 2>${logfile}
     rv=$?

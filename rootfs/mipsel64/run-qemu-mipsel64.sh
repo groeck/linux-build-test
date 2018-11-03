@@ -106,6 +106,7 @@ runkernel()
 
     echo -n "running ..."
 
+    rootfs="$(rootfsname ${rootfs})"
     if [[ "${rootfs}" == *cpio ]]; then
 	initcli="rdinit=/sbin/init"
 	diskcmd="-initrd ${rootfs}"
@@ -115,7 +116,7 @@ runkernel()
 	grep -q CONFIG_ATA=y .config >/dev/null 2>&1
 	[ $? -eq 0 ] && hddev="sda"
 	initcli="root=/dev/${hddev} rw"
-	diskcmd="-drive file=${rootfs},format=raw,if=ide"
+	diskcmd="-snapshot -drive file=${rootfs},format=raw,if=ide"
 	# or something like:
 	# -device ide-hd,drive=d0,bus=ide.0 \
 	# -drive file=${rootfs},id=d0,format=raw,if=none

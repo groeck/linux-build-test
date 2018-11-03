@@ -18,6 +18,7 @@ patch_defconfig()
 {
     local defconfig=$1
     local mach=$2
+    local rootfs="$(rootfsname rootfs.cpio)"
 
     if [[ "${mach}" = "mcf5208evb" ]]; then
 	# Enable DEVTMPFS
@@ -32,7 +33,7 @@ patch_defconfig()
 	sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
 	sed -i -e '/CONFIG_INITRAMFS_ROOT_UID/d' ${defconfig}
 	sed -i -e '/CONFIG_INITRAMFS_ROOT_GID/d' ${defconfig}
-	echo "CONFIG_INITRAMFS_SOURCE=\"rootfs.cpio\"" >> ${defconfig}
+	echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
 	echo "CONFIG_INITRAMFS_ROOT_UID=0" >> ${defconfig}
 	echo "CONFIG_INITRAMFS_ROOT_GID=0" >> ${defconfig}
     fi
@@ -63,6 +64,7 @@ runkernel()
 	return 1
     fi
 
+    rootfs="$(rootfsname ${rootfs})"
     if [[ "${rootfs}" == *cpio ]]; then
 	if [[ "${mach}" = "q800" ]]; then
 	    initcli="rdinit=/sbin/init"
@@ -74,7 +76,7 @@ runkernel()
 	fi
     else
 	initcli="root=/dev/sda rw"
-	diskcmd="-drive file=${rootfs},format=raw"
+	diskcmd="-snapshot -drive file=${rootfs},format=raw"
     fi
 
     echo -n "running ..."

@@ -18,7 +18,7 @@ patch_defconfig()
 
     # Specify initramfs file name
     sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
-    echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
+    echo "CONFIG_INITRAMFS_SOURCE=\"$(rootfsname ${rootfs})\"" >> ${defconfig}
 
     # We need to support initramfs gzip compression
     sed -i -e '/CONFIG_RD_GZIP/d' ${defconfig}

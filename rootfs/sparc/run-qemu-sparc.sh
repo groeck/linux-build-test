@@ -76,7 +76,8 @@ runkernel()
 
     ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/image -no-reboot \
-	-drive file=hda.sqf,if=scsi,format=raw \
+	-snapshot \
+	-drive "file=$(rootfsname ${rootfs}),if=scsi,format=raw" \
 	-append "root=/dev/sda rw init=/sbin/init.sh panic=1 console=ttyS0 ${apc} doreboot" \
 	-nographic > ${logfile} 2>&1 &
     pid=$!

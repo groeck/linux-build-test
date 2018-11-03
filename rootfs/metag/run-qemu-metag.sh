@@ -21,7 +21,7 @@ patch_defconfig()
     sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
     sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
-    echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
+    echo "CONFIG_INITRAMFS_SOURCE=\"$(rootfsname ${rootfs})\"" >> ${defconfig}
 
 
     # Enable DEVTMPFS

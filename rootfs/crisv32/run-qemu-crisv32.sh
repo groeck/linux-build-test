@@ -12,6 +12,15 @@ PATH_CRIS=/opt/kernel/crisv32/gcc-4.9.2/usr/bin
 
 PATH=${PATH_CRIS}:${PATH}
 
+patch_defconfig()
+{
+    local defconfig=$1
+
+    # Specify initramfs file name
+    sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
+    echo "CONFIG_INITRAMFS_SOURCE=\"$(rootfsname ${rootfs})\"" >> ${defconfig}
+}
+
 runkernel()
 {
     local defconfig=$1
@@ -21,7 +30,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    dosetup -d ${rootfs} ${defconfig}
+    dosetup -f fixup -d ${rootfs} ${defconfig}
     if [ $? -ne 0 ]
     then
 	return 1

@@ -110,7 +110,7 @@ runkernel()
 	-kernel arch/xtensa/boot/uImage -no-reboot \
 	${dtbcmd} \
 	--append "rdinit=/sbin/init ${cmdline} console=ttyS0,115200n8" \
-	-initrd ${rootfs} \
+	-initrd "$(rootfsname ${rootfs})" \
 	-m ${mem} -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
 
