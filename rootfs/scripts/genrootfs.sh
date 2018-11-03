@@ -2,22 +2,27 @@
 #
 # Must run under fakeroot
 
-tmprootfs=/tmp/rootfs.$$
-progdir=$1
-rootfs=$2
-destdir=$(pwd)
+tmprootfs="$(mktemp -d)"
+progdir="$1"
+rootfs="$2"
 
-rm -rf ${tmprootfs}
-mkdir ${tmprootfs}
+inprefix=""
+outprefix=""
+if [[ "${rootfs}" != /* ]]; then
+    # If the rootfs path name is relative, assume implied copy
+    # from ${progdir} to $(pwd).
+    inprefix="${progdir}"
+    outprefix="$(pwd)"
+fi
 
-cd ${tmprootfs}
+rm -rf "${tmprootfs}"
+mkdir "${tmprootfs}"
+cd "${tmprootfs}"
 
-cpio -i < ${progdir}/${rootfs} >/dev/null 2>&1
+cpio -i < "${inprefix}/${rootfs}" >/dev/null 2>&1
 
 (cd ${progdir}/../scripts/runtime; tar cf - .) | tar xf -
 
-find . | cpio --quiet -o -H newc > ${destdir}/${rootfs} 2>/dev/null
+find . | cpio --quiet -o -H newc > "${outprefix}/${rootfs}" 2>/dev/null
 
 rm -rf ${tmprootfs}
-
-cd ${destdir}
