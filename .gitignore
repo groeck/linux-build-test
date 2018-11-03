@@ -26,7 +26,6 @@ master/templates/README.txt
 master/twistd.pid
 master/*.pyc
 crosstool-ng
-metag
 or1k
 qemu
 qemu-install
