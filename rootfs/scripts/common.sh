@@ -479,6 +479,11 @@ setup_rootfs()
 
     local rootfs=$1
     local rootfspath="${__progdir}/${rootfs}"
+    if [[ ! -e "${rootfspath}" && -e "${rootfspath}.gz" ]]; then
+	rootfs="${rootfs}.gz"
+	rootfspath="${rootfspath}.gz"
+    fi
+
     local destfile="$(rootfsname ${rootfs})"
 
     mkdir -p "${__cachedir}"
