@@ -262,6 +262,7 @@ runkernel()
 	pid=$!
 	;;
     "raspi2")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -drive file=${rootfs},format=raw,if=sd \
@@ -270,6 +271,7 @@ runkernel()
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "collie")
 	[[ ${dodebug} -ne 0 ]] && set -x
