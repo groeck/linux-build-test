@@ -143,7 +143,7 @@ runkernel()
     fi
 
     if [[ "${machine}" == "ppce500" ]]; then
-	diskcmd+=" -device e1000e"
+	extra_params+=" -device e1000e"
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
