@@ -4,7 +4,11 @@ shopt -s extglob
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
-__cachedir="/var/cache/buildbot/$(basename ${__progdir})"
+if [[ -w /var/cache/buildbot ]]; then
+    __cachedir="/var/cache/buildbot/$(basename ${__progdir})"
+else
+    __cachedir="/tmp/buildbot-cache/$(basename ${__progdir})"
+fi
 __basedir="${__progdir}/.."
 
 __addtmpfile()
