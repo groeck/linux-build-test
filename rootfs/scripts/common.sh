@@ -753,6 +753,8 @@ dosetup()
     local cached_config=""
     local fragment=""
 
+    __dosetup_rc=0
+
     OPTIND=1
     while getopts c:b:de:f:F: opt
     do
@@ -772,6 +774,15 @@ dosetup()
     local rootfs=$1
     local defconfig=$2
 
+    # Hack: Tests involving DC395 and AM53C974 are just not stable.
+    # Skip for now.
+    if [[ "${fixup}" = *DC395* || "${fixup}" = *AM53C974* || \
+	  "${fixups}" = *DC395* || "${fixups}" = *AM53C974* ]]; then
+	echo "skipped"
+	__dosetup_rc=2
+	return 2
+    fi
+
     # If nobuild is set, don't build image, just set up the root file
     # system as needed. Assumes that the image was built already in
     # a previous test run.
@@ -785,12 +796,14 @@ dosetup()
 	# Don't update build cache information in this case because we
 	# didn't do anything. Don't clear the cache either because it
 	# might still be useful for a later build.
+	__dosetup_rc=2
 	return 2
     fi
 
     if [[ -n "${cached_config}" && "${cached_config}" == "${__cached_config}" ]]; then
 	if [[ ${__cached_results} -ne 0 ]]; then
 	    echo "${__cached_reason} (cached)"
+	    __dosetup_rc=${__cached_results}
 	    return ${__cached_results}
 	fi
 	rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
@@ -822,6 +835,7 @@ dosetup()
 	fi
 	echo "${__cached_reason}"
 	__cached_results=${rv}
+	__dosetup_rc=${rv}
 	return ${rv}
     fi
 
@@ -841,6 +855,7 @@ dosetup()
     fi
 
     __cached_results=${rv}
+    __dosetup_rc=${rv}
     return ${rv}
 }
 
