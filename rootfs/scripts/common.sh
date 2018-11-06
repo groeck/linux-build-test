@@ -775,9 +775,11 @@ dosetup()
     local defconfig=$2
 
     # Hack: Tests involving DC395 and AM53C974 are just not stable.
-    # Skip for now.
-    if [[ "${fixup}" = *DC395* || "${fixup}" = *AM53C974* || \
-	  "${fixups}" = *DC395* || "${fixups}" = *AM53C974* ]]; then
+    # Skip for now unless runall is set.
+    if [[ "${runall}" -eq 0 && ( \
+		"${fixup}" = *DC395* || "${fixup}" = *AM53C974* || \
+		"${fixups}" = *DC395* || "${fixups}" = *AM53C974* \
+		) ]]; then
 	echo "skipped"
 	__dosetup_rc=2
 	return 2
