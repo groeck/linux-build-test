@@ -92,6 +92,9 @@ runkernel()
     fi
 
     if ! dosetup -c "${config}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+	if [[ __dosetup_rc -eq 2 ]]; then
+	    return 0
+	fi
 	return 1
     fi
 
@@ -130,12 +133,10 @@ retcode=$((${retcode} + $?))
 runkernel defconfig smp2:efi32:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
-# if [[ ${runall} -ne 0 ]]; then
-  runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
-  retcode=$((${retcode} + $?))
-  runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
-  retcode=$((${retcode} + $?))
-# fi
+runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig smp6:scsi[AM53C974] Nehalem q35 rootfs.ext2
+retcode=$((${retcode} + $?))
 
 runkernel defconfig smp:efi32:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
