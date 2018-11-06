@@ -34,7 +34,7 @@ PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
 # hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
 # PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
 PATH_PPC=/opt/kernel/gcc-6.4.0-nolibc/powerpc64-linux/bin
-# PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+# PATH_PPC=/opt/kernel/powerpc64/gcc-8.2.0/bin
 PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-7.3.0-nolibc/s390-linux/bin
