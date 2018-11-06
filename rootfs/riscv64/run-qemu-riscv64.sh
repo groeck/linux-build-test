@@ -51,7 +51,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}" -d -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
