@@ -34,13 +34,16 @@ PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
 skip_316="arm:mainstone:mainstone_defconfig \
 	arm:raspi2:multi_v7_defconfig \
+	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
 	arm:raspi2:multi_v7_defconfig \
+	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_44="arm:raspi2:multi_v7_defconfig \
+	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
@@ -53,128 +56,79 @@ skip_414="arm:witherspoon-bmc:aspeed_g5_defconfig"
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
+    local fixups=${2//:/ }
+    local fixup
 
-    # explicitly disable fdt for some tests
-    if [ "${fixup}" = "nofdt" ]
-    then
-	sed -i -e '/MACH_PXA27X_DT/d' ${defconfig}
-	sed -i -e '/MACH_PXA3XX_DT/d' ${defconfig}
-    fi
+    # Always enable ...
+    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
+    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
-    # We need DEVTMPFS for initrd images.
-
-    if [ "${fixup}" = "devtmpfs" -o "${fixup}" = "regulator" -o \
-         "${fixup}" = "realview_eb" -o "${fixup}" = "realview_pb" -o \
-	 "${fixup}" = "versatile" -o "${fixup}" = "pxa" -o "${fixup}" = "collie" ]
-    then
-	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-    fi
-
-    # Non-generic pxa images as well as collie need to have BLK_DEV_INITRD
-    # and EABI enabled.
-    if [ "${fixup}" = "pxa" -o "${fixup}" = "collie" ]
-    then
-	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-	sed -i -e '/CONFIG_AEABI/d' ${defconfig}
-	echo "CONFIG_AEABI=y" >> ${defconfig}
-    fi
-
-    # Versatile (scsi) needs to have AEABI, PCI and SCSI enabled.
-
-    if [ "${fixup}" = "versatile" ]
-    then
-	sed -i -e '/CONFIG_AEABI/d' ${defconfig}
-	echo "CONFIG_AEABI=y" >> ${defconfig}
-	sed -i -e '/CONFIG_PCI/d' ${defconfig}
-	echo "CONFIG_PCI=y" >> ${defconfig}
-	echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
-	sed -i -e '/CONFIG_OF/d' ${defconfig}
-	echo "CONFIG_OF=y" >> ${defconfig}
-	echo "CONFIG_OF_PCI=y" >> ${defconfig}
-	echo "CONFIG_OF_PCI_IRQ=y" >> ${defconfig}
-	sed -i -e '/CONFIG_SCSI/d' ${defconfig}
-	echo "CONFIG_SCSI=y" >> ${defconfig}
-	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-	sed -i -e '/CONFIG_BLK_DEV_SD/d' ${defconfig}
-	echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
-    fi
-
-    if [ "${fixup}" = "regulator" ]
-    then
-	sed -i -e '/CONFIG_REGULATOR/d' ${defconfig}
-	sed -i -e '/CONFIG_REGULATOR_VEXPRESS/d' ${defconfig}
-	echo "CONFIG_REGULATOR=y" >> ${defconfig}
-	echo "CONFIG_REGULATOR_VEXPRESS=y" >> ${defconfig}
-    fi
-
-    # CPUIDLE causes Exynos targets to run really slow.
-
-    if [ "${fixup}" = "cpuidle" ]
-    then
-	sed -i -e '/CONFIG_CPU_IDLE/d' ${defconfig}
-	sed -i -e '/CONFIG_ARM_EXYNOS_CPUIDLE/d' ${defconfig}
-    fi
-
-    # For imx25, disable NAND (not supported as of qemu 2.5, causes
-    # a runtime warning).
-
-    if [ "${fixup}" = "imx25" ]
-    then
-	sed -i -e '/CONFIG_MTD_NAND_MXC/d' ${defconfig}
-    fi
-
-    # qemu does not support CONFIG_DRM_IMX. This starts to fail
-    # with commit 5f2f911578fb ("drm/imx: # atomic phase 3 step 1:
-    # Use atomic configuration"), ie since v4.8. Impact is long boot delay
-    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
-    # in drm code.
-    if [ "${fixup}" = "imx6" ]
-    then
-	sed -i -e '/CONFIG_DRM_IMX/d' ${defconfig}
-    fi
-
-    # imx25 and realview need initrd support
-
-    if [ "${fixup}" = "imx25" -o "${fixup}" = "realview_eb" -o \
-	 "${fixup}" = "realview_pb" -o "${fixup}" = "initrd" ]
-    then
-	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-    fi
-
-    # Older versions of realview config files need additional CPU support.
-
-    if [ "${fixup}" = "realview_eb" ]
-    then
-	sed -i -e '/CONFIG_REALVIEW_EB_A9MP/d' ${defconfig}
-	echo "CONFIG_REALVIEW_EB_A9MP=y" >> ${defconfig}
-	sed -i -e '/CONFIG_REALVIEW_EB_ARM11MP_REVB/d' ${defconfig}
-	echo "CONFIG_REALVIEW_EB_ARM11MP_REVB=y" >> ${defconfig}
-	sed -i -e '/CONFIG_MACH_REALVIEW_PBX/d' ${defconfig}
-	echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
-	sed -i -e '/CONFIG_MACH_REALVIEW_PB1176/d' ${defconfig}
-	echo "CONFIG_MACH_REALVIEW_PB1176=y" >> ${defconfig}
-    fi
-
-    # Similar for PB-A8. Also disable some EB and incompatible PB
-    # configurations.
-
-    if [ "${fixup}" = "realview_pb" ]
-    then
-	sed -i -e '/CONFIG_REALVIEW_EB/d' ${defconfig}
-	sed -i -e '/CONFIG_MACH_REALVIEW_PB11/d' ${defconfig}
-	sed -i -e '/CONFIG_MACH_REALVIEW_PBX/d' ${defconfig}
-	echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
-	sed -i -e '/CONFIG_MACH_REALVIEW_PBA8/d' ${defconfig}
-	echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
-    fi
-
-    # Always build PXA watchdog into kernel
+    # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
+
+    for fixup in ${fixups}; do
+        case "${fixup}" in
+	nofdt)
+	    echo "MACH_PXA27X_DT=n" >> ${defconfig}
+	    echo "MACH_PXA3XX_DT=n" >> ${defconfig}
+	    ;;
+	aeabi)
+	    echo "CONFIG_AEABI=y" >> ${defconfig}
+	    ;;
+	pci)
+	    echo "CONFIG_PCI=y" >> ${defconfig}
+	    echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
+	    echo "CONFIG_OF=y" >> ${defconfig}
+	    echo "CONFIG_OF_PCI=y" >> ${defconfig}
+	    echo "CONFIG_OF_PCI_IRQ=y" >> ${defconfig}
+	    ;;
+	scsi)
+	    echo "CONFIG_SCSI=y" >> ${defconfig}
+	    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
+	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+	    ;;
+	regulator)
+	    echo "CONFIG_REGULATOR=y" >> ${defconfig}
+	    echo "CONFIG_REGULATOR_VEXPRESS=y" >> ${defconfig}
+	    ;;
+	cpuidle)
+	    # CPUIDLE causes Exynos targets to run really slow
+	    echo "CONFIG_CPU_IDLE=n" >> ${defconfig}
+	    echo "CONFIG_ARM_EXYNOS_CPUIDLE=n" >> ${defconfig}
+	    ;;
+	nonand)
+	    # For imx25, disable NAND (not supported as of qemu 2.5, causes
+	    # a runtime warning).
+	    echo "CONFIG_MTD_NAND_MXC=n" >> ${defconfig}
+	    ;;
+	nodrm)
+	    # qemu does not support CONFIG_DRM_IMX. This starts to fail
+	    # with commit 5f2f911578fb ("drm/imx: # atomic phase 3 step 1:
+	    # Use atomic configuration"), ie since v4.8. Impact is long boot delay
+	    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
+	    # in drm code.
+	    echo "CONFIG_DRM_IMX=n" >> ${defconfig}
+	    ;;
+	realview_eb)
+	    # Older versions of realview config files need additional CPU support.
+	    echo "CONFIG_REALVIEW_EB_A9MP=y" >> ${defconfig}
+	    echo "CONFIG_REALVIEW_EB_ARM11MP_REVB=y" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PB1176=y" >> ${defconfig}
+	    ;;
+	realview_pb)
+	    # Similar for PB-A8. Also disable some EB and incompatible PB
+	    # configurations.
+	    echo "CONFIG_REALVIEW_EB_A9MP=n" >> ${defconfig}
+	    echo "CONFIG_REALVIEW_EB_ARM11MP=n" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PB11MP=n" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PB1176=n" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
+	    echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
+	    ;;
+	esac
+    done
 }
 
 runkernel()
@@ -218,12 +172,10 @@ runkernel()
 	return 0
     fi
 
-    dosetup -f "${fixup}" -c "${defconfig}:${fixup}" "${rootfs}" "${defconfig}"
-    retcode=$?
-    if [ ${retcode} -eq 2 ]; then
-	return 0
-    fi
-    if [ ${retcode} -ne 0 ]; then
+    if ! dosetup -f "${fixup:-fixup}" -c "${defconfig}${fixup:+:${fixup}}" "${rootfs}" "${defconfig}"; then
+        if [[ __dosetup_rc -eq 2 ]]; then
+	    return 0
+	fi
 	return 1
     fi
     rootfs="$(rootfsname ${rootfs})"
@@ -252,7 +204,22 @@ runkernel()
     fi
 
     case ${mach} in
+    "virt")
+	[[ ${dodebug} -ne 0 ]] && set -x
+	${QEMU} -M ${mach} -m 512 \
+	    -no-reboot \
+	    -kernel arch/arm/boot/zImage \
+	    -snapshot \
+	    -drive file=${rootfs},format=raw,id=rootfs,if=none \
+	    -device virtio-blk-device,drive=rootfs \
+	    --append "console=ttyAMA0 root=/dev/vda rw doreboot" \
+	    -nographic -monitor null -serial stdio \
+	    > ${logfile} 2>&1 &
+	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
+	;;
     "mps2-an385")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -bios "${progdir}/mps2-boot.axf" \
 	    -kernel vmlinux \
@@ -261,6 +228,7 @@ runkernel()
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "raspi2")
 	[[ ${dodebug} -ne 0 ]] && set -x
@@ -445,16 +413,16 @@ echo "Build reference: $(git describe)"
 echo
 
 runkernel versatile_defconfig versatilepb-scsi "" 128 \
-	core-image-minimal-qemuarm.ext3 auto versatile versatile-pb.dtb
+	core-image-minimal-qemuarm.ext3 auto aeabi:pci:scsi versatile-pb.dtb
 retcode=$?
 checkstate ${retcode}
 
 runkernel versatile_defconfig versatileab "" 128 \
-	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-ab.dtb
+	core-image-minimal-qemuarm.cpio auto "" versatile-ab.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" 128 \
-	core-image-minimal-qemuarm.cpio auto devtmpfs versatile-pb.dtb
+	core-image-minimal-qemuarm.cpio auto "" versatile-pb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -468,17 +436,17 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
-	core-image-minimal-qemuarm.cpio manual imx25 imx25-pdk.dtb
+	core-image-minimal-qemuarm.cpio manual nonand imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig kzm "" 128 \
-	core-image-minimal-qemuarm.cpio manual imx6
+	core-image-minimal-qemuarm.cpio manual nodrm
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig sabrelite "" 256 \
-	core-image-minimal-qemuarm.cpio manual imx6 imx6dl-sabrelite.dtb
+	core-image-minimal-qemuarm.cpio manual nodrm imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -543,6 +511,11 @@ runkernel multi_v7_defconfig raspi2 "" "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+runkernel multi_v7_defconfig virt "" "" \
+	core-image-minimal-qemuarm.ext3 auto ""
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
 # highbank boots with updated qemu, but generates warnings to the console
 # due to ignored SMC calls.
 
@@ -554,7 +527,7 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel multi_v7_defconfig midway "" 2G \
-	core-image-minimal-qemuarm.cpio auto devtmpfs ecx-2000.dtb
+	core-image-minimal-qemuarm.cpio auto "" ecx-2000.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -608,17 +581,17 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel mainstone_defconfig mainstone "" "" \
-	core-image-minimal-qemuarm.cpio automatic pxa
+	core-image-minimal-qemuarm.cpio automatic aeabi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel spitz_defconfig akita "" "" \
-	core-image-minimal-qemuarm.cpio automatic pxa
+	core-image-minimal-qemuarm.cpio automatic aeabi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel spitz_defconfig spitz "" "" \
-	core-image-minimal-qemuarm.cpio automatic pxa
+	core-image-minimal-qemuarm.cpio automatic aeabi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -658,12 +631,12 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel collie_defconfig collie "" "" \
-	busybox-armv4.cpio manual collie
+	busybox-armv4.cpio manual aeabi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel integrator_defconfig integratorcp "" 128 \
-	busybox-armv4.cpio automatic devtmpfs integratorcp.dtb
+	busybox-armv4.cpio automatic "" integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
