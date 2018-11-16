@@ -423,7 +423,7 @@ do
 		case ${rel} in
 		    "v3.16"|"v3.18")
 			cd "${cmd[$i]}"
-			make ARCH=${ARCH} O="${BUILDDIR}" >/dev/null 2>${LOG}
+			make ARCH=${ARCH} WERROR=0 O="${BUILDDIR}" >/dev/null 2>${LOG}
 			rv=$?
 			cd ../..
 			;;
