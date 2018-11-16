@@ -76,6 +76,26 @@ then
     checkexit $?
 fi
 
+if [ -z "$1" -o "$1" = "v2.6" ]
+then
+    dobuild v2.6.2-local v2.6 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
+	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v2.7" ]
+then
+    dobuild v2.7.0-local v2.7 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
+	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
 if [ -z "$1" -o "$1" = "v2.8" ]
 then
     dobuild v2.8.1-local v2.8 \
@@ -139,6 +159,15 @@ then
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v3.1" ]; then
+    dobuild v3.1.0-local v3.1 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--enable-debug --disable-strip"
     checkexit $?
 fi
 
