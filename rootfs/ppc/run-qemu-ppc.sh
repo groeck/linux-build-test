@@ -24,29 +24,29 @@ QEMU_MACH=mac99
 
 PATH=${PATH_PPC}:${PATH}
 
-skip_316="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
-	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
-	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
-	powerpc:mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
+skip_316="mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
+	mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
+	bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
+	bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
+	bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
+	sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
+	sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
+	mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
 
-skip_318="powerpc:mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
-	powerpc:mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
-	powerpc:bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
-	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
-	powerpc:sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
-	powerpc:mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
+skip_318="mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
+	mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
+	mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
+	bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
+	bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
+	bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
+	sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
+	sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
+	mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
 
 patch_defconfig()
 {
@@ -79,14 +79,16 @@ runkernel()
     local pid
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local pbuild="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local rbuild="${mach}:${defconfig}${fixup:+:${fixup}}"
     local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|mmc|nvme))/}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
-	pbuild+=":initrd"
+	rbuild+=":initrd"
     else
-	pbuild+=":rootfs"
+	rbuild+=":rootfs"
     fi
+
+    local pbuild="ppc:${rbuild}"
 
     if ! match_params "${machine}@${mach}" "${variant}@${fixup}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
@@ -95,7 +97,7 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    if ! checkskip "${pbuild}"; then
+    if ! checkskip "${rbuild}"; then
 	return 0
     fi
 
