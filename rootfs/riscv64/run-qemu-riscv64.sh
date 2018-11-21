@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
@@ -18,7 +18,11 @@ PATH=${PATH}:${PATH_RISCV}
 
 patch_defconfig()
 {
-    : # nothing to do
+    local defconfig=$1
+    local fixups=${2//:/ }
+    local fixup
+
+    echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
 }
 
 cached_config=""
@@ -34,7 +38,7 @@ runkernel()
     local logfile="$(__mktemp)"
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
 	build+=":rootfs"
@@ -79,9 +83,45 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel virt defconfig "" rootfs.cpio.gz
+runkernel virt defconfig "" rootfs.cpio
 retcode=$((retcode + $?))
-runkernel virt defconfig virtio-blk rootfs.ext2.gz
+runkernel virt defconfig virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
+runkernel virt defconfig virtio rootfs.ext2
+retcode=$((retcode + $?))
+runkernel virt defconfig virtio-pci rootfs.ext2
+retcode=$((retcode + $?))
+runkernel virt defconfig mmc rootfs.ext2
+retcode=$((retcode + $?))
+runkernel virt defconfig nvme rootfs.ext2
+retcode=$((retcode + $?))
+runkernel virt defconfig usb-ohci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig usb-ehci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig usb-xhci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig usb-uas-ehci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig usb-uas-xhci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[53C810]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[53C895A]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[DC395]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[MEGASAS]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[MEGASAS2]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[FUSION]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[virtio]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "scsi[virtio-pci]" rootfs.ext2
+retcode=$((${retcode} + $?))
 
 exit ${retcode}
