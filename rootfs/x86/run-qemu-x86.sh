@@ -22,7 +22,7 @@ v3.16|v3.18)
 	PREFIX="x86_64-poky-linux-"
 	;;
 *)
-	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+	PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
 	PREFIX="x86_64-linux-"
 	;;
 esac
