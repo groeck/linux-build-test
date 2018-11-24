@@ -127,15 +127,16 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+retcode=0
 runkernel generic_kc705_defconfig lx60 dc232b lx60 128M rootfs.cpio
-retcode=$?
+retcode=$((retcode + $?))
 runkernel generic_kc705_defconfig kc705 dc232b kc705 1G rootfs.cpio
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel generic_kc705_defconfig ml605 dc233c ml605 128M rootfs.cpio
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel generic_kc705_defconfig kc705 dc233c kc705 1G rootfs.cpio
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu 256M rootfs-nommu.cpio
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 exit ${retcode}
