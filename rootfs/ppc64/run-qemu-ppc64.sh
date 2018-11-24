@@ -24,7 +24,8 @@ v3.16|v3.18)
 	PREFIX=powerpc64-poky-linux-
 	;;
 *)
-	PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+	# PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
+	PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
 	PREFIX=powerpc64-linux-
 	;;
 esac

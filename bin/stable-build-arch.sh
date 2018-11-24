@@ -33,8 +33,10 @@ PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
 # hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
 # PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
-PATH_PPC=/opt/kernel/gcc-6.4.0-nolibc/powerpc64-linux/bin
-# PATH_PPC=/opt/kernel/powerpc64/gcc-8.2.0/bin
+# Compile failures in -next (post 4.20)
+# PATH_PPC=/opt/kernel/gcc-6.4.0-nolibc/powerpc64-linux/bin
+# 8.2.0 generates build errors (overzaelous compiler)
+PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
 PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-7.3.0-nolibc/s390-linux/bin
@@ -43,7 +45,7 @@ PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-7.3.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
-PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
 PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
 
 PREFIX_ARC="arc-linux-"
