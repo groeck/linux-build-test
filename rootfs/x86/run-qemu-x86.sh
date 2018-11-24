@@ -166,6 +166,8 @@ runkernel defconfig nosmp:efi32:ata Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:ata n270 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig pae:nosmp pentium3 q35 rootfs.cpio
+retcode=$((${retcode} + $?))
 runkernel defconfig pae:nosmp:nvme pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig pae:nosmp:efi32:mmc coreduo q35 rootfs.ext2
