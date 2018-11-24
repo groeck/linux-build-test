@@ -7,6 +7,8 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+machine=$1
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 PREFIX=m68k-linux-
 ARCH=m68k
@@ -57,6 +59,11 @@ runkernel()
 	build+=":rootfs"
     fi
 
+    if ! match_params "${machine}@${mach}"; then
+	echo "Skipping ${build} ... "
+	return 0
+    fi
+
     echo -n "Building ${build} ... "
 
     dosetup -c "${defconfig}" -d -f "${mach}" "${rootfs}" "${defconfig}"
@@ -105,8 +112,12 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+retcode=0
 runkernel mcf5208evb m5208 m5208evb_defconfig rootfs.cpio
+retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig rootfs-q800.cpio
+retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig rootfs.ext2
+retcode=$((retcode + $?))
 
-exit $?
+exit ${retcode}
