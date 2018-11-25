@@ -183,14 +183,11 @@ retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-if [[ ${runall} -ne 0 ]]; then
-    # Traceback:
-    # irq 30: nobody cared (try booting with the "irqpoll" option)
-    # during reboot
-    runkernel qemu_ppc64_book3s_defconfig smp:nvme mac99 ppc64 ttyS0 vmlinux \
+# Upstream qemu generates a traceback during reboot.
+# irq 30: nobody cared (try booting with the "irqpoll" option)
+runkernel qemu_ppc64_book3s_defconfig smp:nvme mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
-    retcode=$((${retcode} + $?))
-fi
+retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
