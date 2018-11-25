@@ -351,6 +351,11 @@ case ${ARCH} in
 		PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
 		PREFIX="x86_64-poky-linux-"
 		;;
+	v3.18|v4.4|v4.9|v4.14|v4.19)
+		# doesn't build with 8.2.0 ("virtual memory exhausted")
+		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
+		PREFIX="${PREFIX_X86}"
+		;;
 	*)
 		PREFIX="${PREFIX_X86}"
 		;;
