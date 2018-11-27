@@ -7,6 +7,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_MICRO=${QEMU:-${QEMU_V31_BIN}/qemu-system-arm}
 # Some zynq images fail to run with qemu v2.7
 QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
@@ -324,8 +325,8 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "sabrelite" | "mcimx7d-sabre" )
-	${QEMU} -M ${mach} ${memcmd} \
+    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
+	${QEMU_MICRO} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
 	    -append "rdinit=/sbin/init earlycon console=ttymxc1,115200 doreboot" \
@@ -450,6 +451,14 @@ runkernel imx_v6_v7_defconfig sabrelite "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+if [ ${runall} -eq 1 ]; then
+    # crashes in imx_pwm_apply_v2() with v4.20-rc4
+    runkernel imx_v6_v7_defconfig mcimx6ul-evk "" 256 \
+	core-image-minimal-qemuarm.cpio manual nodrm imx6ul-14x14-evk.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
 runkernel multi_v7_defconfig beagle "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
 retcode=$((${retcode} + $?))
@@ -516,10 +525,9 @@ runkernel multi_v7_defconfig virt "" "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# highbank boots with updated qemu, but generates warnings to the console
-# due to ignored SMC calls.
-
 if [ ${runall} -eq 1 ]; then
+    # highbank boots with updated qemu, but generates warnings to the console
+    # due to ignored SMC calls.
     runkernel multi_v7_defconfig highbank cortex-a9 2G \
 	core-image-minimal-qemuarm.cpio auto "" highbank.dtb
     retcode=$((${retcode} + $?))
