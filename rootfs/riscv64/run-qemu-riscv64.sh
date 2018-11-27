@@ -98,8 +98,12 @@ runkernel virt defconfig mmc rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig nvme rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig usb-ohci rootfs.ext2
-retcode=$((${retcode} + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    runkernel virt defconfig usb-ohci rootfs.ext2
+    retcode=$((${retcode} + $?))
+fi
+
 runkernel virt defconfig usb-ehci rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig usb-xhci rootfs.ext2
@@ -112,10 +116,15 @@ runkernel virt defconfig "scsi[53C810]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "scsi[53C895A]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[DC395]" rootfs.ext2
-retcode=$((${retcode} + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Does not instantiate
+    runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
+    retcode=$((${retcode} + $?))
+    runkernel virt defconfig "scsi[DC395]" rootfs.ext2
+    retcode=$((${retcode} + $?))
+fi
+
 runkernel virt defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "scsi[MEGASAS2]" rootfs.ext2
