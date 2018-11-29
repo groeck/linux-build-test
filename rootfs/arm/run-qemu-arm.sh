@@ -34,11 +34,13 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
 skip_316="arm:mainstone:mainstone_defconfig \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
 	arm:smdkc210:multi_v7_defconfig"
 skip_318="arm:mainstone:mainstone_defconfig \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig \
@@ -109,6 +111,9 @@ patch_defconfig()
 	    # Use atomic configuration"), ie since v4.8. Impact is long boot delay
 	    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
 	    # in drm code.
+	    # It also does not support CONFIG_DRM_MXSFB; trying to enable it
+	    # crashes the kernel when running mcimx6ul-evk.
+	    echo "CONFIG_DRM_MXSFB=n" >> ${defconfig}
 	    echo "CONFIG_DRM_IMX=n" >> ${defconfig}
 	    ;;
 	realview_eb)
@@ -326,6 +331,7 @@ runkernel()
 	pid=$!
 	;;
     "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU_MICRO} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
@@ -333,6 +339,7 @@ runkernel()
 	    -nographic -monitor none -display none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "smdkc210")
 	${QEMU_SMDKC} -M ${mach} -smp 2 \
@@ -451,13 +458,10 @@ runkernel imx_v6_v7_defconfig sabrelite "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # crashes in imx_pwm_apply_v2() with v4.20-rc4
-    runkernel imx_v6_v7_defconfig mcimx6ul-evk "" 256 \
+runkernel imx_v6_v7_defconfig mcimx6ul-evk "" 256 \
 	core-image-minimal-qemuarm.cpio manual nodrm imx6ul-14x14-evk.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig beagle "" 256 \
 	core-image-minimal-qemuarm.cpio auto "" omap3-beagle.dtb
