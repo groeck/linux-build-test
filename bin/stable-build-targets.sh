@@ -5,8 +5,8 @@ buildarch=(alpha arm arm64 blackfin c6x cris frv hexagon i386 ia64 \
 	   tile x86_64 xtensa um unicore32)
 
 cmd_alpha=(defconfig allmodconfig allnoconfig tinyconfig)
-cmd_arc=(defconfig allnoconfig tinyconfig tb10x_defconfig)
-cmd_arcv2=(axs103_defconfig nsim_hs_smp_defconfig vdk_hs38_smp_defconfig)
+cmd_arc=(tb10x_defconfig)
+cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig nsim_hs_smp_defconfig vdk_hs38_smp_defconfig)
 cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig omap1_defconfig \
