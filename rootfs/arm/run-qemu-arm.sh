@@ -49,6 +49,7 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:romulus-bmc:aspeed_g5_defconfig \
 	arm:witherspoon-bmc:aspeed_g5_defconfig"
