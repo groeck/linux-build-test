@@ -134,8 +134,8 @@ runkernel malta_defconfig smp:scsi[FUSION] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nosmp rootfs.cpio.gz
-retcode=$?
+retcode=$((retcode + $?))
 runkernel malta_defconfig nosmp:ide rootfs.ext2.gz
-retcode=$?
+retcode=$((retcode + $?))
 
 exit ${retcode}
