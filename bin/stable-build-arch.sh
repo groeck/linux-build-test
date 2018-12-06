@@ -97,6 +97,8 @@ v3.16|v3.18)
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
+	# x86 sees build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
+	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	;;
 v4.4)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
