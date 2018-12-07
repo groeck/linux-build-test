@@ -13,11 +13,13 @@ Packages to install (Debian/Ubuntu):
 automake
 autoconf
 autotools-dev
+bison
 build-essential
 buildbot
 buildbot-slave
 coccinelle
 device-tree-compiler
+flex
 genext2fs
 nfs-client
 fakeroot
@@ -28,6 +30,7 @@ libcacard0
 libcacard-dev
 libglib2.0-dev
 libgtk-3-dev
+libisl15
 libssh2-1
 libssh2-1-dev
 libcurl4-openssl-dev
@@ -55,6 +58,12 @@ libdw-dev
 libslang2-dev
 libgtk2.0-de
 binutils-dev
+
+For 32-bit compiler support:
+
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
 
 ----
 
