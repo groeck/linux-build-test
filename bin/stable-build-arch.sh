@@ -22,9 +22,7 @@ PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/microblaze/gcc-6.4.0/bin
-PATH_MIPS_22=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/mips32-poky-linux
-PATH_MIPS_24=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
-PATH_MIPS_25=/opt/poky/2.0/sysroots/x86_64-pokysdk-linux/usr/bin/mips-poky-linux
+PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips64-linux/bin
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-7.3.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
@@ -76,6 +74,9 @@ configcmd="olddefconfig"
 # Older releases don't like gcc 6+
 case ${rel} in
 v3.16|v3.18)
+	# lib/mpi/longlong.h:651:2: error: impossible constraint in 'asm'
+	# with gcc 5.1 and later
+	PATH_MIPS=/opt/kernel/gcc-4.9.4-nolibc/mips64-linux/bin
 	# Various errors and warnings with more recent compilers
 	# (including gcc 7.3.0)
 	PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
@@ -233,23 +234,10 @@ case ${ARCH} in
 	PREFIX="microblaze-linux-"
 	PATH=${PATH_MICROBLAZE}:${PATH}
 	;;
-    mips_22)
-	ARCH=mips
-	cmd=(${cmd_mips_22[*]});
-	PREFIX="mips-poky-linux-"
-	PATH=${PATH_MIPS_22}:${PATH}
-	;;
-    mips_24)
-	ARCH=mips
-	cmd=(${cmd_mips_24[*]});
-	PREFIX="mips-linux-"
-	PATH=${PATH_MIPS_24}:${PATH}
-	;;
-    mips_25)
-	ARCH=mips
-	cmd=(${cmd_mips_25[*]});
-	PREFIX="mips-poky-linux-"
-	PATH=${PATH_MIPS_25}:${PATH}
+    mips)
+	cmd=(${cmd_mips[*]});
+	PREFIX="mips64-linux-"
+	PATH=${PATH_MIPS}:${PATH}
 	;;
     mn10300)
 	cmd=(${cmd_mn10300[*]})

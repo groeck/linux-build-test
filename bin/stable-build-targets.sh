@@ -34,11 +34,9 @@ cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
 cmd_metag=(defconfig allnoconfig tinyconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
 cmd_microblaze=(mmu_defconfig nommu_defconfig allnoconfig tinyconfig)
-cmd_mips_22=(defconfig allnoconfig tinyconfig)
-cmd_mips_24=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
+cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
 	nlm_xlp_defconfig ath79_defconfig ar7_defconfig \
 	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
-cmd_mips_25=(defconfig)	# allnoconfig tinyconfig fails with binutils 2.25
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
