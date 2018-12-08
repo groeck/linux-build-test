@@ -17,8 +17,8 @@ ARCH=x86_64
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 "v3.16"|"v3.18")
-	PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-	PREFIX="x86_64-poky-linux-"
+	PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
+	PREFIX="x86_64-linux-"
 	;;
 *)
 	PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
