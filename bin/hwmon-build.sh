@@ -6,9 +6,9 @@ ERR=/tmp/error.$$
 
 BRANCH=$(git branch | egrep "^\*" | cut -f2 -d' ')
 
-PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-PATH_ARM=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/armv5te-poky-linux-gnueabi
-PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
+PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
+PATH_ARM=/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin
+PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
 
 export PATH=${PATH_X86}:${PATH_ARM}:${PATH_PPC}:${PATH}
 
@@ -96,17 +96,14 @@ doit()
     # We should be on the target directory, in the target branch
 
     case ${ARCH} in
-    x86_64)
-	PREFIX="x86_64-poky-linux-"
-	;;
-    i386)
-	PREFIX="x86_64-poky-linux-"
+    x86_64|i386)
+	PREFIX="x86_64-linux-"
 	;;
     arm)
-	PREFIX="arm-poky-linux-gnueabi-"
+	PREFIX="arm-linux-gnueabi-"
 	;;
     powerpc)
-	PREFIX="powerpc64-poky-linux-"
+	PREFIX="powerpc64-linux-"
 	;;
     *)
 	return 1
