@@ -49,7 +49,6 @@ PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
 PREFIX_ARC="arc-linux-"
 PREFIX_ARM="arm-linux-gnueabi-"
 PREFIX_PPC=powerpc64-linux-
-# PREFIX_PPC="powerpc64-poky-linux-"
 PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
 
@@ -84,22 +83,20 @@ v3.16|v3.18)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
 	# ppc needs old compiler up to and including v3.18
 	# (see commit c2ce6f9f3dc0)
-	PATH_PPC=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-	PREFIX_PPC="powerpc64-poky-linux-"
-	# PATH_S390=/opt/kernel/gcc-4.6.3-nolibc/s390x-linux/bin
-	# PREFIX_S390="s390x-linux-"
+	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
 	PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
 	# sh4 supports recent compilers only starting with v4.4
 	# (see commit 940d4113f330). Note that we can't use the kernel.org
 	# toolchain for gcc 5.5.0 either; it results in "'-m4-nofpu' is not
 	# supported ...".
 	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
-	# PATH_SH4=/opt/kernel/gcc-6.4.0-nolibc/sh4-linux/bin
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
-	# x86 sees build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
-	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+	if [[ "${rel}" = "3.16" ]]; then
+	    # x86 has build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
+	    PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
+	fi
 	;;
 v4.4)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
@@ -337,9 +334,9 @@ case ${ARCH} in
 	cmd=(${cmd_um[*]})
 	case ${rel} in
 	v3.16)
-		# um fails to build with those releases
-		PATH_X86=/opt/poky/1.3/sysroots/x86_64-pokysdk-linux/usr/bin/x86_64-poky-linux
-		PREFIX="x86_64-poky-linux-"
+		# um fails to build with more recent compilers
+		PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
+		PREFIX="${PREFIX_X86}"
 		;;
 	v3.18|v4.4|v4.9|v4.14|v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
