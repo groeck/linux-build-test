@@ -16,9 +16,19 @@ config=$3
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
-# PATH_PPC=/opt/poky/1.4.0-1/sysroots/x86_64-pokysdk-linux/usr/bin/ppc64e5500-poky-linux
-PATH_PPC=/opt/poky/1.5.1/sysroots/x86_64-pokysdk-linux/usr/bin/powerpc64-poky-linux
-PREFIX=powerpc64-poky-linux-
+
+PREFIX=powerpc64-linux-
+
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v3.16|v3.18)
+	PATH_PPC=/opt/kernel/gcc-4.9.4-nolibc/powerpc64-linux/bin
+	;;
+*)
+	PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
+	;;
+esac
+
 ARCH=powerpc
 QEMU_MACH=mac99
 
