@@ -37,6 +37,7 @@ libcurl4-openssl-dev
 libiscsi-dev
 libpixman-1-dev
 libxml2-dev
+zlib1g:i386 (for unicore32)
 lzop
 module-init-tools
 qemu-system
