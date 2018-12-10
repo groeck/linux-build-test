@@ -20,6 +20,7 @@ do
 		continue
 	fi
 	rsync -l --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share \
+		${base}/.git \
 		${base}/lib ${base}/include ${base}/kconfig ${base}/qemu-install \
 		${system}:${base}
 	if [ $? -ne 0 ]
