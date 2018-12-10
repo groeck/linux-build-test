@@ -29,12 +29,10 @@ PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
-# hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
-# PATH_PPC=/opt/kernel/gcc-7.3.0-nolibc/powerpc64-linux/bin
-# Compile failures in -next (post 4.20)
-# PATH_PPC=/opt/kernel/gcc-6.4.0-nolibc/powerpc64-linux/bin
+# 6.4.0, 6.5.0 internal compiler error in fs/exofs/dir.o -next after 4.20
+# 7.3.0 hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
 # 8.2.0 generates build errors (overzaelous compiler)
-PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
+PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
 PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-7.3.0-nolibc/s390-linux/bin
@@ -93,7 +91,7 @@ v3.16|v3.18)
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
-	if [[ "${rel}" = "3.16" ]]; then
+	if [[ "${rel}" = "v3.16" ]]; then
 	    # x86 has build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
 	    PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	fi
