@@ -697,6 +697,14 @@ __setup_fragment()
     echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
     echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
     echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
+
+    # file systems
+    echo "CONFIG_BTRFS_FS=y" >> ${fragment}
+    echo "CONFIG_SQUASHFS=y" >> ${fragment}
+    echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
+    echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
+    echo "CONFIG_SQUASHFS_4K_DEVBLK_SIZE=y" >> ${fragment}
+    echo "CONFIG_EXT3_FS=y" >> ${fragment}
 }
 
 # match_params

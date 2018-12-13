@@ -163,7 +163,7 @@ runkernel virt defconfig smp:mem512 rootfs.cpio.gz
 retcode=$?
 runkernel virt defconfig smp2:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:mem512:usb-uas-xhci rootfs.ext2.gz
+runkernel virt defconfig smp4:mem512:usb-uas-xhci rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp6:mem512:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
@@ -171,21 +171,21 @@ runkernel virt defconfig smp8:mem512:virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:mem512:virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:mem512:nvme rootfs.ext2.gz
+runkernel virt defconfig smp2:mem512:nvme rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:mem512:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:mem512:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:mem512:scsi[AM53C974]" rootfs.ext2.gz
+runkernel virt defconfig "smp8:mem512:scsi[AM53C974]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:mem512:scsi[MEGASAS]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:mem512:scsi[MEGASAS2]" rootfs.ext2.gz
+runkernel virt defconfig "smp4:mem512:scsi[MEGASAS2]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:mem512:scsi[53C810]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:mem512:scsi[53C895A]" rootfs.ext2.gz
+runkernel virt defconfig "smp8:mem512:scsi[53C895A]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
@@ -202,7 +202,7 @@ runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-re
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig smp2:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
 retcode=$((retcode + $?))
 
 runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
