@@ -12,6 +12,7 @@ if [[ ! -d "${vdir}" ]]; then
     virtualenv "${vdir}"
     source "${vdir}/bin/activate"
     pip install buildbot==0.8.14
+    pip install buildbot-slave==0.8.14
     # Needs patch - see README
 else
     source "${vdir}/bin/activate"
