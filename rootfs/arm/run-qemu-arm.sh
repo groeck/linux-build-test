@@ -210,6 +210,18 @@ runkernel()
 	memcmd="-m ${mem}"
     fi
 
+    local earlycon=""
+    case ${mach} in
+    raspi2)
+	earlycon="earlycon=pl011,0x3f201000"
+	;;
+    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
+	earlycon="earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
+	;;
+    *)
+	;;
+    esac
+
     case ${mach} in
     "virt")
 	[[ ${dodebug} -ne 0 ]] && set -x
@@ -243,7 +255,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    --append "earlycon=pl011,0x3f201000 root=/dev/mmcblk0 rootwait rw console=ttyAMA0 doreboot" \
+	    --append "root=/dev/mmcblk0 rootwait rw ${earlycon} console=ttyAMA0 doreboot" \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
@@ -336,7 +348,7 @@ runkernel()
 	${QEMU_MICRO} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
-	    -append "rdinit=/sbin/init earlycon console=ttymxc1,115200 doreboot" \
+	    -append "rdinit=/sbin/init ${earlycon} console=ttymxc1,115200 doreboot" \
 	    -nographic -monitor none -display none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -482,10 +494,13 @@ runkernel multi_v7_defconfig sabrelite "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# runkernel multi_v7_defconfig mcimx7d-sabre "" 256 \
-# 	core-image-minimal-qemuarm.cpio manual "" imx7d-sdb.dtb
-# retcode=$((${retcode} + $?))
-# checkstate ${retcode}
+if [[ "${runall}" -eq 1 ]]; then
+  # Completely fails to boot, no message to console
+  runkernel multi_v7_defconfig mcimx7d-sabre "" 256 \
+	core-image-minimal-qemuarm.cpio manual "" imx7d-sdb.dtb
+  retcode=$((${retcode} + $?))
+  checkstate ${retcode}
+fi
 
 runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	core-image-minimal-qemuarm.ext3 auto "" vexpress-v2p-ca9.dtb
