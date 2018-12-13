@@ -13,6 +13,7 @@ Packages to install (Debian/Ubuntu):
 automake
 autoconf
 autotools-dev
+bc
 bison
 build-essential
 buildbot
@@ -36,16 +37,16 @@ libssh2-1-dev
 libcurl4-openssl-dev
 libiscsi-dev
 libpixman-1-dev
+libssl-dev
 libxml2-dev
-zlib1g:i386 (for unicore32)
 lzop
 module-init-tools
 qemu-system
 qemu-user
 qemu-utils
+rsync
 u-boot-tools
-
-For perf:
+virtualenv
 
 libaudit-dev
 libunwind-dev
@@ -64,7 +65,20 @@ For 32-bit compiler support:
 
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386
+
+---
+
+Install on new builder:
+
+- install all packages listed above
+- Run bin/distribute.sh to new builder
+- Run
+	rsync -l --timeout=15 -r /opt/kernel <builder>:/opt/kernel
+- Run
+	cd /opt/buildbot
+	bin/buildslave.sh create-slave <basedir> <master> <name> <passwd>
+
 
 ----
 
