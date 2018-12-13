@@ -14,6 +14,7 @@ PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
 PATH_C6X=/opt/kernel/gcc-8.1.0-nolibc/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
+PATH_CSKY=/opt/kernel/csky/gcc-6.3.0/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
 PATH_H8300=/opt/kernel/gcc-8.1.0-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
@@ -177,6 +178,11 @@ case ${ARCH} in
 	cmd=(${cmd_cris[*]})
 	PREFIX="cris-linux-"
 	PATH=${PATH_CRIS}:${PATH}
+	;;
+    csky)
+	cmd=(${cmd_csky[*]})
+	PREFIX="csky-linux-"
+	PATH=${PATH_CSKY}:${PATH}
 	;;
     frv)
 	cmd=(${cmd_frv[*]})
