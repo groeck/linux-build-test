@@ -414,11 +414,15 @@ do
 
 	# perf build is special. Use host gcc and build based on defconfig.
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
-	    make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>&1
-	    if [ $? -ne 0 ]; then
-		echo "failed (config) - skipping"
-	    else
-		case ${rel} in
+	    if ! make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>${LOG}; then
+		echo "failed"
+		echo "--------------"
+		echo "Error log:"
+		cat ${LOG}
+		echo "--------------"
+		continue
+	    fi
+	    case ${rel} in
 		    "v3.16"|"v3.18")
 			cd "${cmd[$i]}"
 			make ARCH=${ARCH} WERROR=0 O="${BUILDDIR}" >/dev/null 2>${LOG}
@@ -429,26 +433,31 @@ do
 			make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>${LOG}
 			rv=$?
 			;;
-		esac
-		if [ ${rv} -ne 0 ]; then
+	    esac
+	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
 		    echo "--------------"
 		    echo "Error log:"
 		    cat ${LOG}
 		    echo "--------------"
 		    errors=$(expr ${errors} + 1)
-		else
+	    else
 		    echo "passed"
-		fi
 	    fi
 	    i=$(expr $i + 1)
 	    continue
 	fi
 
-	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>&1
-	if [ $? -ne 0 ]
-	then
-	        echo "failed (config) - skipping"
+	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>${LOG}; then
+		if grep -q "No rule to make target" ${LOG}; then
+	            echo "failed (config) - skipping"
+		else
+	            echo "failed"
+		    echo "--------------"
+		    echo "Error log:"
+		    cat ${LOG}
+		    echo "--------------"
+		fi
 	 	i=$(expr $i + 1)
 	 	continue
 	fi
