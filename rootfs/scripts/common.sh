@@ -623,6 +623,7 @@ __setup_fragment()
     echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
     echo "CONFIG_PROVE_RCU=y" >> ${fragment}
     echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
+    echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
     echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
     echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
     echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
