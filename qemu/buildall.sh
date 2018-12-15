@@ -82,6 +82,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--with-gtkabi=3.0 \
+	--disable-werror \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
@@ -139,6 +140,21 @@ then
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--with-gtkabi=3.0 \
 	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v3.1" ]
+then
+    dobuild v3.1.0-local v3.1 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+    dobuild v3.1.0-q800 v3.1-m68k \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=m68k-softmmu"
     checkexit $?
 fi
 

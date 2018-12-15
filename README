@@ -16,8 +16,6 @@ autotools-dev
 bc
 bison
 build-essential
-buildbot
-buildbot-slave
 coccinelle
 device-tree-compiler
 flex
