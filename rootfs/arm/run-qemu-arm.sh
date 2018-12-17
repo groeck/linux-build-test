@@ -231,7 +231,7 @@ runkernel()
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,id=rootfs,if=none \
 	    -device virtio-blk-device,drive=rootfs \
-	    --append "console=ttyAMA0 root=/dev/vda rw doreboot" \
+	    --append "console=ttyAMA0 root=/dev/vda rw" \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -255,7 +255,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    --append "root=/dev/mmcblk0 rootwait rw ${earlycon} console=ttyAMA0 doreboot" \
+	    --append "root=/dev/mmcblk0 rootwait rw ${earlycon} console=ttyAMA0" \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
@@ -283,7 +283,7 @@ runkernel()
 	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
-	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
+	    --append "rdinit=/sbin/init console=ttyS0" \
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -298,7 +298,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    -drive file=/tmp/flash,format=raw,if=pflash \
-	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
+	    --append "rdinit=/sbin/init console=ttyS0" \
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -310,7 +310,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -d unimp,guest_errors \
 	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttyS0 doreboot" \
+	    --append "rdinit=/sbin/init console=ttyS0" \
 	    -monitor null -nographic ${dtbcmd} \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -340,7 +340,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    -initrd ${rootfs} \
-	    -append "rdinit=/sbin/init console=ttymxc0,115200 doreboot" \
+	    -append "rdinit=/sbin/init console=ttymxc0,115200" \
 	    -nographic -monitor none -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -358,7 +358,7 @@ runkernel()
 	${QEMU_MICRO} -M ${mach} ${memcmd} \
 	    -kernel arch/arm/boot/zImage  -no-reboot \
 	    ${diskcmd} \
-	    -append "${initcli} ${earlycon} console=ttymxc1,115200 doreboot" \
+	    -append "${initcli} ${earlycon} console=ttymxc1,115200" \
 	    -nographic -monitor none -display none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -368,7 +368,7 @@ runkernel()
 	${QEMU_SMDKC} -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
-	    -append "rdinit=/sbin/init console=ttySAC0,115200n8 doreboot" \
+	    -append "rdinit=/sbin/init console=ttySAC0,115200n8" \
 	    -nographic -monitor none -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -378,7 +378,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0 doreboot" \
+	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0" \
 	    -nographic -monitor none -serial null -serial stdio \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -391,7 +391,7 @@ runkernel()
 	${QEMU} -M ${mach} ${cpucmd} ${memcmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttyAMA0,115200 doreboot" \
+	    --append "rdinit=/sbin/init console=ttyAMA0,115200" \
 	    -serial stdio -monitor null -nographic \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -403,7 +403,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=scsi \
-	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty doreboot" \
+	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty" \
 	    -nographic -serial stdio -monitor null \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
@@ -415,7 +415,7 @@ runkernel()
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -snapshot \
 	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1 doreboot" \
+	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
@@ -427,7 +427,7 @@ runkernel()
 		-kernel arch/arm/boot/zImage -no-reboot \
 		-snapshot \
 		${dtbcmd} \
-		-append "rdinit=/sbin/init console=ttyS4,115200 earlyprintk doreboot" \
+		-append "rdinit=/sbin/init console=ttyS4,115200 earlyprintk" \
 		-initrd ${rootfs} \
 		> ${logfile} 2>&1 &
 	pid=$!
