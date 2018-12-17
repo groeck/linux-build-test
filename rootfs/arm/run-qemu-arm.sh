@@ -607,12 +607,12 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-pb-a8 "" 512 \
-	busybox-arm.cpio auto realview_pb arm-realview-pba8.dtb
+	rootfs-armv5.cpio auto realview_pb arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-pbx-a9 "" "" \
-	busybox-arm.cpio auto realview_pb arm-realview-pbx-a9.dtb
+	rootfs-armv5.cpio auto realview_pb arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
