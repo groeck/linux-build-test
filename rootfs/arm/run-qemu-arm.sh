@@ -267,7 +267,7 @@ runkernel()
 	${QEMU} -M ${mach} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttySA1 doreboot" \
+	    --append "rdinit=/sbin/init console=ttySA1" \
 	    -monitor null -nographic \
 	    > ${logfile} 2>&1 &
 	pid=$!
@@ -683,7 +683,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel collie_defconfig collie "" "" \
-	busybox-armv4.cpio manual aeabi
+	rootfs-sa110.cpio manual aeabi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
