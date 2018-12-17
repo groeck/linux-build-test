@@ -90,7 +90,7 @@ runkernel()
 
     if [[ "${mach}" = "q800" ]]; then
 	# q800 needs special qemu, which in turn does not support mcf5208evb
-	qemu="${QEMU_V211_M68K_BIN}/qemu-system-m68k"
+	qemu="${QEMU_V31_M68K_BIN}/qemu-system-m68k"
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
