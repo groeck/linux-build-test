@@ -14,7 +14,7 @@ fi
 
 progdir=$(cd $(dirname $0); pwd)
 
-/opt/buildbot/bin/mksdimage.sh -s 256 \
+/usr/bin/fakeroot /opt/buildbot/bin/mksdimage.sh -s 256 \
 	-m ${progdir}/MLO.2011.9 -u ${progdir}/u-boot.bin.2011.9 \
 	-b ${progdir}/boot.cmd \
 	-r ${rootfs} -d ${dtbfile} \
