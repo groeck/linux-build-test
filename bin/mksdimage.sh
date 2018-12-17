@@ -90,7 +90,8 @@ populate_image()
     echo "[ Copying file system ]"
 
     if [[ "${rootfs}" = *ext2 ]]; then
-	ext2fs="${rootfs}"
+	cp "${rootfs}" "${ext2fs}"
+	chmod +w "${ext2fs}"
     else
 	rm -rf ${tmpdir}
 	mkdir -p ${tmpdir}
@@ -110,9 +111,9 @@ populate_image()
 	genext2fs -U -N 4096 -b ${ext2blocks} -d ${tmpdir} ${ext2fs}
 	# fsck.ext3 ${ext2fs}
 	# e2label ${ext2fs} rootfs
-	# tune2fs -j ${ext2fs}
 	echo "[ Done ${ext2fs} ]"
     fi
+    tune2fs -j ${ext2fs}
 
     dd if=${ext2fs} bs=512 seek=${EXT3_SECTOR_OFFSET} count=${EXT3_SECTORS} of=${outfile} conv=notrunc
 
