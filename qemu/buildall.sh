@@ -19,7 +19,10 @@ dobuild()
 	echo options: ${options}
 
 	git clean -d -x -f -q
-	git checkout ${branch}
+	if ! git checkout ${branch}; then
+	    echo "Unable to check out ${branch}"
+	    return 1
+	fi
 	if [ -z "${targets}" ]
 	then
 	    ./configure --prefix=${prefix} ${options}
