@@ -501,15 +501,15 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig beagle "" 256 \
-	rootfs-armv5.cpio auto "" omap3-beagle.dtb
+	rootfs-armv5.ext2 auto "" omap3-beagle.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig beaglexm "" 512 \
-	rootfs-armv5.cpio auto "" omap3-beagle-xm.dtb
+	rootfs-armv5.ext2 auto "" omap3-beagle-xm.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig overo "" 256 \
-	rootfs-armv5.cpio auto "" omap3-overo-tobi.dtb
+	rootfs-armv5.ext2 auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -594,15 +594,15 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel omap2plus_defconfig beagle "" 256 \
-	rootfs-armv5.cpio auto "" omap3-beagle.dtb
+	rootfs-armv5.ext2 auto "" omap3-beagle.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel omap2plus_defconfig beaglexm "" 512 \
-	rootfs-armv5.cpio auto "" omap3-beagle-xm.dtb
+	rootfs-armv5.ext2 auto "" omap3-beagle-xm.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel omap2plus_defconfig overo "" 256 \
-	rootfs-armv5.cpio auto "" omap3-overo-tobi.dtb
+	rootfs-armv5.ext2 auto "" omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
