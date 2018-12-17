@@ -32,6 +32,7 @@ libgtk-3-dev
 libisl15
 libssh2-1
 libssh2-1-dev
+libcurl3
 libcurl4-openssl-dev
 libiscsi-dev
 libpixman-1-dev
