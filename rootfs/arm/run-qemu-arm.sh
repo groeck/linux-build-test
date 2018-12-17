@@ -688,27 +688,27 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel integrator_defconfig integratorcp "" 128 \
-	busybox-armv4.cpio automatic "" integratorcp.dtb
+	rootfs-armv5.cpio automatic "" integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" 512 \
-	busybox-armv4.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
+	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig witherspoon-bmc "" 512 \
-	busybox-armv4.cpio automatic "" aspeed-bmc-opp-witherspoon.dtb
+	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
-	busybox-armv4.cpio automatic "" aspeed-ast2500-evb.dtb
+	rootfs-armv5.cpio automatic "" aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" 512 \
-	busybox-armv4.cpio automatic "" aspeed-bmc-opp-romulus.dtb
+	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
