@@ -448,18 +448,22 @@ do
 	    continue
 	fi
 
-	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >/dev/null 2>${LOG}; then
-		if grep -q "No rule to make target" ${LOG}; then
-	            echo "failed (config) - skipping"
-		else
-	            echo "failed"
-		    echo "--------------"
-		    echo "Error log:"
-		    cat ${LOG}
-		    echo "--------------"
-		fi
-	 	i=$(expr $i + 1)
-	 	continue
+	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >${LOG} 2>&1; then
+	    # Only report an error if the default configuration
+	    # does not exist.
+	    if grep -q "No rule to make target" ${LOG}; then
+	        echo "failed (config) - skipping"
+	    elif grep -q "Can't find default configuration" ${LOG}; then
+	        echo "failed (config) - skipping"
+	    else
+	        echo "failed"
+		echo "--------------"
+		echo "Error log:"
+		cat ${LOG}
+		echo "--------------"
+	    fi
+	     i=$(expr $i + 1)
+	     continue
 	fi
 	# run config file fixups if necessary
 	if [ ${#fixup[*]} -gt 0 ]; then
