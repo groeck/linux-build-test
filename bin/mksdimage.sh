@@ -9,7 +9,7 @@
 # Based on:
 #   Narcissus - Online image builder for the angstrom distribution
 #   Copyright (C) 2008 - 2011 Koen Kooi
-#   Copyright (C) 2010        Denys Dmytriyenko
+#   Copyright (C) 2010	Denys Dmytriyenko
 # and
 #   Linaro Images Tools.
 #   Author: Guilherme Salgado <guilherme.salgado@linaro.org>
@@ -72,12 +72,12 @@ populate_image()
 
     if [ -n ${bootscript} ]
     then
-        mkimage -C none -A arm -T script -d ${bootscript} boot.scr
-        cp boot.scr /${tmpdir}/boot.scr
+	mkimage -C none -A arm -T script -d ${bootscript} boot.scr
+	cp boot.scr /${tmpdir}/boot.scr
     fi
     if [ -n "${dtbfile}" ]
     then
-    	cp ${dtbfile} /${tmpdir}/devicetree.dtb
+	cp ${dtbfile} /${tmpdir}/devicetree.dtb
     fi
     cp ${mlo} /${tmpdir}/MLO
     cp ${uboot} /${tmpdir}/u-boot.bin
@@ -89,26 +89,30 @@ populate_image()
 
     echo "[ Copying file system ]"
 
-    rm -rf ${tmpdir}
-    mkdir -p ${tmpdir}
-
-    echo "[ Extracting to ${tmpdir} ]"
-    if [[ "${rootfs}" = *cpio ]]; then
-	local prefix=""
-	if [[ "${rootfs}" != /* ]]; then
-	    prefix="$(pwd)"
-	fi
-	(cd ${tmpdir} ; cpio -i < "${prefix}/${rootfs}")
+    if [[ "${rootfs}" = *ext2 ]]; then
+	ext2fs="${rootfs}"
     else
-        tar xaf ${rootfs} -C ${tmpdir}
-    fi
+	rm -rf ${tmpdir}
+	mkdir -p ${tmpdir}
 
-    echo "[ Generating ${ext2fs} with ${ext2blocks} blocks ]"
-    genext2fs -U -N 4096 -b ${ext2blocks} -d ${tmpdir} ${ext2fs}
-    # fsck.ext3 ${ext2fs}
-    # e2label ${ext2fs} rootfs
-    tune2fs -j ${ext2fs}
-    echo "[ Done ${ext2fs} ]"
+	echo "[ Extracting to ${tmpdir} ]"
+	if [[ "${rootfs}" = *cpio ]]; then
+	    local prefix=""
+	    if [[ "${rootfs}" != /* ]]; then
+		prefix="$(pwd)"
+	    fi
+	    (cd ${tmpdir} ; cpio -i < "${prefix}/${rootfs}")
+	else
+	    tar xaf ${rootfs} -C ${tmpdir}
+	fi
+
+	echo "[ Generating ${ext2fs} with ${ext2blocks} blocks ]"
+	genext2fs -U -N 4096 -b ${ext2blocks} -d ${tmpdir} ${ext2fs}
+	# fsck.ext3 ${ext2fs}
+	# e2label ${ext2fs} rootfs
+	# tune2fs -j ${ext2fs}
+	echo "[ Done ${ext2fs} ]"
+    fi
 
     dd if=${ext2fs} bs=512 seek=${EXT3_SECTOR_OFFSET} count=${EXT3_SECTORS} of=${outfile} conv=notrunc
 
