@@ -590,56 +590,14 @@ __setup_fragment()
     local fragment="$1"
     local fixups="${2//:/ }"
     local fixup
+    local nodebug=0
+    local notests=0
+    local noscsi=0
+    local nousb=0
+    local novirt=0
 
     rm -f "${fragment}"
     touch "${fragment}"
-
-    # debug options
-    echo "CONFIG_EXPERT=y" >> ${fragment}
-    echo "CONFIG_DEBUG_KERNEL" >> ${fragment}
-    echo "CONFIG_LOCK_DEBUGGING_SUPPORT" >> ${fragment}
-    echo "CONFIG_DEBUG_RT_MUTEXES=y" >> ${fragment}
-    echo "CONFIG_DEBUG_SPINLOCK=y" >> ${fragment}
-    echo "CONFIG_DEBUG_MUTEXES=y" >> ${fragment}
-    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y" >> ${fragment}
-    echo "CONFIG_DEBUG_LOCK_ALLOC=y" >> ${fragment}
-    echo "CONFIG_DEBUG_LOCKDEP=y" >> ${fragment}
-    echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
-    echo "CONFIG_DEBUG_LIST=y" >> ${fragment}
-
-    # selftests
-    echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
-    echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
-    echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_DEBUG_RODATA_TEST=y" >> ${fragment}
-    echo "CONFIG_DEBUG_TLBFLUSH=y" >> ${fragment}
-    echo "CONFIG_DMATEST=y" >> ${fragment}
-    echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
-    echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
-    echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
-    echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
-    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
-    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
-    echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
-    echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
-    echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
-    echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
-    echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
-    echo "CONFIG_TEST_BITMAP=y" >> ${fragment}
-    echo "CONFIG_TEST_FIRMWARE=y" >> ${fragment}
-    # takes too long
-    # echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
-    echo "CONFIG_TEST_SORT=y" >> ${fragment}
-    echo "CONFIG_TEST_SYSCTL=y" >> ${fragment}
-    echo "CONFIG_TEST_UUID=y" >> ${fragment}
-    echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
-    echo "CONFIG_USB_TEST=y" >> ${fragment}
-    echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
-    echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
-    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -649,10 +607,68 @@ __setup_fragment()
 	smp*)
 	    echo "CONFIG_SMP=y" >> ${fragment}
 	    ;;
+	nodebug) nodebug=1 ;;
+	notests) notests=1 ;;
+	noscsi) noscsi=1 ;;
+	nousb) nousb=1 ;;
+	novirt) novirt=1 ;;
 	*)
 	    ;;
 	esac
     done
+
+    if [[ "${nodebug}" -eq 0 ]]; then
+	# debug options
+	echo "CONFIG_EXPERT=y" >> ${fragment}
+	echo "CONFIG_DEBUG_KERNEL" >> ${fragment}
+	echo "CONFIG_LOCK_DEBUGGING_SUPPORT" >> ${fragment}
+	echo "CONFIG_DEBUG_RT_MUTEXES=y" >> ${fragment}
+	echo "CONFIG_DEBUG_SPINLOCK=y" >> ${fragment}
+	echo "CONFIG_DEBUG_MUTEXES=y" >> ${fragment}
+	echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y" >> ${fragment}
+	echo "CONFIG_DEBUG_LOCK_ALLOC=y" >> ${fragment}
+	echo "CONFIG_DEBUG_LOCKDEP=y" >> ${fragment}
+	echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
+	echo "CONFIG_DEBUG_LIST=y" >> ${fragment}
+    fi
+
+    if [[ "${notests}" -eq 0 ]]; then
+	# selftests
+	echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
+	echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
+	echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_DEBUG_RODATA_TEST=y" >> ${fragment}
+	echo "CONFIG_DEBUG_TLBFLUSH=y" >> ${fragment}
+	echo "CONFIG_DMATEST=y" >> ${fragment}
+	echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
+	echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
+	echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
+	echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
+	echo "CONFIG_PROVE_RCU=y" >> ${fragment}
+	echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
+	echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_TEST_BITMAP=y" >> ${fragment}
+	echo "CONFIG_TEST_FIRMWARE=y" >> ${fragment}
+	# takes too long
+	# echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
+	echo "CONFIG_TEST_SORT=y" >> ${fragment}
+	echo "CONFIG_TEST_SYSCTL=y" >> ${fragment}
+	echo "CONFIG_TEST_UUID=y" >> ${fragment}
+	echo "CONFIG_USB_TEST=y" >> ${fragment}
+	echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
+	echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
+
+	echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
+	echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
+	echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
+	echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+
+	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
+	echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
+    fi
 
     # BLK_DEV_INITRD
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${fragment}
@@ -661,16 +677,18 @@ __setup_fragment()
     echo "CONFIG_DEVTMPFS=y" >> ${fragment}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${fragment}
 
-    # SCSI and SCSI controller drivers
-    echo "CONFIG_SCSI=y" >> ${fragment}
-    echo "CONFIG_BLK_DEV_SD=y" >> ${fragment}
-    echo "CONFIG_SCSI_LOWLEVEL=y" >> ${fragment}
-    echo "CONFIG_SCSI_DC395x=y" >> ${fragment}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${fragment}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${fragment}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${fragment}
-    echo "CONFIG_FUSION=y" >> ${fragment}
-    echo "CONFIG_FUSION_SAS=y" >> ${fragment}
+    if [[ "${noscsi}" -eq 0 ]]; then
+	# SCSI and SCSI controller drivers
+	echo "CONFIG_SCSI=y" >> ${fragment}
+	echo "CONFIG_BLK_DEV_SD=y" >> ${fragment}
+	echo "CONFIG_SCSI_LOWLEVEL=y" >> ${fragment}
+	echo "CONFIG_SCSI_DC395x=y" >> ${fragment}
+	echo "CONFIG_SCSI_AM53C974=y" >> ${fragment}
+	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${fragment}
+	echo "CONFIG_MEGARAID_SAS=y" >> ${fragment}
+	echo "CONFIG_FUSION=y" >> ${fragment}
+	echo "CONFIG_FUSION_SAS=y" >> ${fragment}
+    fi
 
     # MMC/SDHCI support
     echo "CONFIG_MMC=y" >> ${fragment}
@@ -680,24 +698,28 @@ __setup_fragment()
     # NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
 
-    # USB support
-    echo "CONFIG_USB=y" >> ${fragment}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${fragment}
-    echo "CONFIG_USB_EHCI_HCD=y" >> ${fragment}
-    echo "CONFIG_USB_OHCI_HCD=y" >> ${fragment}
-    echo "CONFIG_USB_STORAGE=y" >> ${fragment}
-    echo "CONFIG_USB_UAS=y" >> ${fragment}
+    if [[ "${nousb}" -eq 0 ]]; then
+	# USB support
+	echo "CONFIG_USB=y" >> ${fragment}
+	echo "CONFIG_USB_XHCI_HCD=y" >> ${fragment}
+	echo "CONFIG_USB_EHCI_HCD=y" >> ${fragment}
+	echo "CONFIG_USB_OHCI_HCD=y" >> ${fragment}
+	echo "CONFIG_USB_STORAGE=y" >> ${fragment}
+	echo "CONFIG_USB_UAS=y" >> ${fragment}
+    fi
 
-    # Virtualization
-    echo "CONFIG_VIRTIO=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_PCI=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_BALLOON=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_MMIO=y" >> ${fragment}
-    echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
-    echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
-    echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
+    if [[ "${novirt}" -eq 0 ]]; then
+	# Virtualization
+	echo "CONFIG_VIRTIO=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_PCI=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_BALLOON=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_MMIO=y" >> ${fragment}
+	echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
+	echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
+	echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
+    fi
 
     # file systems
     echo "CONFIG_BTRFS_FS=y" >> ${fragment}
