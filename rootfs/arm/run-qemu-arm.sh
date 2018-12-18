@@ -152,7 +152,7 @@ runkernel()
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}"
 
-    PREFIX="${PREFIX_A}"
+    local PREFIX="${PREFIX_A}"
     if [[ "${cpu}" == "cortex-m3" ]]; then
 	PREFIX="${PREFIX_M3}"
     fi
@@ -237,17 +237,6 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
         ;;
-    "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -snapshot \
-	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1" \
-	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     *)
 	echo "Missing build recipe for machine ${mach}"
 	exit 1
@@ -274,6 +263,8 @@ newrunkernel()
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
+    local QEMUCMD="${QEMU}"
+    local PREFIX="${PREFIX_A}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
@@ -345,11 +336,11 @@ newrunkernel()
 	initcli+=" earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
 	initcli+=" console=ttymxc1,115200"
 	extra_params+=" -display none -serial null"
-	QEMU="${QEMU_MICRO}"
+	QEMUCMD="${QEMU_MICRO}"
 	;;
     "smdkc210")
 	initcli+=" console=ttySAC0,115200n8"
-	QEMU="${QEMU_SMDKC}"
+	QEMUCMD="${QEMU_SMDKC}"
 	;;
     "realview-pb-a8" | "realview-pbx-a9" | \
     "realview-eb-mpcore" | "realview-eb" | \
@@ -362,13 +353,14 @@ newrunkernel()
 	;;
     "xilinx-zynq-a9")
 	initcli+=" console=ttyPS0"
+	extra_params+=" -serial null"
 	;;
     *)
 	;;
     esac
 
     [[ ${dodebug} -ne 0 ]] && set -x
-    ${QEMU} -M ${mach} \
+    ${QEMUCMD} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
 	    -kernel arch/arm/boot/zImage \
 	    -no-reboot \
@@ -400,12 +392,13 @@ newrunkernel versatile_defconfig versatileab "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel vexpress_defconfig vexpress-a9 "" 128 \
-	rootfs-armv5.ext2 auto regulator vexpress-v2p-ca9.dtb
+# vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
+newrunkernel vexpress_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel vexpress_defconfig vexpress-a15 "" 128 \
-	rootfs-armv5.ext2 auto regulator vexpress-v2p-ca15-tc1.dtb
+newrunkernel vexpress_defconfig vexpress-a15 "" \
+	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -454,18 +447,23 @@ runkernel multi_v7_defconfig overo "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig vexpress-a9 "" 128 \
-	rootfs-armv5.ext2 auto "" vexpress-v2p-ca9.dtb
+newrunkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto notests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel multi_v7_defconfig vexpress-a15 "" 128 \
-	rootfs-armv7a.ext2 auto "" vexpress-v2p-ca15-tc1.dtb
+newrunkernel multi_v7_defconfig vexpress-a15 "" \
+	rootfs-armv7a.ext2 auto notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
-runkernel multi_v7_defconfig vexpress-a15-a7 "" 256 \
-	rootfs-armv7a.ext2 auto "" vexpress-v2p-ca15_a7.dtb
+newrunkernel multi_v7_defconfig vexpress-a15-a7 "" \
+	rootfs-armv7a.ext2 auto notests::sd:mem256 vexpress-v2p-ca15_a7.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+newrunkernel multi_v7_defconfig midway "" \
+	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -518,11 +516,6 @@ if [ ${runall} -eq 1 ]; then
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
-
-newrunkernel multi_v7_defconfig midway "" \
-	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
 
 newrunkernel multi_v7_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
