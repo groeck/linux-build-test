@@ -137,120 +137,6 @@ runkernel()
     local defconfig=$1
     local mach=$2
     local cpu=$3
-    local mem=$4
-    local rootfs=$5
-    local mode=$6
-    local fixup=$7
-    local dtb=$8
-    local ddtb=$(echo ${dtb} | sed -e 's/.dtb//')
-    local dtbfile="arch/arm/boot/dts/${dtb}"
-    local pid
-    local retcode
-    local logfile="$(__mktemp)"
-    local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local s
-    local build="${ARCH}:${mach}:${defconfig}"
-    local pbuild="${build}"
-
-    local PREFIX="${PREFIX_A}"
-    if [[ "${cpu}" == "cortex-m3" ]]; then
-	PREFIX="${PREFIX_M3}"
-    fi
-
-    if [ -n "${ddtb}" ]
-    then
-	pbuild="${build}:${ddtb}"
-    fi
-
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}"; then
-	echo "Skipping ${pbuild} ... "
-	return 0
-    fi
-
-    echo -n "Building ${pbuild} ... "
-
-    if ! checkskip "${build}" ; then
-	return 0
-    fi
-
-    if ! dosetup -f "${fixup:-fixup}" -c "${defconfig}${fixup:+:${fixup}}" "${rootfs}" "${defconfig}"; then
-        if [[ __dosetup_rc -eq 2 ]]; then
-	    return 0
-	fi
-	return 1
-    fi
-    rootfs="$(rootfsname ${rootfs})"
-
-    echo -n "running ..."
-
-    # if we have a dtb file use it
-    local dtbcmd=""
-    if [ -n "${dtb}" -a -f "${dtbfile}" ]
-    then
-	dtbcmd="-dtb ${dtbfile}"
-    fi
-
-    # Specify CPU if provided
-    local cpucmd=""
-    if [ -n "${cpu}" ]
-    then
-	cpucmd="-cpu ${cpu}"
-    fi
-
-    # Specify amount of memory if provided
-    local memcmd=""
-    if [ -n "${mem}" ]
-    then
-	memcmd="-m ${mem}"
-    fi
-
-    case ${mach} in
-    "mps2-an385")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-	    -bios "${progdir}/mps2-boot.axf" \
-	    -kernel vmlinux \
-	    -initrd ${rootfs} \
-	    ${dtbcmd} \
-	    -nographic -monitor null -serial stdio \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "overo" | "beagle" | "beaglexm")
-	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
-	    ${dtbfile} sd.img > ${logfile} 2>&1
-	if [ $? -ne 0 ]
-	then
-	    echo "failed"
-	    cat ${logfile}
-	    return 1
-	fi
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU_LINARO} -M ${mach} \
-	    ${memcmd} -clock unix -no-reboot \
-	    -snapshot \
-	    -drive file=sd.img,format=raw,if=sd,cache=writeback \
-	    -device usb-mouse -device usb-kbd \
-	    -serial stdio -monitor none -nographic \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-        ;;
-    *)
-	echo "Missing build recipe for machine ${mach}"
-	exit 1
-    esac
-
-    dowait ${pid} ${logfile} ${mode} waitlist[@]
-    return $?
-}
-
-newrunkernel()
-{
-    local defconfig=$1
-    local mach=$2
-    local cpu=$3
     local rootfs=$4
     local mode=$5
     local fixup=$6
@@ -265,6 +151,9 @@ newrunkernel()
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
     local QEMUCMD="${QEMU}"
     local PREFIX="${PREFIX_A}"
+    if [[ "${cpu}" = "cortex-m3" ]]; then
+	PREFIX="${PREFIX_M3}"
+    fi
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
@@ -301,7 +190,27 @@ newrunkernel()
 	dtbcmd="-dtb ${dtbfile}"
     fi
 
+    kernel="arch/arm/boot/zImage"
     case ${mach} in
+    "mps2-an385")
+	extra_params+=" -bios ${progdir}/mps2-boot.axf"
+	initcli=""
+	kernel="vmlinux"
+	;;
+    "overo" | "beagle" | "beaglexm")
+	if ! ${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
+			${dtbfile} sd.img > ${logfile} 2>&1 ; then
+	    echo "failed"
+	    cat ${logfile}
+	    return 1
+	fi
+	extra_params+=" -clock unix"
+	extra_params+=" -device usb-mouse -device usb-kbd"
+	# replace original root file system with generated image
+	extra_params="${extra_params//${rootfs}/sd.img}"
+	initcli=""
+	QEMUCMD="${QEMU_LINARO}"
+	;;
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
 	initcli+=" console=ttyS4,115200"
 	extra_params+=" -nodefaults"
@@ -362,10 +271,10 @@ newrunkernel()
     [[ ${dodebug} -ne 0 ]] && set -x
     ${QEMUCMD} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
-	    -kernel arch/arm/boot/zImage \
+	    -kernel ${kernel} \
 	    -no-reboot \
 	    ${extra_params} \
-	    --append "${initcli}" \
+	    ${initcli:+--append "${initcli}"} \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
@@ -378,132 +287,132 @@ newrunkernel()
 echo "Build reference: $(git describe)"
 echo
 
-newrunkernel versatile_defconfig versatilepb "" \
+runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128 versatile-pb.dtb
 retcode=$?
 checkstate ${retcode}
-newrunkernel versatile_defconfig versatilepb "" \
+runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.cpio auto aeabi:pci::mem128 versatile-pb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel versatile_defconfig versatileab "" \
+runkernel versatile_defconfig versatileab "" \
 	rootfs-armv5.cpio auto ::mem128 versatile-ab.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 # vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
-newrunkernel vexpress_defconfig vexpress-a9 "" \
+runkernel vexpress_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-newrunkernel vexpress_defconfig vexpress-a15 "" \
+runkernel vexpress_defconfig vexpress-a15 "" \
 	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel imx_v4_v5_defconfig imx25-pdk "" \
+runkernel imx_v4_v5_defconfig imx25-pdk "" \
 	rootfs-armv5.cpio manual nonand::mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel imx_v6_v7_defconfig kzm "" \
+runkernel imx_v6_v7_defconfig kzm "" \
 	rootfs-armv5.cpio manual nodrm::mem128
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel imx_v6_v7_defconfig sabrelite "" \
+runkernel imx_v6_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual nodrm::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 if [[ "${runall}" -eq 1 ]]; then
   # Qemu does not accept drive command
-  newrunkernel imx_v6_v7_defconfig sabrelite "" \
+  runkernel imx_v6_v7_defconfig sabrelite "" \
 	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6dl-sabrelite.dtb
   retcode=$((${retcode} + $?))
   checkstate ${retcode}
 fi
 
-newrunkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-newrunkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig beagle "" 256 \
-	rootfs-armv5.ext2 auto "" omap3-beagle.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig beaglexm "" 512 \
-	rootfs-armv5.ext2 auto "" omap3-beagle-xm.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig overo "" 256 \
-	rootfs-armv5.ext2 auto "" omap3-overo-tobi.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-newrunkernel multi_v7_defconfig vexpress-a9 "" \
+runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto notests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-newrunkernel multi_v7_defconfig vexpress-a15 "" \
+runkernel multi_v7_defconfig vexpress-a15 "" \
 	rootfs-armv7a.ext2 auto notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+runkernel multi_v7_defconfig beagle "" \
+	rootfs-armv5.ext2 auto ::sd:mem256 omap3-beagle.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig beaglexm "" \
+	rootfs-armv5.ext2 auto ::sd:mem512 omap3-beagle-xm.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig overo "" \
+	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
-newrunkernel multi_v7_defconfig vexpress-a15-a7 "" \
+runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 	rootfs-armv7a.ext2 auto notests::sd:mem256 vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel multi_v7_defconfig midway "" \
+runkernel multi_v7_defconfig midway "" \
 	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel multi_v7_defconfig sabrelite "" \
+runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 if [[ "${runall}" -eq 1 ]]; then
   # Completely fails to boot, no message to console
-  newrunkernel multi_v7_defconfig mcimx7d-sabre "" \
+  runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
   retcode=$((${retcode} + $?))
   checkstate ${retcode}
 fi
 
-newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc702.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc706.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zed.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel multi_v7_defconfig cubieboard "" \
+runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel multi_v7_defconfig raspi2 "" \
+runkernel multi_v7_defconfig raspi2 "" \
 	rootfs-armv7a.ext2 manual ::sd bcm2836-rpi-2-b.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel multi_v7_defconfig virt "" \
+runkernel multi_v7_defconfig virt "" \
 	rootfs-armv7a.ext2 auto "::virtio-blk:mem512"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -511,146 +420,146 @@ checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # highbank boots with updated qemu, but generates warnings to the console
     # due to ignored SMC calls.
-    newrunkernel multi_v7_defconfig highbank cortex-a9 \
+    runkernel multi_v7_defconfig highbank cortex-a9 \
 	rootfs-armv7a.cpio auto ::mem2G highbank.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
 
-newrunkernel multi_v7_defconfig smdkc210 "" \
+runkernel multi_v7_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel exynos_defconfig smdkc210 "" \
+runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel omap2plus_defconfig beagle "" 256 \
-	rootfs-armv5.ext2 auto "" omap3-beagle.dtb
+runkernel omap2plus_defconfig beagle "" \
+	rootfs-armv5.ext2 auto ::sd:mem256 omap3-beagle.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel omap2plus_defconfig beaglexm "" 512 \
-	rootfs-armv5.ext2 auto "" omap3-beagle-xm.dtb
+runkernel omap2plus_defconfig beaglexm "" \
+	rootfs-armv5.ext2 auto ::sd:mem512 omap3-beagle-xm.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel omap2plus_defconfig overo "" 256 \
-	rootfs-armv5.ext2 auto "" omap3-overo-tobi.dtb
+runkernel omap2plus_defconfig overo "" \
+	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel realview_defconfig realview-pb-a8 "" \
+runkernel realview_defconfig realview-pb-a8 "" \
 	rootfs-armv5.cpio auto realview_pb::mem512 arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel realview_defconfig realview-pbx-a9 "" \
+runkernel realview_defconfig realview-pbx-a9 "" \
 	rootfs-armv5.cpio auto realview_pb arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel realview_defconfig realview-eb cortex-a8 \
+runkernel realview_defconfig realview-eb cortex-a8 \
 	rootfs-armv5.cpio manual realview_eb::mem512 arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel realview_defconfig realview-eb-mpcore "" \
+runkernel realview_defconfig realview-eb-mpcore "" \
 	rootfs-armv5.cpio manual realview_eb::mem512 \
 	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel realview-smp_defconfig realview-eb-mpcore "" \
+runkernel realview-smp_defconfig realview-eb-mpcore "" \
 	rootfs-armv5.cpio manual realview_e::mem512b
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel mainstone_defconfig mainstone "" \
+runkernel mainstone_defconfig mainstone "" \
 	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 # disable tests to avoid running out of memory
-newrunkernel spitz_defconfig akita "" \
+runkernel spitz_defconfig akita "" \
 	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel spitz_defconfig spitz "" \
+runkernel spitz_defconfig spitz "" \
 	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 # disable options to avoid running out of memory
-newrunkernel pxa_defconfig akita "" \
+runkernel pxa_defconfig akita "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig borzoi "" \
+runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig mainstone "" \
+runkernel pxa_defconfig mainstone "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig spitz "" \
+runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig terrier "" \
+runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig tosa "" \
+runkernel pxa_defconfig tosa "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel pxa_defconfig z2 "" \
+runkernel pxa_defconfig z2 "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel collie_defconfig collie "" \
+runkernel collie_defconfig collie "" \
 	rootfs-sa110.cpio manual aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel integrator_defconfig integratorcp "" \
+runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.cpio automatic ::mem128 integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel aspeed_g4_defconfig palmetto-bmc "" \
+runkernel aspeed_g4_defconfig palmetto-bmc "" \
 	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 # selftests sometimes hang with soft CPU lockup
-newrunkernel aspeed_g5_defconfig witherspoon-bmc "" \
+runkernel aspeed_g5_defconfig witherspoon-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel aspeed_g5_defconfig ast2500-evb "" \
+runkernel aspeed_g5_defconfig ast2500-evb "" \
 	rootfs-armv5.cpio automatic notests aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-newrunkernel aspeed_g5_defconfig romulus-bmc "" \
+runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel mps2_defconfig "mps2-an385" "cortex-m3" "" \
-	rootfs-arm-m3.cpio manual initrd mps2-an385.dtb
+runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
+	rootfs-arm-m3.cpio manual "" mps2-an385.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -659,7 +568,7 @@ if [ ${runall} -eq 1 ]; then
     # which may be caused by qemu. The call originates from ep_config_from_hw(),
     # which calls musb_read_fifosize(), which in turn calls the function
     # with parameter MUSB_FIFOSIZE=0x0f.
-    newrunkernel sunxi_defconfig cubieboard "" \
+    runkernel sunxi_defconfig cubieboard "" \
 	rootfs-armv7a.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
