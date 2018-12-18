@@ -252,19 +252,6 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "realview-pb-a8" | "realview-pbx-a9" | \
-    "realview-eb-mpcore" | "realview-eb" | \
-    "highbank" | "midway" )
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} ${cpucmd} ${memcmd} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttyAMA0,115200" \
-	    -serial stdio -monitor null -nographic \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
@@ -542,14 +529,14 @@ checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # highbank boots with updated qemu, but generates warnings to the console
     # due to ignored SMC calls.
-    runkernel multi_v7_defconfig highbank cortex-a9 2G \
-	rootfs-armv7a.cpio auto "" highbank.dtb
+    newrunkernel multi_v7_defconfig highbank cortex-a9 \
+	rootfs-armv7a.cpio auto ::mem2G highbank.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
 
-runkernel multi_v7_defconfig midway "" 2G \
-	rootfs-armv7a.cpio auto "" ecx-2000.dtb
+newrunkernel multi_v7_defconfig midway "" \
+	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -576,29 +563,29 @@ runkernel omap2plus_defconfig overo "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview_defconfig realview-pb-a8 "" 512 \
-	rootfs-armv5.cpio auto realview_pb arm-realview-pba8.dtb
+newrunkernel realview_defconfig realview-pb-a8 "" \
+	rootfs-armv5.cpio auto realview_pb::mem512 arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview_defconfig realview-pbx-a9 "" "" \
+newrunkernel realview_defconfig realview-pbx-a9 "" \
 	rootfs-armv5.cpio auto realview_pb arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview_defconfig realview-eb cortex-a8 512 \
-	rootfs-armv5.cpio manual realview_eb arm-realview-eb.dtb
+newrunkernel realview_defconfig realview-eb cortex-a8 \
+	rootfs-armv5.cpio manual realview_eb::mem512 arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview_defconfig realview-eb-mpcore "" 512 \
-	rootfs-armv5.cpio manual realview_eb \
+newrunkernel realview_defconfig realview-eb-mpcore "" \
+	rootfs-armv5.cpio manual realview_eb::mem512 \
 	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
-	rootfs-armv5.cpio manual realview_eb
+newrunkernel realview-smp_defconfig realview-eb-mpcore "" \
+	rootfs-armv5.cpio manual realview_e::mem512b
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -696,7 +683,7 @@ if [ ${runall} -eq 1 ]; then
     # which calls musb_read_fifosize(), which in turn calls the function
     # with parameter MUSB_FIFOSIZE=0x0f.
     newrunkernel sunxi_defconfig cubieboard "" \
-	rootfs-armv7a.cpio manual mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv7a.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
