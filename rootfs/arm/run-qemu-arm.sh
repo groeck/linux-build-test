@@ -306,16 +306,6 @@ runkernel()
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	;;
-    "xilinx-zynq-a9")
-	${QEMU_ZYNQ} -M ${mach} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -snapshot \
-	    -drive file=${rootfs},format=raw,if=sd \
-	    -append "root=/dev/mmcblk0 rootwait rw console=ttyPS0" \
-	    -nographic -monitor none -serial null -serial stdio \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	;;
     "realview-pb-a8" | "realview-pbx-a9" | \
     "realview-eb-mpcore" | "realview-eb" | \
     "highbank" | "midway" )
@@ -337,19 +327,6 @@ runkernel()
 	    -drive file=${rootfs},format=raw,if=sd \
 	    -append "root=/dev/mmcblk0 rootwait rw console=ttyAMA0,115200 console=tty1" \
 	    -nographic ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-		-nodefaults -nographic -serial stdio -monitor none \
-		-kernel arch/arm/boot/zImage -no-reboot \
-		-snapshot \
-		${dtbcmd} \
-		-append "rdinit=/sbin/init console=ttyS4,115200 earlyprintk" \
-		-initrd ${rootfs} \
-		> ${logfile} 2>&1 &
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
@@ -418,6 +395,7 @@ newrunkernel()
     case ${mach} in
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
 	initcli+=" console=ttyS4,115200"
+	extra_params+=" -nodefaults"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
 	initcli+=" console=ttyS0"
@@ -725,23 +703,24 @@ newrunkernel integrator_defconfig integratorcp "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g4_defconfig palmetto-bmc "" 512 \
+newrunkernel aspeed_g4_defconfig palmetto-bmc "" \
 	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig witherspoon-bmc "" 512 \
-	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-witherspoon.dtb
+# selftests sometimes hang with soft CPU lockup
+newrunkernel aspeed_g5_defconfig witherspoon-bmc "" \
+	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig ast2500-evb "" 512 \
-	rootfs-armv5.cpio automatic "" aspeed-ast2500-evb.dtb
+newrunkernel aspeed_g5_defconfig ast2500-evb "" \
+	rootfs-armv5.cpio automatic notests aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig romulus-bmc "" 512 \
-	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-romulus.dtb
+newrunkernel aspeed_g5_defconfig romulus-bmc "" \
+	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
