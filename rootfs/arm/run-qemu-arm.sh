@@ -223,17 +223,6 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
-    "collie")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttySA1" \
-	    -monitor null -nographic \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     "overo" | "beagle" | "beaglexm")
 	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
 	    ${dtbfile} sd.img > ${logfile} 2>&1
@@ -665,7 +654,7 @@ newrunkernel pxa_defconfig z2 "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel collie_defconfig collie "" "" \
+newrunkernel collie_defconfig collie "" \
 	rootfs-sa110.cpio manual aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -706,8 +695,8 @@ if [ ${runall} -eq 1 ]; then
     # which may be caused by qemu. The call originates from ep_config_from_hw(),
     # which calls musb_read_fifosize(), which in turn calls the function
     # with parameter MUSB_FIFOSIZE=0x0f.
-    runkernel sunxi_defconfig cubieboard "" 128 \
-	rootfs-armv7a.cpio manual "" sun4i-a10-cubieboard.dtb
+    newrunkernel sunxi_defconfig cubieboard "" \
+	rootfs-armv7a.cpio manual mem128 sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
