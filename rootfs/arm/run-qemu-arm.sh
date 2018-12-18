@@ -7,15 +7,9 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_MICRO=${QEMU:-${QEMU_V31_BIN}/qemu-system-arm}
-# Some zynq images fail to run with qemu v2.7
-QEMU_ZYNQ=${QEMU:-${QEMU_BIN}/qemu-system-arm}
-QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
-# Failures seen with qemu v2.9:
-# arm:smdkc210:multi_v7_defconfig:exynos4210-smdkv310
-# arm:smdkc210:exynos_defconfig:exynos4210-smdkv310
-# arm:z2:pxa_defconfig
+QEMU_MICRO=${QEMU:-${QEMU_V31_BIN}/qemu-system-arm}
+QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -243,15 +237,6 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
         ;;
-    "smdkc210")
-	${QEMU_SMDKC} -M ${mach} -smp 2 \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -initrd ${rootfs} \
-	    -append "rdinit=/sbin/init console=ttySAC0,115200n8" \
-	    -nographic -monitor none -serial stdio \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	;;
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
@@ -376,7 +361,6 @@ newrunkernel()
 	initcli+=" console=ttyAMA0,115200 console=tty1"
 	;;
     "xilinx-zynq-a9")
-	QEMU="${QEMU_ZYNQ}"
 	initcli+=" console=ttyPS0"
 	;;
     *)
@@ -540,13 +524,13 @@ newrunkernel multi_v7_defconfig midway "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig smdkc210 "" 128 \
-	rootfs-armv5.cpio manual cpuidle exynos4210-smdkv310.dtb
+newrunkernel multi_v7_defconfig smdkc210 "" \
+	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel exynos_defconfig smdkc210 "" 128 \
-	rootfs-armv5.cpio manual cpuidle exynos4210-smdkv310.dtb
+newrunkernel exynos_defconfig smdkc210 "" \
+	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
