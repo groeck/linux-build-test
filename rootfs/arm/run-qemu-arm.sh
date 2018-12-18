@@ -210,52 +210,13 @@ runkernel()
 	memcmd="-m ${mem}"
     fi
 
-    local earlycon=""
     case ${mach} in
-    raspi2)
-	earlycon="earlycon=pl011,0x3f201000"
-	;;
-    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
-	earlycon="earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
-	;;
-    *)
-	;;
-    esac
-
-    case ${mach} in
-    "virt")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -m 512 \
-	    -no-reboot \
-	    -kernel arch/arm/boot/zImage \
-	    -snapshot \
-	    -drive file=${rootfs},format=raw,id=rootfs,if=none \
-	    -device virtio-blk-device,drive=rootfs \
-	    --append "console=ttyAMA0 root=/dev/vda rw" \
-	    -nographic -monitor null -serial stdio \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     "mps2-an385")
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} \
 	    -bios "${progdir}/mps2-boot.axf" \
 	    -kernel vmlinux \
 	    -initrd ${rootfs} \
-	    ${dtbcmd} \
-	    -nographic -monitor null -serial stdio \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "raspi2")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -snapshot \
-	    -drive file=${rootfs},format=raw,if=sd \
-	    --append "root=/dev/mmcblk0 rootwait rw ${earlycon} console=ttyAMA0" \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio \
 	    > ${logfile} 2>&1 &
@@ -304,7 +265,7 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -336,34 +297,6 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
         ;;
-    "kzm" | "imx25-pdk" )
-	${QEMU} -M ${mach} \
-	    -kernel arch/arm/boot/zImage  -no-reboot \
-	    -initrd ${rootfs} \
-	    -append "rdinit=/sbin/init console=ttymxc0,115200" \
-	    -nographic -monitor none -serial stdio \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	;;
-    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
-	if [[ "${rootfs}" = *cpio ]]; then
-	    diskcmd="-initrd ${rootfs}"
-	    initcli="rdinit=/sbin/init"
-	else
-	    diskcmd="-drive file=${rootfs},format=raw,if=sd -snapshot"
-	    initcli="root=/dev/mmcblk0 rootwait rw"
-	fi
-
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU_MICRO} -M ${mach} ${memcmd} \
-	    -kernel arch/arm/boot/zImage  -no-reboot \
-	    ${diskcmd} \
-	    -append "${initcli} ${earlycon} console=ttymxc1,115200" \
-	    -nographic -monitor none -display none -serial null -serial stdio \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     "smdkc210")
 	${QEMU_SMDKC} -M ${mach} -smp 2 \
 	    -kernel arch/arm/boot/zImage -no-reboot \
@@ -385,26 +318,13 @@ runkernel()
 	;;
     "realview-pb-a8" | "realview-pbx-a9" | \
     "realview-eb-mpcore" | "realview-eb" | \
-    "versatileab" | "versatilepb" | \
-    "highbank" | "midway" | "integratorcp")
+    "highbank" | "midway" )
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} ${cpucmd} ${memcmd} \
 	    -kernel arch/arm/boot/zImage -no-reboot \
 	    -initrd ${rootfs} \
 	    --append "rdinit=/sbin/init console=ttyAMA0,115200" \
 	    -serial stdio -monitor null -nographic \
-	    ${dtbcmd} > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "versatilepb-scsi" )
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M versatilepb -m 128 \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -snapshot \
-	    -drive file=${rootfs},format=raw,if=scsi \
-	    --append "root=/dev/sda rw mem=128M console=ttyAMA0,115200 console=tty" \
-	    -nographic -serial stdio -monitor null \
 	    ${dtbcmd} > ${logfile} 2>&1 &
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
@@ -442,20 +362,133 @@ runkernel()
     return $?
 }
 
+newrunkernel()
+{
+    local defconfig=$1
+    local mach=$2
+    local cpu=$3
+    local rootfs=$4
+    local mode=$5
+    local fixup=$6
+    local dtb=$7
+    local ddtb="${dtb%.dtb}"
+    local dtbfile="arch/arm/boot/dts/${dtb}"
+    local pid
+    local retcode
+    local logfile="$(__mktemp)"
+    local waitlist=("Restarting" "Boot successful" "Rebooting")
+    local build="${ARCH}:${mach}:${defconfig}"
+    local pbuild="${build}${dtb:+:${dtb%.dtb}}"
+
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
+	pbuild+=":initrd"
+    else
+	pbuild+=":rootfs"
+    fi
+
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}"; then
+	echo "Skipping ${pbuild} ... "
+	return 0
+    fi
+
+    echo -n "Building ${pbuild} ... "
+
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
+
+    if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}}" "${rootfs}" "${defconfig}"; then
+        if [[ __dosetup_rc -eq 2 ]]; then
+	    return 0
+	fi
+	return 1
+    fi
+
+    rootfs="$(rootfsname ${rootfs})"
+
+    echo -n "running ..."
+
+    # if we have a dtb file use it
+    local dtbcmd=""
+    if [ -n "${dtb}" -a -f "${dtbfile}" ]
+    then
+	dtbcmd="-dtb ${dtbfile}"
+    fi
+
+    case ${mach} in
+    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
+	initcli+=" console=ttyS4,115200"
+	;;
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
+	initcli+=" console=ttyS0"
+	;;
+    "collie")
+	initcli+=" console=ttySA1"
+	;;
+    "kzm" | "imx25-pdk" )
+	initcli+=" console=ttymxc0,115200"
+	;;
+    "raspi2")
+	initcli+=" earlycon=pl011,0x3f201000"
+	initcli+=" console=ttyAMA0"
+	;;
+    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
+	initcli+=" earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
+	initcli+=" console=ttymxc1,115200"
+	extra_params+=" -display none -serial null"
+	QEMU="${QEMU_MICRO}"
+	;;
+    "smdkc210")
+	initcli+=" console=ttySAC0,115200n8"
+	QEMU="${QEMU_SMDKC}"
+	;;
+    "realview-pb-a8" | "realview-pbx-a9" | \
+    "realview-eb-mpcore" | "realview-eb" | \
+    "versatileab" | "versatilepb" | \
+    "highbank" | "midway" | "integratorcp" | "virt")
+	initcli+=" console=ttyAMA0,115200"
+	;;
+    "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
+	initcli+=" console=ttyAMA0,115200 console=tty1"
+	;;
+    "xilinx-zynq-a9")
+	QEMU="${QEMU_ZYNQ}"
+	initcli+=" console=ttyPS0"
+	;;
+    *)
+	;;
+    esac
+
+    [[ ${dodebug} -ne 0 ]] && set -x
+    ${QEMU} -M ${mach} \
+	    ${cpu:+-cpu ${cpu}} \
+	    -kernel arch/arm/boot/zImage \
+	    -no-reboot \
+	    ${extra_params} \
+	    --append "${initcli}" \
+	    ${dtbcmd} \
+	    -nographic -monitor null -serial stdio \
+	    > ${logfile} 2>&1 &
+    pid=$!
+    [[ ${dodebug} -ne 0 ]] && set +x
+    dowait ${pid} ${logfile} ${mode} waitlist[@]
+    return $?
+}
+
 echo "Build reference: $(git describe)"
 echo
 
-runkernel versatile_defconfig versatilepb-scsi "" 128 \
-	rootfs-armv5.ext2 auto aeabi:pci:scsi versatile-pb.dtb
+newrunkernel versatile_defconfig versatilepb "" \
+	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128 versatile-pb.dtb
 retcode=$?
 checkstate ${retcode}
-
-runkernel versatile_defconfig versatileab "" 128 \
-	rootfs-armv5.cpio auto "" versatile-ab.dtb
+newrunkernel versatile_defconfig versatilepb "" \
+	rootfs-armv5.cpio auto aeabi:pci::mem128 versatile-pb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel versatile_defconfig versatilepb "" 128 \
-	rootfs-armv5.cpio auto "" versatile-pb.dtb
+
+newrunkernel versatile_defconfig versatileab "" \
+	rootfs-armv5.cpio auto ::mem128 versatile-ab.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -468,35 +501,35 @@ runkernel vexpress_defconfig vexpress-a15 "" 128 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel imx_v4_v5_defconfig imx25-pdk "" 128 \
-	rootfs-armv5.cpio manual nonand imx25-pdk.dtb
+newrunkernel imx_v4_v5_defconfig imx25-pdk "" \
+	rootfs-armv5.cpio manual nonand::mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel imx_v6_v7_defconfig kzm "" 128 \
-	rootfs-armv5.cpio manual nodrm
+newrunkernel imx_v6_v7_defconfig kzm "" \
+	rootfs-armv5.cpio manual nodrm::mem128
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel imx_v6_v7_defconfig sabrelite "" 256 \
-	rootfs-armv5.cpio manual nodrm imx6dl-sabrelite.dtb
+newrunkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.cpio manual nodrm::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 if [[ "${runall}" -eq 1 ]]; then
   # Qemu does not accept drive command
-  runkernel imx_v6_v7_defconfig sabrelite "" 256 \
-	rootfs-armv7a.ext2 manual nodrm imx6dl-sabrelite.dtb
+  newrunkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6dl-sabrelite.dtb
   retcode=$((${retcode} + $?))
   checkstate ${retcode}
 fi
 
-runkernel imx_v6_v7_defconfig mcimx6ul-evk "" 256 \
-	rootfs-armv7a.cpio manual nodrm imx6ul-14x14-evk.dtb
+newrunkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel imx_v6_v7_defconfig mcimx6ul-evk "" 256 \
-	rootfs-armv7a.ext2 manual nodrm imx6ul-14x14-evk.dtb
+newrunkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -513,19 +546,6 @@ runkernel multi_v7_defconfig overo "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig sabrelite "" 256 \
-	rootfs-armv5.cpio manual "" imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-if [[ "${runall}" -eq 1 ]]; then
-  # Completely fails to boot, no message to console
-  runkernel multi_v7_defconfig mcimx7d-sabre "" 256 \
-	rootfs-armv7a.cpio manual "" imx7d-sdb.dtb
-  retcode=$((${retcode} + $?))
-  checkstate ${retcode}
-fi
-
 runkernel multi_v7_defconfig vexpress-a9 "" 128 \
 	rootfs-armv5.ext2 auto "" vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
@@ -541,31 +561,44 @@ runkernel multi_v7_defconfig vexpress-a15-a7 "" 256 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
-	rootfs-armv5.ext2 auto "" zynq-zc702.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
-	rootfs-armv5.ext2 auto "" zynq-zc706.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" 128 \
-	rootfs-armv5.ext2 auto "" zynq-zed.dtb
+newrunkernel multi_v7_defconfig sabrelite "" \
+	rootfs-armv5.cpio manual ::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig cubieboard "" 128 \
-	rootfs-armv5.cpio manual "" sun4i-a10-cubieboard.dtb
+if [[ "${runall}" -eq 1 ]]; then
+  # Completely fails to boot, no message to console
+  newrunkernel multi_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
+  retcode=$((${retcode} + $?))
+  checkstate ${retcode}
+fi
+
+newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc706.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+newrunkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zed.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig raspi2 "" "" \
-	rootfs-armv7a.ext2 manual "" bcm2836-rpi-2-b.dtb
+newrunkernel multi_v7_defconfig cubieboard "" \
+	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig virt "" "" \
-	rootfs-armv7a.ext2 auto ""
+newrunkernel multi_v7_defconfig raspi2 "" \
+	rootfs-armv7a.ext2 manual ::sd bcm2836-rpi-2-b.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+newrunkernel multi_v7_defconfig virt "" \
+	rootfs-armv7a.ext2 auto "::virtio-blk:mem512"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -687,8 +720,8 @@ runkernel collie_defconfig collie "" "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel integrator_defconfig integratorcp "" 128 \
-	rootfs-armv5.cpio automatic "" integratorcp.dtb
+newrunkernel integrator_defconfig integratorcp "" \
+	rootfs-armv5.cpio automatic ::mem128 integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
