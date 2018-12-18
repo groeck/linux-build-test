@@ -234,49 +234,6 @@ runkernel()
 	pid=$!
 	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
-    "mainstone")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
-	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
-	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} ${cpucmd} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -initrd ${rootfs} \
-	    -drive file=/tmp/flash,format=raw,if=pflash \
-	    -drive file=/tmp/flash,format=raw,if=pflash \
-	    --append "rdinit=/sbin/init console=ttyS0" \
-	    -monitor null -nographic \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "z2")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
-	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
-	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} ${cpucmd} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -initrd ${rootfs} \
-	    -drive file=/tmp/flash,format=raw,if=pflash \
-	    --append "rdinit=/sbin/init console=ttyS0" \
-	    -monitor null -nographic \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} ${cpucmd} \
-	    -kernel arch/arm/boot/zImage -no-reboot \
-	    -d unimp,guest_errors \
-	    -initrd ${rootfs} \
-	    --append "rdinit=/sbin/init console=ttyS0" \
-	    -monitor null -nographic ${dtbcmd} \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
-	;;
     "overo" | "beagle" | "beaglexm")
 	${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
 	    ${dtbfile} sd.img > ${logfile} 2>&1
@@ -405,6 +362,19 @@ newrunkernel()
 	;;
     "kzm" | "imx25-pdk" )
 	initcli+=" console=ttymxc0,115200"
+	;;
+    "mainstone")
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
+	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
+	initcli+=" console=ttyS0"
+	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
+	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
+	;;
+    "z2")
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
+	initcli+=" console=ttyS0"
 	;;
     "raspi2")
 	initcli+=" earlycon=pl011,0x3f201000"
@@ -643,58 +613,60 @@ runkernel realview-smp_defconfig realview-eb-mpcore "" 512 \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel mainstone_defconfig mainstone "" "" \
-	rootfs-armv5.cpio automatic aeabi
+newrunkernel mainstone_defconfig mainstone "" \
+	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel spitz_defconfig akita "" "" \
-	rootfs-armv5.cpio automatic aeabi
+# disable tests to avoid running out of memory
+newrunkernel spitz_defconfig akita "" \
+	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel spitz_defconfig spitz "" "" \
-	rootfs-armv5.cpio automatic aeabi
+newrunkernel spitz_defconfig spitz "" \
+	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig akita "" "" \
-	rootfs-armv5.cpio automatic nofdt
+# disable options to avoid running out of memory
+newrunkernel pxa_defconfig akita "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig borzoi "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig borzoi "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig mainstone "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig mainstone "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig spitz "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig spitz "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig terrier "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig terrier "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig tosa "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig tosa "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig z2 "" "" \
-	rootfs-armv5.cpio automatic nofdt
+newrunkernel pxa_defconfig z2 "" \
+	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel collie_defconfig collie "" "" \
-	rootfs-sa110.cpio manual aeabi
+	rootfs-sa110.cpio manual aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
