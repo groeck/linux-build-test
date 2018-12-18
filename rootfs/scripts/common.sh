@@ -595,6 +595,7 @@ __setup_fragment()
     local noscsi=0
     local nousb=0
     local novirt=0
+    local nofs=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -612,6 +613,7 @@ __setup_fragment()
 	noscsi) noscsi=1 ;;
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
+	nofs) nofs=1 ;;
 	*)
 	    ;;
 	esac
@@ -721,13 +723,15 @@ __setup_fragment()
 	echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
     fi
 
-    # file systems
-    echo "CONFIG_BTRFS_FS=y" >> ${fragment}
-    echo "CONFIG_SQUASHFS=y" >> ${fragment}
-    echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
-    echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
-    echo "CONFIG_SQUASHFS_4K_DEVBLK_SIZE=y" >> ${fragment}
-    echo "CONFIG_EXT3_FS=y" >> ${fragment}
+    if [[ "${nofs}" -eq 0 ]]; then
+	# file systems
+	echo "CONFIG_BTRFS_FS=y" >> ${fragment}
+	echo "CONFIG_SQUASHFS=y" >> ${fragment}
+	echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
+	echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
+	echo "CONFIG_SQUASHFS_4K_DEVBLK_SIZE=y" >> ${fragment}
+	echo "CONFIG_EXT3_FS=y" >> ${fragment}
+    fi
 }
 
 # match_params
