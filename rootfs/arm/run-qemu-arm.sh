@@ -246,11 +246,9 @@ runkernel()
     "realview-pb-a8" | "realview-pbx-a9" | \
     "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | \
-    "highbank" | "midway" | "integratorcp" | "virt")
-	initcli+=" console=ttyAMA0,115200"
-	;;
+    "highbank" | "midway" | "integratorcp" | "virt" | \
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
-	initcli+=" console=ttyAMA0,115200 console=tty1"
+	initcli+=" console=ttyAMA0,115200"
 	;;
     "xilinx-zynq-a9")
 	initcli+=" console=ttyPS0"
