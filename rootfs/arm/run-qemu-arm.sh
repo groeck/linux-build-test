@@ -82,10 +82,6 @@ patch_defconfig()
 	    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
 	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
 	    ;;
-	regulator)
-	    echo "CONFIG_REGULATOR=y" >> ${defconfig}
-	    echo "CONFIG_REGULATOR_VEXPRESS=y" >> ${defconfig}
-	    ;;
 	cpuidle)
 	    # CPUIDLE causes Exynos targets to run really slow
 	    echo "CONFIG_CPU_IDLE=n" >> ${defconfig}
@@ -297,16 +293,6 @@ runkernel versatile_defconfig versatileab "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
-runkernel vexpress_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca9.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel vexpress_defconfig vexpress-a15 "" \
-	rootfs-armv5.ext2 auto regulator:notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
 	rootfs-armv5.cpio manual nonand::mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
@@ -326,12 +312,18 @@ runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+# vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto notests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
 	rootfs-armv7a.ext2 auto notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+# Local qemu v2.7+ has minimal support for vexpress-a15-a7
+runkernel multi_v7_defconfig vexpress-a15-a7 "" \
+	rootfs-armv7a.ext2 auto notests::sd:mem256 vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -345,12 +337,6 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig overo "" \
 	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-# Local qemu v2.7+ has minimal support for vexpress-a15-a7
-runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto notests::sd:mem256 vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
