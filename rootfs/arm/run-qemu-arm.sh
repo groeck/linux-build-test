@@ -435,11 +435,6 @@ runkernel realview_defconfig realview-eb-mpcore "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel realview-smp_defconfig realview-eb-mpcore "" \
-	rootfs-armv5.cpio manual realview_eb::mem512
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
 # disable options to avoid running out of memory
 runkernel pxa_defconfig akita "" \
 	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
