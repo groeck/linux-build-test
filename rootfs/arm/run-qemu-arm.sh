@@ -27,18 +27,14 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_316="arm:mainstone:mainstone_defconfig \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
+skip_316="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:smdkc210:multi_v7_defconfig"
-skip_318="arm:mainstone:mainstone_defconfig \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
+	arm:realview-pbx-a9:realview_defconfig"
+skip_318="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
-	arm:realview-pbx-a9:realview_defconfig \
-	arm:smdkc210:multi_v7_defconfig"
+	arm:realview-pbx-a9:realview_defconfig"
 skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
@@ -321,19 +317,6 @@ runkernel imx_v6_v7_defconfig kzm "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel imx_v6_v7_defconfig sabrelite "" \
-	rootfs-armv5.cpio manual nodrm::mem256 imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-if [[ "${runall}" -eq 1 ]]; then
-  # Qemu does not accept drive command
-  runkernel imx_v6_v7_defconfig sabrelite "" \
-	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6dl-sabrelite.dtb
-  retcode=$((${retcode} + $?))
-  checkstate ${retcode}
-fi
-
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
@@ -426,26 +409,8 @@ if [ ${runall} -eq 1 ]; then
     checkstate ${retcode}
 fi
 
-runkernel multi_v7_defconfig smdkc210 "" \
-	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
 runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel omap2plus_defconfig beagle "" \
-	rootfs-armv5.ext2 auto ::sd:mem256 omap3-beagle.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel omap2plus_defconfig beaglexm "" \
-	rootfs-armv5.ext2 auto ::sd:mem512 omap3-beagle-xm.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel omap2plus_defconfig overo "" \
-	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -472,22 +437,6 @@ checkstate ${retcode}
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" \
 	rootfs-armv5.cpio manual realview_eb::mem512
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel mainstone_defconfig mainstone "" \
-	rootfs-armv5.cpio automatic aeabi:notests
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-# disable tests to avoid running out of memory
-runkernel spitz_defconfig akita "" \
-	rootfs-armv5.cpio automatic aeabi:notests
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel spitz_defconfig spitz "" \
-	rootfs-armv5.cpio automatic aeabi:notests
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
