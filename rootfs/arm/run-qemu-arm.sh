@@ -471,7 +471,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview-smp_defconfig realview-eb-mpcore "" \
-	rootfs-armv5.cpio manual realview_e::mem512b
+	rootfs-armv5.cpio manual realview_eb::mem512
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
