@@ -357,6 +357,9 @@ if [[ "${runall}" -eq 1 ]]; then
 fi
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc702.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -374,6 +377,10 @@ runkernel multi_v7_defconfig cubieboard "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+runkernel multi_v7_defconfig raspi2 "" \
+	rootfs-armv7a.cpio manual "" bcm2836-rpi-2-b.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig raspi2 "" \
 	rootfs-armv7a.ext2 manual ::sd bcm2836-rpi-2-b.dtb
 retcode=$((${retcode} + $?))
