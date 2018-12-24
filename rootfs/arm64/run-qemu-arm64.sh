@@ -11,7 +11,7 @@ machine=$1
 option=$2
 config=$3
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
+QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
@@ -110,7 +110,7 @@ runkernel()
     echo -n "running ..."
 
     case ${mach} in
-    "virt")
+    "virt" | "xlnx-versal-virt" )
 	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -cpu cortex-a57 \
 		-nographic \
@@ -191,6 +191,10 @@ runkernel virt defconfig "smp:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
+
+# No idea how to instantiate virtual devices
+# runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
+# retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
