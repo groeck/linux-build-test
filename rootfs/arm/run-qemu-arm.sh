@@ -140,7 +140,7 @@ runkernel()
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}"
-    local pbuild="${build}${dtb:+:${dtb%.dtb}}"
+    local pbuild="${build}${fixup:+:${fixup}}${dtb:+:${dtb%.dtb}}"
     local QEMUCMD="${QEMU}"
     local PREFIX="${PREFIX_A}"
     if [[ "${cpu}" = "cortex-m3" ]]; then
@@ -152,6 +152,8 @@ runkernel()
     else
 	pbuild+=":rootfs"
     fi
+
+    pbuild="${pbuild//+(:)/:}"
 
     if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}"; then
 	echo "Skipping ${pbuild} ... "
@@ -312,16 +314,22 @@ checkstate ${retcode}
 
 # vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto notests::sd:mem128 vexpress-v2p-ca9.dtb
+	rootfs-armv5.cpio auto nolocktests::mem128 vexpress-v2p-ca9.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto nolocktests::sd:mem128 vexpress-v2p-ca9.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
-	rootfs-armv7a.ext2 auto notests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto notests::sd:mem256 vexpress-v2p-ca15_a7.dtb
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem256 vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
