@@ -591,11 +591,12 @@ __setup_fragment()
     local fixups="${2//:/ }"
     local fixup
     local nodebug=0
-    local notests=0
+    local nofs=0
+    local nolocktests=0
     local noscsi=0
+    local notests=0
     local nousb=0
     local novirt=0
-    local nofs=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -609,11 +610,12 @@ __setup_fragment()
 	    echo "CONFIG_SMP=y" >> ${fragment}
 	    ;;
 	nodebug) nodebug=1 ;;
-	notests) notests=1 ;;
+	nofs) nofs=1 ;;
+	nolocktests) nolocktests=1 ;;
 	noscsi) noscsi=1 ;;
+	notests) notests=1 ;;
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
-	nofs) nofs=1 ;;
 	*)
 	    ;;
 	esac
@@ -647,8 +649,6 @@ __setup_fragment()
 	echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
 	echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
 	echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
-	echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
-	echo "CONFIG_PROVE_RCU=y" >> ${fragment}
 	echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
 	echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
 	echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
@@ -663,10 +663,14 @@ __setup_fragment()
 	echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
 	echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
 
-	echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
-	echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
-	echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+	if [[ "${nolocktests}" -eq 0 ]]; then
+	    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
+	    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
+	    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
+	    echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
+	    echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
+	    echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+	fi
 
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
 	echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
