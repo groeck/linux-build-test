@@ -23,6 +23,14 @@ patch_defconfig()
     local fixup
 
     echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
+
+    # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
+    # only worse.
+    if grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
+	echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
+	echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
+	echo "CONFIG_WW_MUTEX_SELFTEST=n" >> ${defconfig}
+    fi
 }
 
 cached_config=""
