@@ -71,6 +71,11 @@ patch_defconfig()
 	    echo "CONFIG_SERIAL_PMACZILOG_CONSOLE=y" >> ${defconfig}
 	fi
     done
+
+    # IDE has trouble with atomic sleep.
+    if grep -q "CONFIG_IDE=y" "${defconfig}"; then
+	echo "CONFIG_DEBUG_ATOMIC_SLEEP=n" >> "${defconfig}"
+    fi
 }
 
 cached_defconfig=""
