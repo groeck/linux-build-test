@@ -30,6 +30,9 @@ patch_defconfig()
     echo "CONFIG_TORTURE_TEST=n" >> ${defconfig}
     echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
     echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
+
+    # known to result in backtraces, not likely to ever get fixed
+    echo "CONFIG_DEBUG_MUTEXES=n" >> ${defconfig}
 }
 
 runkernel()
