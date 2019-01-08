@@ -87,6 +87,7 @@ __common_scsicmd()
     local device
     local wwn
     local iface
+    local media
 
     case "${fixup}" in
     "scsi")	# Standard SCSI controller provided by platform
@@ -129,10 +130,17 @@ __common_scsicmd()
 	;;
     esac
 
-    initcli+=" root=/dev/sda rw"
+    if [[ "${rootfs}" == *iso ]]; then
+	initcli+=" root=/dev/sr0"
+	media="cdrom"
+    else
+	initcli+=" root=/dev/sda"
+    fi
+
     extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus}"
     extra_params+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
     extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
+    extra_params+="${media:+,media=${media}}"
 }
 
 __common_usbcmd()
@@ -186,7 +194,7 @@ __common_usbcmd()
 	;;
     esac
 
-    initcli+=" root=/dev/sda rw rootwait"
+    initcli+=" root=/dev/sda rootwait"
 }
 
 __common_virtcmd()
@@ -215,7 +223,7 @@ __common_virtcmd()
 	;;
     esac
 
-    initcli+=" root=/dev/vda rw"
+    initcli+=" root=/dev/vda"
 }
 
 __common_mmccmd()
@@ -238,7 +246,7 @@ __common_mmccmd()
 	;;
     esac
 
-    initcli+=" root=/dev/mmcblk0 rw rootwait"
+    initcli+=" root=/dev/mmcblk0 rootwait"
 }
 
 __common_satacmd()
@@ -269,13 +277,15 @@ __common_satacmd()
 	;;
     esac
 
-    initcli+=" root=/dev/sda rw"
+    initcli+=" root=/dev/sda"
 }
 
 __common_diskcmd()
 {
     local fixup="$1"
     local rootfs="$2"
+    local media
+    local hddev
 
     case "${ARCH}" in
     sparc64)
@@ -286,28 +296,39 @@ __common_diskcmd()
 	;;
     esac
 
+    if [[ "${rootfs}" == *iso ]]; then
+	media="cdrom"
+	hddev="sr0"
+    else
+	hddev="sda"
+    fi
+
     case "${fixup}" in
     "ata")
 	# standard ata/sata drive provided by platform
-	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
-	initcli+=" root=/dev/sda rw"
+	initcli+=" root=/dev/${hddev}"
+	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
     "ide")
 	# standard ide/ata/sata drive provided by platform
-	extra_params+=" -drive file=${rootfs},format=raw,if=ide"
-	local hddev="hda"
 	# The actual configuration determines if the root file system
 	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-	if grep -q "CONFIG_ATA=y" .config; then
-	    hddev="sda"
+	# Need to figure out the device name for cdrom.
+	if ! grep -q "CONFIG_ATA=y" .config; then
+	    if [[ -z "${media}" ]]; then
+	        hddev="hda"
+	    else
+		:
+	    fi
 	fi
-	initcli+=" root=/dev/${hddev} rw"
+	initcli+=" root=/dev/${hddev}"
+	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
     "mmc"|"sd"|"sd1")
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
     "nvme")
-	initcli+=" root=/dev/nvme0n1 rw rootwait"
+	initcli+=" root=/dev/nvme0n1 rootwait"
 	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
@@ -426,7 +447,7 @@ common_diskcmd()
     __common_diskcmd "${fixup}" "${rootfs}"
     diskcmd="${extra_params}"
     if [ -z "${initcli}" ]; then
-	initcli="root=/dev/sda rw"
+	initcli="root=/dev/sda"
     fi
 }
 
@@ -703,6 +724,11 @@ __setup_fragment()
 
     # NVME support
     echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
+
+    # CDROM support
+    echo "CONFIG_BLK_DEV_SR=y" >> ${fragment}
+    echo "CONFIG_ISO9660_FS=y" >> ${fragment}
+    echo "CONFIG_CDROM=y" >> ${fragment}
 
     if [[ "${nousb}" -eq 0 ]]; then
 	# USB support
