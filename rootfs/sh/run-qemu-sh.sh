@@ -25,15 +25,6 @@ patch_defconfig()
     # Drop command line overwrite
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
-    # broken for this architecture
-    echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
-    echo "CONFIG_TORTURE_TEST=n" >> ${defconfig}
-    echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
-    echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
-
-    # known to result in backtraces, not likely to ever get fixed
-    echo "CONFIG_DEBUG_MUTEXES=n" >> ${defconfig}
-
     # Enable earlyprintk
     # echo "CONFIG_SERIAL_SH_SCI_EARLYCON=y" >> ${defconfig}
 }
@@ -62,7 +53,7 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}:notests:nodebug" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
@@ -92,50 +83,50 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel rts7751r2dplus_defconfig nolocktests rootfs.cpio.gz
+runkernel rts7751r2dplus_defconfig "" rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig ata:nolocktests rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig mmc:nolocktests rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig nvme:nolocktests rootfs.ext2.gz
-retcode=$((retcode + $?))
-
-runkernel rts7751r2dplus_defconfig usb:nolocktests rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-hub:nolocktests rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel rts7751r2dplus_defconfig usb-ohci:nolocktests rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-ehci:nolocktests rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-xhci:nolocktests rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-uas-ehci:nolocktests rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-uas-xhci:nolocktests rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb-hub rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel rts7751r2dplus_defconfig "scsi[53C810]:nolocktests" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb-ohci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-uas-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-uas-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+
+runkernel rts7751r2dplus_defconfig "scsi[53C810]" rootfs.ext2.gz
 retcode=$((${retcode} + $?))
-runkernel rts7751r2dplus_defconfig "scsi[53C895A]:nolocktests" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # hang (scsi command aborts/timeouts)
-    runkernel rts7751r2dplus_defconfig "scsi[DC395]:nolocktests" rootfs.ext2.gz
+    runkernel rts7751r2dplus_defconfig "scsi[DC395]" rootfs.ext2.gz
     retcode=$((retcode + $?))
-    runkernel rts7751r2dplus_defconfig "scsi[AM53C974]:nolocktests" rootfs.ext2.gz
+    runkernel rts7751r2dplus_defconfig "scsi[AM53C974]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     # Hang after "megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state"
-    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS]:nolocktests" rootfs.ext2.gz
+    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
-    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS2]:nolocktests" rootfs.ext2.gz
+    runkernel rts7751r2dplus_defconfig "scsi[MEGASAS2]" rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
 
-runkernel rts7751r2dplus_defconfig "scsi[FUSION]:nolocktests" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
