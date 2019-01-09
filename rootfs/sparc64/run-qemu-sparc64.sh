@@ -50,8 +50,10 @@ runkernel()
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
+    elif [[ "${rootfs%.gz}" == *iso ]]; then
+	build+=":cd"
     else
-	build+=":rootfs"
+	build+=":hd"
     fi
 
     if ! match_params "${machine}@${mach}" "${_fixup}@${fixup}" "${config}@${defconfig}"; then
@@ -100,11 +102,15 @@ runkernel sparc64_defconfig sun4u smp rootfs.cpio.gz
 retcode=$?
 runkernel sparc64_defconfig sun4u smp:ata rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:ata rootfs.iso.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u smp:ata rootfs.squashfs
+retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:scsi[DC395] rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:scsi[DC395] rootfs.iso.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:scsi[MEGASAS] rootfs.ext2.gz
 retcode=$((retcode + $?))
@@ -117,6 +123,8 @@ retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4v smp:ata rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4v smp:ata rootfs.iso.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4v smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
