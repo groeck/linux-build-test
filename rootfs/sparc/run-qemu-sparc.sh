@@ -52,8 +52,10 @@ runkernel()
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
+    elif [[ "${rootfs%.gz}" == *iso ]]; then
+	build+=":cd"
     else
-	build+=":rootfs"
+	build+=":hd"
     fi
 
     if ! match_params "${machine}@${mach}" "${variant}@${fixup}"; then
