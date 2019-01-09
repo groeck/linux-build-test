@@ -85,6 +85,7 @@ __common_scsicmd()
     local fixup="$1"
     local rootfs="$2"
     local device
+    local sdevice
     local wwn
     local iface
     local media
@@ -133,12 +134,14 @@ __common_scsicmd()
     if [[ "${rootfs}" == *iso ]]; then
 	initcli+=" root=/dev/sr0"
 	media="cdrom"
+	sdevice="scsi-cd"
     else
 	initcli+=" root=/dev/sda"
+	sdevice="scsi-hd"
     fi
 
     extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus}"
-    extra_params+=" ${device:+-device scsi-hd,bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
+    extra_params+=" ${device:+-device ${sdevice},bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
     extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
     extra_params+="${media:+,media=${media}}"
 }
@@ -253,31 +256,41 @@ __common_satacmd()
 {
     local fixup="$1"
     local rootfs="$2"
+    local idedevice
+    local media
+    local rootdev
+    local satadev
+
+    if [[ "${rootfs}" == *iso ]]; then
+	media="cdrom"
+	idedevice="ide-cd"
+	rootdev="sr0"
+    else
+	idedevice="ide-hd"
+	rootdev="sda"
+    fi
 
     case "${fixup}" in
     "sata-sii3112")
 	# generic sata drive provided by SII3112 SATA controller
 	# Available on ppc
-	extra_params+=" -device sii3112,id=ata"
-	extra_params+=" -device ide-hd,bus=ata.0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	satadev="sii3112"
 	;;
     "sata-cmd646")
 	# generic sata drive provided by CMD646 PCI ATA/SATA controller
 	# Available on alpha, parisc, sparc64
-	extra_params+=" -device cmd646-ide,id=ata"
-	extra_params+=" -device ide-hd,bus=ata.0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	satadev="cmd646-ide"
 	;;
     "sata")	# generic sata drive, pre-existing bus
-	extra_params+=" -device ide-hd,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     *)
 	;;
     esac
-
-    initcli+=" root=/dev/sda"
+    extra_params+="${satadev:+ -device ${satadev},id=ata}"
+    extra_params+=" -device ${idedevice}${satadev:+,bus=ata.0},drive=d0"
+    extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+    extra_params+="${media:+,media=${media}}"
+    initcli+=" root=/dev/${rootdev}"
 }
 
 __common_diskcmd()
@@ -659,7 +672,7 @@ __setup_fragment()
 
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
-	echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${fragment}
+	echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n" >> ${fragment}
 	echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
 	echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
 	echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
