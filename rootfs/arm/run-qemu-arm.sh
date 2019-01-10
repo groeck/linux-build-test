@@ -103,6 +103,10 @@ patch_defconfig()
 	    echo "CONFIG_DRM_MXSFB=n" >> ${defconfig}
 	    echo "CONFIG_DRM_IMX=n" >> ${defconfig}
 	    ;;
+	nocrypto)
+	    # Broken (hangs) for some platforms
+	    echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${defconfig}
+	    ;;
 	realview_eb)
 	    # Older versions of realview config files need additional CPU support.
 	    echo "CONFIG_REALVIEW_EB_A9MP=y" >> ${defconfig}
@@ -409,7 +413,7 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel exynos_defconfig smdkc210 "" \
-	rootfs-armv5.cpio manual cpuidle::mem128 exynos4210-smdkv310.dtb
+	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
