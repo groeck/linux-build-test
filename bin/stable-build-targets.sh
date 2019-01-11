@@ -50,7 +50,7 @@ cmd_powerpc=(defconfig allmodconfig allnoconfig tinyconfig ppc64e_defconfig cell
 	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig \
 	86xx/sbc8641d_defconfig)
 cmd_riscv=(defconfig allnoconfig tinyconfig)
-cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig)
+cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig performance_defconfig)
 cmd_score=(defconfig)
 cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig shx3_defconfig)
 cmd_sparc32=(defconfig allnoconfig tinyconfig)
