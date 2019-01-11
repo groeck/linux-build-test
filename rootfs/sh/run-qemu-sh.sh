@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-sh4}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
 ARCH=sh
