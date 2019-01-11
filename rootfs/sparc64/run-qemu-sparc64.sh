@@ -19,11 +19,11 @@ PATH_SPARC=/opt/kernel/sparc64/gcc-6.5.0/bin
 
 PATH=${PATH_SPARC}:${PATH}
 
-skip_316="sparc64:sun4u:smp:scsi[DC395]:rootfs
-	sparc64:sun4u:smp:scsi[AM53C974]:rootfs"
+skip_316="sparc64:sun4u:smp:scsi[DC395]:cd
+	sparc64:sun4u:smp:scsi[AM53C974]:hd"
 
-skip_318="sparc64:sun4u:smp:scsi[DC395]:rootfs
-	sparc64:sun4u:smp:scsi[AM53C974]:rootfs"
+skip_318="sparc64:sun4u:smp:scsi[DC395]:cd
+	sparc64:sun4u:smp:scsi[AM53C974]:hd"
 
 patch_defconfig()
 {
