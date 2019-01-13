@@ -62,8 +62,10 @@ runkernel()
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
+    elif [[ "${rootfs%.gz}" == *iso ]]; then
+	pbuild+=":cd"
     else
-	pbuild+=":rootfs"
+	pbuild+=":hd"
     fi
 
     if ! match_params "${machine}@${mach}" "${cputype}@${cpu}"; then
@@ -96,7 +98,7 @@ runkernel()
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot \
 	${extra_params} \
-	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0 console=tty doreboot" \
+	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0" \
 	-nographic > ${logfile} 2>&1 &
     pid=$!
 
@@ -115,9 +117,11 @@ retcode=0
 # retcode=$((${retcode} + $?))
 runkernel defconfig smp:mem256:ata Broadwell-noTSX q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:efi:mem512:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp:mem256:ata Cascadelake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
-runkernel defconfig smp4:efi32:mem1G:usb SandyBridge q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem512:nvme IvyBridge q35 rootfs.btrfs
+retcode=$((${retcode} + $?))
+runkernel defconfig smp4:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
@@ -129,11 +133,11 @@ retcode=$((${retcode} + $?))
 runkernel defconfig smp:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
-runkernel defconfig smp2:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:mem4G:scsi[FUSION] EPYC pc rootfs.ext2
+runkernel defconfig smp:mem4G:scsi[FUSION] EPYC pc rootfs.btrfs
 retcode=$((${retcode} + $?))
 # efi combined with scsi[FUSION] fails
 runkernel defconfig smp2:efi:mem8G:scsi[MEGASAS] EPYC-IBPB q35 rootfs.ext2
