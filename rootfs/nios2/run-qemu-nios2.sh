@@ -14,7 +14,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-nios2}
 
 PREFIX=nios2-linux-
 ARCH=nios2
-rootfs=busybox-nios2.cpio
+rootfs=rootfs.cpio
 PATH_NIOS2=/opt/kernel/gcc-7.3.0-nolibc/nios2-linux/bin
 
 PATH=${PATH_NIOS2}:${PATH}
@@ -24,8 +24,6 @@ patch_defconfig()
     local defconfig=$1
     local progdir=$(cd $(dirname $0); pwd)
 
-    sed -i -e '/CONFIG_NIOS2_PASS_CMDLINE/d' ${defconfig}
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
     echo "CONFIG_NIOS2_PASS_CMDLINE=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 }
@@ -70,7 +68,7 @@ runkernel()
     ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \
 	-dtb ${dtb} \
-	--append "rdinit=/sbin/init earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200 doreboot" \
+	--append "rdinit=/sbin/init earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200" \
 	-initrd "$(rootfsname ${rootfs})" \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
