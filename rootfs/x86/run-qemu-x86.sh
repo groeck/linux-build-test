@@ -76,8 +76,10 @@ runkernel()
 
     if [[ "${rootfs}" == *cpio ]]; then
 	pbuild+=":initrd"
+    elif [[ "${rootfs%.gz}" == *iso ]]; then
+	pbuild+=":cd"
     else
-	pbuild+=":rootfs"
+	pbuild+=":hd"
     fi
 
     if ! match_params "${_cpu}@${cpu}" "${_mach}@${mach}" "${_variant}@${fixup}"; then
@@ -105,7 +107,7 @@ runkernel()
     ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} -no-reboot -m 256 \
 	${extra_params} \
-	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M vga=0 uvesafb.mode_option=640x480-32 oprofile.timer=1 console=ttyS0 console=tty doreboot" \
+	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M console=ttyS0" \
 	-nographic \
 	-d unimp,guest_errors \
 	> ${logfile} 2>&1 &
@@ -124,7 +126,9 @@ retcode=0
 
 runkernel defconfig smp:ata Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:efi32:nvme IvyBridge q35 rootfs.ext2
+runkernel defconfig smp:ata Icelake-Server q35 rootfs.iso
+retcode=$((${retcode} + $?))
+runkernel defconfig smp2:efi32:nvme IvyBridge q35 rootfs.btrfs
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
@@ -140,13 +144,13 @@ retcode=$((${retcode} + $?))
 
 runkernel defconfig smp:efi32:scsi[53C810] Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp2:scsi[53C895A] Skylake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:efi32:scsi[MEGASAS] EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:scsi[MEGASAS2] EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:efi32:scsi[FUSION] Opteron_G5 q35 rootfs.ext2
+runkernel defconfig smp:efi32:scsi[FUSION] Opteron_G5 q35 rootfs.squashfs
 retcode=$((${retcode} + $?))
 runkernel defconfig smp phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
