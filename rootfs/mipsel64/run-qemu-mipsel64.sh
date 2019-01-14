@@ -1,13 +1,16 @@
 #!/bin/bash
 
+dir=$(cd $(dirname $0); pwd)
+. ${dir}/../scripts/config.sh
+. ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
+
 config=$1
 variant=$2
 
 skip_49="mipsel64:64r6el_defconfig:boston:rootfs"
-
-dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
-. ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
 
@@ -121,6 +124,7 @@ runkernel()
 
     case ${mach} in
     "malta"|"fulong2e")
+	[[ ${dodebug} -ne 0 ]] && set -x
         ${QEMU} -M ${mach} \
 	    -kernel vmlinux -no-reboot -m 128 \
 	    --append "${initcli} mem=128M console=ttyS0 doreboot" \
@@ -128,8 +132,10 @@ runkernel()
 	    -nographic -serial stdio -monitor none \
 	    > ${logfile} 2>&1 &
     	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	;;
     "boston")
+	[[ ${dodebug} -ne 0 ]] && set -x
 	${QEMU} -M ${mach} -m 1G -kernel arch/mips/boot/vmlinux.gz.itb \
 		${diskcmd} \
 		--append "${initcli} console=ttyS0" \
@@ -137,6 +143,7 @@ runkernel()
 		-dtb arch/mips/boot/dts/img/boston.dtb \
 		> ${logfile} 2>&1 &
 	pid=$!
+	[[ ${dodebug} -ne 0 ]] && set +x
 	wait="manual"
 	;;
     esac
