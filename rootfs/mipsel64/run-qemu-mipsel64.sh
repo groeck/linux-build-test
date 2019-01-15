@@ -10,7 +10,8 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-skip_49="mipsel64:64r6el_defconfig:boston:rootfs"
+skip_49="mipsel64:64r6el_defconfig:boston:hd
+	mipsel64:64r6el_defconfig:boston:cd"
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64el}
 
@@ -35,33 +36,39 @@ PATH=${PATH_MIPS}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
+    local fixups=${2//:/ }
+    local fixup
 
-    # INITRD may be disabled. Enable for testing.
-    sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    for fixup in ${fixups}; do
+	case "${fixup}" in
+	r1)
+	    echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
+	    ;;
+	r2)
+	    echo "CONFIG_CPU_MIPS64_R2=y" >> ${defconfig}
+	    ;;
+	nosmp)
+	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
+	    echo "CONFIG_SCHED_SMT=n" >> ${defconfig}
+	    ;;
+	smp)
+	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
+	    echo "CONFIG_SCHED_SMT=y" >> ${defconfig}
+	    echo "CONFIG_NR_CPUS=8" >> ${defconfig}
+	    ;;
+	esac
+    done
 
-    sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # Leave fulong2e and boston configuration alone
-    if [ "${fixup}" = "fulong2e" -o "${fixup}" = "boston" ]
-    then
-	return 0
-    fi
-
-    sed -i -e '/CONFIG_CPU_MIPS/d' ${defconfig}
-    sed -i -e '/CONFIG_32BIT/d' ${defconfig}
-    sed -i -e '/CONFIG_64BIT/d' ${defconfig}
-    echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
+    echo "CONFIG_BINFMT_MISC=y" >> ${defconfig}
     echo "CONFIG_64BIT=y" >> ${defconfig}
 
-    # Only build an SMP image if asked for.
-    sed -i -e '/CONFIG_MIPS_MT_SMP/d' ${defconfig}
-    if [ "${fixup}" = "smp" ]
-    then
-        echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
-    fi
+    echo "CONFIG_MIPS32_O32=y" >> ${defconfig}
+    echo "CONFIG_MIPS32_N32=y" >> ${defconfig}
+
+    # Avoid DMA memory allocation errors
+    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=n" >> ${defconfig}
+    echo "CONFIG_DEBUG_LOCK_ALLOC=n" >> ${defconfig}
+    echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
 }
 
 runkernel()
@@ -73,15 +80,19 @@ runkernel()
     local pid
     local retcode
     local logfile="$(__mktemp)"
-    local waitlist=("Boot successful" "Rebooting")
+    local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="mipsel64:${defconfig}:${fixup}"
-    local buildconfig="${defconfig}:${fixup}"
+    local buildconfig="${defconfig}:${fixup//smp*/smp}"
     local wait="automatic"
+    local mem
+    local kernel
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
+    elif [[ "${rootfs%.gz}" == *iso ]]; then
+	build+=":cd"
     else
-	build+=":rootfs"
+	build+=":hd"
     fi
 
     if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
@@ -95,10 +106,8 @@ runkernel()
 	return 0;
     fi
 
-    dosetup -c "${buildconfig}" -f "${fixup}" "${rootfs}" "${defconfig}"
-    retcode=$?
-    if [ ${retcode} -ne 0 ]; then
-	if [ ${retcode} -eq 2 ]; then
+    if ! dosetup -c "${buildconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
 	return 1
@@ -106,47 +115,28 @@ runkernel()
 
     echo -n "running ..."
 
-    rootfs="$(rootfsname ${rootfs})"
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-    else
-	local hddev="hda"
-	# Configurations with CONFIG_ATA=y mount sda
-	grep -q CONFIG_ATA=y .config >/dev/null 2>&1
-	[ $? -eq 0 ] && hddev="sda"
-	initcli="root=/dev/${hddev} rw"
-	diskcmd="-snapshot -drive file=${rootfs},format=raw,if=ide"
-	# or something like:
-	# -device ide-hd,drive=d0,bus=ide.0 \
-	# -drive file=${rootfs},id=d0,format=raw,if=none
-    fi
-
     case ${mach} in
     "malta"|"fulong2e")
-	[[ ${dodebug} -ne 0 ]] && set -x
-        ${QEMU} -M ${mach} \
-	    -kernel vmlinux -no-reboot -m 128 \
-	    --append "${initcli} mem=128M console=ttyS0 doreboot" \
-	    ${diskcmd} \
-	    -nographic -serial stdio -monitor none \
-	    > ${logfile} 2>&1 &
-    	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
+	kernel="vmlinux"
+	mem="256"
 	;;
-    "boston")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -m 1G -kernel arch/mips/boot/vmlinux.gz.itb \
-		${diskcmd} \
-		--append "${initcli} console=ttyS0" \
-		-serial stdio -monitor none -no-reboot -nographic \
-		-dtb arch/mips/boot/dts/img/boston.dtb \
-		> ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
+    boston)
+	mem=1G
+	kernel="arch/mips/boot/vmlinux.gz.itb"
+	extra_params+=" -dtb arch/mips/boot/dts/img/boston.dtb"
 	wait="manual"
 	;;
     esac
+
+    [[ ${dodebug} -ne 0 ]] && set -x
+    ${QEMU} -M ${mach} -kernel "${kernel}" \
+	-no-reboot -m "${mem}" \
+	${extra_params} \
+	--append "${initcli} console=ttyS0" \
+	-nographic -serial stdio -monitor none \
+	> ${logfile} 2>&1 &
+    pid=$!
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} ${wait} waitlist[@]
     return $?
@@ -155,15 +145,36 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 nosmp
+# Lack of memory for tests
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:nosmp:ide
 retcode=$?
-runkernel malta_defconfig malta busybox-mips64el.cpio smp
-retcode=$((${retcode} + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 smp
-retcode=$((${retcode} + $?))
-runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 fulong2e
-retcode=$((${retcode} + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6.ext2 boston
-retcode=$((${retcode} + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.cpio r1:smp
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:ide
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.iso r1:smp:ide
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-xhci
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-uas-xhci
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:mmc
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:nvme
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[DC395]
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[FUSION]
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.iso r1:smp:scsi[53C895A]
+retcode=$((retcode + $?))
+# Note: Other boot configurations fail
+runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 nosmp:ide
+retcode=$((retcode + $?))
+# Image fails to boot with tests enabled
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6.ext2 notests:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6.iso notests:smp:ide
+retcode=$((retcode + $?))
 
 exit ${retcode}
