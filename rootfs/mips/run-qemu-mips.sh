@@ -46,6 +46,11 @@ patch_defconfig()
 	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
 	fi
     done
+
+    # Avoid spurious DMA memory allocation errors
+    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=n" >> ${defconfig}
+    echo "CONFIG_DEBUG_LOCK_ALLOC=n" >> ${defconfig}
+    echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
 }
 
 runkernel()
