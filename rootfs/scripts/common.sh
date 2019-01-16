@@ -326,13 +326,9 @@ __common_diskcmd()
 	# standard ide/ata/sata drive provided by platform
 	# The actual configuration determines if the root file system
 	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
-	# Need to figure out the device name for cdrom.
+	# With CONFIG_IDE, the device is /dev/hda for both hdd and cdrom.
 	if ! grep -q "CONFIG_ATA=y" .config; then
-	    if [[ -z "${media}" ]]; then
-	        hddev="hda"
-	    else
-		:
-	    fi
+	    hddev="hda"
 	fi
 	initcli+=" root=/dev/${hddev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
