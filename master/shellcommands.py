@@ -21,42 +21,43 @@ def lastStep(step):
     (started, finished) = last.getTimes()
     return started
 
+class GetBuildReference(LogLineObserver):
+    ref = None
+    _re_ref = re.compile(r'^Build reference: (\S+)$')
+
+    def __init__(self, **kwargs):
+	LogLineObserver.__init__(self, **kwargs)   # always upcall!
+
+    def outLineReceived(self, line):
+	s = self._re_ref.search(line.strip())
+	if s:
+	    self.ref = s.group(1)
+	    self.step.setProgress('ref', 1)
+
 class RefShellCommand(ShellCommand):
     name = "buildcommand"
     command = [name]
 
     def __init__(self, **kwargs):
-        ShellCommand.__init__(self, **kwargs)   # always upcall!
-	self.ref = None
-	self.traceback = False
-
-    def createSummary(self, log):
-        s = re.search("^Build reference: (\S+)$", log.getText(), re.MULTILINE)
-	if s:
-	    self.ref = s.group(1)
-        s = re.search("\[ cut here \]", log.getText(), re.MULTILINE)
-	if s:
-	    self.traceback = True
-        s = re.search("stack backtrace", log.getText(), re.MULTILINE)
-	if s:
-	    self.traceback = True
-        s = re.search('(try booting with the "irqpoll" option)', log.getText(), re.MULTILINE)
-	if s:
-	    self.traceback = True
+	ShellCommand.__init__(self, **kwargs)   # always upcall!
+	self.reference = GetBuildReference()
+	self.addLogObserver('stdio', self.reference)
+	self.progressMetrics += ('ref',)
 
     def getText(self, cmd, results):
-        if results != SKIPPED:
-            text = ShellCommand.getText(self, cmd, results)
-	else:
-	    text = [ "skipped" ]
-	if self.ref:
-	    text.append(self.ref)
+        # if results != SKIPPED:
+        #     text = ShellCommand.getText(self, cmd, results)
+	# else:
+	#     text = [ "skipped" ]
+        text = ShellCommand.getText(self, cmd, results)
+	if self.reference.ref:
+	    text.append(self.reference.ref)
         return text
 
     def getText2(self, cmd, results):
         text = [ ]
-	if self.ref:
-	    text.append(self.ref)
+	if self.reference.ref:
+	    text.append(self.reference.ref)
         return text
 
     def maybeGetText2(self, cmd, results):
@@ -71,12 +72,10 @@ class RefShellCommand(ShellCommand):
 	    text.extend(self.getText2(cmd, results))
         return text
 
-    def evaluateCommand(self, cmd):
-	if cmd.didFail():
-	    return FAILURE
-	if self.traceback:
-	    return WARNINGS
-	return SUCCESS
+#    def evaluateCommand(self, cmd):
+#	if cmd.didFail():
+#	    return FAILURE
+#	return SUCCESS
 
 class AnalyzeBuildLog(LogLineObserver):
     def __init__(self, **kwargs):
@@ -170,6 +169,7 @@ class AnalyzeQemuBuildLog(LogLineObserver):
         self.numPassed = 0
         self.numFailed = 0
         self.numSkipped = 0
+        self.tracebacks = False
         self.failed = []
     def outLineReceived(self, line):
 	# Look for:
@@ -187,6 +187,16 @@ class AnalyzeQemuBuildLog(LogLineObserver):
             if skipped_qemu.match(line):
 	        self.numSkipped += 1
                 self.step.setProgress('skipped', self.numSkipped)
+	if line.find('[ cut here ]') != -1:
+	    self.tracebacks = True
+	elif line.find('Call trace:') != -1:
+	    self.tracebacks = True
+	elif line.find('stack backtrace') != -1:
+	    self.tracebacks = True
+	elif line.find('Kernel panic') != -1:
+	    self.tracebacks = True
+	elif line.find('(try booting with the "irqpoll" option)') != -1:
+	    self.tracebacks = True
 
 class QemuBuildCommand(RefShellCommand):
     name = "qemubuildcommand"
@@ -252,4 +262,6 @@ class QemuBuildCommand(RefShellCommand):
 	    if self.counter.numPassed == 0:
 	        self.build.result = SKIPPED
 		return SKIPPED
+	    if self.counter.tracebacks and result == SUCCESS:
+		return WARNINGS
             return result
