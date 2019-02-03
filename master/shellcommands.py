@@ -31,7 +31,7 @@ class GetBuildReference(LogLineObserver):
     def outLineReceived(self, line):
 	s = self._re_ref.search(line.strip())
 	if s:
-	    self.ref = s.group(1)
+	    self.step.setProperty('reference', s.group(1))
 	    self.step.setProgress('ref', 1)
 
 class RefShellCommand(ShellCommand):
@@ -50,14 +50,16 @@ class RefShellCommand(ShellCommand):
 	# else:
 	#     text = [ "skipped" ]
         text = ShellCommand.getText(self, cmd, results)
-	if self.reference.ref:
-	    text.append(self.reference.ref)
+        ref = self.getProperty('reference', None)
+        if ref:
+            text.append(ref)
         return text
 
     def getText2(self, cmd, results):
         text = [ ]
-	if self.reference.ref:
-	    text.append(self.reference.ref)
+        ref = self.getProperty('reference', None)
+        if ref:
+            text.append(ref)
         return text
 
     def maybeGetText2(self, cmd, results):
