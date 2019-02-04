@@ -14,9 +14,18 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 PREFIX=sh4-linux-
 ARCH=sh
 
-PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v4.4)
+	# gcc 8.2.0 causes boot stalls with this kernel.
+	PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	;;
+*)
+	PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
+	;;
+esac
 
-PATH=${PATH}:${PATH_SH}
+PATH=${PATH_SH}:${PATH}
 
 patch_defconfig()
 {
