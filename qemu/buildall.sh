@@ -79,6 +79,18 @@ then
     checkexit $?
 fi
 
+if [ -z "$1" -o "$1" = "csky" ]
+then
+    dobuild v2.8.1-local-csky csky \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--with-gtkabi=3.0 \
+	--disable-werror \
+	--target-list=cskyv2-softmmu \
+	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+fi
+
 if [ -z "$1" -o "$1" = "v2.8" ]
 then
     dobuild v2.8.1-local v2.8 \
