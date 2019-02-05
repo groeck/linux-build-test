@@ -15,6 +15,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 machine=$1
 config=$2
 devtree=$3
+boot=$4
 
 ARCH=arm
 
@@ -151,15 +152,18 @@ runkernel()
 	PREFIX="${PREFIX_M3}"
     fi
 
+    local _boot
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	pbuild+=":initrd"
+	_boot="initrd"
     else
 	pbuild+=":rootfs"
+	_boot="rootfs"
     fi
 
     pbuild="${pbuild//+(:)/:}"
 
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}"; then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
