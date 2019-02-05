@@ -256,14 +256,26 @@ class QemuBuildCommand(RefShellCommand):
 
     def evaluateCommand(self, cmd):
         result = RefShellCommand.evaluateCommand(self, cmd)
-        if self.counter.numFailed > 0:
-	    if self.counter.numPassed == 0:
-	        return FAILURE
-            return WARNINGS
+        c = self.counter
+        if c.numFailed > 0:
+            if c.numPassed == 0:
+                result = FAILURE
+            else:
+                result = WARNINGS
         else:
-	    if self.counter.numPassed == 0:
-	        self.build.result = SKIPPED
-		return SKIPPED
-	    if self.counter.tracebacks and result == SUCCESS:
-		return WARNINGS
-            return result
+            if c.numPassed == 0:
+                self.build.result = SKIPPED
+                result = SKIPPED
+            if c.tracebacks and result == SUCCESS:
+                result = WARNINGS
+
+        # Request retry only if at least one build passed.
+	# Also retry if all builds failed. We don't really want to do that,
+	# but the first build would otherwise be marked as success since
+	# haltOnFailure is false and the next step would be skipped.
+        if ((result == WARNINGS and c.numFailed > 0 and c.numFailed < 3)
+	    or result in (FAILURE, EXCEPTION, RETRY)):
+            self.setProperty('needRetry', True)
+            self.build.setProperty('requestRetry', True)
+
+        return result
