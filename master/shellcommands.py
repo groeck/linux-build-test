@@ -270,11 +270,8 @@ class QemuBuildCommand(RefShellCommand):
                 result = WARNINGS
 
         # Request retry only if at least one build passed.
-	# Also retry if all builds failed. We don't really want to do that,
-	# but the first build would otherwise be marked as success since
-	# haltOnFailure is false and the next step would be skipped.
-        if ((result == WARNINGS and c.numFailed > 0 and c.numFailed < 3)
-	    or result in (FAILURE, EXCEPTION, RETRY)):
+        # Do not retry if all tests failed.
+        if result == WARNINGS and c.numFailed > 0 and c.numFailed < 3:
             self.setProperty('needRetry', True)
             self.build.setProperty('requestRetry', True)
 
