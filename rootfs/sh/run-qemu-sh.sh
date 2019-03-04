@@ -16,9 +16,10 @@ ARCH=sh
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v4.4)
-	# gcc 8.2.0 causes boot stalls with this kernel.
-	PATH_SH=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+v4.4|v4.9|v4.14|v4.19)
+	# gcc 8.2.0 causes random boot stalls and crashes
+	# with this kernel.
+	PATH_SH=/opt/kernel/sh4/gcc-5.5.0/usr/bin
 	;;
 *)
 	PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
