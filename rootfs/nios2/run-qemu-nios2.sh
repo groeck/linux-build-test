@@ -76,7 +76,7 @@ runkernel()
 
     [[ ${dodebug} -ne 0 ]] && set +x
 
-    dowait ${pid} ${logfile} automatic waitlist[@]
+    dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
 
