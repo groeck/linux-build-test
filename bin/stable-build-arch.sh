@@ -3,49 +3,57 @@
 basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
-PATH_ALPHA=/opt/kernel/gcc-8.1.0-nolibc/alpha-linux/bin
+PATH_ALPHA=/opt/kernel/gcc-8.3.0-nolibc/alpha-linux/bin
 PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
-PATH_ARM=/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin
-PATH_ARM64=/opt/kernel/gcc-7.3.0-nolibc/aarch64-linux/bin
-# arc images don't build with gcc 8.1.0 / 7.3.0 from kernel.org
-PATH_ARC=/opt/kernel/arc/gcc-7.3.0/usr/bin
-PATH_ARCV2=/opt/kernel/arcv2/gcc-8.2.0/usr/bin
+PATH_ARM=/opt/kernel/gcc-8.3.0-nolibc/arm-linux-gnueabi/bin
+PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
+PATH_ARC=/opt/kernel/gcc-8.3.0-nolibc/arc-linux/bin
+PATH_ARCV2=/opt/kernel/gcc-8.3.0-nolibc/arcv2-linux/bin
 PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
-PATH_C6X=/opt/kernel/gcc-8.1.0-nolibc/c6x-elf/bin
+PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_CSKY=/opt/kernel/csky/gcc-6.3.0/bin
 PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
-PATH_H8300=/opt/kernel/gcc-8.1.0-nolibc/h8300-linux/bin
+PATH_H8300=/opt/kernel/gcc-8.3.0-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
-PATH_IA64=/opt/kernel/gcc-8.1.0-nolibc/ia64-linux/bin
+PATH_IA64=/opt/kernel/gcc-8.3.0-nolibc/ia64-linux/bin
 PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
+# gcc 8.3.0 insists replacing strncmp with strcmp and then
+# doesn't find strcmp (m68k only).
+# PATH_M68=/opt/kernel/gcc-8.3.0-nolibc/m68k-linux/bin
 PATH_M68=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
-PATH_MICROBLAZE=/opt/kernel/microblaze/gcc-6.4.0/bin
-PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips64-linux/bin
+PATH_MICROBLAZE=/opt/kernel/gcc-8.3.0-nolibc/microblaze-linux/bin
+PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
+# gcc-8.3.0 doesn't build for nds32.
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
-PATH_NIOS2=/opt/kernel/gcc-7.3.0-nolibc/nios2-linux/bin
+PATH_NIOS2=/opt/kernel/gcc-8.3.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
+# Still no official support for openrisc in gcc-8.3.0.
 PATH_OPENRISC=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
-PATH_PARISC=/opt/kernel/gcc-8.1.0-nolibc/hppa-linux/bin
-PATH_PARISC64=/opt/kernel/gcc-8.1.0-nolibc/hppa64-linux/bin
+PATH_PARISC=/opt/kernel/gcc-8.3.0-nolibc/hppa-linux/bin
+PATH_PARISC64=/opt/kernel/gcc-8.3.0-nolibc/hppa64-linux/bin
 # 6.4.0, 6.5.0 internal compiler error in fs/exofs/dir.o -next after 4.20
 # 7.3.0 hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
+# 7.4.0 known to work
 # 8.2.0 generates build errors (overzaelous compiler)
-PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-PATH_RISCV64=/opt/kernel/gcc-7.3.0-nolibc/riscv64-linux/bin
+# 8.3.0 testing
+PATH_PPC=/opt/kernel/gcc-8.3.0-nolibc/powerpc64-linux/bin
+PATH_RISCV64=/opt/kernel/gcc-8.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
-PATH_S390=/opt/kernel/gcc-7.3.0-nolibc/s390-linux/bin
-PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
-# sparc images don't build with gcc 8.1.0
-PATH_SPARC=/opt/kernel/gcc-7.3.0-nolibc/sparc64-linux/bin
+PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
+# 8.3.0: ommand line option '-m4-nofpu' is not supported by this configuration
+PATH_SH4=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
+# PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
+PATH_SPARC=/opt/kernel/gcc-8.3.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
-PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
-PATH_XTENSA=/opt/kernel/xtensa/gcc-7.2.0/usr/bin
+PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
+PATH_XTENSA=/opt/kernel/gcc-8.3.0-nolibc/xtensa-linux/bin
 
-PREFIX_ARC="arc-linux-"
+PREFIX_ARC="arc-elf-"
+PREFIX_ARCV2="arc-elf-"
 PREFIX_ARM="arm-linux-gnueabi-"
 PREFIX_PPC=powerpc64-linux-
 PREFIX_S390="s390-linux-"
@@ -80,6 +88,7 @@ v3.16|v3.18)
 	PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
 	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
+	PREFIX_ARC="arc-linux-"
 	# ppc needs old compiler up to and including v3.18
 	# (see commit c2ce6f9f3dc0)
 	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
@@ -88,17 +97,21 @@ v3.16|v3.18)
 	# (see commit 940d4113f330). Note that we can't use the kernel.org
 	# toolchain for gcc 5.5.0 either; it results in "'-m4-nofpu' is not
 	# supported ...".
-	PATH_SH4=/opt/kernel/sh4/gcc-5.3.0/usr/bin
+	PATH_SH4=/opt/kernel/sh4/gcc-5.5.0/bin
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
-	if [[ "${rel}" = "v3.16" ]]; then
-	    # x86 has build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
-	    PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
-	fi
+	PATH_SPARC=/opt/kernel/sparc64/gcc-6.5.0/bin
+	# x86 has build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
+	# Error:
+	#   Unsupported relocation type: R_X86_64_PLT32 (4)
+	# The same error is seen with gcc-6.5.0, suggesting it may be
+	# a binutils issue.
+	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	;;
 v4.4)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
+	# x86_64:allyesconfig was seen to bail out with gcc 8.2.0
+	PATH_X86=/opt/kernel/x86_64/gcc-6.5.0/bin/
 	;;
 *)
 	;;
@@ -142,9 +155,10 @@ case ${ARCH} in
     arcv2)
 	ARCH=arc
 	cmd=(${cmd_arcv2[*]})
-	PREFIX="arc-linux-"
+	PREFIX="${PREFIX_ARCV2}"
 	# Original path first to pick up bison
-	PATH=${PATH}:${PATH_ARCV2}
+	# PATH=${PATH}:${PATH_ARCV2}
+	PATH=${PATH}:${PATH_ARC}
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
