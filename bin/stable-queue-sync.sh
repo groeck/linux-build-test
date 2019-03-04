@@ -83,6 +83,8 @@ do_import()
 			return $?
 		fi
 	fi
+	echo "describe source: $(git describe ${source})"
+	echo "describe target: $(git describe local/${target})"
 	return 0
 }
 
