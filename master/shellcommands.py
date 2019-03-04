@@ -204,11 +204,12 @@ class QemuBuildCommand(RefShellCommand):
     name = "qemubuildcommand"
     command = [name]
 
-    def __init__(self, **kwargs):
+    def __init__(self, isRetry=False, **kwargs):
         RefShellCommand.__init__(self, **kwargs)   # always upcall!
         self.counter = AnalyzeQemuBuildLog()
         self.addLogObserver('stdio', self.counter)
         self.progressMetrics += ('builds', 'pass', 'fail', 'skipped', )
+	self.isRetry = isRetry
 
     def getText(self, cmd, results):
 	hidden = self._maybeEvaluate(self.hideStepIf, results, self)
@@ -234,6 +235,10 @@ class QemuBuildCommand(RefShellCommand):
 	hidden = self._maybeEvaluate(self.hideStepIf, results, self)
 	if hidden:
 	    return ""
+	# Skip build log output if this is the first build attempt
+	# which will be (or has been) retried.
+	if not self.isRetry and self.build.getProperty("requestRetry", False):
+            return ""
         text = RefShellCommand.getText2(self, cmd, results)
 	# if results == SKIPPED:
 	#     return text
