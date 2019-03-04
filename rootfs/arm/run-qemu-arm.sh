@@ -8,7 +8,7 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
-QEMU_MICRO=${QEMU:-${QEMU_V31_BIN}/qemu-system-arm}
+QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
@@ -247,16 +247,19 @@ runkernel()
 	initcli+=" earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
 	initcli+=" console=ttymxc1,115200"
 	extra_params+=" -display none -serial null"
-	QEMUCMD="${QEMU_MICRO}"
 	;;
     "smdkc210")
 	initcli+=" console=ttySAC0,115200n8"
 	QEMUCMD="${QEMU_SMDKC}"
 	;;
+    "midway")
+	initcli+=" console=ttyAMA0,115200"
+	QEMUCMD="${QEMU_MIDWAY}"
+	;;
     "realview-pb-a8" | "realview-pbx-a9" | \
     "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | \
-    "highbank" | "midway" | "integratorcp" | "virt" | \
+    "highbank" | "integratorcp" | "virt" | \
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
 	initcli+=" console=ttyAMA0,115200"
 	;;
