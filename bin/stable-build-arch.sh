@@ -37,9 +37,9 @@ PATH_PARISC64=/opt/kernel/gcc-8.3.0-nolibc/hppa64-linux/bin
 # 6.4.0, 6.5.0 internal compiler error in fs/exofs/dir.o -next after 4.20
 # 7.3.0 hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
 # 7.4.0 known to work
-# 8.2.0 generates build errors (overzaelous compiler)
-# 8.3.0 testing
-PATH_PPC=/opt/kernel/gcc-8.3.0-nolibc/powerpc64-linux/bin
+PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
+# 8.2.0, 8.3.0 generate build errors (overzaelous compiler)
+# PATH_PPC=/opt/kernel/gcc-8.3.0-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-8.3.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
