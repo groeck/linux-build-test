@@ -243,10 +243,15 @@ runkernel()
 	initcli+=" earlycon=pl011,0x3f201000"
 	initcli+=" console=ttyAMA0"
 	;;
-    "sabrelite" | "mcimx7d-sabre" | "mcimx6ul-evk")
+    "sabrelite" | "mcimx6ul-evk")
 	initcli+=" earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
 	initcli+=" console=ttymxc1,115200"
 	extra_params+=" -display none -serial null"
+	;;
+    "mcimx7d-sabre")
+	initcli+=" earlycon=ec_imx6q,mmio,0x30860000,115200n8"
+	initcli+=" console=ttymxc0,115200"
+	extra_params+=" -display none"
 	;;
     "smdkc210")
 	initcli+=" console=ttySAC0,115200n8"
@@ -367,13 +372,10 @@ runkernel multi_v7_defconfig sabrelite "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-if [[ "${runall}" -eq 1 ]]; then
-  # Completely fails to boot, no message to console
-  runkernel multi_v7_defconfig mcimx7d-sabre "" \
+runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
-  retcode=$((${retcode} + $?))
-  checkstate ${retcode}
-fi
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
