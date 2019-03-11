@@ -110,45 +110,40 @@ runkernel()
     echo -n "running ..."
 
     case ${mach} in
-    "virt" | "xlnx-versal-virt" )
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -cpu cortex-a57 \
-		-nographic \
-		-monitor none \
-		-kernel arch/arm64/boot/Image -no-reboot \
-		${extra_params} \
-		-append "console=ttyAMA0 ${initcli}" \
-		> ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
+    "virt")
+	initcli+=" earlycon=pl011,0x9000000 console=ttyAMA0"
+	extra_params+=" -cpu cortex-a57"
+	waitflag="manual"
+	;;
+    "xlnx-versal-virt")
+	initcli+=" earlycon=pl011,0xff000000 console=ttyAMA0"
+	extra_params+=" -cpu cortex-a57"
 	waitflag="manual"
 	;;
     "raspi3")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} \
-	    -kernel arch/arm64/boot/Image -no-reboot \
-	    --append "earlycon=uart8250,mmio32,0x3f215040 ${initcli} console=ttyS1,115200" \
-	    ${extra_params} \
-	    ${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
-	    -nographic -monitor null -serial null -serial stdio \
-	    > ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
+	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
+	extra_params+=" -serial null"
 	waitflag="manual"
 	;;
     "xlnx-zcu102")
-	[[ ${dodebug} -ne 0 ]] && set -x
-	${QEMU} -M ${mach} -kernel arch/arm64/boot/Image \
-		-nographic -serial stdio -monitor none -no-reboot \
-		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
-		${extra_params} \
-		--append "${initcli} console=ttyPS0 earlycon=cdns,mmio,0xFF000000,115200n8" \
-		> ${logfile} 2>&1 &
-	pid=$!
-	[[ ${dodebug} -ne 0 ]] && set +x
+	initcli+=" earlycon=cdns,mmio,0xFF000000,115200n8 console=ttyPS0"
 	waitflag="automatic"
 	;;
     esac
+
+    [[ ${dodebug} -ne 0 ]] && set -x
+    ${QEMU} -M ${mach} \
+		-kernel arch/arm64/boot/Image -no-reboot \
+		-nographic \
+		${extra_params} \
+		-serial stdio \
+		-monitor none \
+		-no-reboot \
+		--append "${initcli}" \
+		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
+		> ${logfile} 2>&1 &
+    pid=$!
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} ${waitflag} waitlist[@]
     retcode=$?
@@ -192,9 +187,9 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-# No idea how to instantiate virtual devices
-# runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
-# retcode=$((retcode + $?))
+# Instantiating virtual devices requires qemu v3.1.0 plus patches, or qemu v4.0.0.
+runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
+retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
