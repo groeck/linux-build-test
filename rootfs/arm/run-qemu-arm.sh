@@ -29,22 +29,27 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
 skip_316="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
+	arm:mcimx7d-sabre:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_318="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
+	arm:mcimx7d-sabre:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_44="arm:raspi2:multi_v7_defconfig \
+	arm:mcimx7d-sabre:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
+	arm:mcimx7d-sabre:multi_v7_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:romulus-bmc:aspeed_g5_defconfig \
 	arm:witherspoon-bmc:aspeed_g5_defconfig"
-skip_414="arm:witherspoon-bmc:aspeed_g5_defconfig"
+skip_414="arm:mcimx7d-sabre:multi_v7_defconfig \
+	arm:witherspoon-bmc:aspeed_g5_defconfig"
 
 . ${progdir}/../scripts/common.sh
 
