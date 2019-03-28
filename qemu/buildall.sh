@@ -173,6 +173,15 @@ then
     checkexit $?
 fi
 
+if [ "$1" = "v4.0" ]; then
+    dobuild v4.0.0-local v4.0 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--enable-debug --disable-strip"
+    checkexit $?
+fi
+
 if [ "$1" = "master" ]; then
     dobuild master-local master \
 	"--disable-user --disable-gnutls --disable-docs \
