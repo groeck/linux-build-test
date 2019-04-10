@@ -180,6 +180,12 @@ if [ "$1" = "v4.0" ]; then
 	--disable-xen --disable-xen-pci-passthrough \
 	--enable-debug --disable-strip"
     checkexit $?
+    dobuild v4.0.0-q800 v4.0-m68k \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=m68k-softmmu"
+    checkexit $?
 fi
 
 if [ "$1" = "master" ]; then
@@ -187,6 +193,6 @@ if [ "$1" = "master" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--enable-debug --disable-strip"
+	--enable-debug --disable-strip --extra-cflags=-g"
     checkexit $?
 fi
