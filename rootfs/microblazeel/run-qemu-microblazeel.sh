@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
@@ -33,7 +32,7 @@ runkernel()
     ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "$(rootfsname ${rootfs})" \
-	-append "rdinit=/sbin/init console=${console},115200" \
+	-append "${initcli} rdinit=/sbin/init console=${console},115200" \
 	-monitor none -serial stdio -nographic \
 	> ${logfile} 2>&1 &
     pid=$!
