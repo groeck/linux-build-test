@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
 parse_args "$@"
@@ -13,16 +12,21 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
 ARCH=sh
+CONFIG=""
+EARLYCON=""
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v4.4|v4.9|v4.14|v4.19)
+v3.16|v3.18|v4.4|v4.9|v4.14|v4.19)
 	# gcc 8.2.0 causes random boot stalls and crashes
 	# with this kernel.
 	PATH_SH=/opt/kernel/sh4/gcc-5.5.0/usr/bin
 	;;
 *)
 	PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
+	# earlycon only works with v4.20+ and otherwise results in a crash.
+	CONFIG="CONFIG_SERIAL_SH_SCI_EARLYCON=y"
+	EARLYCON="earlycon=scif,mmio16,0xffe80000"
 	;;
 esac
 
@@ -35,8 +39,8 @@ patch_defconfig()
     # Drop command line overwrite
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
-    # Enable earlyprintk
-    # echo "CONFIG_SERIAL_SH_SCI_EARLYCON=y" >> ${defconfig}
+    # Conditionally enable earlyprintk
+    echo "${CONFIG}" >> ${defconfig}
 }
 
 runkernel()
@@ -48,7 +52,6 @@ runkernel()
     local logfile=$(__mktemp)
     local waitlist=("Power down" "Boot successful" "Poweroff")
     local build="${ARCH}:${defconfig}"
-    local append
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -69,15 +72,13 @@ runkernel()
 
     echo -n "running ..."
 
-    # earlycon only works with v4.20+ and otherwise results in a crash.
-    # append="${initcli} console=ttySC1,115200 earlycon=scif,mmio16,0xffe80000 noiotrap"
-    append="${initcli} console=ttySC1,115200 noiotrap"
+    initcli+=" console=ttySC1,115200 ${EARLYCON} noiotrap"
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${extra_params} \
-	-append "${append}" \
+	-append "${initcli}" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
 	-nographic -monitor null \
 	> ${logfile} 2>&1 &
