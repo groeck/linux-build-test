@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. "${dir}/../scripts/config.sh"
 . "${dir}/../scripts/common.sh"
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
@@ -68,7 +67,7 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local fixup="${cpu}"
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
-    local cmdline
+    local earlycon
 
     if ! match_params "${machine}@${mach}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
@@ -78,11 +77,11 @@ runkernel()
     case "${mach}" in
     "lx60"|"kc705"|"ml605")
 	PATH=${PATH_XTENSA}:${PATH}
-	cmdline="earlycon=uart8250,mmio32,0xfd050020,115200n8"
+	earlycon="earlycon=uart8250,mmio32,0xfd050020,115200n8"
 	;;
     "kc705-nommu")
 	PATH=${PATH}:${PATH_XTENSA_DE212}
-	cmdline="earlycon=uart8250,mmio32,0x9d050020,115200n8 \
+	earlycon="earlycon=uart8250,mmio32,0x9d050020,115200n8 \
 		memmap=256M@0x60000000"
 	;;
     esac
@@ -109,7 +108,7 @@ runkernel()
     ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel arch/xtensa/boot/uImage -no-reboot \
 	${dtbcmd} \
-	--append "rdinit=/sbin/init ${cmdline} console=ttyS0,115200n8" \
+	--append "rdinit=/sbin/init ${initcli} ${earlycon} console=ttyS0,115200n8" \
 	-initrd "$(rootfsname ${rootfs})" \
 	-m ${mem} -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
