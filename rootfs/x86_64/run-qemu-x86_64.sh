@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 machine=$1
 cputype=$2
 
-QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-x86_64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-x86_64}
 ARCH=x86_64
 
 # Older releases don't like gcc 6+
@@ -21,7 +21,8 @@ case "${rel}" in
 	PREFIX="x86_64-linux-"
 	;;
 *)
-	PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
+	PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
+	# PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
 	PREFIX="x86_64-linux-"
 	;;
 esac
@@ -155,6 +156,15 @@ retcode=$((${retcode} + $?))
 runkernel defconfig smp4:efi:mem8G:virtio Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp2:efi32:mem1G:virtio Nehalem q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+
+runkernel defconfig preempt:smp4:efi:mem2G:virtio Icelake-Client q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig preempt:smp8:mem4G:nvme Icelake-Server q35 rootfs.btrfs
+retcode=$((${retcode} + $?))
+runkernel defconfig preempt:smp2:efi32:mem1G:mmc Skylake-Client-IBRS q35 rootfs.iso
+retcode=$((${retcode} + $?))
+runkernel defconfig preempt:smp6:mem512 KnightsMill q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 
 runkernel defconfig nosmp:mem1G:usb Opteron_G3 pc rootfs.ext2
