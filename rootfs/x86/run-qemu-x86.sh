@@ -11,7 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-i386}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=i386
 
 # Older releases don't like gcc 6+
@@ -22,7 +22,8 @@ v3.16|v3.18)
 	PREFIX="x86_64-linux-"
 	;;
 *)
-	PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
+	PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
+	# PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
 	PREFIX="x86_64-linux-"
 	;;
 esac
