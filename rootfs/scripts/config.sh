@@ -20,3 +20,5 @@ QEMU_BIN=${QEMU_V31_BIN}
 
 QEMU_LINARO_BIN=${QEMU_INSTALL}/v2.3.50-linaro/bin
 QEMU_METAG_BIN=${QEMU_INSTALL}/metag/bin
+
+config_initcli=""

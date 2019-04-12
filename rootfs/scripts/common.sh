@@ -7,12 +7,14 @@ shopt -s extglob
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
+__basedir="${__progdir}/.."
+. "${__basedir}/scripts/config.sh"
+
 if [[ -w /var/cache/buildbot ]]; then
     __cachedir="/var/cache/buildbot/$(basename ${__progdir})"
 else
     __cachedir="/tmp/buildbot-cache/$(basename ${__progdir})"
 fi
-__basedir="${__progdir}/.."
 
 __addtmpfile()
 {
@@ -399,15 +401,15 @@ __common_fixups()
     local rootfs="$2"
     local fixup
 
+    initcli="panic=-1 ${config_initcli}"
+    extra_params="-snapshot"
+
     if [[ -z "${fixups}" ]]; then
 	return
     fi
 
-    initcli=""
-    extra_params="-snapshot"
-
     if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
+	initcli+=" rdinit=/sbin/init"
 	# initrd doesn't need snapshot
 	extra_params="-initrd ${rootfs}"
 	rootfs=""
@@ -417,8 +419,7 @@ __common_fixups()
 	__common_fixup "${fixup}" "${rootfs}"
     done
 
-    initcli+=" panic=-1"
-    # trim leading whitespace
+    # trim leading whitespaces, if any
     initcli="${initcli##*( )}"
     extra_params="${extra_params##*( )}"
 }
@@ -627,6 +628,7 @@ __setup_fragment()
     local notests=0
     local nousb=0
     local novirt=0
+    local preempt=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -646,6 +648,7 @@ __setup_fragment()
 	notests) notests=1 ;;
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
+	preempt) preempt=1 ;;
 	*)
 	    ;;
 	esac
@@ -770,6 +773,10 @@ __setup_fragment()
 	echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS_4K_DEVBLK_SIZE=y" >> ${fragment}
 	echo "CONFIG_EXT3_FS=y" >> ${fragment}
+    fi
+
+    if [[ "${preempt}" -eq 1 ]]; then
+	echo "CONFIG_PREEMPT=y" >> ${fragment}
     fi
 }
 
