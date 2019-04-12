@@ -1,8 +1,10 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
+
+parse_args "$@"
+shift $((OPTIND - 1))
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblaze}
 PREFIX=microblaze-linux-
@@ -24,21 +26,22 @@ runkernel()
     echo -n "Building ${ARCH}:${defconfig} ... "
 
     dosetup -d "${rootfs}" "${defconfig}"
-    if [ $? -ne 0 ]
-    then
+    if [ $? -ne 0 ]; then
 	return 1
     fi
 
     echo -n "running ..."
 
+    initcli+=" rdinit=/sbin/init console=${console},115200"
+    [[ ${dodebug} -ne 0 ]] && set -x
     ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "$(rootfsname ${rootfs})" \
-	-append "rdinit=/sbin/init console=${console},115200" \
+	-append "${initcli}" \
 	-monitor none -serial stdio -nographic \
 	> ${logfile} 2>&1 &
-
     pid=$!
+    [[ ${dodebug} -ne 0 ]] && set +x
 
     dowait ${pid} ${logfile} manual waitlist[@]
     return $?
