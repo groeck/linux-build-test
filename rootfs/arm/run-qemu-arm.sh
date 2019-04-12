@@ -1,7 +1,6 @@
 #!/bin/bash
 
 progdir=$(cd $(dirname $0); pwd)
-. ${progdir}/../scripts/config.sh
 . ${progdir}/../scripts/common.sh
 
 parse_args "$@"
