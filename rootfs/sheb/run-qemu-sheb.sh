@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
 parse_args "$@"
