@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dir=$(cd $(dirname $0); pwd)
-. ${dir}/../scripts/config.sh
 . ${dir}/../scripts/common.sh
 
 parse_args "$@"
@@ -74,15 +73,14 @@ runkernel()
     rootfs="$(rootfsname ${rootfs})"
     if [[ "${rootfs}" == *cpio ]]; then
 	if [[ "${mach}" = "q800" ]]; then
-	    initcli="rdinit=/sbin/init"
+	    initcli+=" rdinit=/sbin/init"
 	    diskcmd="-initrd ${rootfs}"
 	else
 	    # initrd is embedded in image
-	    initcli=""
 	    diskcmd=""
 	fi
     else
-	initcli="root=/dev/sda rw"
+	initcli+=" root=/dev/sda rw"
 	diskcmd="-snapshot -drive file=${rootfs},format=raw"
     fi
 
@@ -90,7 +88,7 @@ runkernel()
 
     if [[ "${mach}" = "q800" ]]; then
 	# q800 needs special qemu, which in turn does not support mcf5208evb
-	qemu="${QEMU_V31_M68K_BIN}/qemu-system-m68k"
+	qemu="${QEMU_V40_M68K_BIN}/qemu-system-m68k"
     fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
