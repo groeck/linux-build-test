@@ -68,7 +68,7 @@ runkernel()
     ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \
 	-dtb ${dtb} \
-	--append "rdinit=/sbin/init earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200" \
+	--append "rdinit=/sbin/init ${initcli} earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200" \
 	-initrd "$(rootfsname ${rootfs})" \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
