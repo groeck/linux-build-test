@@ -150,7 +150,7 @@ fi
 
 if [ -z "$1" -o "$1" = "v3.0" ]
 then
-    dobuild v3.0.0-local v3.0 \
+    dobuild v3.0.1-local v3.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--with-gtkabi=3.0 \
