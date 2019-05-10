@@ -59,6 +59,8 @@ libdw-dev
 libslang2-dev
 libgtk2.0-de
 binutils-dev
+libbabeltrace-dev
+openjdk-8-jdk
 
 For 32-bit compiler support:
 
