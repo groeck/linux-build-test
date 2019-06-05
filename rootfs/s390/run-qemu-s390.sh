@@ -7,10 +7,11 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
-PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
+# PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
+PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 
 PATH=${PATH_S390}:${PATH}
 
@@ -68,11 +69,15 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel defconfig "" rootfs.cpio.gz
+runkernel performance_defconfig "" rootfs.cpio.gz
 retcode=$?
-runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
-retcode=$((${retcode} + $?))
-runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
-retcode=$((${retcode} + $?))
+runkernel performance_defconfig virtio-blk-ccw rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel performance_defconfig scsi[virtio-ccw] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel performance_defconfig virtio-pci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel performance_defconfig scsi[virtio-pci] rootfs.ext2.gz
+retcode=$((retcode + $?))
 
 exit ${retcode}
