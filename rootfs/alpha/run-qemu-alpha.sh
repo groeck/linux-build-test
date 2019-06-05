@@ -85,31 +85,31 @@ echo "Build reference: $(git describe)"
 echo
 
 runkernel defconfig devtmpfs busybox-alpha.cpio
-rv=$?
+retcode=$?
 runkernel defconfig ide rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig mmc rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig usb-ohci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig usb-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig usb-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig usb-uas-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig usb-uas-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig "scsi[AM53C974]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig "scsi[DC395]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig "scsi[MEGASAS2]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel defconfig "scsi[FUSION]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # broken
@@ -119,14 +119,14 @@ if [[ ${runall} -ne 0 ]]; then
     # sym0: giving up ...
     # WARNING: CPU: 0 PID: 1 at ./include/linux/dma-mapping.h:541 ___free_dma_mem_cluster+0x184/0x1a0
     runkernel defconfig "scsi[53C810]" rootfs.ext2
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
     # sym0: SCSI BUS has been reset.
     # sym0: unexpected disconnect
     runkernel defconfig "scsi[53C895A]" rootfs.ext2
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
 fi
 
 runkernel defconfig nvme rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
-exit ${rv}
+exit ${retcode}
