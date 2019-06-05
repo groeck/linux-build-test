@@ -64,9 +64,9 @@ cmd_unicore32=(defconfig allnoconfig tinyconfig)
 # build to skip
 
 # skip_316="m68k:allnoconfig m68k:tinyconfig i386:tools/perf x86_64:tools/perf"
-skip_316="m68k:allnoconfig m68k:tinyconfig"
+skip_316="m68k:allnoconfig m68k:tinyconfig i386:tools/perf"
 skip_318="m68k:allnoconfig m68k:tinyconfig i386:tools/perf x86_64:tools/perf"
-skip_44="cris:allnoconfig cris:tinyconfig"
+skip_44="cris:allnoconfig cris:tinyconfig powerpc:allmodconfig"
 
 # fixups
 
