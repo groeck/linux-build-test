@@ -17,10 +17,13 @@ EARLYCON=""
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.16|v3.18|v4.4|v4.9|v4.14|v4.19)
+v3.16|v3.18|v4.4|v4.9|v4.14)
 	# gcc 8.2.0 causes random boot stalls and crashes
 	# with this kernel.
 	PATH_SH=/opt/kernel/sh4/gcc-5.5.0/usr/bin
+	;;
+v4.19)
+	PATH_SH=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
 	;;
 *)
 	PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
