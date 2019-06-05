@@ -197,6 +197,8 @@ class AnalyzeQemuBuildLog(LogLineObserver):
 	    self.tracebacks = True
 	elif line.find('Kernel panic') != -1:
 	    self.tracebacks = True
+	elif line.find('show_stack') != -1:
+	    self.tracebacks = True
 	elif line.find('(try booting with the "irqpoll" option)') != -1:
 	    self.tracebacks = True
 
