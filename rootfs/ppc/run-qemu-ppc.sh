@@ -21,7 +21,7 @@ PREFIX=powerpc64-linux-
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.16|v3.18)
+v3.16)
 	PATH_PPC=/opt/kernel/gcc-4.9.4-nolibc/powerpc64-linux/bin
 	;;
 *)
@@ -35,18 +35,6 @@ QEMU_MACH=mac99
 PATH=${PATH_PPC}:${PATH}
 
 skip_316="mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
-	bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
-	bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
-	bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
-	sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
-	sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
-	mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
-
-skip_318="mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
 	mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
 	mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
 	mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \

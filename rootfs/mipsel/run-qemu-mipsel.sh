@@ -27,10 +27,6 @@ skip_316="mipsel:M14Kc:malta_defconfig:smp:scsi[DC395]:rootfs \
 	mipsel:24Kf:malta_defconfig:smp:scsi[AM53C974]:rootfs \
 	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:smp:ide:rootfs"
 
-skip_318="mipsel:M14Kc:malta_defconfig:smp:scsi[DC395]:rootfs \
-	mipsel:24Kf:malta_defconfig:smp:scsi[AM53C974]:rootfs \
-	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:smp:ide:rootfs"
-
 patch_defconfig()
 {
     local defconfig=$1

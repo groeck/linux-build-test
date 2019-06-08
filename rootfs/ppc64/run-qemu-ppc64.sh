@@ -21,7 +21,7 @@ PREFIX=powerpc64-linux-
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.16|v3.18)
+v3.16)
 	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
 	;;
 *)
@@ -35,18 +35,6 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
-	powernv:powernv_defconfig:initrd \
-	ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
-	ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
-	pseries:pseries_defconfig:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:initrd \
-	pseries:pseries_defconfig:little:scsi:rootfs \
-	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
-	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:mmc:rootfs \
-	pseries:pseries_defconfig:little:nvme:rootfs"
-skip_318="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	powernv:powernv_defconfig:initrd \
 	ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \

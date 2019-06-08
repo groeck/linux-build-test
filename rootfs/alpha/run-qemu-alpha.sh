@@ -22,9 +22,6 @@ PATH=${PATH_ALPHA}:${PATH}
 skip_316="alpha:defconfig:scsi[AM53C974]:rootfs \
 	alpha:defconfig:scsi[DC395]:rootfs"
 
-skip_318="alpha:defconfig:scsi[AM53C974]:rootfs \
-	alpha:defconfig:scsi[DC395]:rootfs"
-
 patch_defconfig()
 {
     : # nothing to do

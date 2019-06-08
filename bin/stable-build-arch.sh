@@ -79,7 +79,7 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.16|v3.18)
+v3.16)
 	# lib/mpi/longlong.h:651:2: error: impossible constraint in 'asm'
 	# with gcc 5.1 and later
 	PATH_MIPS=/opt/kernel/gcc-4.9.4-nolibc/mips64-linux/bin
@@ -272,7 +272,7 @@ case ${ARCH} in
     openrisc)
 	cmd=(${cmd_openrisc[*]})
 	case ${rel} in
-	v3.16|v3.18|v4.4|v4.9)
+	v3.16|v4.4|v4.9)
 		PREFIX="or32-linux-"
 		PATH=${PATH_OPENRISC_45}:${PATH}
 		;;
@@ -356,7 +356,7 @@ case ${ARCH} in
 		PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
 		PREFIX="${PREFIX_X86}"
 		;;
-	v3.18|v4.4|v4.9|v4.14|v4.19)
+	v4.4|v4.9|v4.14|v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
 		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
 		PREFIX="${PREFIX_X86}"
@@ -437,7 +437,7 @@ do
 		continue
 	    fi
 	    case ${rel} in
-		    "v3.16"|"v3.18")
+		    "v3.16")
 			cd "${cmd[$i]}"
 			make ARCH=${ARCH} WERROR=0 O="${BUILDDIR}" >/dev/null 2>${LOG}
 			rv=$?

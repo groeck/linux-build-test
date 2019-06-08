@@ -22,9 +22,6 @@ PATH=${PATH_SPARC}:${PATH}
 skip_316="sparc64:sun4u:smp:scsi[DC395]:cd
 	sparc64:sun4u:smp:scsi[AM53C974]:hd"
 
-skip_318="sparc64:sun4u:smp:scsi[DC395]:cd
-	sparc64:sun4u:smp:scsi[AM53C974]:hd"
-
 patch_defconfig()
 {
     local defconfig=$1

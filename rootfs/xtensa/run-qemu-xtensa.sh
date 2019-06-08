@@ -13,7 +13,6 @@ then
 fi
 
 skip_316="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
-skip_318="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
 skip_44="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
 
 machine=$1

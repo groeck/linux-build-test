@@ -32,11 +32,6 @@ skip_316="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \
 	arm:realview-pbx-a9:realview_defconfig"
-skip_318="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
-	arm:mcimx7d-sabre:multi_v7_defconfig \
-	arm:raspi2:multi_v7_defconfig \
-	arm:virt:multi_v7_defconfig \
-	arm:realview-pbx-a9:realview_defconfig"
 skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:mcimx7d-sabre:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig \

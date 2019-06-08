@@ -17,7 +17,7 @@ ARCH=i386
 # Older releases don't like gcc 6+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case ${rel} in
-v3.16|v3.18)
+v3.16)
 	PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
 	PREFIX="x86_64-linux-"
 	;;
@@ -31,9 +31,6 @@ esac
 PATH=${PATH_X86}:${PATH}
 
 skip_316="defconfig:smp6:scsi[AM53C974] \
-	defconfig:smp4:scsi[DC395]"
-
-skip_318="defconfig:smp6:scsi[AM53C974] \
 	defconfig:smp4:scsi[DC395]"
 
 skip_44="defconfig:smp6:scsi[AM53C974] \

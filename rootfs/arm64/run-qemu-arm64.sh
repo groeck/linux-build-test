@@ -37,21 +37,6 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
 	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs \
 	xlnx-versal-virt:defconfig:smp2:mem512:virtio-blk:rootfs"
-skip_318="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
-	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
-	virt:defconfig:smp6:mem512:virtio:rootfs \
-	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
-	virt:defconfig:smp2:mem512:nvme:rootfs \
-	virt:defconfig:smp4:mem512:mmc:rootfs \
-	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
-	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
-	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
-	virt:defconfig:smp4:mem512:scsi[MEGASAS2]:rootfs \
-	virt:defconfig:smp6:mem512:scsi[53C810]:rootfs \
-	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
-	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs \
-	virt:defconfig:smp:mem512:scsi[virtio]:rootfs \
-	xlnx-versal-virt:defconfig:smp2:mem512:virtio-blk:rootfs"
 skip_44="xlnx-zcu102:defconfig:smp2:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3:defconfig:smp:mem1G:initrd \

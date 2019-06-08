@@ -12,8 +12,6 @@ variant=$2
 
 skip_316="mipsel64:malta_defconfig:r1:smp:scsi[DC395]:hd"
 
-skip_318="mipsel64:malta_defconfig:r1:smp:scsi[DC395]:hd"
-
 skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
 	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
 

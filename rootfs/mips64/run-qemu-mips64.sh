@@ -33,15 +33,6 @@ skip_316="mips64:malta_defconfig:initrd \
 	mips64:malta_defconfig:smp:scsi[MEGASAS2]:rootfs \
 	mips64:malta_defconfig:nosmp:ide:rootfs"
 
-skip_318="mips64:malta_defconfig:initrd \
-	mips64:malta_defconfig:smp:ide:rootfs \
-	mips64:malta_defconfig:smp:usb-xhci:rootfs \
-	mips64:malta_defconfig:smp:scsi[53C810]:rootfs \
-	mips64:malta_defconfig:smp:scsi[DC395]:rootfs \
-	mips64:malta_defconfig:smp:scsi[AM53C974]:rootfs \
-	mips64:malta_defconfig:smp:scsi[MEGASAS2]:rootfs \
-	mips64:malta_defconfig:nosmp:ide:rootfs"
-
 patch_defconfig()
 {
     local defconfig=$1
