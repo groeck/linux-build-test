@@ -25,6 +25,7 @@ patch_defconfig()
     sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
     sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
     echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
+    echo "CONFIG_PCI=y" >> ${defconfig}
 }
 
 runkernel()
@@ -69,15 +70,15 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel performance_defconfig "" rootfs.cpio.gz
+runkernel defconfig "" rootfs.cpio.gz
 retcode=$?
-runkernel performance_defconfig virtio-blk-ccw rootfs.ext2.gz
+runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel performance_defconfig scsi[virtio-ccw] rootfs.ext2.gz
+runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel performance_defconfig virtio-pci rootfs.ext2.gz
+runkernel defconfig virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel performance_defconfig scsi[virtio-pci] rootfs.ext2.gz
+runkernel defconfig scsi[virtio-pci] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
