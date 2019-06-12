@@ -7,7 +7,7 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
 # PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
@@ -25,7 +25,6 @@ patch_defconfig()
     sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
     sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
     echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
-    echo "CONFIG_PCI=y" >> ${defconfig}
 }
 
 runkernel()
@@ -75,10 +74,6 @@ retcode=$?
 runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel defconfig virtio-pci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel defconfig scsi[virtio-pci] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
