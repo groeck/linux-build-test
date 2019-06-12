@@ -184,6 +184,9 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
+runkernel pseries_defconfig usb pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((${retcode} + $?))
 runkernel pseries_defconfig mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
@@ -197,6 +200,9 @@ runkernel pseries_defconfig little pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little:scsi pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((${retcode} + $?))
+runkernel pseries_defconfig little:usb pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little:sata-sii3112 pseries POWER8 hvc0 vmlinux \
