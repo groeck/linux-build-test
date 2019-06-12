@@ -7,6 +7,8 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+_fixup=$1
+
 QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
@@ -42,6 +44,11 @@ runkernel()
 	build+=":initrd"
     else
 	build+=":rootfs"
+    fi
+
+    if ! match_params "${_fixup}@${fixup}"; then
+	echo "Skipping ${build} ... "
+	return 0
     fi
 
     echo -n "Building ${build} ... "
