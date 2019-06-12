@@ -177,8 +177,7 @@ if [ "$1" = "v4.0" ]; then
     dobuild v4.0.0-local v4.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--enable-debug --disable-strip"
+	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
     dobuild v4.0.0-q800 v4.0-m68k \
 	"--disable-user --disable-gnutls --disable-docs \
