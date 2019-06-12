@@ -73,7 +73,7 @@ parse_args()
 	while getopts ae:dnt opt; do
 	case ${opt} in
 	a)	runall=1;;
-	d)	dodebug=1;;
+	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
 	t)	testbuild=1;;
