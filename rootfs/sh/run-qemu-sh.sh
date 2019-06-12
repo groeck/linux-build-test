@@ -15,6 +15,8 @@ ARCH=sh
 CONFIG=""
 EARLYCON=""
 
+errlog="/tmp/err-sh.log"
+
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v3.16|v4.4|v4.9|v4.14)
@@ -77,7 +79,11 @@ runkernel()
 
     initcli+=" console=ttySC1,115200 ${EARLYCON} noiotrap"
 
-    [[ ${dodebug} -ne 0 ]] && set -x
+    if [[ ${dodebug} -eq 2 ]]; then
+	extra_params+=" -d int,mmu,in_asm,guest_errors,unimp,pcall -D ${errlog}"
+    fi
+
+    [[ ${dodebug} -eq 1 ]] && set -x
 
     ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${extra_params} \
@@ -87,10 +93,15 @@ runkernel()
 	> ${logfile} 2>&1 &
     pid=$!
 
-    [[ ${dodebug} -ne 0 ]] && set +x
+    [[ ${dodebug} -eq 1 ]] && set +x
 
     dowait ${pid} ${logfile} automatic waitlist[@]
-    return $?
+    local rv=$?
+    if [[ ${dodebug} -eq 2 && ${rv} -ne 0 ]]; then
+	logfile="$(mktemp sh)"
+	mv "${errlog}" "${logfile}"
+    fi
+    return ${rv}
 }
 
 echo "Build reference: $(git describe)"
