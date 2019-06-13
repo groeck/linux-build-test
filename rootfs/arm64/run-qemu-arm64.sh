@@ -23,6 +23,8 @@ PATH=${PATH}:${PATH_ARM64}
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
 skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
+	virt:defconfig:smp4:mem512:usb-ehci:rootfs \
+	virt:defconfig:smp4:mem512:usb-ohci:rootfs \
 	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
 	virt:defconfig:smp6:mem512:virtio:rootfs \
 	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
@@ -143,6 +145,10 @@ echo
 runkernel virt defconfig smp:mem512 rootfs.cpio.gz
 retcode=$?
 runkernel virt defconfig smp2:mem512:usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig smp2:mem512:usb-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel virt defconfig smp2:mem512:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:mem512:usb-uas-xhci rootfs.btrfs.gz
 retcode=$((retcode + $?))
