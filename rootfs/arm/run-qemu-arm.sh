@@ -216,11 +216,15 @@ runkernel()
 	initcli+=" console=ttyS4,115200"
 	extra_params+=" -nodefaults"
 	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "cubieboard")
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
 	initcli+=" console=ttyS0"
 	;;
     "collie")
 	initcli+=" console=ttySA1"
+	;;
+    "cubieboard")
+	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
+	initcli+=" console=ttyS0"
 	;;
     "kzm" | "imx25-pdk" )
 	initcli+=" console=ttymxc0,115200"
@@ -394,6 +398,14 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig cubieboard "" \
+	rootfs-armv5.ext2 manual ::usb:mem128 sun4i-a10-cubieboard.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig cubieboard "" \
+	rootfs-armv5.ext2 manual ::sata:mem128 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
