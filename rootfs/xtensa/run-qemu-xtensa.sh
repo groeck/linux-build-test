@@ -5,12 +5,8 @@ dir=$(cd $(dirname $0); pwd)
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
 
-debug=0
-if [ "$1" = "-d" ]
-then
-	debug=1
-	shift
-fi
+parse_args "$@"
+shift $((OPTIND - 1))
 
 skip_316="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
 skip_44="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
@@ -104,6 +100,8 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -eq 1 ]] && set -x
+
     ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel arch/xtensa/boot/uImage -no-reboot \
 	${dtbcmd} \
@@ -111,12 +109,13 @@ runkernel()
 	-initrd "$(rootfsname ${rootfs})" \
 	-m ${mem} -nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
-
     pid=$!
+
+    [[ ${dodebug} -eq 1 ]] && set +x
+
     dowait ${pid} ${logfile} manual waitlist[@]
     retcode=$?
-    if [ ${debug} -ne 0 ]
-    then
+    if [ ${dodebug} -eq 2 ]; then
 	cat ${logfile}
     fi
     return ${retcode}
