@@ -45,7 +45,8 @@ skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
 	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
 	pseries:pseries_defconfig:little:mmc:rootfs \
-	pseries:pseries_defconfig:little:nvme:rootfs"
+	pseries:pseries_defconfig:little:nvme:rootfs \
+	pseries:pseries_defconfig:little:usb:rootfs"
 skip_44="powernv:powernv_defconfig:initrd \
 	pseries:pseries_defconfig:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:initrd \
@@ -54,7 +55,8 @@ skip_44="powernv:powernv_defconfig:initrd \
 	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
 	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
 	pseries:pseries_defconfig:little:mmc:rootfs \
-	pseries:pseries_defconfig:little:nvme:rootfs"
+	pseries:pseries_defconfig:little:nvme:rootfs \
+	pseries:pseries_defconfig:little:usb:rootfs"
 skip_49="pseries:pseries_defconfig:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:sata-sii3112:rootfs"
 
