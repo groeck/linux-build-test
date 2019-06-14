@@ -173,6 +173,13 @@ __common_usbcmd()
 	extra_params+=" -usb -device usb-storage,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
+    usb[0-9])
+	# Same as "usb", but with explicit bus number
+	# The above must not be in quotes to enable pattern matching
+	extra_params+=" -usb"
+	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${fixup#usb}"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
     "usb-hub")
 	extra_params+=" -usb -device usb-hub,bus=usb-bus.0,port=2"
 	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
