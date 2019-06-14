@@ -114,6 +114,8 @@ fi
 
 runkernel 24Kf malta_defconfig smp:usb-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
+runkernel 24Kf malta_defconfig smp:usb-ehci rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
 runkernel 24Kc malta_defconfig smp:usb-uas-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 runkernel 24KEc malta_defconfig smp:mmc rootfs-mipselr1.ext2.gz
