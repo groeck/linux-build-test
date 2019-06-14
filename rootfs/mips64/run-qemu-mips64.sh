@@ -27,6 +27,7 @@ PATH=${PATH_MIPS}:${PATH}
 skip_316="mips64:malta_defconfig:initrd \
 	mips64:malta_defconfig:smp:ide:rootfs \
 	mips64:malta_defconfig:smp:usb-xhci:rootfs \
+	mips64:malta_defconfig:smp:usb-ehci:rootfs \
 	mips64:malta_defconfig:smp:scsi[53C810]:rootfs \
 	mips64:malta_defconfig:smp:scsi[DC395]:rootfs \
 	mips64:malta_defconfig:smp:scsi[AM53C974]:rootfs \
@@ -144,6 +145,8 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 
 runkernel malta_defconfig smp:usb-xhci rootfs-n32.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig smp:usb-ehci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:usb-uas-xhci rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
