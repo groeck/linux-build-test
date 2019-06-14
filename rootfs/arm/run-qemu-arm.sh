@@ -387,6 +387,10 @@ runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.ext2 manual ::usb1:mem256 imx7d-sdb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel multi_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.ext2 manual ::sd:mem256 imx7d-sdb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
