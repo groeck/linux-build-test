@@ -158,6 +158,8 @@ runkernel malta_defconfig malta rootfs.mipsel64r1.iso r1:smp:ide
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-xhci
 retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-ehci
+retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-uas-xhci
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:mmc
