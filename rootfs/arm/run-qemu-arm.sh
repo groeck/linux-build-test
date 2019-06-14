@@ -61,6 +61,10 @@ patch_defconfig()
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
 
+    # Build CONFIG_NOP_USB_XCEIV into kernel if enabled
+    # Needed for mcimx7d-sabre usb boot
+    sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
+
     for fixup in ${fixups}; do
         case "${fixup}" in
 	nofdt)
@@ -377,6 +381,10 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.ext2 manual ::usb1:mem256 imx7d-sdb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
