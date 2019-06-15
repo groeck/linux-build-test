@@ -378,6 +378,10 @@ runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel multi_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual ::mmc1:mem256 imx6dl-sabrelite.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
