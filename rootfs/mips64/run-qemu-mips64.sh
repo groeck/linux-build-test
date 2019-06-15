@@ -135,7 +135,7 @@ runkernel malta_defconfig smp rootfs-n32.cpio.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -172,7 +172,7 @@ retcode=$((retcode + $?))
 
 runkernel malta_defconfig nosmp:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nosmp:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nosmp:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

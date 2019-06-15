@@ -120,7 +120,7 @@ runkernel malta_defconfig smp:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:mmc rootfs.ext2.gz
+runkernel malta_defconfig smp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:scsi[53C810] rootfs.ext2.gz
 retcode=$((retcode + $?))

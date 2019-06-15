@@ -123,7 +123,7 @@ runkernel defconfig smp4:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:efi:mem4G:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:efi:mem4G:sdhci:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 runkernel defconfig smp4:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
@@ -159,7 +159,7 @@ runkernel defconfig preempt:smp4:efi:mem2G:virtio Icelake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig preempt:smp8:mem4G:nvme Icelake-Server q35 rootfs.btrfs
 retcode=$((${retcode} + $?))
-runkernel defconfig preempt:smp2:efi32:mem1G:mmc Skylake-Client-IBRS q35 rootfs.iso
+runkernel defconfig preempt:smp2:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.iso
 retcode=$((${retcode} + $?))
 runkernel defconfig preempt:smp6:mem512 KnightsMill q35 rootfs.cpio
 retcode=$((${retcode} + $?))

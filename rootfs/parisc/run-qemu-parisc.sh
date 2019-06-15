@@ -84,7 +84,7 @@ retcode=0
 runkernel defconfig smp rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:mmc rootfs.ext2.gz
+runkernel defconfig smp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:nvme rootfs.ext2.gz
@@ -140,7 +140,7 @@ checkstate ${retcode}
 runkernel defconfig nosmp rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:mmc rootfs.ext2.gz
+runkernel defconfig nosmp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:nvme rootfs.ext2.gz

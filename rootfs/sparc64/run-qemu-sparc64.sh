@@ -103,7 +103,7 @@ runkernel sparc64_defconfig sun4u smp:ata rootfs.iso.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:ata rootfs.squashfs
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:mmc rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))

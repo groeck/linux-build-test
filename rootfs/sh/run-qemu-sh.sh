@@ -112,7 +112,7 @@ runkernel rts7751r2dplus_defconfig "" rootfs.cpio.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig mmc rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig nvme rootfs.ext2.gz
 retcode=$((retcode + $?))

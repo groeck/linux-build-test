@@ -44,7 +44,7 @@ skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
 	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:mmc:rootfs \
+	pseries:pseries_defconfig:little:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:little:nvme:rootfs \
 	pseries:pseries_defconfig:little:usb:rootfs"
 skip_44="powernv:powernv_defconfig:initrd \
@@ -54,7 +54,7 @@ skip_44="powernv:powernv_defconfig:initrd \
 	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
 	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:mmc:rootfs \
+	pseries:pseries_defconfig:little:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:little:nvme:rootfs \
 	pseries:pseries_defconfig:little:usb:rootfs"
 skip_49="pseries:pseries_defconfig:sata-sii3112:rootfs \
@@ -169,7 +169,7 @@ retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_book3s_defconfig smp:ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 # Upstream qemu generates a traceback during reboot.
@@ -189,7 +189,7 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig usb pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig mmc pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig sdhci:mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig nvme pseries POWER9 hvc0 vmlinux \
@@ -216,7 +216,7 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little:scsi[FUSION] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:mmc pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little:sdhci:mmc pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little:nvme pseries POWER8 hvc0 vmlinux \
@@ -236,7 +236,7 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500:nvme ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:mmc ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500:sdhci:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500:scsi[53C895A] ppce500 e5500 ttyS0 \

@@ -132,7 +132,7 @@ runkernel defconfig smp4:usb SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:usb-uas Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:efi32:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:efi32:sdhci:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 runkernel defconfig smp4:scsi[DC395] Conroe q35 rootfs.ext2
@@ -172,7 +172,7 @@ runkernel defconfig pae:nosmp pentium3 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig pae:nosmp:nvme pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig pae:nosmp:efi32:mmc coreduo q35 rootfs.ext2
+runkernel defconfig pae:nosmp:efi32:sdhci:mmc coreduo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}

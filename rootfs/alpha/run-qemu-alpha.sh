@@ -85,7 +85,7 @@ runkernel defconfig devtmpfs busybox-alpha.cpio
 retcode=$?
 runkernel defconfig ide rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig mmc rootfs.ext2
+runkernel defconfig sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig usb-ohci rootfs.ext2
 retcode=$((retcode + $?))

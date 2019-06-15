@@ -242,23 +242,31 @@ __common_mmccmd()
 {
     local fixup="$1"
     local rootfs="$2"
+    local rootdev="/dev/mmcblk0"
 
     case "${fixup}" in
-    "mmc")
-	extra_params+=" -device sdhci-pci${__pcibus} -device sd-card,drive=d0"
-	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+    "sdhci")
+	extra_params+=" -device sdhci-pci${__pcibus}"
 	;;
-    "sd")	# similar to mmc, but does not need sdhci-pci
+    mmc*)
+	local devindex=${fixup#mmc}
+	extra_params+=" -device sd-card,drive=d0"
+	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+	if [[ -n "${devindex}" ]]; then
+	    rootdev="/dev/mmcblk${devindex}"
+	fi
+	;;
+    "sd")	# similar to mmc, but does not need sd-card; uses if=sd
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
 	;;
-    "sd1")	# sd at index 1
-	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=1"
+    sd[0-9])	# sd drive at index [0-9]
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=${fixup#sd}"
 	;;
     *)
 	;;
     esac
 
-    initcli+=" root=/dev/mmcblk0 rootwait"
+    initcli+=" root=${rootdev} rootwait"
 }
 
 __common_satacmd()
@@ -342,7 +350,7 @@ __common_diskcmd()
 	initcli+=" root=/dev/${hddev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
-    "mmc"|"sd"|"sd1")
+    mmc*|sd*|"sdhci")
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
     "nvme")
@@ -373,7 +381,7 @@ __common_fixup()
     local rootfs="${2}"
 
     case "${fixup}" in
-    "mmc"|"sd"|"sd1"|"nvme"|\
+    mmc*|sd*|"sdhci"|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
@@ -435,9 +443,13 @@ __common_fixups()
 # using common fixup strings.
 # Supports:
 # - initrd / rootfs separation
-# - mmc/sd/sd1
-#   Difference: mmc instantiates sdhci-pci; sd/sd1 doesn't.
-#   sd1 instantiates the drive at index 1.
+# - mmc/mmc[0-9]/sd/sd[0-9]/sdhci
+#   Difference:
+#   - sdhci instantiates sdhci-pci, as pre-requisite of mmc
+#   - mmc/mmc[0-9] instantiates sd-card
+#     mmc[0-9] uses mmcblk[0-9] as root device
+#   - sd/sd[0-9] uses if=sd
+#   sd[0-9] instantiates the drive at index [0-9].
 # - ata/sata/sata-cmd646
 #   Difference: sata instantiates ide-hd, ata doesn't.
 #   sata-cmd646 also instantiates cmd-646 (a PCI sata/ide controller)

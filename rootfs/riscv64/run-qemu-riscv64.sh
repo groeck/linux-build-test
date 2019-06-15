@@ -102,7 +102,7 @@ runkernel virt defconfig virtio rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig mmc rootfs.ext2
+runkernel virt defconfig sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig nvme rootfs.ext2
 retcode=$((retcode + $?))

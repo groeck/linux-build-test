@@ -118,7 +118,7 @@ retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # Most likely those are all PCI bus endianness translation issues.
     # SD card does not instantiate
-    runkernel rts7751r2dplus_defconfig mmc rootfs.ext2
+    runkernel rts7751r2dplus_defconfig sdhci:mmc rootfs.ext2
     retcode=$((retcode + $?))
     # nvme nvme0: Device not ready; aborting initialisation
     # nvme nvme0: Removing after probe failure status: -19

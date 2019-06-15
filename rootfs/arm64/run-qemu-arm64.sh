@@ -29,7 +29,7 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp6:mem512:virtio:rootfs \
 	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
 	virt:defconfig:smp2:mem512:nvme:rootfs \
-	virt:defconfig:smp4:mem512:mmc:rootfs \
+	virt:defconfig:smp4:mem512:sdhci:mmc:rootfs \
 	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
 	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
@@ -160,7 +160,7 @@ runkernel virt defconfig smp:mem512:virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:mem512:nvme rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:mem512:mmc rootfs.ext2.gz
+runkernel virt defconfig smp4:mem512:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:mem512:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))

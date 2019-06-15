@@ -83,7 +83,7 @@ runkernel()
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local rbuild="${mach}:${defconfig}${fixup:+:${fixup}}"
-    local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|mmc|nvme))/}"
+    local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|sdhci|mmc|nvme))/}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	rbuild+=":initrd"
@@ -179,7 +179,7 @@ runkernel mpc85xx_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig sata-sii3112 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig mmc mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig sdhci:mmc mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
@@ -218,7 +218,7 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 runkernel 44x/bamboo_defconfig "smp:scsi[FUSION]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp:mmc" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:sdhci:mmc" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp:nvme" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
@@ -226,7 +226,7 @@ runkernel 44x/canyonlands_defconfig "" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig usb sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig mmc sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig sdhci:mmc sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig nvme sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
@@ -252,7 +252,7 @@ runkernel pmac32_defconfig zilog:ide mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:usb mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:mmc mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:sdhci:mmc mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:nvme mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
