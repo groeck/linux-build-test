@@ -27,23 +27,40 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_316="arm:mcimx6ul-evk:imx_v6_v7_defconfig \
-	arm:mcimx7d-sabre:multi_v7_defconfig \
+skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
+	arm:cubieboard:multi_v7_defconfig:usb:mem128 \
+	arm:cubieboard:multi_v7_defconfig:sata:mem128 \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:raspi2:multi_v7_defconfig \
-	arm:virt:multi_v7_defconfig \
-	arm:realview-pbx-a9:realview_defconfig"
+	arm:raspi2:multi_v7_defconfig:sd \
+	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
+	arm:virt:multi_v7_defconfig:virtio-blk:mem512  \
+	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_44="arm:raspi2:multi_v7_defconfig \
-	arm:mcimx7d-sabre:multi_v7_defconfig \
-	arm:virt:multi_v7_defconfig \
-	arm:realview-pbx-a9:realview_defconfig"
-skip_49="arm:ast2500-evb:aspeed_g5_defconfig \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig \
-	arm:mcimx7d-sabre:multi_v7_defconfig \
+	arm:raspi2:multi_v7_defconfig:sd \
+	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
+	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
+	arm:realview-pbx-a9:realview_defconfig:realview_pb"
+skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
-	arm:romulus-bmc:aspeed_g5_defconfig \
-	arm:witherspoon-bmc:aspeed_g5_defconfig"
-skip_414="arm:mcimx7d-sabre:multi_v7_defconfig \
-	arm:witherspoon-bmc:aspeed_g5_defconfig"
+	arm:romulus-bmc:aspeed_g5_defconfig:notests \
+	arm:witherspoon-bmc:aspeed_g5_defconfig:notests"
+skip_414="arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
+	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:witherspoon-bmc:aspeed_g5_defconfig:notests"
 
 . ${progdir}/../scripts/common.sh
 
@@ -147,8 +164,8 @@ runkernel()
     local retcode
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local build="${ARCH}:${mach}:${defconfig}"
-    local pbuild="${build}${fixup:+:${fixup}}${dtb:+:${dtb%.dtb}}"
+    local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local pbuild="${build}${dtb:+:${dtb%.dtb}}"
     local QEMUCMD="${QEMU}"
     local PREFIX="${PREFIX_A}"
     if [[ "${cpu}" = "cortex-m3" ]]; then
@@ -165,6 +182,7 @@ runkernel()
     fi
 
     pbuild="${pbuild//+(:)/:}"
+    build="${build//+(:)/:}"
 
     if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
 	echo "Skipping ${pbuild} ... "
