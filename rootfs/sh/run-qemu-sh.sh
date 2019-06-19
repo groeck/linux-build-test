@@ -28,7 +28,8 @@ v4.19)
 	PATH_SH=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
 	;;
 *)
-	PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
+	PATH_SH=/opt/kernel/gcc-9.1.0-nolibc/sh4-linux/bin
+	# PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
 	# earlycon only works with v4.20+ and otherwise results in a crash.
 	CONFIG="CONFIG_SERIAL_SH_SCI_EARLYCON=y"
 	EARLYCON="earlycon=scif,mmio16,0xffe80000"
