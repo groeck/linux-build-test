@@ -11,7 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
+QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-i386}
 ARCH=i386
 
 # Older releases don't like gcc 6+
