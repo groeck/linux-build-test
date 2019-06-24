@@ -173,21 +173,26 @@ then
     checkexit $?
 fi
 
-if [ "$1" = "v4.0" ]; then
+if [ -z "$1" -o "$1" = "v4.0" ]; then
     dobuild v4.0.0-local v4.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough"
+	--disable-xen --disable-xen-pci-passthrough \
+	--disable-strip --extra-cflags=-g"
     checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
     dobuild v4.0.0-q800 v4.0-m68k \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-strip --extra-cflags=-g \
 	--target-list=m68k-softmmu"
     checkexit $?
 fi
 
-if [ "$1" = "master" ]; then
+if [ -z "$1" -o "$1" = "master" ]; then
     dobuild master-local master \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
