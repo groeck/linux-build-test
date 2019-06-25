@@ -260,7 +260,8 @@ runkernel()
 	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
 	;;
     "z2")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+        # dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+        dd if=/dev/zero of=/tmp/flash bs=262144 count=32 >/dev/null 2>&1
 	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
 	initcli+=" console=ttyS0"
 	;;
