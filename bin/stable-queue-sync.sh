@@ -88,6 +88,12 @@ do_import()
 	return 0
 }
 
+# Auto-clean repository if needed
+if [[ -e .git/gc.log ]]; then
+	git prune
+	rm -f .git/gc.log
+fi
+
 rv=0
 for rel in ${releases[*]}
 do
