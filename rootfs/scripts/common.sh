@@ -5,6 +5,8 @@ __skip_dc395=0
 
 shopt -s extglob
 
+ulimit -c unlimited
+
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
 __basedir="${__progdir}/.."
@@ -787,6 +789,8 @@ __setup_fragment()
     if [[ "${nofs}" -eq 0 ]]; then
 	# file systems
 	echo "CONFIG_BTRFS_FS=y" >> ${fragment}
+	# Needed to address broken dependencies in -next (around 20190708)
+	echo "CONFIG_LIBCRC32C=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
@@ -1057,6 +1061,30 @@ dowait()
     fi
     if grep -q "stack backtrace" ${logfile}; then
 	dolog=1
+    fi
+
+    # Store coredump in well defined location
+    if [[ -e core ]]; then
+	dolog=1
+	mkdir -p /tmp/coredumps
+	# Wait until coredump is complete
+	sleep 1
+	while lsof core >/dev/null 2>&1; do
+	    sleep 1
+	done
+	# Sometimes the core dump still has a size of 0.
+	# No idea what is going on, but let's wait a little longer.
+	if [[ ! -s core ]]; then
+	    sleep 10
+	    while lsof core >/dev/null 2>&1; do
+	        sleep 1
+	    done
+	fi
+	# There is no value in saving zero size core dumps
+	if [[ -s core ]]; then
+	    gzip core
+	    mv core.gz /tmp/coredumps/core.$(basename ${QEMU}).${pid}.gz
+	fi
     fi
 
     if [ ${dolog} -ne 0 ]
