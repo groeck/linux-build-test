@@ -20,16 +20,16 @@ do_import()
 	source_s=""
 	case "${release}" in
 	"3.10" | "4.1")
-		source=origin/linux-${release}.y-queue
+		source="origin/linux-${release}.y-queue"
 		;;
 	*)
-		source=origin/linux-${release}.y
-		source_s=stable/linux-${release}.y
+		source="origin/linux-${release}.y"
+		source_s="stable/linux-${release}.y"
 		;;
 	esac
 
 	echo "Importing ${release}"
-	echo source: ${source} target: ${target}
+	echo "source: ${source} target: ${target}"
 
 	# Add local repository to remote only if needed
 	git remote | grep -q local || {
@@ -43,19 +43,14 @@ do_import()
 
 	git fetch --all
 	# Check if source branch exists. If not, there is nothing we can do.
-	git branch -r | grep -q ${source}  >/dev/null 2>&1
-	if [ $? -ne 0 ]
-	then
-		if [ -z ${source_s} ]
-		then
-			echo "Source branch does not exist, aborting."
+	if ! git branch -r | grep -q "${source}" >/dev/null 2>&1; then
+		if [ -z "${source_s}" ]; then
+			echo "Source branch does not exist, skipping."
 			return 1
 		fi
 		echo "Source branch does not exist in ${source}, checking ${source_s}."
-		git branch -r | grep -q ${source_s}  >/dev/null 2>&1
-		if [ $? -ne 0 ]
-		then
-			echo "Source branch does not exist, aborting."
+		if ! git branch -r | grep -q "${source_s}" >/dev/null 2>&1; then
+			echo "Source branch does not exist, skipping."
 			return 1
 		fi
 		source=${source_s}
@@ -64,22 +59,16 @@ do_import()
 	# If not, we have to create it first
 	# Note: "git push local ${source}:${target}" does not work
 	# if ${target} does not exist.
-	git branch -r | grep -q local/${target} >/dev/null 2>&1
-	if [ $? -ne 0 ]
-	then
-		git checkout -b ${target} ${source}
-		if [ $? -ne 0 ]
-		then
+	if ! git branch -r | grep -q "local/${target}" >/dev/null 2>&1; then
+		if ! git checkout -b "${target}" "${source}"; then
 		    return 1
 		fi
-		git push local ${target}
+		git push local "${target}"
 		return $?
 	else
-		git push local ${source}:${target}
-		if [ $? -ne 0 ]
-		then
+		if ! git push local "${source}:${target}"; then
 			echo "push failed, retrying with force"
-			git push --force local ${source}:${target}
+			git push --force local "${source}:${target}"
 			return $?
 		fi
 	fi
@@ -98,7 +87,7 @@ rv=0
 for rel in ${releases[*]}
 do
 	do_import ${rel}
-	rv=$((${rv} + $?))
+	rv=$((rv + $?))
 done
 
 echo "$(date): complete"
