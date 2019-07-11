@@ -1085,6 +1085,8 @@ dowait()
 	    gzip core
 	    mv core.gz /tmp/coredumps/core.$(basename ${QEMU}).${pid}.gz
 	fi
+	# clear out leftover empty core files
+	rm -f core
     fi
 
     if [ ${dolog} -ne 0 ]
