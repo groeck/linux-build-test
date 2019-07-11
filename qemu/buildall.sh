@@ -1,3 +1,9 @@
+#!/bin/bash
+
+# This makes sure that all CPUs are busy without overloading the system
+# too much.
+parallel=$(($(nproc) * 3 / 2))
+
 checkexit()
 {
 	if [ $1 -ne 0 ]; then
@@ -18,31 +24,37 @@ dobuild()
 	echo installdir: ${installdir}
 	echo options: ${options}
 
-	git clean -d -x -f -q
+	# Some odd changes between releases require this directory to be
+	# clean/removed.
+	# If it isn't, changing the branch may fail.
+	rm -rf slirp
+	# Clean up as much as we can. Yes, that will remove any uncommitted
+	# changes, but it is necessary to be able to switch between branches.
+	git reset --hard HEAD >/dev/null 2>&1
+	git clean -d -x -f -q >/dev/null 2>&1
 	if ! git checkout ${branch}; then
 	    echo "Unable to check out ${branch}"
 	    return 1
 	fi
-	if [ -z "${targets}" ]
-	then
-	    ./configure --prefix=${prefix} ${options}
+	if [ -z "${targets}" ]; then
+	    if ! ./configure --prefix=${prefix} ${options}; then
+		return 1
+	    fi
 	else
 	    echo targets: ${targets}
-	    ./configure --prefix=${prefix} ${options} --target-list="${targets}"
+	    if ! ./configure --prefix=${prefix} ${options} --target-list="${targets}"; then
+		return 1
+	    fi
 	fi
-	rv=$?
-	if [ ${rv} -ne 0 ]
-	then
-		return ${rv}
+	if ! make -j${parallel} install; then
+	    return 1
 	fi
-	make -j20 install
-	return $?
+	return 0
 }
 
 if [ ! -d .git -o ! -f qemu-io.c ]
 then
-	if [ ! -d qemu ]
-	then
+	if [ ! -d qemu ]; then
 		echo "Bad directory"
 		exit 1
 	fi
@@ -59,7 +71,7 @@ then
 	--disable-vnc-png \
 	--target-list=meta-softmmu
     checkexit $?
-    make -j20 install
+    make -j${parallel} install
     checkexit $?
 fi
 
@@ -75,7 +87,7 @@ then
 	--disable-curl \
 	--target-list=arm-softmmu
     checkexit $?
-    make -j20 install
+    make -j${parallel} install
     checkexit $?
 fi
 
@@ -189,6 +201,15 @@ if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
 	--disable-xen --disable-xen-pci-passthrough \
 	--disable-strip --extra-cflags=-g \
 	--target-list=m68k-softmmu"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v4.1" ]; then
+    dobuild v4.1.0-local v4.1 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
 
