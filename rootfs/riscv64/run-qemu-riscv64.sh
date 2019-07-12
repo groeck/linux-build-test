@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
@@ -75,11 +75,11 @@ runkernel()
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -M virt -m 512M -no-reboot \
-	-bios "${progdir}/bbl" \
-	-kernel vmlinux \
+	-bios default \
+	-kernel arch/riscv/boot/Image \
 	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
 	${extra_params} \
-	-append "${initcli} console=ttyS0,115200" \
+	-append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200" \
 	-nographic -monitor none \
 	> ${logfile} 2>&1 &
     pid=$!
