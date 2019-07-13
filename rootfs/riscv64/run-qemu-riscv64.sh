@@ -42,7 +42,7 @@ runkernel()
     local fixup=$3
     local rootfs=$4
     local pid
-    local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
+    local waitlist=("Power off|Power down" "Boot successful" "Requesting system poweroff")
     local logfile="$(__mktemp)"
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
 
