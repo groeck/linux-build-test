@@ -1037,9 +1037,7 @@ dowait()
     then
 	for i in $(seq 0 $((${entries} - 1)))
 	do
-	    grep "${waitlist[$i]}" ${logfile} >/dev/null 2>&1
-	    if [ $? -ne 0 ]
-	    then
+	    if ! grep -q -E "${waitlist[$i]}" ${logfile}; then
 		msg="failed (No \"${waitlist[$i]}\" message in log)"
 		retcode=1
 		break
