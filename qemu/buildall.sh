@@ -209,6 +209,7 @@ if [ -z "$1" -o "$1" = "v4.1" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh \
 	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
@@ -218,6 +219,7 @@ if [ -z "$1" -o "$1" = "master" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh \
 	--enable-debug --disable-strip --extra-cflags=-g"
     checkexit $?
 fi
