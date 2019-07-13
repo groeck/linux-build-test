@@ -9,7 +9,8 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-riscv64}
+QEMU41=${QEMU:-${QEMU_V41_BIN}/qemu-system-riscv64}
+QEMU40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
@@ -72,11 +73,21 @@ runkernel()
 
     echo -n "running ..."
 
+    if [[ -e arch/riscv/boot/Image ]]; then
+	QEMU="${QEMU41}"
+	BIOS="default"
+	KERNEL="arch/riscv/boot/Image"
+    else
+	QEMU="${QEMU40}"
+	BIOS="${progdir}/bbl"
+	KERNEL="vmlinux"
+    fi
+
     [[ ${dodebug} -ne 0 ]] && set -x
 
     ${QEMU} -M virt -m 512M -no-reboot \
-	-bios default \
-	-kernel arch/riscv/boot/Image \
+	-bios "${BIOS}" \
+	-kernel "${KERNEL}" \
 	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
 	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200" \
