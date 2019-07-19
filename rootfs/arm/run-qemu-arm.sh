@@ -9,6 +9,7 @@ shift $((OPTIND - 1))
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
+QEMU_SWIFT=${QEMU:-${QEMU_V41_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -54,13 +55,10 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:palmetto-bmc:aspeed_g4_defconfig \
-	arm:romulus-bmc:aspeed_g5_defconfig:notests \
-	arm:witherspoon-bmc:aspeed_g5_defconfig:notests"
+	arm:palmetto-bmc:aspeed_g4_defconfig"
 skip_414="arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:witherspoon-bmc:aspeed_g5_defconfig:notests"
+	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
 
 . ${progdir}/../scripts/common.sh
 
@@ -202,16 +200,19 @@ runkernel()
 	return 1
     fi
 
+    # If a dtb file was specified but does not exist, skip the build.
+    local dtbcmd=""
+    if [[ -n "${dtb}" ]]; then
+        if [[ ! -e "${dtbfile}" ]]; then
+	    echo "skipped"
+	    return 0
+	fi
+	dtbcmd="-dtb ${dtbfile}"
+    fi
+
     rootfs="$(rootfsname ${rootfs})"
 
     echo -n "running ..."
-
-    # if we have a dtb file use it
-    local dtbcmd=""
-    if [ -n "${dtb}" -a -f "${dtbfile}" ]
-    then
-	dtbcmd="-dtb ${dtbfile}"
-    fi
 
     kernel="arch/arm/boot/zImage"
     case ${mach} in
@@ -237,6 +238,11 @@ runkernel()
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
 	initcli+=" console=ttyS4,115200"
 	extra_params+=" -nodefaults"
+	;;
+    "swift-bmc")
+	initcli+=" console=ttyS4,115200"
+	extra_params+=" -nodefaults"
+	QEMUCMD="${QEMU_SWIFT}"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
 	initcli+=" console=ttyS0"
@@ -557,6 +563,11 @@ checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel aspeed_g5_defconfig swift-bmc "" \
+	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
