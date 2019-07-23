@@ -51,6 +51,7 @@ trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT
 
 LOOPTIME=5	# Wait time before checking status
 MAXTIME=150	# Maximum wait time for qemu session to complete
+MAXSTIME=60	# Maximum wait time for qemu session to generate output
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -978,9 +979,12 @@ dowait()
     local entries=${#waitlist[*]}
     local retcode=0
     local t=0
+    local st=0
     local i
     local msg="passed"
     local dolog
+    local fsize=0
+    local fsize_tmp
 
     while true
     do
@@ -1021,6 +1025,19 @@ dowait()
 	    break
 	fi
 
+	fsize_tmp="$(stat -c "%s" ${logfile})"
+	if [[ "${fsize}" = "${fsize_tmp}" ]]; then
+	    if [[ ${st} -gt ${MAXSTIME} ]]; then
+		msg="failed (silent)"
+		dokill ${pid}
+		retcode=1
+		break
+	    fi
+	else
+	    fsize="${fsize_tmp}"
+	    st=0
+	fi
+
 	if [ $t -gt ${MAXTIME} ]
 	then
 		msg="failed (timeout)"
@@ -1029,7 +1046,8 @@ dowait()
 		break
 	fi
 	sleep ${LOOPTIME}
-	t=$(($t + ${LOOPTIME}))
+	t=$((t + ${LOOPTIME}))
+	st=$((st + ${LOOPTIME}))
 	echo -n .
     done
 
