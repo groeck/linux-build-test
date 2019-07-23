@@ -502,30 +502,16 @@ do
 	 	continue
 	fi
     	builds=$(expr ${builds} + 1)
-	# Auto-repeat a few times to handle internal compiler errors
-	# [Ryzen problem]
-	n=0
-	while true
-	do
-	  make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>${LOG}
-	  if [ $? -eq 0 ]
-	  then
-	    echo "passed"
-	    break
-	  fi
-	  grep -q -e "internal compiler error|Segmentation fault" ${LOG}
-	  if [ $? -ne 0 -o $n -gt 2 ]
-	  then
+	if ! make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>"${LOG}"; then
 	    echo "failed"
 	    echo "--------------"
 	    echo "Error log:"
-	    cat ${LOG}
+	    cat "${LOG}"
 	    echo "--------------"
 	    errors=$(expr ${errors} + 1)
-	    break
-	  fi
-	  n=$(expr $n + 1)
-	done
+	else
+	    echo "passed"
+	fi
 done
 
 # Clean up again to conserve disk space
