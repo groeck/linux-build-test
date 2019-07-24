@@ -60,7 +60,7 @@ PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
 
 BUILDDIR="$(mktemp -d /tmp/buildbot-builddir.XXXXX)"
-LOG="$(mktemp /tmp/buildlog.XXXXX)"
+LOG="/tmp/buildlog.stable-build-arch"
 
 trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT
 
@@ -516,6 +516,7 @@ done
 
 # Clean up again to conserve disk space
 git clean -d -f -x -q
+rm -rf "${BUILDDIR}" "${LOG}"
 
 echo
 echo "-----------------------"
