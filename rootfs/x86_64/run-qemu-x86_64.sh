@@ -97,6 +97,7 @@ runkernel()
 	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot \
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0" \
+	-d unimp,guest_errors \
 	-nographic > ${logfile} 2>&1 &
     pid=$!
 
