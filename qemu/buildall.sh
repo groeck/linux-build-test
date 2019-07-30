@@ -11,6 +11,18 @@ checkexit()
 	fi
 }
 
+rinse()
+{
+	git clean -d -x -f -q
+	git submodule foreach --recursive git clean -d -x -f -q
+	git reset --hard
+	git submodule foreach --recursive git reset --hard
+	# slirp doesn't always exist as submodule.
+	# If it does, it creates havoc if one tries to check out
+	# an older branch.
+	git submodule deinit slirp 2>/dev/null
+}
+
 dobuild()
 {
 	local branch=$1
@@ -24,14 +36,9 @@ dobuild()
 	echo installdir: ${installdir}
 	echo options: ${options}
 
-	# Some odd changes between releases require this directory to be
-	# clean/removed.
-	# If it isn't, changing the branch may fail.
-	rm -rf slirp
-	# Clean up as much as we can. Yes, that will remove any uncommitted
-	# changes, but it is necessary to be able to switch between branches.
-	git reset --hard HEAD >/dev/null 2>&1
-	git clean -d -x -f -q >/dev/null 2>&1
+	# Clean up as good as we can prior to checking out a different branch
+	rinse
+
 	if ! git checkout ${branch}; then
 	    echo "Unable to check out ${branch}"
 	    return 1
@@ -181,6 +188,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh --disable-slirp \
 	--target-list=m68k-softmmu"
     checkexit $?
 fi
@@ -190,6 +198,7 @@ if [ -z "$1" -o "$1" = "v4.0" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-slirp \
 	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
@@ -199,6 +208,7 @@ if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh --disable-slirp \
 	--disable-strip --extra-cflags=-g \
 	--target-list=m68k-softmmu"
     checkexit $?
@@ -209,7 +219,7 @@ if [ -z "$1" -o "$1" = "v4.1" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
+	--disable-libssh --disable-slirp \
 	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
@@ -219,7 +229,7 @@ if [ -z "$1" -o "$1" = "master" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
+	--disable-libssh --disable-slirp \
 	--enable-debug --disable-strip --extra-cflags=-g"
     checkexit $?
 fi
