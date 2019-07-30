@@ -70,6 +70,12 @@ skip_44="cris:allnoconfig cris:tinyconfig powerpc:allmodconfig"
 
 # fixups
 
+# h8300 declares CONFIG_BOOT_LINK_OFFSET= without value. This is invalid,
+# since the symbol is declared as hex, and can't be fixed with olddefconfig.
+# This in turn results in an endless loop when building an image with
+# stdin=/dev/null.
+fixup_h8300=("/CONFIG_BOOT_LINK_OFFSET/d")
+
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
