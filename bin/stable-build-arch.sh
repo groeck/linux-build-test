@@ -75,6 +75,10 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
+# Limit file size to ~100 MB to prevent log file sizes from getting
+# out of control.
+ulimit -f $((100*1024))
+
 configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
