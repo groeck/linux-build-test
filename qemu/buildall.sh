@@ -188,7 +188,7 @@ then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh --disable-slirp \
+	--disable-libssh \
 	--target-list=m68k-softmmu"
     checkexit $?
 fi
@@ -198,7 +198,6 @@ if [ -z "$1" -o "$1" = "v4.0" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-slirp \
 	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
@@ -208,7 +207,7 @@ if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh --disable-slirp \
+	--disable-libssh \
 	--disable-strip --extra-cflags=-g \
 	--target-list=m68k-softmmu"
     checkexit $?
@@ -219,7 +218,7 @@ if [ -z "$1" -o "$1" = "v4.1" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh --disable-slirp \
+	--disable-libssh \
 	--disable-strip --extra-cflags=-g"
     checkexit $?
 fi
@@ -229,7 +228,7 @@ if [ -z "$1" -o "$1" = "master" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh --disable-slirp \
+	--disable-libssh \
 	--enable-debug --disable-strip --extra-cflags=-g"
     checkexit $?
 fi
