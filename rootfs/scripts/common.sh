@@ -616,8 +616,7 @@ __setup_config()
 	cp ${__progdir}/${defconfig} arch/${arch}/configs
     fi
 
-    make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null
-    if [ $? -ne 0 ]; then
+    if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null; then
 	return 2
     fi
 
@@ -965,7 +964,7 @@ dosetup()
 	echo "failed"
 	echo "------------"
 	echo "Error log:"
-	cat ${logfile}
+	head -1000 ${logfile}
 	echo "------------"
     fi
 
@@ -1113,7 +1112,7 @@ dowait()
     then
 	echo "------------"
 	echo "qemu log:"
-	cat ${logfile}
+	head -5000 ${logfile}
 	echo "------------"
     fi
     return ${retcode}
