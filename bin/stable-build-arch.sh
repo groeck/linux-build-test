@@ -75,9 +75,10 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
-# Limit file size to ~100 MB to prevent log file sizes from getting
-# out of control.
-ulimit -f $((100*1024))
+# Limit file size to ~1.2 GB to prevent log file sizes from getting
+# out of control while at the same time supporting large allyesconfig
+# images (which can reach 1 GB).
+ulimit -f $((1200*1024))
 
 configcmd="olddefconfig"
 
@@ -433,10 +434,10 @@ do
 	# perf build is special. Use host gcc and build based on defconfig.
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
 	    if ! make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>${LOG}; then
-		echo "failed"
+		echo "failed (config)"
 		echo "--------------"
 		echo "Error log:"
-		cat ${LOG}
+		head -100 ${LOG}
 		echo "--------------"
 		continue
 	    fi
@@ -456,7 +457,7 @@ do
 		    echo "failed"
 		    echo "--------------"
 		    echo "Error log:"
-		    cat ${LOG}
+		    head -1000 ${LOG}
 		    echo "--------------"
 		    errors=$(expr ${errors} + 1)
 	    else
@@ -466,7 +467,7 @@ do
 	    continue
 	fi
 
-	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} >${LOG} 2>&1; then
+	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} </dev/null >${LOG} 2>&1; then
 	    # Only report an error if the default configuration
 	    # does not exist.
 	    if grep -q "No rule to make target" ${LOG}; then
@@ -474,14 +475,14 @@ do
 	    elif grep -q "Can't find default configuration" ${LOG}; then
 	        echo "failed (config) - skipping"
 	    else
-	        echo "failed"
+	        echo "failed (config)"
 		echo "--------------"
 		echo "Error log:"
-		cat ${LOG}
+		head -100 ${LOG}
 		echo "--------------"
 	    fi
-	     i=$(expr $i + 1)
-	     continue
+	    i=$(expr $i + 1)
+	    continue
 	fi
 	# run config file fixups if necessary
 	if [ ${#fixup[*]} -gt 0 ]; then
@@ -495,22 +496,20 @@ do
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
 	then
-		. ${basedir}/branches/${BRANCH}/setup.sh ${ARCH} ${BRANCH} ${BUILDDIR}
+	    . ${basedir}/branches/${BRANCH}/setup.sh ${ARCH} ${BRANCH} ${BUILDDIR}
 	fi
 
-	make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} "${configcmd}" >/dev/null 2>&1
-	if [ $? -ne 0 ]
-	then
-	        echo "failed (${configcmd}) - skipping"
-	 	i=$(expr $i + 1)
-	 	continue
+	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} "${configcmd}" </dev/null >/dev/null 2>&1; then
+	    echo "failed (${configcmd}) - skipping"
+	    i=$(expr $i + 1)
+	    continue
 	fi
     	builds=$(expr ${builds} + 1)
-	if ! make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} >/dev/null 2>"${LOG}"; then
+	if ! make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} </dev/null >/dev/null 2>"${LOG}"; then
 	    echo "failed"
 	    echo "--------------"
 	    echo "Error log:"
-	    cat "${LOG}"
+	    head -10000 "${LOG}"
 	    echo "--------------"
 	    errors=$(expr ${errors} + 1)
 	else
