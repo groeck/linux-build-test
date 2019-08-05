@@ -13,8 +13,17 @@ variant=$2
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips-linux/bin
-PREFIX=mips-linux-
+
+case ${rel} in
+v3.16)
+	PATH_MIPS=/opt/kernel/gcc-4.9.0-nolibc/mips64-linux/bin
+	;;
+*)
+	PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
+	;;
+esac
+
+PREFIX=mips64-linux-
 cpu="-cpu 5KEc"
 
 # machine specific information
