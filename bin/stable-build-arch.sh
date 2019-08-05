@@ -75,10 +75,10 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
-# Limit file size to ~1.2 GB to prevent log file sizes from getting
-# out of control while at the same time supporting large allyesconfig
-# images (which can reach 1 GB).
-ulimit -f $((1200*1024))
+# Limit file size to ~3.5 GB to prevent log file sizes from getting
+# out of control while at the same time supporting large images
+# (x86_64/allyesconfig: above 1GB, cris/defconfig: 3.2GB).
+ulimit -f $((3500*1024))
 
 configcmd="olddefconfig"
 
