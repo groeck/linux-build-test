@@ -10,7 +10,7 @@ machine=$1
 option=$2
 config=$3
 
-QEMU=${QEMU:-${QEMU_V31_BIN}/qemu-system-aarch64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
