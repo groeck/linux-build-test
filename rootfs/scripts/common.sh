@@ -646,9 +646,11 @@ __setup_fragment()
     local fragment="$1"
     local fixups="${2//:/ }"
     local fixup
+    local nocd=0
     local nodebug=0
     local nofs=0
     local nolocktests=0
+    local nonvme=0
     local noscsi=0
     local notests=0
     local nousb=0
@@ -667,8 +669,10 @@ __setup_fragment()
 	    echo "CONFIG_SMP=y" >> ${fragment}
 	    ;;
 	nodebug) nodebug=1 ;;
+	nocd) nocd=1 ;;
 	nofs) nofs=1 ;;
 	nolocktests) nolocktests=1 ;;
+	nonvme) nonvme=1 ;;
 	noscsi) noscsi=1 ;;
 	notests) notests=1 ;;
 	nousb) nousb=1 ;;
@@ -759,13 +763,17 @@ __setup_fragment()
     echo "CONFIG_MMC_SDHCI=y" >> ${fragment}
     echo "CONFIG_MMC_SDHCI_PCI=y" >> ${fragment}
 
-    # NVME support
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
+    if [[ "${nonvme}" -eq 0 ]]; then
+	# NVME support
+	echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
+    fi
 
-    # CDROM support
-    echo "CONFIG_BLK_DEV_SR=y" >> ${fragment}
-    echo "CONFIG_ISO9660_FS=y" >> ${fragment}
-    echo "CONFIG_CDROM=y" >> ${fragment}
+    if [[ "${nocd}" -eq 0 ]]; then
+	# CDROM support
+	echo "CONFIG_BLK_DEV_SR=y" >> ${fragment}
+	echo "CONFIG_ISO9660_FS=y" >> ${fragment}
+	echo "CONFIG_CDROM=y" >> ${fragment}
+    fi
 
     if [[ "${nousb}" -eq 0 ]]; then
 	# USB support
