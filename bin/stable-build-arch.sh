@@ -3,54 +3,51 @@
 basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
-PATH_ALPHA=/opt/kernel/gcc-8.3.0-nolibc/alpha-linux/bin
-PATH_AM33=/opt/kernel/gcc-4.6.3-nolibc/am33_2.0-linux/bin
-PATH_ARM=/opt/kernel/gcc-8.3.0-nolibc/arm-linux-gnueabi/bin
-PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
-PATH_ARC=/opt/kernel/gcc-8.3.0-nolibc/arc-linux/bin
-PATH_ARCV2=/opt/kernel/gcc-8.3.0-nolibc/arcv2-linux/bin
-PATH_BFIN=/opt/kernel/gcc-4.6.3-nolibc/bfin-uclinux/bin
+PATH_ALPHA=/opt/kernel/gcc-9.2.0-nolibc/alpha-linux/bin
+PATH_AM33=/opt/kernel/gcc-9.2.0-nolibc/am33_2.0-linux/bin
+PATH_ARM=/opt/kernel/gcc-9.2.0-nolibc/arm-linux-gnueabi/bin
+PATH_ARM64=/opt/kernel/gcc-9.2.0-nolibc/aarch64-linux/bin
+PATH_ARC=/opt/kernel/gcc-9.2.0-nolibc/arc-linux/bin
+PATH_ARCV2=/opt/kernel/gcc-9.2.0-nolibc/arcv2-linux/bin
+PATH_BFIN=/opt/kernel/gcc-9.2.0-nolibc/bfin-uclinux/bin
+# Repeatable ICE with gcc 9.2.0
+# PATH_C6X=/opt/kernel/gcc-9.2.0-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
-PATH_CRIS=/opt/kernel/gcc-4.6.3-nolibc/cris-linux/bin
+PATH_CRIS=/opt/kernel/gcc-9.2.0-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
-PATH_CSKY=/opt/kernel/csky/gcc-6.3.0/bin
-PATH_FRV=/opt/kernel/gcc-4.6.3-nolibc/frv-linux/bin
-PATH_H8300=/opt/kernel/gcc-8.3.0-nolibc/h8300-linux/bin
+PATH_CSKY=/opt/kernel/gcc-9.2.0-nolibc/csky-linux/bin
+PATH_FRV=/opt/kernel/gcc-9.2.0-nolibc/frv-linux/bin
+PATH_H8300=/opt/kernel/gcc-9.2.0-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
+# Repeatable ICE with gcc-9.2.0
+# PATH_IA64=/opt/kernel/gcc-9.2.0-nolibc/ia64-linux/bin
 PATH_IA64=/opt/kernel/gcc-8.3.0-nolibc/ia64-linux/bin
-PATH_M32R=/opt/kernel/gcc-4.6.3-nolibc/m32r-linux/bin
-# gcc 8.3.0 insists replacing strncmp with strcmp and then
-# doesn't find strcmp (m68k only).
-# PATH_M68=/opt/kernel/gcc-8.3.0-nolibc/m68k-linux/bin
-PATH_M68=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
+PATH_M32R=/opt/kernel/gcc-9.2.0-nolibc/m32r-linux/bin
+PATH_M68=/opt/kernel/gcc-9.2.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
-PATH_MICROBLAZE=/opt/kernel/gcc-8.3.0-nolibc/microblaze-linux/bin
-PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
-# gcc-8.3.0 doesn't build for nds32.
+PATH_MICROBLAZE=/opt/kernel/gcc-9.2.0-nolibc/microblaze-linux/bin
+PATH_MIPS=/opt/kernel/gcc-9.2.0-nolibc/mips64-linux/bin
+# gcc-8.2.0 and 8.3.0 don't build for nds32.
+# gcc-9.2.0: assembler errors when compiling allmodconfig
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
-PATH_NIOS2=/opt/kernel/gcc-8.3.0-nolibc/nios2-linux/bin
+# PATH_NDS32=/opt/kernel/gcc-9.2.0-nolibc/nds32le-linux/bin
+PATH_NIOS2=/opt/kernel/gcc-9.2.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
-# Still no official support for openrisc in gcc-8.3.0.
-PATH_OPENRISC=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
-PATH_PARISC=/opt/kernel/gcc-8.3.0-nolibc/hppa-linux/bin
-PATH_PARISC64=/opt/kernel/gcc-8.3.0-nolibc/hppa64-linux/bin
-# 6.4.0, 6.5.0 internal compiler error in fs/exofs/dir.o -next after 4.20
-# 7.3.0 hangs on ppc64 allnoconfig builds (4.14, 4.16) when building kernel/cpu.o
-# 7.4.0 known to work
-PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-# 8.2.0, 8.3.0 generate build errors (overzaelous compiler)
-# PATH_PPC=/opt/kernel/gcc-8.3.0-nolibc/powerpc64-linux/bin
-PATH_RISCV64=/opt/kernel/gcc-8.3.0-nolibc/riscv64-linux/bin
+PATH_OPENRISC=/opt/kernel/gcc-9.2.0-nolibc/or1k-linux/bin
+PATH_PARISC=/opt/kernel/gcc-9.2.0-nolibc/hppa-linux/bin
+PATH_PARISC64=/opt/kernel/gcc-9.2.0-nolibc/hppa64-linux/bin
+PATH_PPC=/opt/kernel/gcc-9.2.0-nolibc/powerpc64-linux/bin
+PATH_RISCV64=/opt/kernel/gcc-9.2.0-nolibc/riscv64-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
+# Invalid asm expression with gcc 9.2.0
+# PATH_S390=/opt/kernel/gcc-9.2.0-nolibc/s390-linux/bin
 PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
-# 8.3.0: ommand line option '-m4-nofpu' is not supported by this configuration
-PATH_SH4=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
-# PATH_SH4=/opt/kernel/gcc-8.1.0-nolibc/sh4-linux/bin
-PATH_SPARC=/opt/kernel/gcc-8.3.0-nolibc/sparc64-linux/bin
+PATH_SH4=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
+PATH_SPARC=/opt/kernel/gcc-9.2.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
-PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
-PATH_XTENSA=/opt/kernel/gcc-8.3.0-nolibc/xtensa-linux/bin
+PATH_X86=/opt/kernel/gcc-9.2.0-nolibc/x86_64-linux/bin
+PATH_XTENSA=/opt/kernel/gcc-9.2.0-nolibc/xtensa-linux/bin
 
 PREFIX_ARC="arc-elf-"
 PREFIX_ARCV2="arc-elf-"
@@ -114,9 +111,16 @@ v3.16)
 	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
 	;;
 v4.4)
+	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
+	# Don't touch version; other compiler versions have various issues.
+	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
+	# sparc images prior to v4.9 don't build with gcc 7+
+	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
-	# x86_64:allyesconfig was seen to bail out with gcc 8.2.0
-	PATH_X86=/opt/kernel/x86_64/gcc-6.5.0/bin/
+	;;
+v4.9)
+	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
+	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
 	;;
 *)
 	;;
@@ -237,6 +241,7 @@ case ${ARCH} in
 	cmd=(${cmd_m68k[*]})
 	PREFIX="m68k-linux-"
 	PATH=${PATH_M68}:${PATH}
+	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     m68k_nommu)
 	cmd=(${cmd_m68k_nommu[*]})
@@ -414,6 +419,27 @@ fi
 
 rm -rf "${BUILDDIR}/*"
 
+dumplog()
+{
+    local maxsize="$1"
+    local log="$2"
+    local logsize="$(cat ${log} | wc -l)"
+
+    echo "--------------"
+    echo "Error log:"
+    if [[ ${logsize} -lt ${maxsize} ]]; then
+	cat "${log}"
+    else
+	local splitsize=$((maxsize / 3))
+	head "-${splitsize}" "${log}"
+	echo "..."
+	echo "[skipped]"
+	echo "..."
+	tail "-${splitsize}" "${log}"
+    fi
+    echo "--------------"
+}
+
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
 do
@@ -435,10 +461,7 @@ do
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
 	    if ! make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>${LOG}; then
 		echo "failed (config)"
-		echo "--------------"
-		echo "Error log:"
-		head -100 ${LOG}
-		echo "--------------"
+		dumplog 100 "${LOG}"
 		continue
 	    fi
 	    case ${rel} in
@@ -455,10 +478,7 @@ do
 	    esac
 	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
-		    echo "--------------"
-		    echo "Error log:"
-		    head -1000 ${LOG}
-		    echo "--------------"
+		    dumplog 1000 "${LOG}"
 		    errors=$(expr ${errors} + 1)
 	    else
 		    echo "passed"
@@ -476,10 +496,7 @@ do
 	        echo "failed (config) - skipping"
 	    else
 	        echo "failed (config)"
-		echo "--------------"
-		echo "Error log:"
-		head -100 ${LOG}
-		echo "--------------"
+		dumplog 100 "${LOG}"
 	    fi
 	    i=$(expr $i + 1)
 	    continue
@@ -507,10 +524,7 @@ do
     	builds=$(expr ${builds} + 1)
 	if ! make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} </dev/null >/dev/null 2>"${LOG}"; then
 	    echo "failed"
-	    echo "--------------"
-	    echo "Error log:"
-	    head -10000 "${LOG}"
-	    echo "--------------"
+	    dumplog 3000 "${LOG}"
 	    errors=$(expr ${errors} + 1)
 	else
 	    echo "passed"
