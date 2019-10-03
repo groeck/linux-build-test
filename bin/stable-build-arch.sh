@@ -91,6 +91,13 @@ v3.16)
 	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
 	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
 	PREFIX_ARC="arc-linux-"
+	# Infra for gcc 9.x not backported
+	PATH_ARM=/opt/kernel/gcc-8.3.0-nolibc/arm-linux-gnueabi/bin
+	PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
+	PATH_M68=/opt/kernel/gcc-8.3.0-nolibc/m68k-linux/bin
+	PATH_PARISC=/opt/kernel/gcc-8.3.0-nolibc/hppa-linux/bin
+	PATH_PARISC64=/opt/kernel/gcc-8.3.0-nolibc/hppa64-linux/bin
+	PATH_XTENSA=/opt/kernel/gcc-8.3.0-nolibc/xtensa-linux/bin
 	# ppc needs old compiler up to and including v3.18
 	# (see commit c2ce6f9f3dc0)
 	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
