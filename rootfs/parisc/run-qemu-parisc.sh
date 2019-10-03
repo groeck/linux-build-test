@@ -9,12 +9,13 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
+QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-hppa}
 
 PREFIX=hppa-linux-
 ARCH=parisc
 
-PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
+PATH_PARISC=/opt/kernel/gcc-9.2.0-nolibc/hppa-linux/bin
+# PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
 PATH=${PATH}:${PATH_PARISC}
 
 patch_defconfig()
