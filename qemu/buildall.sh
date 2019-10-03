@@ -197,8 +197,7 @@ if [ -z "$1" -o "$1" = "v4.0" ]; then
     dobuild v4.0.0-local v4.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-strip --extra-cflags=-g"
+	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
 fi
 
@@ -208,7 +207,6 @@ if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
 	--disable-libssh \
-	--disable-strip --extra-cflags=-g \
 	--target-list=m68k-softmmu"
     checkexit $?
 fi
@@ -220,6 +218,15 @@ if [ -z "$1" -o "$1" = "v4.1" ]; then
 	--disable-xen --disable-xen-pci-passthrough \
 	--disable-libssh \
 	--disable-strip --extra-cflags=-g"
+    checkexit $?
+fi
+
+if [ -z "$1" -o "$1" = "v4.1-q800" ]; then
+    dobuild v4.1.0-q800 v4.1-m68k \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--target-list=m68k-softmmu"
     checkexit $?
 fi
 
