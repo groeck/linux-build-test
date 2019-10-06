@@ -20,7 +20,7 @@ runkernel()
     local mach=$2
     local console=$3
     local pid
-    local waitlist=("Machine restart" "Boot successful" "Rebooting")
+    local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local logfile="$(__mktemp)"
 
     echo -n "Building ${ARCH}:${defconfig} ... "
