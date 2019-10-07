@@ -96,19 +96,14 @@ runkernel()
     local pid
     local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
-    local buildconfig="${machine}:${defconfig}"
-    local build="${machine}:${defconfig}"
-
-    if [ -n "${fixup}" ]; then
-	build+=":${fixup}"
-	buildconfig+="${fixup//smp*/smp}"
-    fi
+    local build="${machine}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
     else
 	build+=":rootfs"
     fi
+    build="${build//+(:)/:}"
 
     local msg="ppc64:${build}"
 
@@ -123,7 +118,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${buildconfig}" -F "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}${fixup%::*}}" -F "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
@@ -166,60 +161,60 @@ retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:ide mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 # Upstream qemu generates a traceback during reboot.
 # irq 30: nobody cared (try booting with the "irqpoll" option)
-runkernel qemu_ppc64_book3s_defconfig smp:nvme mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::nvme mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig "" pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig scsi pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig usb pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::usb pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig sdhci:mmc pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::sdhci:mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig nvme pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::nvme pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig sata-sii3112 pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:scsi pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::scsi pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:usb pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::usb pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:sata-sii3112 pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::sata-sii3112 pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:scsi[FUSION] pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::scsi[FUSION] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:sdhci:mmc pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::sdhci:mmc pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little:nvme pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
@@ -233,16 +228,16 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:nvme ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::nvme ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:sdhci:mmc ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::sdhci:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:scsi[53C895A] ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::scsi[53C895A] ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500:sata-sii3112 ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::sata-sii3112 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 runkernel powernv_defconfig "" powernv POWER8 hvc0 \
