@@ -193,7 +193,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}" "${rootfs}" "${defconfig}"; then
         if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
