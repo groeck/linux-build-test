@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 option=$1
 
-QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-alpha}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
 
 PREFIX=alpha-linux-
 ARCH=alpha
