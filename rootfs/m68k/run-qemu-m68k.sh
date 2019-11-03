@@ -19,7 +19,7 @@ patch_defconfig()
 {
     local defconfig=$1
     local mach=$2
-    local rootfs="$(rootfsname rootfs.cpio)"
+    local rootfs="$(rootfsname rootfs-5208.cpio)"
 
     if [[ "${mach}" = "mcf5208evb" ]]; then
 	# Enable DEVTMPFS
@@ -37,6 +37,10 @@ patch_defconfig()
 	echo "CONFIG_INITRAMFS_SOURCE=\"${rootfs}\"" >> ${defconfig}
 	echo "CONFIG_INITRAMFS_ROOT_UID=0" >> ${defconfig}
 	echo "CONFIG_INITRAMFS_ROOT_GID=0" >> ${defconfig}
+
+	# Boot parameters are not passed
+	sed -i -e '/CONFIG_BOOTPARAM_STRING/d' ${defconfig}
+	echo 'CONFIG_BOOTPARAM_STRING="panic=-1 console=ttyS0,115200"' >> ${defconfig}
     fi
 }
 
@@ -88,6 +92,8 @@ runkernel()
 
     if [[ "${mach}" = "q800" ]]; then
 	# q800 needs special qemu, which in turn does not support mcf5208evb
+	# Note: Starting with qemu v4.2, q800 support will be available
+	# in the upstream version of qemu.
 	qemu="${QEMU_V40_M68K_BIN}/qemu-system-m68k"
     fi
 
@@ -111,7 +117,7 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel mcf5208evb m5208 m5208evb_defconfig rootfs.cpio
+runkernel mcf5208evb m5208 m5208evb_defconfig rootfs-5208.cpio
 retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig rootfs-q800.cpio
 retcode=$((retcode + $?))
