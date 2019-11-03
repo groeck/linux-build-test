@@ -119,9 +119,9 @@ echo
 retcode=0
 runkernel mcf5208evb m5208 m5208evb_defconfig rootfs-5208.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig rootfs-q800.cpio
+runkernel q800 m68040 mac_defconfig rootfs-68040.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig rootfs.ext2
+runkernel q800 m68040 mac_defconfig rootfs-68040.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
