@@ -50,13 +50,17 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
+        arm:ast2600-evb:aspeed_g5_defconfig:notests \
+        arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:palmetto-bmc:aspeed_g4_defconfig"
-skip_414="arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
+skip_414="arm:ast2600-evb:aspeed_g5_defconfig:notests \
+        arm:ast2600-evb:multi_v7_defconfig:notests \
+	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
 
@@ -235,7 +239,7 @@ runkernel()
 	initcli=""
 	QEMUCMD="${QEMU_LINARO}"
 	;;
-    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
+    "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
 	initcli+=" console=ttyS4,115200"
 	extra_params+=" -nodefaults"
 	;;
@@ -471,6 +475,14 @@ if [ ${runall} -eq 1 ]; then
 	rootfs-armv7a.cpio auto ::mem2G highbank.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
+    # Requires qemu v4.2+
+    # Note: This boots, but takes forever due to running boot tests
+    # and because 'master' has debugging enabled. Only run in production
+    # after a non-debugging version of qemu is built.
+    runkernel multi_v7_defconfig ast2600-evb "" \
+	rootfs-armv7a.cpio automatic "" aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 runkernel exynos_defconfig smdkc210 "" \
@@ -561,6 +573,20 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+if [ ${runall} -eq 1 ]; then
+    # Requires qemu v4.2+
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    # Repeat this test with armv7a root file system.
+    # Both are expected to work.
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.cpio automatic notests aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
 runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
@@ -570,6 +596,15 @@ runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    # requires qemu v4.2+
+    # Note: Also works with romulus-bmc with aspeed-bmc-opp-swift.dtb
+    runkernel aspeed_g5_defconfig swift-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mmc aspeed-bmc-opp-swift.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
 	rootfs-arm-m3.cpio manual "" mps2-an385.dtb
