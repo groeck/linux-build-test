@@ -194,7 +194,7 @@ then
 fi
 
 if [ -z "$1" -o "$1" = "v4.0" ]; then
-    dobuild v4.0.0-local v4.0 \
+    dobuild v4.0.1-local v4.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough"
