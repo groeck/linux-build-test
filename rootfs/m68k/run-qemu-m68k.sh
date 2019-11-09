@@ -8,7 +8,7 @@ shift $((OPTIND - 1))
 
 machine=$1
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
+QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
 PREFIX=m68k-linux-
 ARCH=m68k
 PATH_M68K=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
@@ -89,13 +89,6 @@ runkernel()
     fi
 
     echo -n "running ..."
-
-    if [[ "${mach}" = "q800" ]]; then
-	# q800 needs special qemu, which in turn does not support mcf5208evb
-	# Note: Starting with qemu v4.2, q800 support will be available
-	# in the upstream version of qemu.
-	qemu="${QEMU_V40_M68K_BIN}/qemu-system-m68k"
-    fi
 
     [[ ${dodebug} -ne 0 ]] && set -x
 
