@@ -15,7 +15,8 @@ skip_316="mipsel64:malta_defconfig:r1:smp:scsi[DC395]:hd"
 skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
 	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
 
-QEMU=${QEMU:-${QEMU_V30_BIN}/qemu-system-mips64el}
+QEMU_FULOONG="${QEMU:-${QEMU_V30_BIN}/qemu-system-mips64el}"
+QEMU="${QEMU:-${QEMU_V42_BIN}/qemu-system-mips64el}"
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
@@ -118,11 +119,17 @@ runkernel()
     echo -n "running ..."
 
     case ${mach} in
-    "malta"|"fulong2e")
+    "malta")
 	kernel="vmlinux"
 	mem="256"
 	;;
-    boston)
+    "fulong2e")
+	QEMU="${QEMU_FULOONG}"		# crashes or stalls with later versions
+	kernel="vmlinux"
+	extra_params+=" -vga none"	# fulong2e v3.1+ crashes if vga is enabled
+	mem="256"
+	;;
+    "boston")
 	mem=1G
 	kernel="arch/mips/boot/vmlinux.gz.itb"
 	extra_params+=" -dtb arch/mips/boot/dts/img/boston.dtb"
