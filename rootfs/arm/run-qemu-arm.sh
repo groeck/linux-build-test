@@ -8,9 +8,7 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU_SMDKC=${QEMU:-${QEMU_V28_BIN}/qemu-system-arm}
-QEMU_SWIFT=${QEMU:-${QEMU_V41_BIN}/qemu-system-arm}
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -237,6 +235,7 @@ runkernel()
 	# replace original root file system with generated image
 	extra_params="${extra_params//${rootfs}/sd.img}"
 	initcli=""
+	# Not supported in mainline version of qemu
 	QEMUCMD="${QEMU_LINARO}"
 	;;
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
@@ -246,7 +245,6 @@ runkernel()
     "swift-bmc")
 	initcli+=" console=ttyS4,115200"
 	extra_params+=" -nodefaults"
-	QEMUCMD="${QEMU_SWIFT}"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
 	initcli+=" console=ttyS0"
@@ -291,10 +289,10 @@ runkernel()
 	;;
     "smdkc210")
 	initcli+=" console=ttySAC0,115200n8"
-	QEMUCMD="${QEMU_SMDKC}"
 	;;
     "midway")
 	initcli+=" console=ttyAMA0,115200"
+	# Fails silently with later versions of qemu (up to at least 4.2)
 	QEMUCMD="${QEMU_MIDWAY}"
 	;;
     "realview-pb-a8" | "realview-pbx-a9" | \
@@ -469,21 +467,18 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
-    # highbank boots with updated qemu, but generates warnings to the console
-    # due to ignored SMC calls.
+    # highbank boots with updated (local version of) qemu,
+    # but generates warnings to the console due to ignored SMC calls.
     runkernel multi_v7_defconfig highbank cortex-a9 \
-	rootfs-armv7a.cpio auto ::mem2G highbank.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    # Requires qemu v4.2+
-    # Note: This boots, but takes forever due to running boot tests
-    # and because 'master' has debugging enabled. Only run in production
-    # after a non-debugging version of qemu is built.
-    runkernel multi_v7_defconfig ast2600-evb "" \
-	rootfs-armv7a.cpio automatic "" aspeed-ast2600-evb.dtb
+	rootfs-armv5.cpio auto ::mem2G highbank.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
+
+runkernel multi_v7_defconfig ast2600-evb "" \
+	rootfs-armv7a.cpio automatic "" aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 exynos4210-smdkv310.dtb
@@ -573,19 +568,16 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # Requires qemu v4.2+
-    runkernel aspeed_g5_defconfig ast2600-evb "" \
+runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    # Repeat this test with armv7a root file system.
-    # Both are expected to work.
-    runkernel aspeed_g5_defconfig ast2600-evb "" \
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+# Repeat this test with armv7a root file system.
+# Both are expected to work.
+runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.cpio automatic notests aspeed-ast2600-evb.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
@@ -617,7 +609,7 @@ if [ ${runall} -eq 1 ]; then
     # which calls musb_read_fifosize(), which in turn calls the function
     # with parameter MUSB_FIFOSIZE=0x0f.
     runkernel sunxi_defconfig cubieboard "" \
-	rootfs-armv7a.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
