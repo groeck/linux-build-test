@@ -79,6 +79,14 @@ patch_defconfig()
 	    echo "CONFIG_CPU_BIG_ENDIAN=n" >> ${defconfig}
 	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
 	fi
+
+	if [ "${fixup}" = "nosmp" ]; then
+	    # Since commit a55c7454a8c8 ("sched/topology: Improve load
+	    # balancing on AMD EPYC systems"), NUMA depends on SMP.
+	    # This isn't correctly expressed in Kconfig, so disable
+	    # it manually here.
+	    echo "CONFIG_NUMA=n" >> ${defconfig}
+	fi
     done
 
     # extra SATA config
