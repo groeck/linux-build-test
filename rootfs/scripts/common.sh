@@ -245,6 +245,19 @@ __common_virtcmd()
     initcli+=" root=/dev/vda"
 }
 
+__common_flashcmd()
+{
+    local fixup="$1"
+    local rootfs="$2"
+    local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
+    local flashsize="${fixup#flash}"	# flash size in MB
+
+    dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}"
+    dd if="${rootfs}" of="${tmpfile}" conv=notrunc
+    extra_params+=" -drive file=${tmpfile},format=raw,if=pflash"
+    initcli+=" root=/dev/mtdblock0"
+}
+
 __common_mmccmd()
 {
     local fixup="$1"
@@ -360,6 +373,9 @@ __common_diskcmd()
     mmc*|sd*|"sdhci")
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
+    flash*)
+	__common_flashcmd "${fixup}" "${rootfs}"
+	;;
     "nvme")
 	initcli+=" root=/dev/nvme0n1 rootwait"
 	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus}"
@@ -389,7 +405,7 @@ __common_fixup()
 
     case "${fixup}" in
     mmc*|sd*|"sdhci"|"nvme"|\
-    "ide"|"ata"|sata*|usb*|scsi*|virtio*)
+    "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
     pci*)
@@ -467,6 +483,8 @@ __common_fixups()
 #   Difference: usb-xhci enables usb and instantiates qemu-xhci
 # - usb-uas, usb-uas-xhci
 #   Difference: same as above.
+# - flash{size_in_MB}
+#   Creates flash file with root file system at start
 common_diskcmd()
 {
     local fixup="$1"
