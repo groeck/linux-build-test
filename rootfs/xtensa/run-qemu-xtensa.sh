@@ -3,7 +3,7 @@
 dir=$(cd $(dirname $0); pwd)
 . "${dir}/../scripts/common.sh"
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
+QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-xtensa}
 
 parse_args "$@"
 shift $((OPTIND - 1))
@@ -12,7 +12,8 @@ skip_316="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
 skip_44="xtensa:de212:kc705-nommu:nommu_kc705_defconfig"
 
 machine=$1
-config=$2
+_cpu=$2
+config=$3
 
 PREFIX=xtensa-linux-
 ARCH=xtensa
@@ -25,23 +26,31 @@ PATH=${PATH_XTENSA_TOOLS}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
-    local fixup=$2
-    local progdir=$(cd $(dirname $0); pwd)
+    local fixups=${2//:/ }
+    local fixup
 
-    case "${fixup}" in
-    dc232b)
-	sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
-	echo "CONFIG_XTENSA_VARIANT_DC232B=y" >> ${defconfig}
-	echo "# CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX is not set" >> ${defconfig}
-	echo "CONFIG_KERNEL_LOAD_ADDRESS=0xd0003000" >> ${defconfig}
-	;;
-    dc233c)
-	sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
-	echo "CONFIG_XTENSA_VARIANT_DC233C=y" >> ${defconfig}
-	;;
-    *)
-	;;
-    esac
+    # We need to have the following configuration options enabled
+    # to be able to boot from flash.
+    echo "CONFIG_MTD_BLOCK=y" >> ${defconfig}
+    echo "CONFIG_MTD_PHYSMAP=y" >> ${defconfig}
+    echo "CONFIG_MTD_PHYSMAP_OF=y" >> ${defconfig}
+
+    for fixup in ${fixups}; do
+        case "${fixup}" in
+        dc232b)
+	    sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
+	    echo "CONFIG_XTENSA_VARIANT_DC232B=y" >> ${defconfig}
+	    echo "# CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX is not set" >> ${defconfig}
+	    echo "CONFIG_KERNEL_LOAD_ADDRESS=0xd0003000" >> ${defconfig}
+	    ;;
+        dc233c)
+	    sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
+	    echo "CONFIG_XTENSA_VARIANT_DC233C=y" >> ${defconfig}
+	    ;;
+        *)
+	    ;;
+        esac
+    done
 
     # No built-in initrd
     sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
@@ -54,17 +63,16 @@ runkernel()
     local dtb="arch/xtensa/boot/dts/$2.dtb"
     local cpu=$3
     local mach=$4
-    local mem=$5
+    local fixup="${cpu}:${5}"
     local rootfs=$6
     local pid
     local retcode
     local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local fixup="${cpu}"
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local earlycon
 
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}"; then
+    if ! match_params "${machine}@${mach}" "${_cpu}@${cpu}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -87,7 +95,7 @@ runkernel()
 	return 0;
     fi
 
-    if ! dosetup -c "${defconfig}:${cpu}" -f "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}:${cpu}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
@@ -105,9 +113,9 @@ runkernel()
     ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel arch/xtensa/boot/uImage -no-reboot \
 	${dtbcmd} \
-	--append "rdinit=/sbin/init ${initcli} ${earlycon} console=ttyS0,115200n8" \
-	-initrd "$(rootfsname ${rootfs})" \
-	-m ${mem} -nographic -monitor null -serial stdio \
+	${extra_params} \
+	--append "${initcli} ${earlycon} console=ttyS0,115200n8" \
+	-nographic -monitor null -serial stdio \
 	> ${logfile} 2>&1 &
     pid=$!
 
@@ -125,15 +133,21 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel generic_kc705_defconfig lx60 dc232b lx60 128M rootfs.cpio
+runkernel generic_kc705_defconfig lx60 dc232b lx60 mem128 rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc232b kc705 1G rootfs.cpio
+runkernel generic_kc705_defconfig lx200 dc232b lx200 mem128:flash16 rootfs-dc232b.squashfs
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig ml605 dc233c ml605 128M rootfs.cpio
+runkernel generic_kc705_defconfig kc705 dc232b kc705 mem1G rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc233c kc705 1G rootfs.cpio
+runkernel generic_kc705_defconfig kc705 dc232b kc705 mem1G:flash128 rootfs-dc232b.ext2
 retcode=$((retcode + $?))
-runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu 256M rootfs-nommu.cpio
+runkernel generic_kc705_defconfig ml605 dc233c ml605 mem128 rootfs-dc233c.cpio
+retcode=$((retcode + $?))
+runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G rootfs-dc233c.cpio
+retcode=$((retcode + $?))
+runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G:flash128 rootfs-dc233c.ext2
+retcode=$((retcode + $?))
+runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256 rootfs-nommu.cpio
 retcode=$((retcode + $?))
 
 exit ${retcode}
