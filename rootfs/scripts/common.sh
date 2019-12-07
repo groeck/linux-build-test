@@ -252,8 +252,8 @@ __common_flashcmd()
     local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
     local flashsize="${fixup#flash}"	# flash size in MB
 
-    dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}"
-    dd if="${rootfs}" of="${tmpfile}" conv=notrunc
+    dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
+    dd if="${rootfs}" of="${tmpfile}" conv=notrunc status=none
     extra_params+=" -drive file=${tmpfile},format=raw,if=pflash"
     initcli+=" root=/dev/mtdblock0"
 }
