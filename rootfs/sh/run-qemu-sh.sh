@@ -25,7 +25,8 @@ v3.16|v4.4|v4.9|v4.14)
 	PATH_SH=/opt/kernel/sh4/gcc-5.5.0/usr/bin
 	;;
 v4.19)
-	PATH_SH=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
+	# PATH_SH=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
+	PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
 	;;
 *)
 	PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
