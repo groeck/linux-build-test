@@ -71,6 +71,7 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local earlycon
+    local image
 
     if ! match_params "${machine}@${mach}" "${_cpu}@${cpu}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
@@ -78,14 +79,11 @@ runkernel()
     fi
 
     case "${mach}" in
-    "lx60"|"kc705"|"ml605")
-	PATH=${PATH_XTENSA}:${PATH}
-	earlycon="earlycon=uart8250,mmio32,0xfd050020,115200n8"
-	;;
     "kc705-nommu")
 	PATH=${PATH}:${PATH_XTENSA_DE212}
-	earlycon="earlycon=uart8250,mmio32,0x9d050020,115200n8 \
-		memmap=256M@0x60000000"
+	;;
+    *)
+	PATH=${PATH_XTENSA}:${PATH}
 	;;
     esac
 
@@ -106,12 +104,30 @@ runkernel()
 	fi
     fi
 
+    case "${mach}" in
+    "virt")
+	image="arch/xtensa/boot/Image.elf"
+	extra_params+=" -semihosting"
+	extra_params+=" -device virtio-rng-pci"
+	extra_params+=" -device virtio-keyboard-pci"
+	;;
+    "lx200"|"lx60"|"kc705"|"ml605")
+	image="arch/xtensa/boot/uImage"
+	earlycon="earlycon=uart8250,mmio32,0xfd050020,115200n8"
+	;;
+    "kc705-nommu")
+	image="arch/xtensa/boot/uImage"
+	earlycon="earlycon=uart8250,mmio32,0x9d050020,115200n8 \
+		memmap=256M@0x60000000"
+	;;
+    esac
+
     echo -n "running ..."
 
     [[ ${dodebug} -eq 1 ]] && set -x
 
     ${QEMU} -cpu ${cpu} -M ${mach} \
-	-kernel arch/xtensa/boot/uImage -no-reboot \
+	-kernel "${image}" -no-reboot \
 	${dtbcmd} \
 	${extra_params} \
 	--append "${initcli} ${earlycon} console=ttyS0,115200n8" \
@@ -145,6 +161,14 @@ runkernel generic_kc705_defconfig ml605 dc233c ml605 mem128 rootfs-dc233c.cpio
 retcode=$((retcode + $?))
 runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G rootfs-dc233c.cpio
 retcode=$((retcode + $?))
+
+if [[ ${runall} -eq 1 ]]; then
+    # Works but takes forever to run, and idle doesn't work well
+    # (system runs at 100% CPU)
+    runkernel virt_defconfig "" dc233c virt virtio-pci:mem2G rootfs-dc233c.ext2
+    retcode=$((retcode + $?))
+fi
+
 runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G:flash128 rootfs-dc233c.ext2
 retcode=$((retcode + $?))
 runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256 rootfs-nommu.cpio
