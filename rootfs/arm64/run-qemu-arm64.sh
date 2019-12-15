@@ -189,12 +189,15 @@ runkernel xlnx-zcu102 defconfig smp2:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp2:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    retcode=$((retcode + $?))
+    runkernel xlnx-zcu102 defconfig smp2:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    retcode=$((retcode + $?))
+    runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    retcode=$((retcode + $?))
+fi
 
 runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
@@ -203,13 +206,17 @@ retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio.gz
 retcode=$((retcode + $?))
+
 runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
-retcode=$((retcode + $?))
+    retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    retcode=$((retcode + $?))
+    runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    retcode=$((retcode + $?))
+fi
 
 exit ${retcode}
