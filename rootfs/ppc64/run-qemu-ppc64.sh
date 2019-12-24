@@ -79,14 +79,6 @@ patch_defconfig()
 	    echo "CONFIG_CPU_BIG_ENDIAN=n" >> ${defconfig}
 	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
 	fi
-
-	if [ "${fixup}" = "nosmp" ]; then
-	    # Since commit a55c7454a8c8 ("sched/topology: Improve load
-	    # balancing on AMD EPYC systems"), NUMA depends on SMP.
-	    # This isn't correctly expressed in Kconfig, so disable
-	    # it manually here.
-	    echo "CONFIG_NUMA=n" >> ${defconfig}
-	fi
     done
 
     # extra SATA config
@@ -166,12 +158,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_ppc64_book3s_defconfig nosmp mac99 ppc64 ttyS0 vmlinux \
-	rootfs.cpio.gz manual
-retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
-retcode=$((${retcode} + $?))
+retcode=$?
 runkernel qemu_ppc64_book3s_defconfig smp::ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
@@ -227,10 +216,6 @@ runkernel pseries_defconfig little::sdhci:mmc pseries POWER8 hvc0 vmlinux \
 retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little::nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
-retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_e5500_defconfig nosmp mpc8544ds e5500 ttyS0 \
-	arch/powerpc/boot/uImage \
-	../ppc/rootfs.cpio.gz auto "dt_compatible=fsl,,P5020DS"
 retcode=$((${retcode} + $?))
 runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
 	arch/powerpc/boot/uImage \
