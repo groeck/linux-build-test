@@ -76,14 +76,16 @@ parse_args()
 	dodebug=0
 	runall=0
 	testbuild=0
+	verbose=0
 	extracli=""
-	while getopts ae:dnt opt; do
+	while getopts ae:dntv opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
 	t)	testbuild=1;;
+	v)	verbose=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
 	done
@@ -1134,8 +1136,7 @@ dowait()
 	rm -f core
     fi
 
-    if [ ${dolog} -ne 0 ]
-    then
+    if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
 	echo "------------"
 	echo "qemu log:"
 	head -5000 ${logfile}
