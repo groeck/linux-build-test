@@ -10,7 +10,8 @@ machine=$1
 option=$2
 config=$3
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
+# 2nd CPU of xlnx-versal-virt fails to come online with qemu v4.2
+QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
@@ -39,11 +40,11 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
 	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs \
 	xlnx-versal-virt:defconfig:smp2:mem512:virtio-blk:rootfs"
-skip_44="xlnx-zcu102:defconfig:smp2:mem2G:sd:rootfs \
+skip_44="xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3:defconfig:smp:mem1G:initrd \
 	raspi3:defconfig:smp4:mem1G:sd:rootfs \
-	xlnx-zcu102:defconfig:smp2:mem2G:sd:rootfs \
+	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
 patch_defconfig()
@@ -185,17 +186,17 @@ retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp2:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig smp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig smp2:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig smp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig smp4:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
 fi
 
