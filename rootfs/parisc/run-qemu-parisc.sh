@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-hppa}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
 
 PREFIX=hppa-linux-
 ARCH=parisc

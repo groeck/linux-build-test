@@ -16,7 +16,7 @@ skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
 	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
 
 QEMU_FULOONG="${QEMU:-${QEMU_V30_BIN}/qemu-system-mips64el}"
-QEMU="${QEMU:-${QEMU_V42_BIN}/qemu-system-mips64el}"
+QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in

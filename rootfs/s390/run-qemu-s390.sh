@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
 # PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin

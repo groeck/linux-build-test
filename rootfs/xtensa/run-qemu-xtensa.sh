@@ -3,7 +3,7 @@
 dir=$(cd $(dirname $0); pwd)
 . "${dir}/../scripts/common.sh"
 
-QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-xtensa}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-xtensa}
 
 parse_args "$@"
 shift $((OPTIND - 1))

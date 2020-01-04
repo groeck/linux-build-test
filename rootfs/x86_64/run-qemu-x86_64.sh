@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 machine=$1
 cputype=$2
 
-QEMU=${QEMU:-${QEMU_V40_BIN}/qemu-system-x86_64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-x86_64}
 ARCH=x86_64
 
 # Older releases don't like gcc 6+

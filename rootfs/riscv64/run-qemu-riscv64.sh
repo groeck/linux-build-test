@@ -9,8 +9,8 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-QEMU41=${QEMU:-${QEMU_V41_BIN}/qemu-system-riscv64}
 QEMU40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/riscv64/gcc-7.3.0/bin
@@ -74,7 +74,6 @@ runkernel()
     echo -n "running ..."
 
     if [[ -e arch/riscv/boot/Image ]]; then
-	QEMU="${QEMU41}"
 	BIOS="default"
 	KERNEL="arch/riscv/boot/Image"
     else
