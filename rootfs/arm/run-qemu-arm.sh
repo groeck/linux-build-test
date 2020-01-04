@@ -8,7 +8,7 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -289,6 +289,7 @@ runkernel()
 	;;
     "smdkc210")
 	initcli+=" console=ttySAC0,115200n8"
+	initcli+=" earlycon=exynos4210,mmio32,0x13800000,115200n8"
 	;;
     "midway")
 	initcli+=" console=ttyAMA0,115200"
@@ -484,6 +485,13 @@ runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    runkernel s5pv210_defconfig smdkc210 "" \
+	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 s5pv210-smdkv210.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 runkernel realview_defconfig realview-pb-a8 "" \
 	rootfs-armv5.cpio auto realview_pb::mem512 arm-realview-pba8.dtb
