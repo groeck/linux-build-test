@@ -236,7 +236,7 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500::sata-sii3112 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig "" powernv POWER8 hvc0 \
+runkernel powernv_defconfig "" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((${retcode} + $?))
 
