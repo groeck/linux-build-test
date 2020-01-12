@@ -240,10 +240,12 @@ runkernel()
 	;;
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
 	initcli+=" console=ttyS4,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "swift-bmc")
 	initcli+=" console=ttyS4,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
@@ -583,12 +585,16 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 	rootfs-armv5.ext2 automatic notests::sd aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2500-evb "" \
+	rootfs-armv5.ext2 automatic notests::mtd512 aspeed-ast2500-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# Repeat this test with armv7a root file system.
+# Repeat with armv7a root file system.
 # Both are expected to work.
 runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.cpio automatic notests aspeed-ast2600-evb.dtb
