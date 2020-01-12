@@ -7,9 +7,10 @@ shopt -s extglob
 
 ulimit -c unlimited
 
-# limit file size to 1GB to prevent log file sizes from getting
-# out of control.
-ulimit -f $((1000 * 1024))
+# limit file size to 1GB to prevent log file sizes from getting out of control.
+# Note that the limit needs to be a bit larger than 1GB to accommodate 1GB
+# flashes.
+ulimit -f $((1100 * 1024))
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
@@ -252,11 +253,19 @@ __common_flashcmd()
     local fixup="$1"
     local rootfs="$2"
     local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
-    local flashsize="${fixup#flash}"	# flash size in MB
+    local flashif="${fixup%%[0-9]*}"
+    local flashsize	# flash size in MB
+
+    if [[ "${flashif}" = "mtd" ]]; then
+        local flashsize="${fixup#mtd}"
+    else
+        local flashsize="${fixup#flash}"
+	flashif="pflash"
+    fi
 
     dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
     dd if="${rootfs}" of="${tmpfile}" conv=notrunc status=none
-    extra_params+=" -drive file=${tmpfile},format=raw,if=pflash"
+    extra_params+=" -drive file=${tmpfile},format=raw,if=${flashif}"
     initcli+=" root=/dev/mtdblock0"
 }
 
@@ -375,7 +384,7 @@ __common_diskcmd()
     mmc*|sd*|"sdhci")
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
-    flash*)
+    flash*|mtd*)
 	__common_flashcmd "${fixup}" "${rootfs}"
 	;;
     "nvme")
@@ -407,7 +416,7 @@ __common_fixup()
 
     case "${fixup}" in
     mmc*|sd*|"sdhci"|"nvme"|\
-    "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*)
+    "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
     pci*)
@@ -486,6 +495,7 @@ __common_fixups()
 # - usb-uas, usb-uas-xhci
 #   Difference: same as above.
 # - flash{size_in_MB}
+# - mtd{size_in_MB}
 #   Creates flash file with root file system at start
 common_diskcmd()
 {
