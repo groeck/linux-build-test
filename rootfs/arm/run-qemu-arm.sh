@@ -485,6 +485,10 @@ runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel exynos_defconfig smdkc210 "" \
+	rootfs-armv5.ext2 manual cpuidle:nocrypto::sd2:mem128 exynos4210-smdkv310.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
     runkernel s5pv210_defconfig smdkc210 "" \
@@ -575,6 +579,10 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 	rootfs-armv5.cpio automatic notests aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2500-evb "" \
+	rootfs-armv5.ext2 automatic notests::sd aspeed-ast2500-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
@@ -594,6 +602,10 @@ checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-swift.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig swift-bmc "" \
+	rootfs-armv5.ext2 automatic notests::sd1 aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
