@@ -48,19 +48,23 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
-        arm:ast2600-evb:aspeed_g5_defconfig:notests \
-        arm:ast2600-evb:multi_v7_defconfig:notests \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd512 \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests \
+	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:palmetto-bmc:aspeed_g4_defconfig"
-skip_414="arm:ast2600-evb:aspeed_g5_defconfig:notests \
-        arm:ast2600-evb:multi_v7_defconfig:notests \
+skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests \
+	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
+skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd"
 
 . ${progdir}/../scripts/common.sh
 
@@ -83,7 +87,7 @@ patch_defconfig()
     sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
 
     for fixup in ${fixups}; do
-        case "${fixup}" in
+	case "${fixup}" in
 	nofdt)
 	    echo "MACH_PXA27X_DT=n" >> ${defconfig}
 	    echo "MACH_PXA3XX_DT=n" >> ${defconfig}
@@ -196,7 +200,7 @@ runkernel()
     fi
 
     if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}" "${rootfs}" "${defconfig}"; then
-        if [[ __dosetup_rc -eq 2 ]]; then
+	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
 	return 1
@@ -205,7 +209,7 @@ runkernel()
     # If a dtb file was specified but does not exist, skip the build.
     local dtbcmd=""
     if [[ -n "${dtb}" ]]; then
-        if [[ ! -e "${dtbfile}" ]]; then
+	if [[ ! -e "${dtbfile}" ]]; then
 	    echo "skipped"
 	    return 0
 	fi
@@ -262,7 +266,7 @@ runkernel()
 	initcli+=" console=ttymxc0,115200"
 	;;
     "mainstone")
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+	dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
 	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
 	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
 	initcli+=" console=ttyS0"
@@ -270,8 +274,8 @@ runkernel()
 	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
 	;;
     "z2")
-        # dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
-        dd if=/dev/zero of=/tmp/flash bs=262144 count=32 >/dev/null 2>&1
+	# dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
+	dd if=/dev/zero of=/tmp/flash bs=262144 count=32 >/dev/null 2>&1
 	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
 	initcli+=" console=ttyS0"
 	;;
