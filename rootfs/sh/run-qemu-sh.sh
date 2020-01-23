@@ -9,6 +9,7 @@ shift $((OPTIND - 1))
 _fixup="$1"
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
+PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
 
 PREFIX=sh4-linux-
 ARCH=sh
@@ -19,18 +20,9 @@ errlog="/tmp/err-sh.log"
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.16|v4.4|v4.9|v4.14)
-	# gcc 8.2.0 causes random boot stalls and crashes
-	# with this kernel.
-	PATH_SH=/opt/kernel/sh4/gcc-5.5.0/usr/bin
-	;;
-v4.19)
-	# PATH_SH=/opt/kernel/gcc-8.3.0-nolibc/sh4-linux/bin
-	PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
+v3.16|v4.4|v4.9|v4.14|v4.19)
 	;;
 *)
-	PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
-	# PATH_SH=/opt/kernel/sh4/gcc-8.2.0/usr/bin
 	# earlycon only works with v4.20+ and otherwise results in a crash.
 	CONFIG="CONFIG_SERIAL_SH_SCI_EARLYCON=y"
 	EARLYCON="earlycon=scif,mmio16,0xffe80000"
@@ -73,7 +65,9 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if ! dosetup -c "${defconfig}" -F "${fixup}:notests:nodebug" "${rootfs}" "${defconfig}"; then
+    # 'nofs' is needed to avoid enabling btrfs, which in turn enables raid6,
+    # which sometimes hangs in emulation, depending on code alignment.
+    if ! dosetup -c "${defconfig}" -F "${fixup}:nofs:notests:nodebug" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
