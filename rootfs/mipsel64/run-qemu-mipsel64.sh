@@ -171,8 +171,11 @@ runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-uas-xhci
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:sdhci:mmc
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:nvme
-retcode=$((retcode + $?))
+if [[ ${runall} -ne 0 ]]; then
+    # interrupts don't work, resulting in random timeouts
+    runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:nvme
+    retcode=$((retcode + $?))
+fi
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[DC395]
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[FUSION]
