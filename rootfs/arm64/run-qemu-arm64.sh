@@ -49,7 +49,14 @@ skip_49="raspi3:defconfig:smp:mem1G:initrd \
 
 patch_defconfig()
 {
-    : # nothing to do
+    local defconfig=$1
+
+    # Starting with v5.6, we need to have DMA_BCM2835 built into the
+    # kernel because MMC code using may otherwise fail with -EPROBE_DEFER.
+    # Otherwise we can no longer boot raspi3 from mmc cards.
+    # See upstream commit 9e17c1cd28cd ("mmc: bcm2835: Use dma_request_chan()
+    # instead dma_request_slave_channel()") for background.
+    sed -i -e 's/CONFIG_DMA_BCM2835=m/CONFIG_DMA_BCM2835=y/' ${defconfig}
 }
 
 runkernel()
