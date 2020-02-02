@@ -235,13 +235,22 @@ if [ -z "$1" -o "$1" = "v4.2" ]; then
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
-	--disable-strip"
+	--disable-libssh"
     checkexit $?
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
     dobuild master-local master \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh --disable-strip"
+    checkexit $?
+    # While it would be desirable to have debugging enabled in general,
+    # it slows down the system too much. Generate separate master-debug
+    # specifically for to have images with debugging enabled available
+    # if needed.
+    dobuild master-local master-debug \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
 	--disable-xen --disable-xen-pci-passthrough \
