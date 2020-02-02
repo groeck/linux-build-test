@@ -618,12 +618,22 @@ runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::sd1 aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig swift-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mmc aspeed-bmc-opp-swift.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
-    # requires qemu v4.2+
-    # Note: Also works with romulus-bmc with aspeed-bmc-opp-swift.dtb
-    runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc aspeed-bmc-opp-swift.dtb
+    # requires qemu v5.0+ which instantiates sd2 (sd with index=2) as emmc
+    runkernel aspeed_g5_defconfig ast2600-evb \
+	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    # Available in qemu-5.0+
+    # SDIO (eMMC) doesn't work (yet) because of a bug in the dts file
+    # (eMMC controller is not enabled).
+    runkernel aspeed_g5_defconfig tacoma-bmc \
+	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
