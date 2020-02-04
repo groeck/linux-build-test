@@ -48,7 +48,7 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd512 \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32 \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
@@ -57,7 +57,8 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:palmetto-bmc:aspeed_g4_defconfig"
+	arm:palmetto-bmc:aspeed_g4_defconfig \
+	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
@@ -65,6 +66,7 @@ skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
 skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd"
+skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
 
 . ${progdir}/../scripts/common.sh
 
@@ -119,8 +121,8 @@ patch_defconfig()
 	    ;;
 	nodrm)
 	    # qemu does not support CONFIG_DRM_IMX. This starts to fail
-	    # with commit 5f2f911578fb ("drm/imx: # atomic phase 3 step 1:
-	    # Use atomic configuration"), ie since v4.8. Impact is long boot delay
+	    # with commit 5f2f911578fb (drm/imx: atomic phase 3 step 1:
+	    # Use atomic configuration), ie since v4.8. Impact is long boot delay
 	    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
 	    # in drm code.
 	    # It also does not support CONFIG_DRM_MXSFB; trying to enable it
@@ -574,10 +576,18 @@ runkernel aspeed_g4_defconfig palmetto-bmc "" \
 	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g4_defconfig palmetto-bmc "" \
+	rootfs-armv5.ext2 automatic ::mtd32 aspeed-bmc-opp-palmetto.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # selftests sometimes hang with soft CPU lockup
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-witherspoon.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig witherspoon-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -590,7 +600,7 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::mtd512 aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -605,8 +615,27 @@ runkernel aspeed_g5_defconfig ast2600-evb "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+if [ ${runall} -eq 1 ]; then
+    # SPI (NOR) Flash doesn't instantiate on ast2600-evb
+    # because drivers/mtd/spi-nor/aspeed-smc.c doesn't have a 'compatible'
+    # entry for aspeed,ast2600-fmc or aspeed,ast2600-spi.
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+    	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    # requires qemu v5.0+ which instantiates sd2 (sd with index=2) as emmc
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
 runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig romulus-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -622,13 +651,12 @@ runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mmc aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig swift-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128 aspeed-bmc-opp-swift.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
-    # requires qemu v5.0+ which instantiates sd2 (sd with index=2) as emmc
-    runkernel aspeed_g5_defconfig ast2600-evb \
-	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
     # Available in qemu-5.0+
     # SDIO (eMMC) doesn't work (yet) because of a bug in the dts file
     # (eMMC controller is not enabled).
