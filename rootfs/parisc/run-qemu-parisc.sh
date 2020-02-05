@@ -29,9 +29,9 @@ patch_defconfig()
 
 runkernel()
 {
-    local defconfig=$1
-    local fixup=$2
-    local rootfs=$3
+    local defconfig="generic-32bit_defconfig"
+    local fixup=$1
+    local rootfs=$2
     local pid
     local logfile="$(__mktemp)"
     local waitlist=("reboot: Restarting system" "Boot successful" "Requesting system reboot")
@@ -82,69 +82,69 @@ echo
 # than one CPU until qemu has been improved.
 
 retcode=0
-runkernel defconfig smp rootfs.cpio.gz
+runkernel smp rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:sdhci:mmc rootfs.ext2.gz
+runkernel smp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:nvme rootfs.ext2.gz
+runkernel smp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:sata-cmd646 rootfs.ext2.gz
+runkernel smp:sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:scsi rootfs.ext2.gz
+runkernel smp:scsi rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "smp:scsi[53C895A]" rootfs.ext2.gz
+runkernel "smp:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "smp:scsi[DC395]" rootfs.ext2.gz
+runkernel "smp:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "smp:scsi[AM53C974]" rootfs.ext2.gz
+runkernel "smp:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # panic: arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map.
-    runkernel defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
+    runkernel "smp:scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig "smp:scsi[MEGASAS2]" rootfs.ext2.gz
+    runkernel "smp:scsi[MEGASAS2]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
+    runkernel "smp:scsi[FUSION]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 
 # Run remaining tests with SMP disabled
-runkernel defconfig nosmp:usb-ohci rootfs.ext2.gz
+runkernel nosmp:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:usb-ehci rootfs.ext2.gz
+runkernel nosmp:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:usb-xhci rootfs.ext2.gz
+runkernel nosmp:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:usb-uas-ehci rootfs.ext2.gz
+runkernel nosmp:usb-uas-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:usb-uas-xhci rootfs.ext2.gz
+runkernel nosmp:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # duplicate some of the previous tests, with SMP disabled
-runkernel defconfig nosmp rootfs.cpio.gz
+runkernel nosmp rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:sdhci:mmc rootfs.ext2.gz
+runkernel nosmp:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:nvme rootfs.ext2.gz
+runkernel nosmp:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
