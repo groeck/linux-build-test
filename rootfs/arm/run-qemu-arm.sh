@@ -50,6 +50,7 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32 \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
@@ -60,6 +61,7 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
@@ -601,6 +603,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
 	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-ast2500-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2500-evb "" \
+	rootfs-armv5.ext2 automatic notests::usb aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
