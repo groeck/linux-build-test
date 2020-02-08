@@ -1097,6 +1097,14 @@ dowait()
 	for i in $(seq 0 $((${entries} - 1)))
 	do
 	    if ! grep -q -E "${waitlist[$i]}" ${logfile}; then
+		# The first entry is not always found; this can happen
+		# if qemu executes the reset before it is displayed.
+		# Look for alternate.
+	        if [[ $i -eq 0 ]]; then
+		    if grep -q "Requesting system reboot" ${logfile}; then
+			continue
+		    fi
+		fi
 		msg="failed (No \"${waitlist[$i]}\" message in log)"
 		retcode=1
 		break
