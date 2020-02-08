@@ -432,6 +432,10 @@ dumplog()
     local log="$2"
     local logsize="$(cat ${log} | wc -l)"
 
+    # strip off path name - it is irrelevant for the log
+    local basedir="$(pwd | sed -e 's/\//\\\//g')\/"
+    sed -i -e "s/${basedir}//" "${log}"
+
     echo "--------------"
     echo "Error log:"
     if [[ ${logsize} -lt ${maxsize} ]]; then
