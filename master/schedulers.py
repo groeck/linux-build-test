@@ -17,16 +17,23 @@ def currentTimeInRange(range):
     now=datetime.datetime.now()
     if end < start:	# crosses midnight
         if end >= now:	# not yet ended
-	    start -= datetime.timedelta(1)
+	    start -= datetime.timedelta(days=1)
 	else:		# possibly not yet started
-	    end += datetime.timedelta(1)
+	    end += datetime.timedelta(days=1)
     return start <= now <= end
 
-def timeToStart(start):
-    start=parser.parse(start)
+def timeToStart(range):
+    start = parser.parse(range[0])
+    end = parser.parse(range[1])
     now=datetime.datetime.now()
     if start > now:
+        # later today
 	delta=start-now
+	# delta includes fractions of seconds, so let's round up.
+	return delta.days*24*60*60 + delta.seconds + 1
+    if end < now:
+	# tomorrow and not later today
+	delta=start+datetime.timedelta(days=1)-now
 	# delta includes fractions of seconds, so let's round up.
 	return delta.days*24*60*60 + delta.seconds + 1
     return 0
@@ -107,7 +114,7 @@ class TimedSingleBranchScheduler(base.BaseScheduler):
 		d = self.timedChangeTimerFired()
 		d.addErrback(log.err, "while firing deferred timed timer")
 	    self._timed_change_timer = self._reactor.callLater(
-			timeToStart(self.timeRange[0]), fire_timer)
+			timeToStart(self.timeRange), fire_timer)
 	d.addCallback(set_timer)
 	return d
 
