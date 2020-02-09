@@ -436,6 +436,9 @@ dumplog()
     local basedir="$(pwd | sed -e 's/\//\\\//g')\/"
     sed -i -e "s/${basedir}//" "${log}"
 
+    # Empty lines are irrelevant / don't add value.
+    sed -i -e '/^$/d' "${log}"
+
     echo "--------------"
     echo "Error log:"
     if [[ ${logsize} -lt ${maxsize} ]]; then
