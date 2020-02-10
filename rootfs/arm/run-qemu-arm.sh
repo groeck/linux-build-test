@@ -388,6 +388,10 @@ runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::sd:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto nolocktests::flash64:mem128 vexpress-v2p-ca9.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128 vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
