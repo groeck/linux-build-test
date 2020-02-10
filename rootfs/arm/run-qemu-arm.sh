@@ -226,6 +226,9 @@ runkernel()
 
     kernel="arch/arm/boot/zImage"
     case ${mach} in
+    "sx1")
+	initcli+=" console=ttyS0,115200 earlycon=uart8250,mmio32,0xfffb0000,115200n8"
+	;;
     "mps2-an385")
 	extra_params+=" -bios ${progdir}/mps2-boot.axf"
 	initcli=""
@@ -668,6 +671,17 @@ if [ ${runall} -eq 1 ]; then
     # (eMMC controller is not enabled).
     runkernel aspeed_g5_defconfig tacoma-bmc \
 	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    # Data in flash is corrupted
+    runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic flash32.2
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
