@@ -254,19 +254,33 @@ __common_flashcmd()
     local rootfs="$2"
     local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
     local flashif="${fixup%%[0-9]*}"
-    local flashsize	# flash size in MB
+    local params
 
     if [[ "${flashif}" = "mtd" ]]; then
-        local flashsize="${fixup#mtd}"
+        params="${fixup#mtd}"
     else
-        local flashsize="${fixup#flash}"
+        params="${fixup#flash}"
 	flashif="pflash"
+    fi
+    # Sub-parameters are separated by '.'.
+    # First sub-parameter is flash size (in MB),
+    # second parameter is partition offset (in MB),
+    # third parameter is partition index.
+    local plist=(${params//./ })
+    local flashsize="${plist[0]}"
+    local seek="${plist[1]}"
+    if [[ -n "${seek}" ]]; then
+        seek="bs=1M seek=${seek}"
+    fi
+    local partition="${plist[2]}"
+    if [[ -z "${partition}" ]]; then
+	partition="0"
     fi
 
     dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
-    dd if="${rootfs}" of="${tmpfile}" conv=notrunc status=none
+    dd if="${rootfs}" of="${tmpfile}" ${seek} conv=notrunc status=none
     extra_params+=" -drive file=${tmpfile},format=raw,if=${flashif}"
-    initcli+=" root=/dev/mtdblock0"
+    initcli+=" root=/dev/mtdblock${partition}"
 }
 
 __common_mmccmd()
