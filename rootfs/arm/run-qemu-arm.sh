@@ -348,6 +348,10 @@ runkernel versatile_defconfig versatilepb "" \
 retcode=$?
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
+	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128 versatile-pb.dtb
+retcode=$?
+checkstate ${retcode}
+runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.cpio auto aeabi:pci::mem128 versatile-pb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
