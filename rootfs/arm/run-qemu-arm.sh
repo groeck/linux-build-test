@@ -34,18 +34,22 @@ skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
 	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512  \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32 \
@@ -53,21 +57,26 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
-skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd"
+skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
 
 . ${progdir}/../scripts/common.sh
