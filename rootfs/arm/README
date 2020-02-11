@@ -1,0 +1,16 @@
+n800/n810 (omap2420)
+--------------------
+
+Use omap2plus_defconfig.
+
+Run:
+
+qemu-system-arm -M n800 -kernel arch/arm/boot/zImage \
+	-monitor none -nographic \
+	-serial /dev/null -serial /dev/null -serial stdio \
+	--append "console=ttyS2 earlycon" \
+	-dtb arch/arm/boot/dts/omap2420-n800.dtb
+
+It will start but crash with
+	Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+and also generate a lot of backtraces.
