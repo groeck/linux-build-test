@@ -264,13 +264,19 @@ __common_flashcmd()
     fi
     # Sub-parameters are separated by '.'.
     # First sub-parameter is flash size (in MB),
-    # second parameter is partition offset (in MB),
+    # second parameter is partition offset (default in MB, accepts units),
     # third parameter is partition index.
-    local plist=(${params//./ })
+    local plist=(${params//,/ })
     local flashsize="${plist[0]}"
     local seek="${plist[1]}"
     if [[ -n "${seek}" ]]; then
-        seek="bs=1M seek=${seek}"
+	local unit="${seek##*[0-9]}"
+	if [[ -z "${unit}" ]]; then
+	    unit="M"
+	else
+	    seek="${seek%%[a-zA-Z]*}"
+	fi
+        seek="bs=1${unit} seek=${seek}"
     fi
     local partition="${plist[2]}"
     if [[ -z "${partition}" ]]; then
@@ -847,6 +853,8 @@ __setup_fragment()
 	echo "CONFIG_BTRFS_FS=y" >> ${fragment}
 	# Needed to address broken dependencies in -next (around 20190708)
 	echo "CONFIG_LIBCRC32C=y" >> ${fragment}
+	# MISC_FILESYSTEMS is needed for SQUASHFS
+	echo "CONFIG_MISC_FILESYSTEMS=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
 	echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
