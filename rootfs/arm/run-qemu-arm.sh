@@ -698,13 +698,9 @@ checkstate ${retcode}
 runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic ::sd
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # Data in flash is corrupted
-    runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic ::flash32.2
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic ::flash32,26,3
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
 	rootfs-arm-m3.cpio manual "" mps2-an385.dtb
