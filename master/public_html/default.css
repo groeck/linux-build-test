@@ -385,6 +385,12 @@ div.BuildWaterfall {
 
 .warnings {
 	color: #FFFFFF;
+	background-color: #ff8c00;
+	border-color: #C29D46;
+}
+
+.runtime-warnings {
+	color: #FFFFFF;
 	background-color: #fa3;
 	border-color: #C29D46;
 }
