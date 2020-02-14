@@ -72,6 +72,7 @@ skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
@@ -458,6 +459,9 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
 retcode=$((${retcode} + $?))
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::usb0:mem128 zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc702.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -466,7 +470,7 @@ runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zed.dtb
+	rootfs-armv5.ext2 auto ::usb0:mem128 zynq-zed.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
