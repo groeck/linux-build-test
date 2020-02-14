@@ -6,6 +6,8 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+machine=$1
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblaze}
 PREFIX=microblaze-linux-
 ARCH=microblaze
@@ -22,6 +24,11 @@ runkernel()
     local pid
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local logfile="$(__mktemp)"
+
+    if ! match_params "${machine}@${mach}"; then
+	echo "Skipping ${ARCH}:${defconfig} ... "
+	return 0
+    fi
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
