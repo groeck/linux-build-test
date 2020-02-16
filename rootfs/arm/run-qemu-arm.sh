@@ -93,6 +93,11 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
+    # Make sure MTD options and SQUASHFS, if enabled, are builtin
+    sed -i -e 's/CONFIG_MTD_BLOCK=m/CONFIG_MTD_BLOCK=y/' ${defconfig}
+    sed -i -e 's/CONFIG_MTD_PXA2XX=m/CONFIG_MTD_PXA2XX=y/' ${defconfig}
+    sed -i -e 's/CONFIG_SQUASHFS=m/CONFIG_SQUASHFS=y/' ${defconfig}
+
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
 
@@ -269,7 +274,7 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier")
+    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
 	initcli+=" console=ttyS0"
 	;;
     "collie")
@@ -281,20 +286,6 @@ runkernel()
 	;;
     "kzm" | "imx25-pdk" )
 	initcli+=" console=ttymxc0,115200"
-	;;
-    "mainstone")
-	dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
-	# dd if=${rootfs} of=/tmp/flash bs=262144 seek=17 conv=notrunc
-	# then boot from /dev/mtdblock2 (requires mtd to be built into kernel)
-	initcli+=" console=ttyS0"
-	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
-	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
-	;;
-    "z2")
-	# dd if=/dev/zero of=/tmp/flash bs=262144 count=128 >/dev/null 2>&1
-	dd if=/dev/zero of=/tmp/flash bs=262144 count=32 >/dev/null 2>&1
-	extra_params+=" -drive file=/tmp/flash,format=raw,if=pflash"
-	initcli+=" console=ttyS0"
 	;;
     "raspi2")
 	initcli+=" earlycon=pl011,0x3f201000"
@@ -554,37 +545,45 @@ checkstate ${retcode}
 
 # disable options to avoid running out of memory
 runkernel pxa_defconfig akita "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig mainstone "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig mainstone "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::flash32,4352k,2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig spitz "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig tosa "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig z2 "" \
-	rootfs-armv5.cpio automatic nofdt:nodebug:notests:novirt:nousb:noscsi
+	rootfs-armv5.cpio automatic noextras:nofdt
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig z2 "" \
+	rootfs-armv5.sqf automatic noextras:nofdt::flash8,384k,2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
