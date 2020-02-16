@@ -14,3 +14,15 @@ qemu-system-arm -M n800 -kernel arch/arm/boot/zImage \
 It will start but crash with
 	Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
 and also generate a lot of backtraces.
+
+
+spitz and related
+-----------------
+
+Flash probe fails with
+
+physmap-flash physmap-flash: physmap platform flash device: [mem 0x00000000-0x007fffff]
+physmap-flash physmap-flash: map_probe failed
+
+It is unknown what causes the failure. Enabling various configuration options
+did not help.
