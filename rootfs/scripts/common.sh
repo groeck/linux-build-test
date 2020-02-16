@@ -718,6 +718,16 @@ __setup_fragment()
 	smp*)
 	    echo "CONFIG_SMP=y" >> ${fragment}
 	    ;;
+	noextras)
+	    nodebug=1
+	    nocd=1
+	    nofs=1
+	    nonvme=1
+	    noscsi=1
+	    notests=1
+	    nousb=1
+	    novirt=1
+	    ;;
 	nodebug) nodebug=1 ;;
 	nocd) nocd=1 ;;
 	nofs) nofs=1 ;;
