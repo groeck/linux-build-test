@@ -58,6 +58,7 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
