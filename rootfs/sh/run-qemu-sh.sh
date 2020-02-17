@@ -38,6 +38,9 @@ patch_defconfig()
     # Drop command line overwrite
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
+    # Enable MTD_BLOCK to be able to boot from flash
+    echo "CONFIG_MTD_BLOCK=y" >> ${defconfig}
+
     # Conditionally enable earlyprintk
     echo "${CONFIG}" >> ${defconfig}
 }
@@ -105,6 +108,8 @@ echo
 
 retcode=0
 runkernel rts7751r2dplus_defconfig "" rootfs.cpio.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2.gz
 retcode=$((retcode + $?))

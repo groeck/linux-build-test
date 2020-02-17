@@ -1,6 +1,0 @@
-Boot tests with if=pflash fail with:
-
-physmap-flash physmap-flash: physmap platform flash device: [mem 0x00000000-0x02000000]
-physmap-flash physmap-flash: map_probe failed
-
-Reason is unknown.
