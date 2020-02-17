@@ -26,3 +26,9 @@ physmap-flash physmap-flash: map_probe failed
 
 It is unknown what causes the failure. Enabling various configuration options
 did not help.
+
+collie
+------
+
+Collie supports flash, but it doesn't instantiate. do_map_probe()
+from the Linux kernel returns an error, and pflash trace is inconclusive.
