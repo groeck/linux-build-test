@@ -99,6 +99,10 @@ patch_defconfig()
     sed -i -e 's/CONFIG_MTD_PXA2XX=m/CONFIG_MTD_PXA2XX=y/' ${defconfig}
     sed -i -e 's/CONFIG_SQUASHFS=m/CONFIG_SQUASHFS=y/' ${defconfig}
 
+    # Make sure that MMC_BLOCK and MMC_PXA, if enabled, are builtin
+    sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
+    sed -i -e 's/CONFIG_MMC_PXA=m/CONFIG_MMC_PXA=y/' ${defconfig}
+
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
 
@@ -563,14 +567,26 @@ runkernel pxa_defconfig mainstone "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::flash32,4352k,2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig mainstone "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig spitz "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig terrier "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -585,6 +601,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig z2 "" \
 	rootfs-armv5.sqf automatic noextras:nofdt::flash8,384k,2
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig z2 "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
