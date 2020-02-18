@@ -388,6 +388,9 @@ __common_diskcmd()
     "ata")
 	# standard ata/sata drive provided by platform
 	initcli+=" root=/dev/${hddev}"
+	# "rootwait" may be needed for PCMCIA drives and does not hurt
+	# otherwise.
+	initcli+=" rootwait"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
     "ide")
