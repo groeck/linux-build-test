@@ -89,6 +89,11 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # Disable Bluetooth and wireless. We won't ever use or test it.
+    echo "CONFIG_BT=n" >> ${defconfig}
+    echo "CONFIG_WLAN=n" >> ${defconfig}
+    echo "CONFIG_WIRELESS=n" >> ${defconfig}
+
     # Always enable ...
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
@@ -102,6 +107,15 @@ patch_defconfig()
     # Make sure that MMC_BLOCK and MMC_PXA, if enabled, are builtin
     sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
     sed -i -e 's/CONFIG_MMC_PXA=m/CONFIG_MMC_PXA=y/' ${defconfig}
+
+    # Options needed to be built into the kernel for ATA support
+    # on pxa devices
+    sed -i -e 's/CONFIG_ATA=m/CONFIG_ATA=y/' ${defconfig}
+    sed -i -e 's/CONFIG_BLK_DEV_SD=m/CONFIG_BLK_DEV_SD=y/' ${defconfig}
+    sed -i -e 's/CONFIG_PCCARD=m/CONFIG_PCCARD=y/' ${defconfig}
+    sed -i -e 's/CONFIG_PCMCIA=m/CONFIG_PCMCIA=y/' ${defconfig}
+    sed -i -e 's/CONFIG_PATA_PCMCIA=m/CONFIG_PATA_PCMCIA=y/' ${defconfig}
+    sed -i -e 's/CONFIG_PCMCIA_PXA2XX=m/CONFIG_PCMCIA_PXA2XX=y/' ${defconfig}
 
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
@@ -580,6 +594,10 @@ runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig spitz "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::ata
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
@@ -587,6 +605,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig terrier "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::ata
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
