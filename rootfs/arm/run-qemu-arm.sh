@@ -39,6 +39,7 @@ skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
 	arm:raspi2:multi_v7_defconfig:sd \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512  \
+	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_44="arm:raspi2:multi_v7_defconfig \
