@@ -617,6 +617,10 @@ runkernel pxa_defconfig tosa "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig tosa "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::ata
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig z2 "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
