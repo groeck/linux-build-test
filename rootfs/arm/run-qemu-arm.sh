@@ -109,7 +109,7 @@ patch_defconfig()
     sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
     sed -i -e 's/CONFIG_MMC_PXA=m/CONFIG_MMC_PXA=y/' ${defconfig}
 
-    # Options needed to be built into the kernel for ATA support
+    # Options needed to be built into the kernel for ATA and USB support
     # on pxa devices
     sed -i -e 's/CONFIG_ATA=m/CONFIG_ATA=y/' ${defconfig}
     sed -i -e 's/CONFIG_BLK_DEV_SD=m/CONFIG_BLK_DEV_SD=y/' ${defconfig}
@@ -117,6 +117,10 @@ patch_defconfig()
     sed -i -e 's/CONFIG_PCMCIA=m/CONFIG_PCMCIA=y/' ${defconfig}
     sed -i -e 's/CONFIG_PATA_PCMCIA=m/CONFIG_PATA_PCMCIA=y/' ${defconfig}
     sed -i -e 's/CONFIG_PCMCIA_PXA2XX=m/CONFIG_PCMCIA_PXA2XX=y/' ${defconfig}
+    sed -i -e 's/CONFIG_USB=m/CONFIG_USB=y/' ${defconfig}
+    sed -i -e 's/CONFIG_USB_STORAGE=m/CONFIG_USB_STORAGE=y/' ${defconfig}
+    sed -i -e 's/CONFIG_USB_OHCI_HCD=m/CONFIG_USB_OHCI_HCD=y/' ${defconfig}
+    sed -i -e 's/CONFIG_USB_OHCI_HCD_PXA27X=m/CONFIG_USB_OHCI_HCD_PXA27X=y/' ${defconfig}
 
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
@@ -599,6 +603,10 @@ runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::ata
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig spitz "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::usb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
@@ -610,6 +618,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::ata
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig terrier "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
