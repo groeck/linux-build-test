@@ -100,27 +100,32 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
-    # Make sure MTD options and SQUASHFS, if enabled, are builtin
+    # Options needed to be built into the kernel for device support
+    # on pxa devices
+    # MTD, squashfs
     sed -i -e 's/CONFIG_MTD_BLOCK=m/CONFIG_MTD_BLOCK=y/' ${defconfig}
     sed -i -e 's/CONFIG_MTD_PXA2XX=m/CONFIG_MTD_PXA2XX=y/' ${defconfig}
     sed -i -e 's/CONFIG_SQUASHFS=m/CONFIG_SQUASHFS=y/' ${defconfig}
-
-    # Make sure that MMC_BLOCK and MMC_PXA, if enabled, are builtin
+    # MMC
     sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
     sed -i -e 's/CONFIG_MMC_PXA=m/CONFIG_MMC_PXA=y/' ${defconfig}
-
-    # Options needed to be built into the kernel for ATA and USB support
-    # on pxa devices
+    # PCMCIA
     sed -i -e 's/CONFIG_ATA=m/CONFIG_ATA=y/' ${defconfig}
     sed -i -e 's/CONFIG_BLK_DEV_SD=m/CONFIG_BLK_DEV_SD=y/' ${defconfig}
     sed -i -e 's/CONFIG_PCCARD=m/CONFIG_PCCARD=y/' ${defconfig}
     sed -i -e 's/CONFIG_PCMCIA=m/CONFIG_PCMCIA=y/' ${defconfig}
     sed -i -e 's/CONFIG_PATA_PCMCIA=m/CONFIG_PATA_PCMCIA=y/' ${defconfig}
     sed -i -e 's/CONFIG_PCMCIA_PXA2XX=m/CONFIG_PCMCIA_PXA2XX=y/' ${defconfig}
+    # USB
     sed -i -e 's/CONFIG_USB=m/CONFIG_USB=y/' ${defconfig}
     sed -i -e 's/CONFIG_USB_STORAGE=m/CONFIG_USB_STORAGE=y/' ${defconfig}
     sed -i -e 's/CONFIG_USB_OHCI_HCD=m/CONFIG_USB_OHCI_HCD=y/' ${defconfig}
     sed -i -e 's/CONFIG_USB_OHCI_HCD_PXA27X=m/CONFIG_USB_OHCI_HCD_PXA27X=y/' ${defconfig}
+    # NAND (spitz)
+    # Doesn't work as-is; it looks like NAND images need to be
+    # specially prepared.
+    # sed -i -e 's/CONFIG_MTD_RAW_NAND=m/CONFIG_MTD_RAW_NAND=y/' ${defconfig}
+    # sed -i -e 's/CONFIG_MTD_NAND_SHARPSL=m/CONFIG_MTD_NAND_SHARPSL=y/' ${defconfig}
 
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
@@ -588,6 +593,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig mainstone "" \
 	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig mainstone "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
