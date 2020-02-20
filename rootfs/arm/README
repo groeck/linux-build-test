@@ -24,8 +24,17 @@ Flash probe fails with
 physmap-flash physmap-flash: physmap platform flash device: [mem 0x00000000-0x007fffff]
 physmap-flash physmap-flash: map_probe failed
 
-It is unknown what causes the failure. Enabling various configuration options
-did not help.
+This is because the ROM is at address 0, and the root file system
+starts at offset 0x00140000. The qemu spitz code supports the
+address range, but allocates it as ROM at address 0, and doesn't
+support attaching a file to it.
+
+There is a NAND flash at PXA_CS3_PHYS (0x0c000000), to be instantiated
+with IF_MTD. Instantiating it requires CONFIG_MTD_RAW_NAND=y and
+CONFIG_MTD_NAND_SHARPSL=y, but that only results in "bad erase block"
+and uncorrectable ECC errors. The problem is seen even with old kernel
+versions and with old versions of qemu, so it doesn't look like it was
+introduced recently.
 
 collie
 ------
