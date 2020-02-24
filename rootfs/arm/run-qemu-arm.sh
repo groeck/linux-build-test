@@ -582,6 +582,18 @@ runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel pxa_defconfig borzoi "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::mmc
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig borzoi "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::ata
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel pxa_defconfig borzoi "" \
+	rootfs-armv5.ext2 automatic noextras:nofdt::usb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pxa_defconfig mainstone "" \
 	rootfs-armv5.cpio automatic noextras:nofdt
