@@ -409,6 +409,14 @@ runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+	rootfs-armv7a.ext2 manual nodrm::usb0:mem256 imx6ul-14x14-evk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
+	rootfs-armv7a.ext2 manual nodrm::usb1:mem256 imx6ul-14x14-evk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
@@ -459,6 +467,14 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual ::mmc1:mem256 imx6dl-sabrelite.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual ::usb0:mem256 imx6dl-sabrelite.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual ::usb1:mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
