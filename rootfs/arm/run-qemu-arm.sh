@@ -395,6 +395,14 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" \
 	rootfs-armv5.cpio manual nonand::mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel imx_v4_v5_defconfig imx25-pdk "" \
+	rootfs-armv5.ext2 manual nonand::sd:mem128 imx25-pdk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel imx_v4_v5_defconfig imx25-pdk "" \
+	rootfs-armv5.ext2 manual nonand::usb:mem128 imx25-pdk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig kzm "" \
 	rootfs-armv5.cpio manual nodrm::mem128
