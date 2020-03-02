@@ -29,6 +29,7 @@ PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
 	arm:cubieboard:multi_v7_defconfig:usb:mem128 \
 	arm:cubieboard:multi_v7_defconfig:sata:mem128 \
+	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
@@ -42,9 +43,11 @@ skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
-skip_44="arm:raspi2:multi_v7_defconfig \
+skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
+	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
@@ -62,6 +65,7 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
+	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
@@ -400,7 +404,11 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::usb:mem128 imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::usb0:mem128 imx25-pdk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel imx_v4_v5_defconfig imx25-pdk "" \
+	rootfs-armv5.ext2 manual nonand::usb1:mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
