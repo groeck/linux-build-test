@@ -30,6 +30,7 @@ skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
 	arm:cubieboard:multi_v7_defconfig:usb:mem128 \
 	arm:cubieboard:multi_v7_defconfig:sata:mem128 \
 	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
+	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:usb0:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
