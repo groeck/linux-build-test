@@ -763,6 +763,15 @@ __setup_fragment()
 
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
+	# kunit
+	echo "CONFIG_KUNIT=y" >> ${fragment}
+	echo "CONFIG_KUNIT_TEST=y" >> ${fragment}
+	echo "CONFIG_PM_QOS_KUNIT_TEST=y" >> ${fragment}
+	echo "CONFIG_EXT4_KUNIT_TESTS=y" >> ${fragment}
+	echo "CONFIG_SYSCTL_KUNIT_TEST=y" >> ${fragment}
+	echo "CONFIG_LIST_KUNIT_TEST=y" >> ${fragment}
+	echo "CONFIG_SECURITY_APPARMOR_KUNIT_TEST=y" >> ${fragment}
+	# other
 	echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n" >> ${fragment}
 	echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
 	echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
@@ -792,9 +801,9 @@ __setup_fragment()
 	    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
 	    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
 	    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
-	    echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
-	    echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
-	    echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+	    # echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
+	    # echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
+	    # echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
 	fi
 
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
@@ -1064,10 +1073,9 @@ dowait()
 
     while true
     do
-	kill -0 ${pid} >/dev/null 2>&1
-	if [ $? -ne 0 ]
-	then
-		break
+        # terminate if process is no longer running
+	if ! kill -0 ${pid} >/dev/null 2>&1; then
+	    break
 	fi
 
 	# If this qemu session doesn't stop by itself, help it along.
@@ -1076,24 +1084,17 @@ dowait()
 	# We need to do this prior to checking for a crash since
 	# some kernels _do_ crash on reboot (eg sparc64)
 
-	if [ "${manual}" = "manual" ]
-	then
-	    grep "${waitlist[0]}" ${logfile} >/dev/null 2>&1
-	    if [ $? -eq 0 ]
-	    then
+	if [ "${manual}" = "manual" ]; then
+	    if grep -q "${waitlist[0]}" ${logfile}; then
 		dokill ${pid}
 		break
 	    fi
 	fi
 
-	egrep "Oops: |Kernel panic|Internal error:|segfault" ${logfile} >/dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
+	if grep -q -e "Oops: |Kernel panic|Internal error:|segfault" ${logfile}; then
 	    # x86 has the habit of crashing in restart once in a while.
 	    # Try to ignore it.
-	    egrep "^machine restart" ${logfile} >/dev/null 2>&1
-	    if [ $? -ne 0 ]
-	    then
+	    if ! grep -q -e "^machine restart" ${logfile}; then
 		msg="failed (crashed)"
 		retcode=1
 	    fi
@@ -1114,8 +1115,7 @@ dowait()
 	    st=0
 	fi
 
-	if [ $t -gt ${MAXTIME} ]
-	then
+	if [ $t -gt ${MAXTIME} ]; then
 		msg="failed (timeout)"
 		dokill ${pid}
 		retcode=1
@@ -1127,8 +1127,16 @@ dowait()
 	echo -n .
     done
 
-    if [ ${retcode} -eq 0 ]
-    then
+    # The system may have crashed without us noticing above.
+    # Try to catch it here.
+    if [ ${retcode} -eq 0 ]; then
+	if grep -q -e "Oops: |Kernel panic|Internal error:|segfault" ${logfile}; then
+	    msg="failed (crashed)"
+	    retcode=1
+	fi
+    fi
+
+    if [ ${retcode} -eq 0 ]; then
 	for i in $(seq 0 $((${entries} - 1)))
 	do
 	    if ! grep -q -E "${waitlist[$i]}" ${logfile}; then
