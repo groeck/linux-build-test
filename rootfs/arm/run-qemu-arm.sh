@@ -8,6 +8,7 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -298,14 +299,22 @@ runkernel()
 	# Not supported in mainline version of qemu
 	QEMUCMD="${QEMU_LINARO}"
 	;;
-    "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | "witherspoon-bmc")
+    "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
+    "witherspoon-bmc" | "swift-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "swift-bmc")
+    "tacoma-bmc")
+	QEMUCMD="${QEMU_MASTER}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
+	extra_params+=" -nodefaults"
+	;;
+    "orangepi-pc")
+	QEMUCMD="${QEMU_MASTER}"
+	initcli+=" console=ttyS0,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
@@ -568,6 +577,23 @@ runkernel multi_v7_defconfig ast2600-evb "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+runkernel multi_v7_defconfig orangepi-pc "" \
+	rootfs-armv7a.cpio automatic "" sun8i-h3-orangepi-pc.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig orangepi-pc "" \
+	rootfs-armv7a.ext2 automatic ::sd sun8i-h3-orangepi-pc.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig orangepi-pc "" \
+	rootfs-armv7a.ext2 automatic ::usb0 sun8i-h3-orangepi-pc.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig orangepi-pc "" \
+	rootfs-armv7a.ext2 automatic ::usb1 sun8i-h3-orangepi-pc.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
 runkernel exynos_defconfig smdkc210 "" \
 	rootfs-armv5.cpio manual cpuidle:nocrypto::mem128 exynos4210-smdkv310.dtb
 retcode=$((${retcode} + $?))
@@ -763,7 +789,7 @@ if [ ${runall} -eq 1 ]; then
     # because drivers/mtd/spi-nor/aspeed-smc.c doesn't have a 'compatible'
     # entry for aspeed,ast2600-fmc or aspeed,ast2600-spi.
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-    	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
     # requires qemu v5.0+ which instantiates sd2 (sd with index=2) as emmc
@@ -799,12 +825,16 @@ runkernel aspeed_g5_defconfig swift-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+runkernel aspeed_g5_defconfig tacoma-bmc "" \
+	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
 if [ ${runall} -eq 1 ]; then
-    # Available in qemu-5.0+
     # SDIO (eMMC) doesn't work (yet) because of a bug in the dts file
     # (eMMC controller is not enabled).
-    runkernel aspeed_g5_defconfig tacoma-bmc \
-	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+    runkernel aspeed_g5_defconfig tacoma-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mmc aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
