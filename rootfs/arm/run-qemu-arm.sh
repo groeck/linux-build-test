@@ -71,6 +71,7 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:orangepi-pc:multi_v7_defconfig:usb0 \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
