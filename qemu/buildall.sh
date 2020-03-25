@@ -68,6 +68,16 @@ then
 	cd qemu
 fi
 
+dobuild_common()
+{
+    dobuild $1 $2 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-xen --disable-xen-pci-passthrough \
+	--disable-libssh $3"
+    checkexit $?
+}
+
 if [ -z "$1" -o "$1" = "meta" ]
 then
     git clean -d -x -f -q
@@ -179,82 +189,41 @@ fi
 
 if [ -z "$1" -o "$1" = "v3.1" ]
 then
-    dobuild v3.1.0-local v3.1 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-    dobuild v3.1.0-q800 v3.1-m68k \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
-	--target-list=m68k-softmmu"
-    checkexit $?
+    dobuild_common v3.1.0-local v3.1
+    dobuild_common v3.1.0-q800 v3.1-m68k
+	"--disable-libssh --target-list=m68k-softmmu"
 fi
 
 if [ -z "$1" -o "$1" = "v4.0" ]; then
-    dobuild v4.0.1-local v4.0 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
+    dobuild_common v4.0.1-local v4.0
 fi
 
 if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
-    dobuild v4.0.0-q800 v4.0-m68k \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
-	--target-list=m68k-softmmu"
-    checkexit $?
+    dobuild_common v4.0.0-q800 v4.0-m68k "--disable-libssh --target-list=m68k-softmmu"
 fi
 
 if [ -z "$1" -o "$1" = "v4.1" ]; then
-    dobuild v4.1.1-local v4.1 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
-	--disable-strip"
-    checkexit $?
+    dobuild_common v4.1.1-local v4.1
 fi
 
 if [ -z "$1" -o "$1" = "v4.1-q800" ]; then
-    dobuild v4.1.0-q800 v4.1-m68k \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--target-list=m68k-softmmu"
-    checkexit $?
+    dobuild_common v4.1.0-q800 v4.1-m68k "--disable-libssh --target-list=m68k-softmmu"
 fi
 
 if [ -z "$1" -o "$1" = "v4.2" ]; then
-    dobuild v4.2.0-local v4.2 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh"
-    checkexit $?
+    dobuild_common v4.2.0-local v4.2
+fi
+
+if [ -z "$1" -o "$1" = "v5.0" ]; then
+    dobuild_common v5.0.0-local v5.0
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
-    dobuild master-local master \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh --disable-strip"
-    checkexit $?
+    dobuild_common master-local master "--disable-strip"
     # While it would be desirable to have debugging enabled in general,
     # it slows down the system too much. Generate separate master-debug
     # specifically for to have images with debugging enabled available
     # if needed.
-    dobuild master-local master-debug \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh \
-	--enable-debug --disable-strip --extra-cflags=-g"
-    checkexit $?
+    dobuild_common master-local master-debug \
+	"--enable-debug --disable-strip --extra-cflags=-g"
 fi
