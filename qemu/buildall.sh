@@ -108,75 +108,6 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "csky" ]
-then
-    dobuild v2.8.1-local-csky csky \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
-	--disable-werror \
-	--target-list=cskyv2-softmmu \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-fi
-
-if [ -z "$1" -o "$1" = "v2.8" ]
-then
-    dobuild v2.8.1-local v2.8 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
-	--disable-werror \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-fi
-
-if [ -z "$1" -o "$1" = "v2.9" ]
-then
-    dobuild v2.9.1-local v2.9 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-fi
-
-if [ -z "$1" -o "$1" = "v2.10" ]
-then
-    dobuild v2.10.2-local v2.10 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-fi
-
-if [ -z "$1" -o "$1" = "v2.11" ]
-then
-    dobuild v2.11.2-local v2.11 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-    dobuild v2.11.0-q800 v2.11-m68k \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-xen --disable-xen-pci-passthrough \
-	--with-gtkabi=3.0 \
-	--target-list=m68k-softmmu"
-    checkexit $?
-fi
-
-if [ -z "$1" -o "$1" = "v2.12" ]
-then
-    dobuild v2.12.1-local v2.12 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-fi
-
 if [ -z "$1" -o "$1" = "v3.0" ]
 then
     dobuild v3.0.1-local v3.0 \
@@ -187,27 +118,12 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "v3.1" ]
-then
-    dobuild_common v3.1.0-local v3.1
-    dobuild_common v3.1.0-q800 v3.1-m68k
-	"--disable-libssh --target-list=m68k-softmmu"
-fi
-
 if [ -z "$1" -o "$1" = "v4.0" ]; then
     dobuild_common v4.0.1-local v4.0
 fi
 
-if [ -z "$1" -o "$1" = "v4.0-q800" ]; then
-    dobuild_common v4.0.0-q800 v4.0-m68k "--disable-libssh --target-list=m68k-softmmu"
-fi
-
 if [ -z "$1" -o "$1" = "v4.1" ]; then
     dobuild_common v4.1.1-local v4.1
-fi
-
-if [ -z "$1" -o "$1" = "v4.1-q800" ]; then
-    dobuild_common v4.1.0-q800 v4.1-m68k "--disable-libssh --target-list=m68k-softmmu"
 fi
 
 if [ -z "$1" -o "$1" = "v4.2" ]; then
