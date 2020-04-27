@@ -60,7 +60,7 @@ PREFIX_X86="x86_64-linux-"
 BUILDDIR="$(mktemp -d /tmp/buildbot-builddir.XXXXX)"
 LOG="/tmp/buildlog.stable-build-arch"
 
-trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT
+trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGBUS SIGFPE SIGSEGV SIGALRM SIGTERM SIGPWR
 
 __cleanup()
 {
