@@ -49,4 +49,4 @@ retcode=$((retcode + $?))
 runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 ttyS0 rootfs.cpio
 retcode=$((retcode + $?))
 
-exit $?
+exit ${retcode}
