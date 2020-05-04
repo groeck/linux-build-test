@@ -132,6 +132,8 @@ fi
 
 if [ -z "$1" -o "$1" = "v5.0" ]; then
     dobuild_common v5.0.0-local v5.0
+    dobuild_common v5.0.0-local v5.0-debug \
+	"--enable-debug --disable-strip --extra-cflags=-g"
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
