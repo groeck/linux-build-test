@@ -217,10 +217,6 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little::nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_e5500_defconfig smp mpc8544ds e5500 ttyS0 \
-	arch/powerpc/boot/uImage \
-	../ppc/rootfs.cpio.gz auto "dt_compatible=fsl,,P5020DS"
-retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
