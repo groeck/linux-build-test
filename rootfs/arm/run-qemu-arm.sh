@@ -538,15 +538,15 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.cpio manual ::mem512 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::usb:mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::usb:mem512 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::sata:mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::sata:mem512 sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -861,7 +861,7 @@ if [ ${runall} -eq 1 ]; then
     # which calls musb_read_fifosize(), which in turn calls the function
     # with parameter MUSB_FIFOSIZE=0x0f.
     runkernel sunxi_defconfig cubieboard "" \
-	rootfs-armv5.cpio manual ::mem128 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.cpio manual ::mem512 sun4i-a10-cubieboard.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
