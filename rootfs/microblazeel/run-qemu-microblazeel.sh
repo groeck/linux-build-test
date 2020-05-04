@@ -3,6 +3,11 @@
 dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
+parse_args "$@"
+shift $((OPTIND - 1))
+
+machine=$1
+
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
 PREFIX=microblazeel-linux-
 ARCH=microblaze
@@ -20,6 +25,11 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local logfile="$(__mktemp)"
 
+    if ! match_params "${machine}@${mach}"; then
+	echo "Skipping ${ARCH}:${defconfig} ... "
+	return 0
+    fi
+
     echo -n "Building ${ARCH}:${mach}:${defconfig} ... "
 
     dosetup -d "${rootfs}" "${defconfig}"
@@ -29,6 +39,7 @@ runkernel()
 
     echo -n "running ..."
 
+    [[ ${dodebug} -ne 0 ]] && set -x
     ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "$(rootfsname ${rootfs})" \
@@ -36,6 +47,7 @@ runkernel()
 	-monitor none -serial stdio -nographic \
 	> ${logfile} 2>&1 &
     pid=$!
+    [[ ${dodebug} -ne 0 ]] && set +x
     dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
