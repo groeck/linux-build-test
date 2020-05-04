@@ -424,7 +424,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig kzm "" \
-	rootfs-armv5.cpio manual nodrm::mem128
+	rootfs-armv5.cpio manual nodrm
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
