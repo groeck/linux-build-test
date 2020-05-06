@@ -39,6 +39,10 @@ dir=$(cd $(dirname $0); pwd)
 
 skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	powernv:powernv_defconfig:initrd \
+	powernv:powernv_defconfig:nvme:rootfs \
+	powernv:powernv_defconfig:usb-xhci:rootfs \
+	powernv:powernv_defconfig:scsi[MEGASAS]:rootfs \
+	powernv:powernv_defconfig:sdhci:mmc:rootfs \
 	ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
 	pseries:pseries_defconfig:sata-sii3112:rootfs \
@@ -51,6 +55,10 @@ skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	pseries:pseries_defconfig:little:nvme:rootfs \
 	pseries:pseries_defconfig:little:usb:rootfs"
 skip_44="powernv:powernv_defconfig:initrd \
+	powernv:powernv_defconfig:nvme:rootfs \
+	powernv:powernv_defconfig:usb-xhci:rootfs \
+	powernv:powernv_defconfig:scsi[MEGASAS]:rootfs \
+	powernv:powernv_defconfig:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:initrd \
 	pseries:pseries_defconfig:little:scsi:rootfs \
@@ -232,8 +240,21 @@ retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500::sata-sii3112 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
+
 runkernel powernv_defconfig "" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig "::nvme" powernv POWER9 hvc0 \
+	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig "::usb-xhci" powernv POWER9 hvc0 \
+	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig "::scsi[MEGASAS]" powernv POWER9 hvc0 \
+	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
+retcode=$((${retcode} + $?))
+runkernel powernv_defconfig "::sdhci:mmc" powernv POWER9 hvc0 \
+	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
