@@ -152,7 +152,7 @@ echo
 
 runkernel virt defconfig smp:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:efi:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:mem512:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
@@ -164,7 +164,7 @@ runkernel virt defconfig smp6:mem512:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp8:mem512:virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:mem512:virtio-blk rootfs.ext2.gz
+runkernel virt defconfig smp:efi:mem512:virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:mem512:nvme rootfs.btrfs.gz
 retcode=$((retcode + $?))
@@ -172,7 +172,7 @@ runkernel virt defconfig smp4:mem512:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:mem512:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:mem512:scsi[AM53C974]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:efi:mem512:scsi[AM53C974]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:mem512:scsi[MEGASAS]" rootfs.ext2.gz
 retcode=$((retcode + $?))
