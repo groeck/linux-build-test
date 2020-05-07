@@ -42,9 +42,7 @@ runkernel()
     local defconfig=$2
     local fixup=$3
     local rootfs=$4
-    local pid
     local waitlist=("Power off|Power down" "Boot successful" "Requesting system poweroff")
-    local logfile="$(__mktemp)"
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then
@@ -82,21 +80,15 @@ runkernel()
 	KERNEL="vmlinux"
     fi
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M virt -m 512M -no-reboot \
+    execute automatic waitlist[@] \
+      ${QEMU} -M virt -m 512M -no-reboot \
 	-bios "${BIOS}" \
 	-kernel "${KERNEL}" \
 	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
 	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200" \
-	-nographic -monitor none \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor none
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
