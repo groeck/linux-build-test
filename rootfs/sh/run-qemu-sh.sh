@@ -50,8 +50,6 @@ runkernel()
     local defconfig=$1
     local fixup=$2
     local rootfs=$3
-    local pid
-    local logfile=$(__mktemp)
     local waitlist=("Power down" "Boot successful" "Poweroff")
     local build="${ARCH}:${defconfig}"
 
@@ -82,24 +80,13 @@ runkernel()
 	extra_params+=" -d int,mmu,in_asm,guest_errors,unimp,pcall -D ${errlog}"
     fi
 
-    [[ ${dodebug} -eq 1 ]] && set -x
-
-    ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
+    execute automatic waitlist[@] \
+      ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	${extra_params} \
 	-append "${initcli}" \
 	-serial null -serial stdio -net nic,model=rtl8139 -net user \
-	-nographic -monitor null \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor null
 
-    [[ ${dodebug} -eq 1 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
-    local rv=$?
-    if [[ ${dodebug} -eq 2 && ${rv} -ne 0 ]]; then
-	logfile="$(mktemp sh)"
-	mv "${errlog}" "${logfile}"
-    fi
     return ${rv}
 }
 
