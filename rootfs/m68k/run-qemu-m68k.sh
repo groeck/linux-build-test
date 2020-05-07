@@ -50,9 +50,7 @@ runkernel()
     local cpu=$2
     local defconfig=$3
     local rootfs=$4
-    local pid
     local waitlist=("Rebooting" "Boot successful")
-    local logfile="$(__mktemp)"
     local build="${mach}:${cpu}:${defconfig}"
     local qemu="${QEMU}"
 
@@ -90,19 +88,13 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${qemu} -M ${mach} \
+    execute manual waitlist[@] \
+      ${qemu} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
 	${diskcmd} \
-	-append "${initcli} console=ttyS0,115200" \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-append "${initcli} console=ttyS0,115200"
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
 
