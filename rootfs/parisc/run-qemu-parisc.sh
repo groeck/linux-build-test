@@ -32,8 +32,6 @@ runkernel()
     local defconfig="generic-32bit_defconfig"
     local fixup=$1
     local rootfs=$2
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("reboot: Restarting system" "Boot successful" "Requesting system reboot")
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
     local cache="${defconfig}:${fixup//smp*/smp}"
@@ -60,17 +58,12 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel vmlinux -no-reboot \
+    execute automatic waitlist[@] \
+      ${QEMU} -kernel vmlinux -no-reboot \
 	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 ${extracli}" \
-	-nographic -monitor null > ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor null
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
