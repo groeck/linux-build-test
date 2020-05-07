@@ -32,8 +32,6 @@ runkernel()
     local defconfig=$1
     local fixup=$2
     local rootfs=$3
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting" "Restarting system")
     local build="${ARCH}:${defconfig}"
 
@@ -62,19 +60,13 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M clipper \
+    execute auto waitlist[@] \
+      ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
 	${extra_params} \
 	-append "${initcli} console=ttyS0" \
-	-m 128M -nographic -monitor null -serial stdio \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-m 128M -nographic -monitor null -serial stdio
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} auto waitlist[@]
     return $?
 }
 
