@@ -219,8 +219,6 @@ runkernel()
     local dtb=$7
     local ddtb="${dtb%.dtb}"
     local dtbfile="arch/arm/boot/dts/${dtb}"
-    local pid
-    local retcode
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
@@ -369,19 +367,16 @@ runkernel()
 	;;
     esac
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-    ${QEMUCMD} -M ${mach} \
+    execute ${mode} waitlist[@] \
+        ${QEMUCMD} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
 	    -kernel ${kernel} \
 	    -no-reboot \
 	    ${extra_params} \
 	    ${initcli:+--append "${initcli}"} \
 	    ${dtbcmd} \
-	    -nographic -monitor null -serial stdio \
-	    > ${logfile} 2>&1 &
-    pid=$!
-    [[ ${dodebug} -ne 0 ]] && set +x
-    dowait ${pid} ${logfile} ${mode} waitlist[@]
+	    -nographic -monitor null -serial stdio
+
     return $?
 }
 
@@ -394,11 +389,11 @@ retcode=$?
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128 versatile-pb.dtb
-retcode=$?
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.cpio auto aeabi:pci::mem128 versatile-pb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel versatile_defconfig versatileab "" \
