@@ -1209,3 +1209,24 @@ dowait()
     fi
     return ${retcode}
 }
+
+execute()
+{
+    local waitflag=$1
+    local waitlist=("${!2}")
+    local cmd="$3"
+    local pid
+    local logfile="$(__mktemp)"
+
+    shift; shift; shift
+
+    if [[ ${dodebug} -ne 0 ]]; then
+        echo "${cmd} $@"
+    fi
+
+    "${cmd}" "$@" > "${logfile}" 2>&1 &
+    pid=$!
+
+    dowait "${pid}" "${logfile}" "${waitflag}" waitlist[@]
+    return $?
+}
