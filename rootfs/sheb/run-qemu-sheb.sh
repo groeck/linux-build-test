@@ -63,8 +63,6 @@ runkernel()
     local defconfig=$1
     local fixup=$2
     local rootfs=$3
-    local pid
-    local logfile=$(__mktemp)
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
     local build="${DISPARCH}:${defconfig}"
 
@@ -88,20 +86,14 @@ runkernel()
 	return 1
     fi
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
+    execute automatic waitlist[@] \
+      ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	-snapshot \
 	${diskcmd} \
 	-append "${initcli} console=ttySC1,115200 noiotrap" \
 	-serial null -serial stdio -monitor null -nographic \
-	-no-reboot \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-no-reboot
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
