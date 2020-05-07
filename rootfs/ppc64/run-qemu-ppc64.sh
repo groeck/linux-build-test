@@ -104,8 +104,6 @@ runkernel()
     local rootfs=$7
     local reboot=$8
     local dt_cmd="${9:+-machine ${9}}"
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Restarting" "Boot successful" "Rebooting")
     local build="${machine}:${defconfig}${fixup:+:${fixup}}"
 
@@ -147,19 +145,14 @@ runkernel()
 	extra_params+=" -device e1000e"
     fi
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M ${machine} -cpu ${cpu} -m ${mem} \
+    execute ${reboot} waitlist[@] \
+      ${QEMU} -M ${machine} -cpu ${cpu} -m ${mem} \
 	-kernel ${kernel} \
 	${extra_params} \
 	-nographic -vga none -monitor null -no-reboot \
 	--append "${initcli} console=tty console=${console}" \
-	${dt_cmd} > ${logfile} 2>&1 &
-    pid=$!
+	${dt_cmd}
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} ${reboot} waitlist[@]
     return $?
 }
 
