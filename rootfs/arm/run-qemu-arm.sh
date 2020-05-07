@@ -365,7 +365,7 @@ runkernel()
 	;;
     esac
 
-    execute ${mode} waitlist[@] \
+    execute "${mode}" waitlist[@] \
         ${QEMUCMD} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
 	    -kernel ${kernel} \
@@ -833,7 +833,7 @@ if [ ${runall} -eq 1 ]; then
     checkstate ${retcode}
 fi
 
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic ::sd
