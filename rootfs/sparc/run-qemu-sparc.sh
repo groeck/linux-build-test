@@ -46,8 +46,6 @@ runkernel()
     local cpu=$3
     local fixup=$4
     local rootfs=$5
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${fixup}"
     local config="${defconfig}:${fixup//smp*/smp}"
@@ -81,19 +79,14 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M ${mach} \
+    execute automatic waitlist[@] \
+      ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/zImage -no-reboot \
 	${cpu:+-cpu "${cpu}"} \
 	${extra_params} \
 	-append "${initcli} console=ttyS0" \
-	-nographic -monitor none > ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor none
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
