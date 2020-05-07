@@ -65,9 +65,6 @@ runkernel()
     local mach=$4
     local fixup="${cpu}:${5}"
     local rootfs=$6
-    local pid
-    local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local earlycon
@@ -124,25 +121,15 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -eq 1 ]] && set -x
-
-    ${QEMU} -cpu ${cpu} -M ${mach} \
+    execute manual waitlist[@] \
+      ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel "${image}" -no-reboot \
 	${dtbcmd} \
 	${extra_params} \
 	--append "${initcli} ${earlycon} console=ttyS0,115200n8" \
-	-nographic -monitor null -serial stdio \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor null -serial stdio
 
-    [[ ${dodebug} -eq 1 ]] && set +x
-
-    dowait ${pid} ${logfile} manual waitlist[@]
-    retcode=$?
-    if [ ${dodebug} -eq 2 ]; then
-	cat ${logfile}
-    fi
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
