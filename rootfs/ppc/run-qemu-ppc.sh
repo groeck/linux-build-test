@@ -80,8 +80,6 @@ runkernel()
     local kernel=$7
     local dts=$8
     local dtbcmd=""
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local rbuild="${mach}:${defconfig}${fixup:+:${fixup}}"
     local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|sdhci|mmc|nvme))/}"
@@ -142,18 +140,13 @@ runkernel()
 	;;
     esac
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
+    execute automatic waitlist[@] \
+      ${QEMU} -kernel ${kernel} -M ${mach} -m 256 ${cpu} -no-reboot \
 	${extra_params} \
 	${dtbcmd} \
 	--append "${initcli} ${earlycon} mem=256M console=${tty}" \
-	-monitor none -nographic > ${logfile} 2>&1 &
-    pid=$!
+	-monitor none -nographic
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
