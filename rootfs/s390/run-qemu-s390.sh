@@ -35,8 +35,6 @@ runkernel()
     local defconfig=$1
     local fixup=$2
     local rootfs=$3
-    local pid
-    local logfile=$(__mktemp)
     local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
 
@@ -59,18 +57,13 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel arch/s390/boot/bzImage \
+    execute automatic waitlist[@] \
+      ${QEMU} -kernel arch/s390/boot/bzImage \
         ${extra_params} \
 	-append "${initcli}" \
 	-m 512 \
-	-nographic -monitor null --no-reboot > ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor null --no-reboot
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
