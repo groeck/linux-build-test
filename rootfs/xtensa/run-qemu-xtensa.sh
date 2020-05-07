@@ -119,8 +119,6 @@ runkernel()
 	;;
     esac
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
       ${QEMU} -cpu ${cpu} -M ${mach} \
 	-kernel "${image}" -no-reboot \

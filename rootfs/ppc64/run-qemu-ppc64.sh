@@ -134,8 +134,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     mem=1G
     if [[ "${machine}" = "powernv" ]]; then
 	mem=2G

@@ -49,8 +49,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -display none \
 	-kernel vmlinux -device da,exit_threads=1 \

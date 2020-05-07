@@ -86,8 +86,6 @@ runkernel()
 	diskcmd="-snapshot -drive file=${rootfs},format=raw"
     fi
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
       ${qemu} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \

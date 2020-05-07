@@ -34,8 +34,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -serial stdio -kernel vmlinux \
     	-no-reboot -monitor none -nographic \

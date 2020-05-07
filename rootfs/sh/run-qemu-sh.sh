@@ -72,8 +72,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     initcli+=" console=ttySC1,115200 ${EARLYCON} noiotrap"
 
     if [[ ${dodebug} -eq 2 ]]; then

@@ -79,8 +79,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     rootfs="$(rootfsname ${rootfs})"
     if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
 	return 1

@@ -76,8 +76,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu ${cpu} \
 	-vga cirrus -no-reboot \

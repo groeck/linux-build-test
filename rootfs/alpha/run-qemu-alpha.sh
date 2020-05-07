@@ -58,8 +58,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute auto waitlist[@] \
       ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \

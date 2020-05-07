@@ -82,8 +82,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     kvm=""
     if [ "${cpu}" = "kvm64" ]; then
 	kvm="-enable-kvm"

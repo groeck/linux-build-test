@@ -35,8 +35,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     initcli+=" rdinit=/sbin/init console=${console},115200"
 
     execute manual waitlist[@] \

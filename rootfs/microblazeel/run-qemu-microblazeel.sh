@@ -35,8 +35,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \

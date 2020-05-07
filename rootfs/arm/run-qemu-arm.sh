@@ -271,8 +271,6 @@ runkernel()
 
     rootfs="$(rootfsname ${rootfs})"
 
-    echo -n "running ..."
-
     kernel="arch/arm/boot/zImage"
     case ${mach} in
     "sx1")

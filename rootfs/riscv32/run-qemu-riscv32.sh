@@ -68,8 +68,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -M virt -m 512M -no-reboot \
 	-bios default \

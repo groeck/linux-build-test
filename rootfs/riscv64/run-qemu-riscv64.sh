@@ -69,8 +69,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     if [[ -e arch/riscv/boot/Image ]]; then
 	BIOS="default"
 	KERNEL="arch/riscv/boot/Image"

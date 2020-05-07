@@ -53,8 +53,6 @@ runkernel()
 	return ${retcode}
     fi
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
 	${QEMU} -cpu or1200 -M or1k-sim \
 	    -kernel vmlinux -nographic -serial stdio -monitor none

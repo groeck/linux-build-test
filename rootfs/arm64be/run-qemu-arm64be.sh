@@ -94,8 +94,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     case ${mach} in
     "virt")
 	initcli+=" earlycon=pl011,0x9000000 console=ttyAMA0"

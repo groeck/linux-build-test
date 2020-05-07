@@ -59,8 +59,6 @@ runkernel()
     dtb=$(echo ${dts} | sed -e 's/\.dts/\.dtb/')
     dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \

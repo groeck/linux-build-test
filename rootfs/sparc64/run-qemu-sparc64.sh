@@ -69,8 +69,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     # Explicitly select TI UltraSparc IIi. Non-TI CPUs (including the default
     # CPU for sun4v, Sun-UltraSparc-T1) result in a qemu crash or are stuck
     # in an endless loop at poweroff/reboot.

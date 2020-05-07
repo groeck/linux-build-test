@@ -113,8 +113,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     case ${mach} in
     "malta")
 	kernel="vmlinux"

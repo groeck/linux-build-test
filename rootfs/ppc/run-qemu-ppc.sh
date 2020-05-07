@@ -110,8 +110,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     if [[ -n "${cpu}" ]]; then
 	cpu="-cpu ${cpu}"
     fi

@@ -96,8 +96,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute manual waitlist[@] \
       ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} -no-reboot -m 256 \

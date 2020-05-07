@@ -1229,7 +1229,10 @@ execute()
 
     shift; shift; shift
 
+    echo -n "running ..."
+
     if [[ ${dodebug} -ne 0 ]]; then
+	echo
 	echo "${cmd} $@"
     fi
 

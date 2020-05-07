@@ -55,8 +55,6 @@ runkernel()
 	return 1
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -kernel arch/s390/boot/bzImage \
         ${extra_params} \

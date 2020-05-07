@@ -77,8 +77,6 @@ runkernel()
 	initcli+=" apc=noidle"
     fi
 
-    echo -n "running ..."
-
     execute automatic waitlist[@] \
       ${QEMU} -M ${mach} \
 	-kernel arch/sparc/boot/zImage -no-reboot \
