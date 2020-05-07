@@ -66,9 +66,6 @@ runkernel()
     local fixup="$3"
     local rootfs=$4
     local dtb=$5
-    local pid
-    local retcode
-    local logfile=$(__mktemp)
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${defconfig}:${fixup}"
 
@@ -127,8 +124,8 @@ runkernel()
 	;;
     esac
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-    ${QEMU} -M ${mach} \
+    execute ${waitflag} waitlist[@] \
+	${QEMU} -M ${mach} \
 		-kernel arch/arm64/boot/Image -no-reboot \
 		-nographic \
 		${extra_params} \
@@ -136,15 +133,8 @@ runkernel()
 		-monitor none \
 		-no-reboot \
 		--append "${initcli}" \
-		${dtb:+-dtb arch/arm64/boot/dts/${dtb}} \
-		> ${logfile} 2>&1 &
-    pid=$!
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} ${waitflag} waitlist[@]
-    retcode=$?
-
-    return ${retcode}
+		${dtb:+-dtb arch/arm64/boot/dts/${dtb}}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
