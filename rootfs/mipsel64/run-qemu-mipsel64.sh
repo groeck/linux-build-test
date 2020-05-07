@@ -80,9 +80,6 @@ runkernel()
     local mach=$2
     local rootfs=$3
     local fixup=$4
-    local pid
-    local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="mipsel64:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup//smp*/smp}"
@@ -137,17 +134,13 @@ runkernel()
 	;;
     esac
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-    ${QEMU} -M ${mach} -kernel "${kernel}" \
+    execute ${wait} waitlist[@] \
+      ${QEMU} -M ${mach} -kernel "${kernel}" \
 	-no-reboot -m "${mem}" \
 	${extra_params} \
 	--append "${initcli} console=ttyS0" \
-	-nographic -serial stdio -monitor none \
-	> ${logfile} 2>&1 &
-    pid=$!
-    [[ ${dodebug} -ne 0 ]] && set +x
+	-nographic -serial stdio -monitor none
 
-    dowait ${pid} ${logfile} ${wait} waitlist[@]
     return $?
 }
 
