@@ -28,9 +28,7 @@ patch_defconfig()
 runkernel()
 {
     local defconfig=$1
-    local pid
     local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("MACHINE RESTART" "Boot successful" "Rebooting")
     local fixup=0
 
@@ -57,12 +55,10 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -cpu or1200 -M or1k-sim \
-    	-kernel vmlinux -nographic -serial stdio -monitor none \
-	> ${logfile} 2>&1 &
+    execute manual waitlist[@] \
+	${QEMU} -cpu or1200 -M or1k-sim \
+	    -kernel vmlinux -nographic -serial stdio -monitor none
 
-    pid=$!
-    dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
 
