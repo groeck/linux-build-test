@@ -24,9 +24,7 @@ patch_defconfig()
 runkernel()
 {
     local defconfig=$1
-    local pid
     local waitlist=("Requesting system reboot" "Boot successful" "reboot: Restarting system")
-    local logfile="$(__mktemp)"
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
@@ -38,14 +36,11 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -serial stdio -kernel vmlinux \
+    execute automatic waitlist[@] \
+      ${QEMU} -serial stdio -kernel vmlinux \
     	-no-reboot -monitor none -nographic \
-	-append "console=ttyS0,115200,N,8 rdinit=/sbin/init" \
-	> ${logfile} 2>&1 &
+	-append "console=ttyS0,115200,N,8 rdinit=/sbin/init"
 
-    pid=$!
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
