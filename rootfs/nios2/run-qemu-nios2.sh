@@ -33,9 +33,7 @@ runkernel()
     local mach=$1
     local defconfig=$2
     local dts=$3
-    local pid
     local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" "Machine restart")
     local pbuild="${ARCH}:${mach}:${defconfig}:${dts}"
 
@@ -63,20 +61,14 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -M ${mach} \
+    execute manual waitlist[@] \
+      ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \
 	-dtb ${dtb} \
 	--append "rdinit=/sbin/init ${initcli} earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200" \
 	-initrd "$(rootfsname ${rootfs})" \
-	-nographic -monitor none \
-	> ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor none
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
 
