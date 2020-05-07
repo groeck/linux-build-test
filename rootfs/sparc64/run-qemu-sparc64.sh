@@ -40,8 +40,6 @@ runkernel()
     local mach=$2
     local fixup=$3
     local rootfs=$4
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Power down" "Boot successful" "Poweroff")
     local build="${ARCH}:${mach}:${fixup}"
 
@@ -73,22 +71,17 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
     # Explicitly select TI UltraSparc IIi. Non-TI CPUs (including the default
     # CPU for sun4v, Sun-UltraSparc-T1) result in a qemu crash or are stuck
     # in an endless loop at poweroff/reboot.
-    ${QEMU} -M ${mach} -cpu "TI UltraSparc IIi" \
+    execute automatic waitlist[@] \
+      ${QEMU} -M ${mach} -cpu "TI UltraSparc IIi" \
 	-m 512 \
 	${extra_params} \
 	-kernel arch/sparc/boot/image -no-reboot \
 	-append "${initcli} console=ttyS0" \
-	-nographic -monitor none > ${logfile} 2>&1 &
-    pid=$!
+	-nographic -monitor none
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
