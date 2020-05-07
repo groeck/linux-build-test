@@ -87,8 +87,6 @@ runkernel()
     local defconfig=$1
     local fixup=$2
     local rootfs=$3
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="mips64:${defconfig}"
     local cache="${defconfig}${fixup//smp*/smp}"
@@ -120,19 +118,14 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
+    execute automatic waitlist[@] \
+      ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} \
 	${cpu} \
 	${extra_params} \
 	-vga cirrus -no-reboot -m 256 \
 	--append "${initcli} mem=256M console=ttyS0 console=tty ${extracli}" \
-	-nographic > ${logfile} 2>&1 &
-    pid=$!
+	-nographic
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
