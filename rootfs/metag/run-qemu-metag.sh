@@ -32,9 +32,7 @@ patch_defconfig()
 runkernel()
 {
     local defconfig=$1
-    local pid
     local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting system" "Boot successful" \
     		    "Rebooting" "Restarting system")
 
@@ -53,13 +51,12 @@ runkernel()
 
     echo -n "running ..."
 
-    ${QEMU} -display none \
+    execute automatic waitlist[@] \
+      ${QEMU} -display none \
 	-kernel vmlinux -device da,exit_threads=1 \
 	-chardev stdio,id=chan1 -chardev pty,id=chan2 \
-	-append "rdinit=/sbin/init doreboot" > ${logfile} 2>&1 &
+	-append "rdinit=/sbin/init doreboot"
 
-    pid=$!
-    dowait ${pid} ${logfile} automatic waitlist[@]
     return $?
 }
 
