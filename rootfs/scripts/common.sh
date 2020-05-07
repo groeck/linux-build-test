@@ -1063,8 +1063,9 @@ dowait()
 {
     local pid=$1
     local logfile=$2
-    local manual=$3
-    local waitlist=("${!4}")
+    local report=$3
+    local manual=$4
+    local waitlist=("${!5}")
     local entries=${#waitlist[*]}
     local retcode=0
     local t=0
@@ -1159,8 +1160,6 @@ dowait()
 	done
     fi
 
-    echo " ${msg}"
-
     dolog=${retcode}
     if grep -q "\[ cut here \]" ${logfile}; then
 	dolog=1
@@ -1201,14 +1200,21 @@ dowait()
 	rm -f core
     fi
 
-    if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
-	echo "------------"
-	echo "qemu log:"
-	head -5000 ${logfile}
-	echo "------------"
+    if [[ ${report} -ne 0 || ${retcode} -eq 0 ]]; then
+	echo " ${msg}"
+
+	if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
+	    echo "------------"
+	    echo "qemu log:"
+	    head -5000 ${logfile}
+	    echo "------------"
+	fi
     fi
+
     return ${retcode}
 }
+
+NUM_TRIES=2
 
 execute()
 {
@@ -1217,16 +1223,36 @@ execute()
     local cmd="$3"
     local pid
     local logfile="$(__mktemp)"
+    local retries=0
+    local retcode
+    local last=0
 
     shift; shift; shift
 
     if [[ ${dodebug} -ne 0 ]]; then
-        echo "${cmd} $@"
+	echo "${cmd} $@"
     fi
 
-    "${cmd}" "$@" > "${logfile}" 2>&1 &
-    pid=$!
+    while [[ ${retries} -lt ${NUM_TRIES} ]]; do
+	if [[ ${retries} -eq $((NUM_TRIES - 1)) ]]; then
+	    last=1
+	fi
+	if [[ ${retries} -ne 0 ]]; then
+	    echo -n "R"
+	fi
 
-    dowait "${pid}" "${logfile}" "${waitflag}" waitlist[@]
-    return $?
+	"${cmd}" "$@" > "${logfile}" 2>&1 &
+	pid=$!
+
+	dowait "${pid}" "${logfile}" "${last}" "${waitflag}" waitlist[@]
+	retcode=$?
+
+	if [[ ${retcode} -eq 0 ]]; then
+	    break
+	fi
+
+	retries=$((retries + 1))
+    done
+
+    return ${retcode}
 }
