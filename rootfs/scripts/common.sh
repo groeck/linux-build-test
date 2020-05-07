@@ -452,7 +452,11 @@ __common_fixup()
 	extra_params+=" -smp ${fixup#smp}"
 	;;
     efi|efi64)
-	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
+        if [[ "${ARCH}" == "arm64" ]]; then
+	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-aarch64.fd"
+	else
+	    extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
+	fi
 	;;
     efi32)
 	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-32.fd"
