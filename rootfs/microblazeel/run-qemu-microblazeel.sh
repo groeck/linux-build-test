@@ -21,9 +21,7 @@ runkernel()
     local mach=$2
     local console=$3
     local rootfs=$4
-    local pid
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local logfile="$(__mktemp)"
 
     if ! match_params "${machine}@${mach}"; then
 	echo "Skipping ${ARCH}:${defconfig} ... "
@@ -39,16 +37,13 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-    ${QEMU} -M ${mach} -m 256 \
+    execute manual waitlist[@] \
+      ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
 	-initrd "$(rootfsname ${rootfs})" \
 	-append "${initcli} rdinit=/sbin/init console=${console},115200" \
-	-monitor none -serial stdio -nographic \
-	> ${logfile} 2>&1 &
-    pid=$!
-    [[ ${dodebug} -ne 0 ]] && set +x
-    dowait ${pid} ${logfile} manual waitlist[@]
+	-monitor none -serial stdio -nographic
+
     return $?
 }
 
