@@ -51,8 +51,6 @@ runkernel()
     local mach=$4
     local rootfs=$5
     local drive
-    local pid
-    local logfile="$(__mktemp)"
     local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}:${fixup}"
     local build="${defconfig}:${fixup}"
@@ -91,19 +89,14 @@ runkernel()
 	kvm="-enable-kvm"
     fi
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel arch/x86/boot/bzImage \
+    execute manual waitlist[@] \
+      ${QEMU} -kernel arch/x86/boot/bzImage \
 	-M ${mach} -cpu ${cpu} ${kvm} -no-reboot \
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0" \
 	-d unimp,guest_errors \
-	-nographic > ${logfile} 2>&1 &
-    pid=$!
+	-nographic
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} manual waitlist[@]
     return $?
 }
 
