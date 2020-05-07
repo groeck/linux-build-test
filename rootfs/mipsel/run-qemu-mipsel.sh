@@ -48,9 +48,6 @@ runkernel()
     local defconfig=$2
     local fixup="$3"
     local rootfs=$4
-    local pid
-    local retcode
-    local logfile="$(__mktemp)"
     local waitlist=("Boot successful" "Rebooting")
     local build="mipsel:${cpu}:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup//smp*/smp}"
@@ -81,20 +78,14 @@ runkernel()
 
     echo -n "running ..."
 
-    [[ ${dodebug} -ne 0 ]] && set -x
-
-    ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu ${cpu} \
+    execute automatic waitlist[@] \
+      ${QEMU} -kernel ${KERNEL_IMAGE} -M ${QEMU_MACH} -cpu ${cpu} \
 	-vga cirrus -no-reboot \
 	${extra_params} \
 	--append "${initcli} console=ttyS0 ${extracli}" \
-	-nographic > ${logfile} 2>&1 &
-    pid=$!
+	-nographic
 
-    [[ ${dodebug} -ne 0 ]] && set +x
-
-    dowait ${pid} ${logfile} automatic waitlist[@]
-    retcode=$?
-    return ${retcode}
+    return $?
 }
 
 echo "Build reference: $(git describe)"
