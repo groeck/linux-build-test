@@ -23,7 +23,7 @@ PATH=${PATH}:${PATH_ARM64}
 # Exceptions:
 # - virt:defconfig:smp:virtio:rootfs works from v4.4
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
-skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
+skip_316="virt:defconfig:smp2:efi:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp2:mem512:usb-ehci:rootfs \
 	virt:defconfig:smp2:mem512:usb-ohci:rootfs \
 	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
@@ -32,7 +32,7 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp2:mem512:nvme:rootfs \
 	virt:defconfig:smp4:mem512:sdhci:mmc:rootfs \
 	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
-	virt:defconfig:smp8:mem512:scsi[AM53C974]:rootfs \
+	virt:defconfig:smp8:efi:mem512:scsi[AM53C974]:rootfs \
 	virt:defconfig:smp2:mem512:scsi[MEGASAS]:rootfs \
 	virt:defconfig:smp4:mem512:scsi[MEGASAS2]:rootfs \
 	virt:defconfig:smp4:mem512:scsi[virtio]:rootfs \
@@ -40,7 +40,9 @@ skip_316="virt:defconfig:smp2:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp8:mem512:scsi[53C895A]:rootfs \
 	virt:defconfig:smp:mem512:scsi[FUSION]:rootfs \
 	xlnx-versal-virt:defconfig:smp2:mem512:virtio-blk:rootfs"
-skip_44="xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
+skip_44="virt:defconfig:smp2:efi:mem512:usb-xhci:rootfs \
+	virt:defconfig:smp8:efi:mem512:scsi[AM53C974]:rootfs \
+	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3:defconfig:smp:mem1G:initrd \
 	raspi3:defconfig:smp4:mem1G:sd:rootfs \
