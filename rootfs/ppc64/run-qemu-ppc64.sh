@@ -68,7 +68,8 @@ skip_44="powernv:powernv_defconfig:initrd \
 	pseries:pseries_defconfig:little:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:little:nvme:rootfs \
 	pseries:pseries_defconfig:little:usb:rootfs"
-skip_49="pseries:pseries_defconfig:sata-sii3112:rootfs \
+skip_49="powernv:powernv_defconfig:sdhci:mmc:rootfs \
+	pseries:pseries_defconfig:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:sata-sii3112:rootfs"
 
 patch_defconfig()
