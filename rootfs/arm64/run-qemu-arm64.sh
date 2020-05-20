@@ -29,6 +29,7 @@ skip_316="virt:defconfig:smp2:efi:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp4:mem512:usb-uas-xhci:rootfs \
 	virt:defconfig:smp6:mem512:virtio:rootfs \
 	virt:defconfig:smp8:mem512:virtio-pci:rootfs \
+	virt:defconfig:smp:efi:mem512:virtio-blk:rootfs \
 	virt:defconfig:smp2:mem512:nvme:rootfs \
 	virt:defconfig:smp4:mem512:sdhci:mmc:rootfs \
 	virt:defconfig:smp6:mem512:scsi[DC395]:rootfs \
