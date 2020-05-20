@@ -46,6 +46,7 @@ skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
 	ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
 	ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
 	pseries:pseries_defconfig:sata-sii3112:rootfs \
+	pseries:pseries_defconfig:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:little:initrd \
 	pseries:pseries_defconfig:little:scsi:rootfs \
 	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
