@@ -27,9 +27,9 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_316="arm:cubieboard:multi_v7_defconfig:mem128 \
-	arm:cubieboard:multi_v7_defconfig:usb:mem128 \
-	arm:cubieboard:multi_v7_defconfig:sata:mem128 \
+skip_316="arm:cubieboard:multi_v7_defconfig:mem512 \
+	arm:cubieboard:multi_v7_defconfig:usb:mem512 \
+	arm:cubieboard:multi_v7_defconfig:sata:mem512 \
 	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
 	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:usb0:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
