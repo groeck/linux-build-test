@@ -57,7 +57,7 @@ PREFIX_PPC=powerpc64-linux-
 PREFIX_S390="s390-linux-"
 PREFIX_X86="x86_64-linux-"
 
-BUILDDIR="$(mktemp -d /tmp/buildbot-builddir.XXXXX)"
+BUILDDIR="/tmp/buildbot-builddir"
 LOG="/tmp/buildlog.stable-build-arch"
 
 trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGBUS SIGFPE SIGSEGV SIGALRM SIGTERM SIGPWR
@@ -425,7 +425,7 @@ if [ ${#fixup[*]} -gt 0 ]; then
     echo
 fi
 
-rm -rf "${BUILDDIR}/*"
+rm -rf "${BUILDDIR}"
 
 dumplog()
 {
