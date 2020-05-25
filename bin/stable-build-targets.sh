@@ -80,5 +80,4 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
 
-fixup_csky=("s/# CONFIG_CPU_CK610 is not set/CONFIG_CPU_CK610=y/"
-	"s/CONFIG_CPU_CK807=y/# CONFIG_CPU_CK807 is not set/")
+fixup_csky=("s/CONFIG_FRAME_POINTER=y/# CONFIG_FRAME_POINTER is not set/")
