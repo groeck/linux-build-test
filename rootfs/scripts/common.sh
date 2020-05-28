@@ -1232,8 +1232,30 @@ execute()
     echo -n "running ..."
 
     if [[ ${dodebug} -ne 0 ]]; then
+	local x
+	local len="$(echo ${cmd} | wc | awk '{print $3}')"
+
 	echo
-	echo "${cmd} $@"
+	echo -n "${cmd}"
+	# The loop is needed to quote multi-element parameters correctly.
+	# At the same time, it lets us conveniently split command line output
+	# to multiple lines, which is quite useful to improve readability.
+	for x in "$@"; do
+	    local n="$(echo $x | wc | awk '{print $2}')"
+	    local l="$(echo $x | wc | awk '{print $3}')"
+	    if [[ "$((len + l))" -ge 80 ]]; then
+	        echo " \\"; echo -n "    "
+		len=4
+	    fi
+	    len="$((len + l + 1))"
+	    if [[ n -gt 1 ]]; then
+		echo -n " \"$x\""
+		len="$((len + 2))"
+	    else
+		echo -n " $x"
+	    fi
+	done
+	echo
     fi
 
     while [[ ${retries} -lt ${NUM_TRIES} ]]; do
