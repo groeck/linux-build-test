@@ -37,9 +37,9 @@ do_import()
 		git config remote.local.pushurl "ssh://git@server.roeck-us.net//var/cache/git/linux-stable.git"
 	}
 	# Also add -stable if needed
-	# git remote | grep -q stable || {
-	# 	git remote add stable git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-	# }
+	git remote | grep -q stable || {
+	    git remote add stable git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+	}
 
 	git fetch --all
 	# Check if source branch exists. If not, there is nothing we can do.
