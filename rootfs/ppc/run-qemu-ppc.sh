@@ -120,14 +120,21 @@ runkernel()
 	dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
     fi
 
+    # Needed for "FUSION" boot tests
+    initcli+=" coherent_pool=256k"
+
     case "${mach}" in
     sam460ex)
 	# Fails with v4.4.y
-	# earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
+	if [[ "${rel}" != "v4.4" ]]; then
+	    earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
+	fi
 	;;
     virtex-ml507)
 	# fails with v4.4.y
-	# earlycon="earlycon"
+	if [[ "${rel}" != "v4.4" ]]; then
+	    earlycon="earlycon"
+	fi
 	;;
     bamboo|mpc8544ds)
 	# Not needed
