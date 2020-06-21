@@ -524,6 +524,11 @@ do
 	        sed -i -e "${fixup[$f]}" ${BUILDDIR}/.config
 	    done
 	fi
+	# Always disable CONFIG_GCC_PLUGIN_RANDSTRUCT.
+	# Upstream commit a148866489fb ("sched: Replace rq::wake_list")
+	# conflicts directly with it since it makes assumptions about the
+	# distance of two structure members.
+	sed -i -e 's/CONFIG_GCC_PLUGIN_RANDSTRUCT=y/# CONFIG_GCC_PLUGIN_RANDSTRUCT is not set/' ${BUILDDIR}/.config
 
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
