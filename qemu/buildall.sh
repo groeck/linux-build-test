@@ -127,7 +127,7 @@ if [ -z "$1" -o "$1" = "v4.1" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v4.2" ]; then
-    dobuild_common v4.2.0-local v4.2
+    dobuild_common v4.2.1-local v4.2
 fi
 
 if [ -z "$1" -o "$1" = "v5.0" ]; then
