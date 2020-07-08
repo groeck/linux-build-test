@@ -70,12 +70,16 @@ echo
 
 runkernel defconfig "" rootfs.cpio.gz
 retcode=$?
+checkstate ${retcode}
 runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig scsi[virtio-pci] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
