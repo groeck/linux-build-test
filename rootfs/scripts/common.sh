@@ -57,6 +57,7 @@ trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGBUS SIGFPE S
 LOOPTIME=5	# Wait time before checking status
 MAXTIME=150	# Maximum wait time for qemu session to complete
 MAXSTIME=60	# Maximum wait time for qemu session to generate output
+__retries=1	# Default number of retries
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -79,13 +80,19 @@ parse_args()
 	testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dntv opt; do
+	while getopts ae:dnr:tv opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
-	t)	testbuild=1;;
+	t)	testbuild=1;__retries=0;;
+	r)	__retries=${OPTARG}
+		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
+		    echo "Bad number of retries: ${__retries}"
+		    exit 1
+		fi
+		;;
 	v)	verbose=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
@@ -1214,8 +1221,6 @@ dowait()
     return ${retcode}
 }
 
-NUM_TRIES=2
-
 execute()
 {
     local waitflag=$1
@@ -1258,8 +1263,8 @@ execute()
 	echo
     fi
 
-    while [[ ${retries} -lt ${NUM_TRIES} ]]; do
-	if [[ ${retries} -eq $((NUM_TRIES - 1)) ]]; then
+    while [[ ${retries} -le ${__retries} ]]; do
+	if [[ ${retries} -eq ${__retries} ]]; then
 	    last=1
 	fi
 	if [[ ${retries} -ne 0 ]]; then
