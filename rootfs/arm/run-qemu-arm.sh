@@ -9,6 +9,7 @@ shift $((OPTIND - 1))
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
+QEMU_V51=${QEMU:-${QEMU_V51_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -303,13 +304,13 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "tacoma-bmc")
-	QEMUCMD="${QEMU_MASTER}"
+	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "orangepi-pc")
-	QEMUCMD="${QEMU_MASTER}"
+	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
