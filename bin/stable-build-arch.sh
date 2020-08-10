@@ -37,6 +37,7 @@ PATH_PARISC=/opt/kernel/gcc-9.3.0-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-9.3.0-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/kernel/gcc-9.3.0-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin
+PATH_RISCV32=/opt/kernel/gcc-9.3.0-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 # Invalid asm expression with gcc 9.2.0
 # invalid hard register usage with gcc 9.3.0 (4.14.y)
@@ -320,6 +321,11 @@ case ${ARCH} in
 	cmd=(${cmd_riscv[*]})
 	PREFIX="riscv64-linux-"
 	PATH=${PATH_RISCV64}:${PATH}
+	;;
+    riscv32)
+	cmd=(${cmd_riscv[*]})
+	PREFIX="riscv32-linux-"
+	PATH=${PATH_RISCV32}:${PATH}
 	;;
     sparc32)
 	cmd=(${cmd_sparc32[*]})
