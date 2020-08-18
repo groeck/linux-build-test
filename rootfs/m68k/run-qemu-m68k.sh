@@ -8,7 +8,16 @@ shift $((OPTIND - 1))
 
 machine=$1
 
-QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-m68k}
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v4.9|v4.14)
+	QEMU=${QEMU:-${QEMU_V50_BIN}/qemu-system-m68k}
+	;;
+*)
+	QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-m68k}
+	;;
+esac
+
 PREFIX=m68k-linux-
 ARCH=m68k
 PATH_M68K=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
