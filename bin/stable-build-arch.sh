@@ -323,6 +323,7 @@ case ${ARCH} in
 	PATH=${PATH_RISCV64}:${PATH}
 	;;
     riscv32)
+	ARCH=riscv
 	cmd=(${cmd_riscv[*]})
 	PREFIX="riscv32-linux-"
 	PATH=${PATH_RISCV32}:${PATH}
