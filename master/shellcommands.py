@@ -11,7 +11,7 @@ passed = re.compile('Building (\S+):(\S+) \.\.\. passed$')
 failed = re.compile('Building (\S+):(\S+) \.\.\. failed$')
 skipped = re.compile('Building (\S+):(\S+) \.\.\. failed \(\S+\)')
 
-passed_qemu = re.compile('Building (\S+):(\S+) \.+ running \.+ passed$')
+passed_qemu = re.compile('Building (\S+):(\S+) \.+ running [\.R]+ passed$')
 failed_qemu = re.compile('Building (\S+):(\S+) .*?failed.*$')
 skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped$')
 
