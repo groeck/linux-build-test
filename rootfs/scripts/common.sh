@@ -856,6 +856,10 @@ __setup_fragment()
 	echo "CONFIG_BLK_DEV_SR=y" >> ${fragment}
 	echo "CONFIG_ISO9660_FS=y" >> ${fragment}
 	echo "CONFIG_CDROM=y" >> ${fragment}
+    else
+	echo "CONFIG_BLK_DEV_SR=n" >> ${fragment}
+	echo "CONFIG_ISO9660_FS=n" >> ${fragment}
+	echo "CONFIG_CDROM=n" >> ${fragment}
     fi
 
     if [[ "${nousb}" -eq 0 ]]; then
