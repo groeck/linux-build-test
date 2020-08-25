@@ -20,7 +20,7 @@ esac
 
 PREFIX=m68k-linux-
 ARCH=m68k
-PATH_M68K=/opt/kernel/gcc-7.3.0-nolibc/m68k-linux/bin
+PATH_M68K=/opt/kernel/gcc-9.3.0-nolibc/m68k-linux/bin
 
 PATH=${PATH_M68K}:${PATH}
 
