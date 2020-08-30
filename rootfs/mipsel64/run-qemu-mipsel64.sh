@@ -26,7 +26,9 @@ v3.16)
 	PREFIX=mips64-linux-
 	;;
 *)
-	PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips64-linux/bin
+	# gcc 9.3.0 and 10.2.0 refuse to compile fuloong2e_defconfig
+	# cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
+	PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
 	PREFIX=mips64-linux-
 	;;
 esac
