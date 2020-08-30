@@ -12,7 +12,7 @@ config=$2
 variant=$3
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-PATH_MIPS=/opt/kernel/gcc-7.3.0-nolibc/mips-linux/bin
+PATH_MIPS=/opt/kernel/gcc-9.3.0-nolibc/mips-linux/bin
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
 PREFIX=mips-linux-
 
