@@ -22,7 +22,7 @@ ARCH=arm
 PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
-PATH_ARM="/opt/kernel/gcc-7.3.0-nolibc/arm-linux-gnueabi/bin"
+PATH_ARM="/opt/kernel/gcc-9.3.0-nolibc/arm-linux-gnueabi/bin"
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
 PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
