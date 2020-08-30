@@ -8,7 +8,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-or1k}
 PREFIX=or1k-linux-
 ARCH=openrisc
 rootfs=busybox-openrisc.cpio
-PATH_OR32=/opt/kernel/gcc-7.3.0-nolibc/or1k-linux/bin
+PATH_OR32=/opt/kernel/gcc-9.3.0-nolibc/or1k-linux/bin
 
 PATH=${PATH_OR32}:${PATH}
 
