@@ -26,7 +26,7 @@ v3.16)
 	;;
 *)
 	# PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
-	PATH_PPC=/opt/kernel/gcc-9.2.0-nolibc/powerpc64-linux/bin
+	PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
 	;;
 esac
 
