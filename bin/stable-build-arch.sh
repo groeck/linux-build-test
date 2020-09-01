@@ -4,7 +4,9 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 PATH_ALPHA=/opt/kernel/gcc-10.2.0-nolibc/alpha-linux/bin
-PATH_AM33=/opt/kernel/gcc-10.2.0-nolibc/am33_2.0-linux/bin
+# undefined reference to `memset' with gcc 10.2.
+# PATH_AM33=/opt/kernel/gcc-10.2.0-nolibc/am33_2.0-linux/bin
+PATH_AM33=/opt/kernel/gcc-9.3.0-nolibc/am33_2.0-linux/bin
 # gcc 10.2 (affects arm and arm64):
 # "crypto/aegis128-neon-inner.c:151:3: error:
 # incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
@@ -13,9 +15,10 @@ PATH_AM33=/opt/kernel/gcc-10.2.0-nolibc/am33_2.0-linux/bin
 # PATH_ARM64=/opt/kernel/gcc-10.2.0-nolibc/aarch64-linux/bin
 PATH_ARM=/opt/kernel/gcc-9.3.0-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-9.3.0-nolibc/aarch64-linux/bin
-PATH_ARC=/opt/kernel/gcc-10.2.0-nolibc/arc-linux/bin
 # Assembler messages: Error: inappropriate arguments for opcode 'adc'
+# PATH_ARC=/opt/kernel/gcc-10.2.0-nolibc/arc-linux/bin
 # PATH_ARCV2=/opt/kernel/gcc-10.2.0-nolibc/arcv2-linux/bin
+PATH_ARC=/opt/kernel/gcc-9.3.0-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-9.3.0-nolibc/arcv2-linux/bin
 PATH_BFIN=/opt/kernel/gcc-10.2.0-nolibc/bfin-uclinux/bin
 # ICE with gcc 9.2.0, gcc 9.3.0
@@ -186,8 +189,8 @@ case ${ARCH} in
 	cmd=(${cmd_arcv2[*]})
 	PREFIX="${PREFIX_ARCV2}"
 	# Original path first to pick up bison
-	# PATH=${PATH}:${PATH_ARCV2}
-	PATH=${PATH}:${PATH_ARC}
+	PATH=${PATH}:${PATH_ARCV2}
+	# PATH=${PATH}:${PATH_ARC}
 	;;
     arm)
 	cmd=(${cmd_arm[*]})
@@ -327,7 +330,7 @@ case ${ARCH} in
 	cmd=(${cmd_powerpc[*]})
 	PREFIX="${PREFIX_PPC}"
 	PATH=${PATH_PPC}:${PATH}
-	EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
+	# EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
     riscv)
 	cmd=(${cmd_riscv[*]})
