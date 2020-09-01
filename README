@@ -202,7 +202,7 @@ buildroot, configure for arm little endian, cortex-A7
 EABI, VFPv4-D16 (defaults)
 gcc 4.8.x, glibc 2.19
 binutils 2.24
-3.16 kernel headers
+4.4 kernel headers
 
 	make toolchain
 	cd output
@@ -215,7 +215,7 @@ Microblaze
 
 [ tested with tip of buildroot tree as of 8/23/2014 ]
 Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
-3.16 kernel headers
+4.4 kernel headers
 
 	make toolchain
 	cd output
