@@ -97,42 +97,6 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v3.16)
-	# lib/mpi/longlong.h:651:2: error: impossible constraint in 'asm'
-	# with gcc 5.1 and later
-	PATH_MIPS=/opt/kernel/gcc-4.9.4-nolibc/mips64-linux/bin
-	# Various errors and warnings with more recent compilers
-	# (including gcc 7.3.0)
-	PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
-	# arc needs old gcc up to v4.1.y (up to commit a6416f57ce57)
-	PATH_ARC=/opt/kernel/arc/gcc-4.8.3/usr/bin
-	PREFIX_ARC="arc-linux-"
-	# Infra for gcc 9.x not backported
-	PATH_ARM=/opt/kernel/gcc-8.3.0-nolibc/arm-linux-gnueabi/bin
-	PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
-	PATH_M68=/opt/kernel/gcc-8.3.0-nolibc/m68k-linux/bin
-	PATH_PARISC=/opt/kernel/gcc-8.3.0-nolibc/hppa-linux/bin
-	PATH_PARISC64=/opt/kernel/gcc-8.3.0-nolibc/hppa64-linux/bin
-	PATH_XTENSA=/opt/kernel/gcc-8.3.0-nolibc/xtensa-linux/bin
-	# ppc needs old compiler up to and including v3.18
-	# (see commit c2ce6f9f3dc0)
-	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
-	PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
-	# sh4 supports recent compilers only starting with v4.4
-	# (see commit 940d4113f330). Note that we can't use the kernel.org
-	# toolchain for gcc 5.5.0 either; it results in "'-m4-nofpu' is not
-	# supported ...".
-	PATH_SH4=/opt/kernel/sh4/gcc-5.5.0/bin
-	# sparc images prior to v4.9 don't build with gcc 7+
-	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/sparc64/gcc-6.5.0/bin
-	# x86 has build errors with gcc 8.2.0 on v3.16, both i386 and x86_64
-	# Error:
-	#   Unsupported relocation type: R_X86_64_PLT32 (4)
-	# The same error is seen with gcc-6.5.0, suggesting it may be
-	# a binutils issue.
-	PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin/
-	;;
 v4.4)
 	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
 	# Don't touch version; other compiler versions have various issues.
@@ -305,7 +269,7 @@ case ${ARCH} in
     openrisc)
 	cmd=(${cmd_openrisc[*]})
 	case ${rel} in
-	v3.16|v4.4|v4.9)
+	v4.4|v4.9)
 		PREFIX="or32-linux-"
 		PATH=${PATH_OPENRISC_45}:${PATH}
 		;;
@@ -391,11 +355,6 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	case ${rel} in
-	v3.16)
-		# um fails to build with more recent compilers
-		PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
-		PREFIX="${PREFIX_X86}"
-		;;
 	v4.4|v4.9|v4.14|v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
 		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
@@ -501,18 +460,8 @@ do
 		dumplog 100 "${LOG}"
 		continue
 	    fi
-	    case ${rel} in
-		    "v3.16")
-			cd "${cmd[$i]}"
-			make ARCH=${ARCH} WERROR=0 O="${BUILDDIR}" >/dev/null 2>${LOG}
-			rv=$?
-			cd ../..
-			;;
-		    *)
-			make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>${LOG}
-			rv=$?
-			;;
-	    esac
+	    make ARCH=${ARCH} O=${BUILDDIR} "${cmd[$i]}" >/dev/null 2>${LOG}
+	    rv=$?
 	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
 		    dumplog 1000 "${LOG}"
