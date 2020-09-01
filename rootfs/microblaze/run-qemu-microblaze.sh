@@ -13,16 +13,7 @@ PREFIX=microblaze-linux-
 ARCH=microblaze
 rootfs=rootfs.cpio
 
-# Older releases don't support gcc 6+, the latest kernel mandates gcc 4.9+
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case ${rel} in
-v3.16)
-	PATH_MICROBLAZE=/opt/kernel/gcc-4.8.0-nolibc/microblaze-linux/bin
-	;;
-*)
-	PATH_MICROBLAZE=/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin
-	;;
-esac
+PATH_MICROBLAZE=/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin
 
 PATH=${PATH_MICROBLAZE}:${PATH}
 

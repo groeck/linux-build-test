@@ -11,7 +11,6 @@ _cpu=$1
 config=$2
 variant=$3
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 PATH_MIPS=/opt/kernel/gcc-9.3.0-nolibc/mips-linux/bin
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
 PREFIX=mips-linux-
@@ -22,10 +21,6 @@ KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
-
-skip_316="mipsel:M14Kc:malta_defconfig:nocd:smp:scsi[DC395]:rootfs \
-	mipsel:24Kf:malta_defconfig:nocd:smp:scsi[AM53C974]:rootfs \
-	mipsel:mips32r6-generic:malta_qemu_32r6_defconfig:nocd:smp:ide:rootfs"
 
 patch_defconfig()
 {

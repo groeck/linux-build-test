@@ -20,32 +20,12 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 PREFIX=powerpc64-linux-
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.16)
-	PATH_PPC=/opt/kernel/gcc-4.9.4-nolibc/powerpc64-linux/bin
-	;;
-*)
-	# PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
-	PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
-	;;
-esac
+PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
 
 ARCH=powerpc
 QEMU_MACH=mac99
 
 PATH=${PATH_PPC}:${PATH}
-
-skip_316="mpc8544ds:mpc85xx_defconfig:scsi:rootfs \
-	mpc8544ds:mpc85xx_defconfig:sata-sii3112:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:scsi:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:sata-sii3112:rootfs \
-	mpc8544ds:mpc85xx_smp_defconfig:scsi[DC395]:rootfs \
-	bamboo:44x/bamboo_defconfig:smp:scsi[DC395]:rootfs \
-	bamboo:44x/bamboo_defconfig:scsi[AM53C974]:rootfs \
-	bamboo:44x/bamboo_defconfig:smp:scsi[AM53C974]:rootfs \
-	sam460ex:44x/canyonlands_defconfig:scsi[AM53C974]:rootfs \
-	sam460ex:44x/canyonlands_defconfig:scsi[DC395]:rootfs \
-	mac99:pmac32_defconfig:zilog:scsi[DC395]:rootfs"
 
 patch_defconfig()
 {

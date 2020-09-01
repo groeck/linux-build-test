@@ -20,7 +20,7 @@ errlog="/tmp/err-sh.log"
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v3.16|v4.4|v4.9|v4.14|v4.19)
+v4.4|v4.9|v4.14|v4.19)
 	;;
 *)
 	# earlycon only works with v4.20+ and otherwise results in a crash.

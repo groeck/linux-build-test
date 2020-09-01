@@ -19,42 +19,13 @@ ARCH=powerpc
 
 PREFIX=powerpc64-linux-
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.16)
-	PATH_PPC=/opt/kernel/gcc-4.7.3-nolibc/powerpc64-linux/bin
-	;;
-*)
-	# PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
-	# 9.2.0 only for 4.14 or later
-	# PATH_PPC=/opt/kernel/gcc-9.2.0-nolibc/powerpc64-linux/bin
-	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-	;;
-esac
+PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_316="mac99:qemu_ppc64_book3s_defconfig:smp:scsi[DC395]:rootfs \
-	powernv:powernv_defconfig:initrd \
-	powernv:powernv_defconfig:nvme:rootfs \
-	powernv:powernv_defconfig:usb-xhci:rootfs \
-	powernv:powernv_defconfig:scsi[MEGASAS]:rootfs \
-	powernv:powernv_defconfig:sdhci:mmc:rootfs \
-	ppce500:corenet64_smp_defconfig:e5500:sata:rootfs \
-	ppce500:corenet64_smp_defconfig:e5500:scsi:rootfs \
-	pseries:pseries_defconfig:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:little:initrd \
-	pseries:pseries_defconfig:little:scsi:rootfs \
-	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
-	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:little:nvme:rootfs \
-	pseries:pseries_defconfig:little:usb:rootfs"
 skip_44="powernv:powernv_defconfig:initrd \
 	powernv:powernv_defconfig:nvme:rootfs \
 	powernv:powernv_defconfig:usb-xhci:rootfs \

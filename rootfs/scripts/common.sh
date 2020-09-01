@@ -654,7 +654,6 @@ __setup_config()
     local defconfig="$1"
     local fragment="$2"
     local fixup="$3"
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
     local arch
     local target
 
@@ -695,9 +694,6 @@ __setup_config()
     fi
     if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
-	if [[ "${rel}" = "v3.16" ]]; then
-	    target="oldconfig"
-	fi
 	if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null; then
 	    return 1
 	fi
@@ -952,7 +948,6 @@ dosetup()
 {
     local rv
     local logfile="$(__mktemp /tmp/build.XXXXX)"
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
     local build="${ARCH}:${defconfig}"
     local EXTRAS=""
     local fixup=""

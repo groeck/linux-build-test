@@ -28,24 +28,6 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_316="arm:cubieboard:multi_v7_defconfig:mem512 \
-	arm:cubieboard:multi_v7_defconfig:usb:mem512 \
-	arm:cubieboard:multi_v7_defconfig:sata:mem512 \
-	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
-	arm:imx25-pdk:imx_v4_v5_defconfig:nonand:usb0:mem128 \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
-	arm:raspi2:multi_v7_defconfig \
-	arm:raspi2:multi_v7_defconfig:sd \
-	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
-	arm:virt:multi_v7_defconfig:virtio-blk:mem512  \
-	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
-	arm:realview-pbx-a9:realview_defconfig:realview_pb"
 skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
 	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \

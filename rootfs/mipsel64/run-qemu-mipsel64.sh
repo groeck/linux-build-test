@@ -10,28 +10,16 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-skip_316="mipsel64:malta_defconfig:r1:smp:scsi[DC395]:hd"
-
 skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
 	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
 
 QEMU_FULOONG="${QEMU:-${QEMU_V30_BIN}/qemu-system-mips64el}"
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v3.16)
-	# v3.16 needs the old version of gcc
-	PATH_MIPS=/opt/kernel/gcc-4.9.4-nolibc/mips64-linux/bin
-	PREFIX=mips64-linux-
-	;;
-*)
-	# gcc 9.3.0 and 10.2.0 refuse to compile fuloong2e_defconfig
-	# cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
-	PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
-	PREFIX=mips64-linux-
-	;;
-esac
+# gcc 9.3.0 and 10.2.0 refuse to compile fuloong2e_defconfig
+# cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
+PATH_MIPS=/opt/kernel/gcc-8.3.0-nolibc/mips64-linux/bin
+PREFIX=mips64-linux-
 
 # machine specific information
 ARCH=mips

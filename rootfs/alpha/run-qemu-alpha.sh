@@ -19,9 +19,6 @@ PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
 
 PATH=${PATH_ALPHA}:${PATH}
 
-skip_316="alpha:defconfig:scsi[AM53C974]:rootfs \
-	alpha:defconfig:scsi[DC395]:rootfs"
-
 patch_defconfig()
 {
     : # nothing to do

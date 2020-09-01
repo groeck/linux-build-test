@@ -14,24 +14,10 @@ _variant=$3
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=i386
 
-# Older releases don't like gcc 6+
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case ${rel} in
-v3.16)
-	PATH_X86=/opt/kernel/gcc-4.8.5-nolibc/x86_64-linux/bin
-	PREFIX="x86_64-linux-"
-	;;
-*)
-	PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
-	# PATH_X86=/opt/kernel/x86_64/gcc-8.2.0/usr/bin/
-	PREFIX="x86_64-linux-"
-	;;
-esac
+PATH_X86=/opt/kernel/gcc-8.3.0-nolibc/x86_64-linux/bin
+PREFIX="x86_64-linux-"
 
 PATH=${PATH_X86}:${PATH}
-
-skip_316="defconfig:smp6:scsi[AM53C974] \
-	defconfig:smp4:scsi[DC395]"
 
 skip_44="defconfig:smp6:scsi[AM53C974] \
 	defconfig:smp4:scsi[DC395]"

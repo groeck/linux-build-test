@@ -12,7 +12,6 @@ variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips}
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 PATH_MIPS=/opt/kernel/mips/gcc-5.4.0/usr/bin
 PREFIX=mips-linux-
 
@@ -22,9 +21,6 @@ KERNEL_IMAGE=vmlinux
 QEMU_MACH=malta
 
 PATH=${PATH_MIPS}:${PATH}
-
-skip_316="mips:malta_defconfig:smp:scsi[DC395]:rootfs \
-	mips:malta_defconfig:smp:scsi[AM53C974]:rootfs"
 
 patch_defconfig()
 {
