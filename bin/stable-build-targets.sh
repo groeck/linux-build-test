@@ -47,8 +47,7 @@ cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
 cmd_powerpc=(defconfig allmodconfig allnoconfig tinyconfig ppc64e_defconfig cell_defconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
 	tqm8xx_defconfig \
-	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig \
-	86xx/sbc8641d_defconfig)
+	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig)
 cmd_riscv=(defconfig allnoconfig tinyconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig performance_defconfig)
 cmd_score=(defconfig)
