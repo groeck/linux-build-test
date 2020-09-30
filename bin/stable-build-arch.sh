@@ -60,7 +60,6 @@ PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-10.2.0-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-10.2.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
-PATH_UC32=/opt/kernel/unicore32/uc4-1.0.5-hard/bin
 # 9.3.0 seems to have trouble compiling x86_64 targets
 PATH_X86=/opt/kernel/gcc-10.2.0-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-10.2.0-nolibc/xtensa-linux/bin
@@ -336,11 +335,6 @@ case ${ARCH} in
 	cmd=(${cmd_sh[*]})
 	PREFIX="sh4-linux-"
 	PATH=${PATH_SH4}:${PATH}
-	;;
-    unicore32)
-	cmd=(${cmd_unicore32[*]})
-	PREFIX="unicore32-linux-"
-	PATH=${PATH_UC32}:${PATH}
 	;;
     x86_64)
 	cmd=(${cmd_x86_64[*]})
