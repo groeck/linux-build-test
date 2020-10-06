@@ -152,13 +152,13 @@ runkernel defconfig smp2:efi32:mem1G:virtio Nehalem q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig preempt:smp4:efi:mem2G:virtio Icelake-Client q35 rootfs.ext2
+runkernel defconfig preempt:smp4:efi:mem2G:virtio Icelake-Client q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig preempt:smp8:mem4G:nvme Icelake-Server q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig preempt:smp2:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.iso
+runkernel defconfig preempt:smp2:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig preempt:smp6:mem512 KnightsMill q35 rootfs.cpio
