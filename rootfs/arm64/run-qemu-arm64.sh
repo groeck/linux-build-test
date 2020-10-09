@@ -11,7 +11,8 @@ option=$2
 config=$3
 
 # 2nd CPU of xlnx-versal-virt fails to come online with qemu v4.2
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
+# EFI boot fails (crashes) for v4.14.y kernels with qemu 5.0.1.
+QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
