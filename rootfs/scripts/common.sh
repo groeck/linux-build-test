@@ -283,7 +283,12 @@ __common_flashcmd()
 	else
 	    seek="${seek%%[a-zA-Z]*}"
 	fi
-        seek="bs=1${unit} seek=${seek}"
+	case "${unit}" in
+	'K'|'k') copysize="$((flashsize * 1024 - seek))";;
+	'M'|'m') copysize="$((flashsize - seek))";;
+	*) copysize="$((flashsize - seek))";;
+	esac
+        seek="bs=1${unit} seek=${seek} count=${copysize}"
     fi
     local partition="${plist[2]}"
     if [[ -z "${partition}" ]]; then
