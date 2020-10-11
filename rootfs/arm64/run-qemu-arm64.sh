@@ -10,6 +10,8 @@ machine=$1
 option=$2
 config=$3
 
+# raspi3 crashes with qemu v5.0.1/v5.1
+QEMU_RASPI=${QEMU:-${QEMU_V42_BIN}/qemu-system-aarch64}
 # 2nd CPU of xlnx-versal-virt fails to come online with qemu v4.2
 # EFI boot fails (crashes) for v4.14.y kernels with qemu 5.0.1.
 QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-aarch64}
@@ -100,6 +102,7 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
+	QEMU="${QEMU_RASPI}"
 	;;
     "xlnx-zcu102")
 	initcli+=" earlycon=cdns,mmio,0xFF000000,115200n8 console=ttyPS0"
