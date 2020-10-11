@@ -11,7 +11,7 @@ machine=$1
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
 v4.9|v4.14)
-	QEMU=${QEMU:-${QEMU_V50_BIN}/qemu-system-m68k}
+	QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
 	;;
 *)
 	QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-m68k}
