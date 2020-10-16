@@ -14,8 +14,9 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
-devtree=$3
-boot=$4
+options=$3
+devtree=$4
+boot=$5
 
 ARCH=arm
 
@@ -124,11 +125,17 @@ patch_defconfig()
     # Needed for mcimx7d-sabre usb boot
     sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
 
+    # Enable GPIO_MXC if supported, and build into kernel
+    # See upstream kernel commit 12d16b397ce0 ("gpio: mxc: Support module build")
+    if grep -F -q CONFIG_GPIO_MXC ${defconfig}; then
+	echo "CONFIG_GPIO_MXC=y" >> ${defconfig}
+    fi
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	nofdt)
-	    echo "MACH_PXA27X_DT=n" >> ${defconfig}
-	    echo "MACH_PXA3XX_DT=n" >> ${defconfig}
+	    echo "CONFIG_MACH_PXA27X_DT=n" >> ${defconfig}
+	    echo "CONFIG_MACH_PXA3XX_DT=n" >> ${defconfig}
 	    ;;
 	aeabi)
 	    echo "CONFIG_AEABI=y" >> ${defconfig}
@@ -224,7 +231,7 @@ runkernel()
     pbuild="${pbuild//+(:)/:}"
     build="${build//+(:)/:}"
 
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${options}@${fixup}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
