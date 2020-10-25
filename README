@@ -280,6 +280,7 @@ Packages needed to build:
 	libiscsi-dev
 	autoconf
 	libpixman-1-dev
+	ninja-build
 
 Build:
 
