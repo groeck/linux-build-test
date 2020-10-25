@@ -9,8 +9,8 @@ ulimit -c unlimited
 
 # limit file size to 1GB to prevent log file sizes from getting out of control.
 # Note that the limit needs to be a bit larger than 1GB to accommodate 1GB
-# flashes.
-ulimit -f $((1100 * 1024))
+# flashes, and some arm64 builds need inexplicably more space when linking.
+ulimit -f $((1500 * 1024))
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
