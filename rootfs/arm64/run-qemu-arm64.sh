@@ -17,7 +17,7 @@ QEMU_RASPI=${QEMU:-${QEMU_V42_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
-PATH_ARM64=/opt/kernel/gcc-8.3.0-nolibc/aarch64-linux/bin
+PATH_ARM64=/opt/kernel/gcc-9.3.0-nolibc/aarch64-linux/bin
 
 PATH=${PATH}:${PATH_ARM64}
 
