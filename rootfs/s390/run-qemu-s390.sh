@@ -9,7 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
 # PATH_S390=/opt/kernel/s390/gcc-6.4.0/bin
@@ -17,16 +17,27 @@ PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 
 PATH=${PATH_S390}:${PATH}
 
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+
 patch_defconfig()
 {
     local defconfig=$1
     local fixup=$2
 
-    # qemu only supports MARCH_Z900. Older kernels select it as default,
-    # but newer kernels may select MARCH_Z196.
-    sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
-    sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
-    echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
+    case "${rel}" in
+    v4.4)
+	# qemu only fully supports MARCH_Z900.
+	# Newer versions of qemu work for more recent CPUS with CPU model
+	# "qemu", but that does not work for v4.4.y (it crashes silently
+	# when trying to boot with the default configuration).
+	sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
+	sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
+	echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
+	;;
+    *)
+	;;
+    esac
+
     echo "CONFIG_PCI=y" >> ${defconfig}
 }
 
@@ -56,7 +67,9 @@ runkernel()
     fi
 
     execute automatic waitlist[@] \
-      ${QEMU} -kernel arch/s390/boot/bzImage \
+      ${QEMU} \
+	-cpu qemu \
+	-kernel arch/s390/boot/bzImage \
         ${extra_params} \
 	-append "${initcli}" \
 	-m 512 \
