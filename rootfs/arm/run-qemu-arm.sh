@@ -406,10 +406,16 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel imx_v6_v7_defconfig kzm "" \
+if [ ${runall} -eq 1 ]; then
+    # Non-DT support was removed with upstream commit c93197b0041d
+    # ("ARM: imx: Remove i.MX31 board files"), presumably to force interested
+    # parties to write devicetree files for non-converted boards. Obviously
+    # that is not the scope of this project, so just stop testing it.
+    runkernel imx_v6_v7_defconfig kzm "" \
 	rootfs-armv5.cpio manual nodrm
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
@@ -453,18 +459,29 @@ runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig beagle "" \
+if [ ${runall} -eq 1 ]; then
+    # starting with v5.10, beaglexm no longer reboots.
+    # This is thanks to upstream commit fb2c599f0566 ("ARM: omap3: enable off
+    # mode automatically") which auto-enables "off_mode" (whatever that is)
+    # for beagle boards. As probably no one uses those boards anymore,
+    # and the official version of qemu doesn't support them either,
+    # just stop testing them.
+    # Keep the code around for now, but it should be removed sometime soon.
+    # Alternatively we could check the kernel version and only avoid testing
+    # v5.10 and later, but that isn't really worth the effort.
+    runkernel multi_v7_defconfig beagle "" \
 	rootfs-armv5.ext2 auto ::sd:mem256 omap3-beagle.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig beaglexm "" \
-	rootfs-armv5.ext2 auto ::sd:mem512 omap3-beagle-xm.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig overo "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel multi_v7_defconfig beaglexm "" \
+	rootfs-armv5.ext2 automatic ::sd:mem512 omap3-beagle-xm.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel multi_v7_defconfig overo "" \
 	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 runkernel multi_v7_defconfig midway "" \
 	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
@@ -475,8 +492,22 @@ runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256 imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+# For sabrelite, the instatiated mmc device index is linux kernel release
+# specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
+# setting slot index via device tree alias") for reason and details.
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+case "${rel}" in
+v4.4|v4.9|v4.14|v4.19|v5.4|v5.8|v5.9)
+    sabrelite_mmc="mmc1"
+    ;;
+*)
+    sabrelite_mmc="mmc3"
+    ;;
+esac
+
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::mmc1:mem256 imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256" imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
