@@ -10,6 +10,7 @@ QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU_V51=${QEMU:-${QEMU_V51_BIN}/qemu-system-arm}
+QEMU_V52=${QEMU:-${QEMU_V52_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -194,6 +195,12 @@ patch_defconfig()
 	    echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
 	    echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
 	    ;;
+	npcm)
+	    echo "CONFIG_ARCH_NPCM=y" >> ${defconfig}
+	    echo "CONFIG_ARCH_NPCM7XX=y" >> ${defconfig}
+	    echo "CONFIG_SENSORS_NPCM7XX=y" >> ${defconfig}
+	    echo "CONFIG_NPCM7XX_WATCHDOG=y" >> ${defconfig}
+	    ;;
 	esac
     done
 }
@@ -303,6 +310,12 @@ runkernel()
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
+	;;
+    "npcm750-evb")
+	QEMUCMD="${QEMU_V52}"
+	initcli+=" console=ttyS3,115200"
+	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
+	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
 	initcli+=" console=ttyS0"
@@ -606,6 +619,11 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::usb1 sun8i-h3-orangepi-pc.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel multi_v7_defconfig npcm750-evb "" \
+	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
