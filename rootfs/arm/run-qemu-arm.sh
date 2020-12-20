@@ -200,6 +200,7 @@ patch_defconfig()
 	    echo "CONFIG_ARCH_NPCM7XX=y" >> ${defconfig}
 	    echo "CONFIG_SENSORS_NPCM7XX=y" >> ${defconfig}
 	    echo "CONFIG_NPCM7XX_WATCHDOG=y" >> ${defconfig}
+	    echo "CONFIG_SPI_NPCM_FIU=y" >> ${defconfig}
 	    ;;
 	esac
     done
@@ -311,7 +312,7 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "npcm750-evb")
+    "npcm750-evb" | "quanta-gsj")
 	QEMUCMD="${QEMU_V52}"
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
@@ -331,6 +332,7 @@ runkernel()
 	initcli+=" console=ttymxc0,115200"
 	;;
     "raspi2")
+	QEMUCMD="${QEMU_V52}"
 	initcli+=" earlycon=pl011,0x3f201000"
 	initcli+=" console=ttyAMA0"
 	;;
@@ -624,6 +626,18 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig quanta-gsj "" \
+	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-gsj.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig quanta-gsj "" \
+	rootfs-armv5.ext2 automatic npcm::mtd64 nuvoton-npcm730-gsj.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig quanta-gsj "" \
+	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-gsj.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
