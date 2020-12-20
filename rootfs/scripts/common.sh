@@ -169,6 +169,7 @@ __common_usbcmd()
 {
     local fixup="$1"
     local rootfs="$2"
+    local bus
 
     case "${fixup}" in
     "usb-ohci")
@@ -195,6 +196,14 @@ __common_usbcmd()
 	# The above must not be in quotes to enable pattern matching
 	extra_params+=" -usb"
 	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${fixup#usb}"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    usb[0-9].[0-9])
+	# Same as "usb", but with explicit bus and port number
+	# The above must not be in quotes to enable pattern matching
+	bus="${fixup#usb}"
+	extra_params+=" -usb"
+	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${bus%.*},port=${bus#*.}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-hub")
