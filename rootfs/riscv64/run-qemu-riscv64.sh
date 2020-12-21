@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 _fixup="$1"
 
 QEMU40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
-QEMU=${QEMU:-${QEMU_V52_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin

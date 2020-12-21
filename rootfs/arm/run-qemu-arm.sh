@@ -8,9 +8,7 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU_V51=${QEMU:-${QEMU_V51_BIN}/qemu-system-arm}
-QEMU_V52=${QEMU:-${QEMU_V52_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -301,24 +299,24 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "tacoma-bmc")
-	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "orangepi-pc")
-	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "npcm750-evb" | "quanta-gsj")
-	QEMUCMD="${QEMU_V52}"
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
+	# qemu v5.2+ crashes when trying to execute Xscale coprocessor
+	# instructions.
+	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS0"
 	;;
     "collie")
@@ -332,7 +330,6 @@ runkernel()
 	initcli+=" console=ttymxc0,115200"
 	;;
     "raspi2")
-	QEMUCMD="${QEMU_V52}"
 	initcli+=" earlycon=pl011,0x3f201000"
 	initcli+=" console=ttyAMA0"
 	;;

@@ -11,7 +11,6 @@ option=$2
 config=$3
 
 # raspi3 crashes with qemu v5.0.1/v5.1
-QEMU_RASPI=${QEMU:-${QEMU_V42_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -93,7 +92,6 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
-	QEMU="${QEMU_RASPI}"
 	;;
     "xlnx-zcu102")
 	initcli+=" earlycon=cdns,mmio,0xFF000000,115200n8 console=ttyPS0"

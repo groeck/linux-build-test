@@ -23,7 +23,6 @@ rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
 
 ARCH=powerpc
-QEMU_MACH=mac99
 
 PATH=${PATH_PPC}:${PATH}
 
@@ -60,6 +59,7 @@ runkernel()
     local kernel=$7
     local dts=$8
     local dtbcmd=""
+    local earlycon=""
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local rbuild="${mach}:${defconfig}${fixup:+:${fixup}}"
     local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|sdhci|mmc|nvme))/}"
@@ -116,12 +116,7 @@ runkernel()
 	    earlycon="earlycon"
 	fi
 	;;
-    bamboo|mpc8544ds)
-	# Not needed
-        earlycon=""
-	;;
     *)
-        earlycon=""
 	;;
     esac
 

@@ -14,7 +14,7 @@ v4.9|v4.14)
 	QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
 	;;
 *)
-	QEMU=${QEMU:-${QEMU_V51_BIN}/qemu-system-m68k}
+	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 	;;
 esac
 
