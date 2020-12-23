@@ -13,7 +13,6 @@ variant=$2
 skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
 	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
 
-QEMU_FULOONG="${QEMU:-${QEMU_V30_BIN}/qemu-system-mips64el}"
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
 # gcc 9.3.0 and 10.2.0 refuse to compile fuloong2e_defconfig
@@ -109,7 +108,6 @@ runkernel()
 	mem="256"
 	;;
     "fulong2e")
-	QEMU="${QEMU_FULOONG}"		# crashes or stalls with later versions
 	kernel="vmlinux"
 	extra_params+=" -vga none"	# fulong2e v3.1+ crashes if vga is enabled
 	mem="256"
