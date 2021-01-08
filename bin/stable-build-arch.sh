@@ -52,11 +52,7 @@ PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-10.2.0-nolibc/riscv64-linux/bin
 PATH_RISCV32=/opt/kernel/gcc-10.2.0-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
-# Invalid asm expression with gcc 9.2.0
-# invalid hard register usage with gcc 9.3.0 (4.14.y)
-# ./arch/s390/include/asm/jump_label.h:22: Error: bad expression w/ gcc 10.2.0 (4.14.y)
-# PATH_S390=/opt/kernel/gcc-10.2.0-nolibc/s390-linux/bin
-PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
+PATH_S390=/opt/kernel/gcc-10.2.0-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-10.2.0-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-10.2.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
@@ -103,10 +99,24 @@ v4.4)
 	# sparc images prior to v4.9 don't build with gcc 7+
 	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
 	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
+	# Invalid asm expression with gcc 9.2.0
+	# invalid hard register usage with gcc 9.3.0 (4.14.y)
+	# ./arch/s390/include/asm/jump_label.h:22: Error: bad expression w/ gcc 10.2.0 (4.14.y)
+	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 	;;
 v4.9)
 	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
 	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
+	# Invalid asm expression with gcc 9.2.0
+	# invalid hard register usage with gcc 9.3.0 (4.14.y)
+	# ./arch/s390/include/asm/jump_label.h:22: Error: bad expression w/ gcc 10.2.0 (4.14.y)
+	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
+	;;
+v4.14)
+	# Invalid asm expression with gcc 9.2.0
+	# invalid hard register usage with gcc 9.3.0 (4.14.y)
+	# ./arch/s390/include/asm/jump_label.h:22: Error: bad expression w/ gcc 10.2.0 (4.14.y)
+	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 	;;
 *)
 	;;
