@@ -8,7 +8,6 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU_V51=${QEMU:-${QEMU_V51_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -314,9 +313,6 @@ runkernel()
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
     "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
-	# qemu v5.2+ crashes when trying to execute Xscale coprocessor
-	# instructions.
-	QEMUCMD="${QEMU_V51}"
 	initcli+=" console=ttyS0"
 	;;
     "collie")
