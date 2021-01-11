@@ -12,18 +12,9 @@ _fixup=$1
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 PREFIX=s390-linux-
 ARCH=s390
+PATH_S390=/opt/kernel/gcc-10.2.0-nolibc/s390-linux/bin
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-    v4.4|v4.9|v4.14)
-	# v4.14 and older need gcc 8.x
-	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
-	;;
-    *)
-	PATH_S390=/opt/kernel/gcc-10.2.0-nolibc/s390-linux/bin
-	;;
-esac
-PATH=${PATH_S390}:${PATH}
 
 patch_defconfig()
 {
@@ -39,6 +30,12 @@ patch_defconfig()
 	sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
 	sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
 	echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
+	# v4.14 and older need gcc 8.x
+	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
+	;;
+    v4.9|v4.14)
+	# v4.14 and older need gcc 8.x
+	PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 	;;
     *)
 	;;
@@ -46,6 +43,8 @@ patch_defconfig()
 
     echo "CONFIG_PCI=y" >> ${defconfig}
 }
+
+PATH=${PATH_S390}:${PATH}
 
 runkernel()
 {
