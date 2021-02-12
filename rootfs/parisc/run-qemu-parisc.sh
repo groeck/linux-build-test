@@ -99,6 +99,14 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
+    # Random crashes in sym_evaluate_dp(), called from sym_compute_residual()
+    # (NULL pointer access). The probem is seen during shutdown. This is a
+    # kernel bug, obviously, likely caused by timing differences. It is
+    # possible if not likely that an interrupt is seen after the controller
+    # was presumably disabled.
+    runkernel "smp:scsi[53C810]" rootfs.ext2.gz
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
     # panic: arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map.
     runkernel "smp:scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
