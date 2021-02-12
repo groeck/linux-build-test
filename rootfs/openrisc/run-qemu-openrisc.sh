@@ -29,7 +29,7 @@ runkernel()
 {
     local defconfig=$1
     local retcode
-    local waitlist=("MACHINE RESTART" "Boot successful" "Rebooting")
+    local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local fixup=0
 
     echo -n "Building ${ARCH}:${defconfig} ... "
