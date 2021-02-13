@@ -8,6 +8,7 @@ shift $((OPTIND - 1))
 
 QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -296,6 +297,12 @@ runkernel()
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
+	;;
+    "g220a-bmc")
+	initcli+=" console=ttyS4,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
+	extra_params+=" -nodefaults"
+	QEMUCMD="${QEMU_MASTER}"
 	;;
     "tacoma-bmc")
 	initcli+=" console=ttyS4,115200"
@@ -823,6 +830,10 @@ runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.cpio automatic notests aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
     # SPI (NOR) Flash doesn't instantiate on ast2600-evb
@@ -830,11 +841,6 @@ if [ ${runall} -eq 1 ]; then
     # entry for aspeed,ast2600-fmc or aspeed,ast2600-spi.
     runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    # requires qemu v5.0+ which instantiates sd2 (sd with index=2) as emmc
-    runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
@@ -862,6 +868,11 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128 aspeed-bmc-opp-swift.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel aspeed_g5_defconfig g220a-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128 aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
