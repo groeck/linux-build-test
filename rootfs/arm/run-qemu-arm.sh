@@ -70,7 +70,10 @@ skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
 skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128"
-skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
+skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32 \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2 \
+        arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
+skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 
 . ${progdir}/../scripts/common.sh
 
@@ -626,6 +629,10 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig npcm750-evb "" \
+	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm750-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
