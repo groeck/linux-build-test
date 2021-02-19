@@ -10,9 +10,6 @@ machine=$1
 option=$2
 config=$3
 
-# raspi3 crashes with qemu v5.0.1/v5.1
-# 2nd CPU of xlnx-versal-virt fails to come online with qemu v4.2
-# EFI boot fails (crashes) for v4.14.y kernels with qemu 5.0.1.
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -161,8 +158,11 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-# Instantiating virtual devices requires qemu v3.1.0 plus patches, or qemu v4.0.0.
+runkernel xlnx-versal-virt defconfig smp:mem512 rootfs.cpio.gz
+retcode=$((retcode + $?))
 runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel xlnx-versal-virt defconfig "smp2:mem512:sd1" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
