@@ -162,7 +162,7 @@ runkernel xlnx-versal-virt defconfig smp:mem512 rootfs.cpio.gz
 retcode=$((retcode + $?))
 runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel xlnx-versal-virt defconfig "smp2:mem512:sd1" rootfs.ext2.gz
+runkernel xlnx-versal-virt defconfig "smp2:mem512:sd0" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
