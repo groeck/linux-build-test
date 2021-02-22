@@ -23,10 +23,12 @@ PATH=${PATH}:${PATH_ARM64}
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
 skip_44="virt:defconfig:smp2:efi:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp8:efi:mem512:scsi[AM53C974]:rootfs \
+	xlnx-versal-virt:defconfig:smp2:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3:defconfig:smp:mem1G:initrd \
 	raspi3:defconfig:smp4:mem1G:sd:rootfs \
+	xlnx-versal-virt:defconfig:smp2:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
