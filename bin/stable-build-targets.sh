@@ -61,10 +61,9 @@ cmd_um=(defconfig)
 
 # build to skip
 
-# skip_316="m68k:allnoconfig m68k:tinyconfig i386:tools/perf x86_64:tools/perf"
-skip_316="m68k:allnoconfig m68k:tinyconfig i386:tools/perf"
-skip_318="m68k:allnoconfig m68k:tinyconfig i386:tools/perf x86_64:tools/perf"
 skip_44="cris:allnoconfig cris:tinyconfig powerpc:allmodconfig"
+skip_419="riscv:allmodconfig"
+skip_54="riscv:allmodconfig"
 
 # fixups
 
