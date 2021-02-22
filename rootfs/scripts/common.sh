@@ -547,7 +547,7 @@ __common_fixups()
 #   Creates flash file with root file system at start
 common_diskcmd()
 {
-    local fixup="$1"
+    local fixups="${1//:/ }"
     local rootfs="$2"
 
     if [[ "${rootfs}" == *cpio ]]; then
@@ -558,7 +558,9 @@ common_diskcmd()
 
     extra_params=""
     initcli=""
-    __common_diskcmd "${fixup}" "${rootfs}"
+    for fixup in ${fixups}; do
+	__common_diskcmd "${fixup}" "${rootfs}"
+    done
     diskcmd="${extra_params}"
     if [ -z "${initcli}" ]; then
 	initcli="root=/dev/sda"
