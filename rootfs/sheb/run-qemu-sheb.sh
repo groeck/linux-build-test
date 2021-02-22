@@ -6,7 +6,7 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
+QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-sh4eb}
 # PREFIX=sh4-linux-
 PREFIX=sh4eb-linux-
 ARCH=sh
@@ -80,7 +80,7 @@ runkernel()
     fi
 
     rootfs="$(rootfsname ${rootfs})"
-    if ! common_diskcmd "${fixup##*:}" "${rootfs}"; then
+    if ! common_diskcmd "${fixup}" "${rootfs}"; then
 	return 1
     fi
 
@@ -123,6 +123,10 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel rts7751r2dplus_defconfig usb-xhci rootfs.ext2
     retcode=$((retcode + $?))
     runkernel rts7751r2dplus_defconfig usb-uas-xhci rootfs.ext2
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig usb-ehci rootfs.ext2
+    retcode=$((retcode + $?))
+    runkernel rts7751r2dplus_defconfig usb-ohci rootfs.ext2
     retcode=$((retcode + $?))
     # sym0: CACHE INCORRECTLY CONFIGURED.
     # sym0: giving up ...
