@@ -6,7 +6,6 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_LINARO=${QEMU:-${QEMU_LINARO_BIN}/qemu-system-arm}
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
@@ -281,21 +280,6 @@ runkernel()
 	initcli=""
 	kernel="vmlinux"
 	;;
-    "overo" | "beagle" | "beaglexm")
-	if ! ${progdir}/${mach}/setup.sh ${ARCH} ${PREFIX} ${rootfs} \
-			${dtbfile} sd.img > ${logfile} 2>&1 ; then
-	    echo "failed"
-	    cat ${logfile}
-	    return 1
-	fi
-	extra_params+=" -clock unix"
-	extra_params+=" -device usb-mouse -device usb-kbd"
-	# replace original root file system with generated image
-	extra_params="${extra_params//${rootfs}/sd.img}"
-	initcli=""
-	# Not supported in mainline version of qemu
-	QEMUCMD="${QEMU_LINARO}"
-	;;
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "swift-bmc")
 	initcli+=" console=ttyS4,115200"
@@ -477,30 +461,6 @@ runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 	rootfs-armv7a.ext2 auto nolocktests::sd:mem256 vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # starting with v5.10, beaglexm no longer reboots.
-    # This is thanks to upstream commit fb2c599f0566 ("ARM: omap3: enable off
-    # mode automatically") which auto-enables "off_mode" (whatever that is)
-    # for beagle boards. As probably no one uses those boards anymore,
-    # and the official version of qemu doesn't support them either,
-    # just stop testing them.
-    # Keep the code around for now, but it should be removed sometime soon.
-    # Alternatively we could check the kernel version and only avoid testing
-    # v5.10 and later, but that isn't really worth the effort.
-    runkernel multi_v7_defconfig beagle "" \
-	rootfs-armv5.ext2 auto ::sd:mem256 omap3-beagle.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel multi_v7_defconfig beaglexm "" \
-	rootfs-armv5.ext2 automatic ::sd:mem512 omap3-beagle-xm.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel multi_v7_defconfig overo "" \
-	rootfs-armv5.ext2 auto ::sd:mem256 omap3-overo-tobi.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
 
 runkernel multi_v7_defconfig midway "" \
 	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
