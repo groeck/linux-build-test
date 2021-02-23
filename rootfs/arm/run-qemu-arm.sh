@@ -317,7 +317,7 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	initcli+=" console=ttyS0"
 	;;
-    "kzm" | "imx25-pdk" )
+    "imx25-pdk" )
 	initcli+=" console=ttymxc0,115200"
 	;;
     "raspi2")
@@ -408,17 +408,6 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" \
 	rootfs-armv5.ext2 manual nonand::usb1:mem128 imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # Non-DT support was removed with upstream commit c93197b0041d
-    # ("ARM: imx: Remove i.MX31 board files"), presumably to force interested
-    # parties to write devicetree files for non-converted boards. Obviously
-    # that is not the scope of this project, so just stop testing it.
-    runkernel imx_v6_v7_defconfig kzm "" \
-	rootfs-armv5.cpio manual nodrm
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
 
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
