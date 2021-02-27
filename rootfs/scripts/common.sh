@@ -895,8 +895,6 @@ __setup_fragment()
 	echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
 	echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
 	echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
-	# Needed with v5.12+
-	echo "CONFIG_VIRTIO_PCI_MODERN=y" >> ${fragment}
     fi
 
     if [[ "${nofs}" -eq 0 ]]; then
