@@ -224,40 +224,6 @@ Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
 	tar czf /tmp/x86_64-gcc-4.9.1-glibc_microblaze-linux.tar.gz microblaze
 
 ---
-metag:
-
-Download minimorph SDK from
-http://www.imgtec.com/meta_insider/utilities/Minimorph_1_0-rel009.tar.gz
-Inside is ./metag-linux-GPL-Minimorph_1_0-rel009.tar.gz.
-Contains buildroot sources. Untar, then run the following commands.
-
-	cd GPL/buildroot
-	make comet_minimorph_defconfig
-	make
-	cd output
-	mkdir metag
-	mv host metag/gcc-4.2.4
-	tar czf /tmp/x86_64-gcc-4.2.4-uclibc_metag-linux.tar.gz metag
-
-Install in /opt/kernel.
-Path and prefix to use:
-PATH=/opt/kernel/metag/gcc-4.2.4/usr/bin
-CROSS_COMPILE= metag-unknown-linux-uclibc-
-
-Note: As of 7/15/2014, the minimorph SDK is no longer available from above
-location (the meta insider web page seems to have disappeared entirely).
-Contact me for a copy of the toolchain if needed.
-
-Toolchain sources are available at git@github.com:img-meta/metag-buildroot.git.
-Run "make meta2_defconfig" followed by "make"; this should build the toolchain
-in the output/host directory.
-
-metag qemu:
-
-Clone git@github.com:img-meta/qemu.git and build.
-Install qemu-system-meta in your binary directory.
-
----
 NIOS II
 
 Use kernel.org toolchain or toolchain built with buildroot.
@@ -370,19 +336,3 @@ index 24a4b8e..0eff637 100644
  
 -- 
 1.9.1
-
----
-score
-
-- Use and build latest binutils (post June 13, 2014).
-- Use and build gcc 4.9 (tip of tree as of June 22, 2014).
-
-gcc configuration:
-
-../gcc/configure --prefix=/opt/kernel/score --program-prefix=score-elf-
---target=score-elf --without-header --disable-nls --enable-languages=c
---disable-threads --disable-shared --enable-werror=no
-target_configargs=enable_vtable_verify=yes --enable-obsolete --disable-libssp
---disable-libquadmath
-
-Do _not_ configure/build gcc from its source directory; that will fail.
