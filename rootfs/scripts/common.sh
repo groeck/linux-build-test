@@ -453,6 +453,15 @@ __common_diskcmd()
     esac
 }
 
+__common_netcmd()
+{
+    local fixup="$1"
+    local params=(${fixup//,/ })
+    local netdev="${params[1]}"
+
+    extra_params+=" -device ${netdev},netdev=net0 -netdev user,id=net0"
+}
+
 __common_fixup()
 {
     local fixup="${1}"
@@ -467,7 +476,7 @@ __common_fixup()
 	# __common_pcicmd "${fixup}" "${rootfs}"
 	;;
     net*)
-	# __common_netcmd "${fixup}" "${rootfs}"
+	__common_netcmd "${fixup}"
 	;;
     smp[1-9])
 	extra_params+=" -smp ${fixup#smp}"
@@ -732,6 +741,7 @@ __setup_fragment()
     local nousb=0
     local novirt=0
     local preempt=0
+    local netdevs=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -764,6 +774,7 @@ __setup_fragment()
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
 	preempt) preempt=1 ;;
+	net*) netdevs=1;;
 	*)
 	    ;;
 	esac
@@ -827,6 +838,15 @@ __setup_fragment()
 	    # echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
 	    # echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
 	    # echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+	fi
+
+	if [[ "${netdevs}" -ne 0 ]]; then
+	    echo "CONFIG_NET_VENDOR_INTEL=y" >> ${fragment}
+	    echo "CONFIG_E1000=y" >> ${fragment}
+	    echo "CONFIG_NET_VENDOR_REALTEK=y" >> ${fragment}
+	    echo "CONFIG_8139TOO=y" >> ${fragment}
+	    echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
+	    echo "CONFIG_PCNET32=y" >> ${fragment}
 	fi
 
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
