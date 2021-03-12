@@ -7,15 +7,20 @@ progdir=$(cd $(dirname "$0"); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-_fixup="$1"
+_mach="$1"
+_fixup="$2"
 
 QEMU40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-riscv64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin
 
 PATH=${PATH}:${PATH_RISCV}
+
+skip_419="riscv:sifive_u:defconfig:initrd \
+	riscv:sifive_u:defconfig:sd:rootfs"
 
 patch_defconfig()
 {
@@ -42,7 +47,7 @@ runkernel()
     local defconfig=$2
     local fixup=$3
     local rootfs=$4
-    local waitlist=("Power off|Power down" "Boot successful" "Requesting system poweroff")
+    local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then
@@ -51,7 +56,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if ! match_params "${_fixup}@${fixup}"; then
+    if ! match_params "${_mach}@${mach}" "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -78,13 +83,26 @@ runkernel()
 	KERNEL="vmlinux"
     fi
 
-    execute automatic waitlist[@] \
-      ${QEMU} -M virt -m 512M -no-reboot \
+    case "${mach}" in
+    virt)
+	con="console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200"
+	extra_params+=" -netdev user,id=net0 -device virtio-net-device,netdev=net0"
+	wait="automatic"
+	;;
+    sifive_u)
+	# requires qemu v5.3+
+	QEMU="${QEMU_MASTER}"
+	con="console=ttySIF0,115200 earlycon"
+	wait="manual"
+	;;
+    esac
+
+    execute "${wait}" waitlist[@] \
+      ${QEMU} -M "${mach}" -m 512M -no-reboot \
 	-bios "${BIOS}" \
 	-kernel "${KERNEL}" \
-	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
 	${extra_params} \
-	-append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200" \
+	-append "${initcli} ${con}" \
 	-nographic -monitor none
 
     return $?
@@ -143,5 +161,13 @@ runkernel virt defconfig "scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "scsi[virtio-pci]" rootfs.ext2
 retcode=$((${retcode} + $?))
+
+runkernel sifive_u defconfig "" rootfs.cpio
+retcode=$((${retcode} + $?))
+runkernel sifive_u defconfig sd rootfs.ext2
+retcode=$((${retcode} + $?))
+# does not work; mtd device not created
+# runkernel sifive_u defconfig mtd32 rootfs.ext2
+# retcode=$((${retcode} + $?))
 
 exit ${retcode}
