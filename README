@@ -253,6 +253,31 @@ Build:
 See qemu/buildall.sh
 
 ---
+buildroot general configuration, when building root file systems:
+
+Toolchain
+   4.4 kernel headers (or whatever the minimum required kernel version is)
+   Recent binutils/gcc
+
+System configuration
+  Enable:
+    Run a getty (login prompt) after boot
+  then
+    Run test scripts
+      Shutdown command to use: Either reboot or poweroff, depending on HW
+  Network interface to configure through DHCP: eth0
+Filesystem images
+  Disable:
+    tar
+  Enable:
+    cpio, gzip compression
+    ext2/3/4, 16MB, gzip compression
+    iso
+    squashfs, gzip compression
+    evtl btrfs if you like, but needs large image size (100m ?)
+
+
+---
 buildbot
 
 Requires the following patch.
