@@ -26,23 +26,23 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-skip_44="powernv:powernv_defconfig:initrd \
+skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 	powernv:powernv_defconfig:nvme:rootfs \
 	powernv:powernv_defconfig:usb-xhci:rootfs \
 	powernv:powernv_defconfig:scsi[MEGASAS]:rootfs \
 	powernv:powernv_defconfig:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:initrd \
-	pseries:pseries_defconfig:little:scsi:rootfs \
-	pseries:pseries_defconfig:little:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:scsi[MEGASAS]:rootfs \
-	pseries:pseries_defconfig:little:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:little:nvme:rootfs \
-	pseries:pseries_defconfig:little:usb:rootfs"
+	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
+	pseries:pseries_defconfig:little:net,rtl8139:initrd \
+	pseries:pseries_defconfig:little:net,e1000:scsi:rootfs \
+	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs \
+	pseries:pseries_defconfig:little:net,virtio-net:scsi[MEGASAS]:rootfs \
+	pseries:pseries_defconfig:little:net,i82562:scsi[FUSION]:rootfs \
+	pseries:pseries_defconfig:little:net,ne2k_pci:sdhci:mmc:rootfs \
+	pseries:pseries_defconfig:little:net,tulip:nvme:rootfs \
+	pseries:pseries_defconfig:little:net,pcnet:usb:rootfs"
 skip_49="powernv:powernv_defconfig:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:sata-sii3112:rootfs"
+	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
+	pseries:pseries_defconfig:net,e1000e:little:sata-sii3112:rootfs"
 
 patch_defconfig()
 {
@@ -112,10 +112,6 @@ runkernel()
 	mem=2G
     fi
 
-    if [[ "${machine}" == "ppce500" ]]; then
-	extra_params+=" -device e1000e"
-    fi
-
     execute ${reboot} waitlist[@] \
       ${QEMU} -M ${machine} -cpu ${cpu} -m ${mem} \
 	-kernel ${kernel} \
@@ -130,82 +126,95 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel qemu_ppc64_book3s_defconfig smp mac99 ppc64 ttyS0 vmlinux \
+# Notes:
+#   pseries:ne2k_pci on pseries (big endian) results in
+#	NETDEV WATCHDOG: eth0 (ne2k-pci): transmit queue 0 timed out
+#     ne2k_pci with pseries:little is ok.
+#   e5500 network failures:
+#     rtl8139
+#     pcnet
+#     ne2k_pci
+#   powernv crashes with all non-initrd network tests
+#     This is possibly because the network device is connected to the wrong
+#     pcie bus.
+#
+runkernel qemu_ppc64_book3s_defconfig smp::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$?
-runkernel qemu_ppc64_book3s_defconfig smp::ide mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,pcnet:ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp::sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,e1000:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
 # Upstream qemu generates a traceback during reboot.
 # irq 30: nobody cared (try booting with the "irqpoll" option)
-runkernel qemu_ppc64_book3s_defconfig smp::nvme mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,e1000e:nvme mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc64_book3s_defconfig smp::scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,virtio-net:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig "" pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,pcnet pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig ::scsi pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,rtl8139:scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig ::usb pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,e1000e:usb pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig ::sdhci:mmc pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,i82559a:sdhci:mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig ::nvme pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,virtio-net:nvme pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig ::sata-sii3112 pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,tulip:sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,rtl8139 pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::scsi pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,e1000:scsi pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::usb pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,pcnet:usb pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::sata-sii3112 pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,e1000e:sata-sii3112 pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,virtio-net:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::scsi[FUSION] pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,i82562:scsi[FUSION] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::sdhci:mmc pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,ne2k_pci:sdhci:mmc pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::nvme pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,tulip:nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500 ppce500 e5500 ttyS0 \
+
+runkernel corenet64_smp_defconfig e5500::net,e1000e ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500::nvme ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,virtio-net:nvme ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500::sdhci:mmc ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,e1000:sdhci:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500::scsi[53C895A] ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,tulip:scsi[53C895A] ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel corenet64_smp_defconfig e5500::sata-sii3112 ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,i82562:sata-sii3112 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((${retcode} + $?))
 
-runkernel powernv_defconfig "" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((${retcode} + $?))
 runkernel powernv_defconfig "::nvme" powernv POWER9 hvc0 \
