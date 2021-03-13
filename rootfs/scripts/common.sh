@@ -741,7 +741,7 @@ __setup_fragment()
     local nousb=0
     local novirt=0
     local preempt=0
-    local netdevs=0
+    local nonet=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -763,6 +763,7 @@ __setup_fragment()
 	    notests=1
 	    nousb=1
 	    novirt=1
+	    nonet=1
 	    ;;
 	nodebug) nodebug=1 ;;
 	nocd) nocd=1 ;;
@@ -773,8 +774,8 @@ __setup_fragment()
 	notests) notests=1 ;;
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
+	nonet) nonet=1;;
 	preempt) preempt=1 ;;
-	net*) netdevs=1;;
 	*)
 	    ;;
 	esac
@@ -840,13 +841,22 @@ __setup_fragment()
 	    # echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
 	fi
 
-	if [[ "${netdevs}" -ne 0 ]]; then
+	if [[ "${nonet}" -eq 0 ]]; then
 	    echo "CONFIG_NET_VENDOR_INTEL=y" >> ${fragment}
+	    echo "CONFIG_E100=y" >> ${fragment}
 	    echo "CONFIG_E1000=y" >> ${fragment}
+	    echo "CONFIG_E1000E=y" >> ${fragment}
 	    echo "CONFIG_NET_VENDOR_REALTEK=y" >> ${fragment}
-	    echo "CONFIG_8139TOO=y" >> ${fragment}
+	    # rtl8139 requires CONFIG_8139CP, not CONFIG_8139TOO
+	    echo "CONFIG_8139CP=y" >> ${fragment}
+	    # echo "CONFIG_8139TOO=y" >> ${fragment}
 	    echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
 	    echo "CONFIG_PCNET32=y" >> ${fragment}
+	    echo "CONFIG_NET_VENDOR_8390=y" >> ${fragment}
+	    echo "CONFIG_NE2K_PCI=y" >> ${fragment}
+	    echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
+	    echo "CONFIG_NET_TULIP=y" >> ${fragment}
+	    echo "CONFIG_TULIP=y" >> ${fragment}
 	fi
 
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
@@ -915,6 +925,9 @@ __setup_fragment()
 	echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
 	echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
 	echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
+	if [[ "${nonet}" -eq 0 ]]; then
+	    echo "CONFIG_VIRTIO_NET=y" >> ${fragment}
+	fi
     fi
 
     if [[ "${nofs}" -eq 0 ]]; then
@@ -1106,8 +1119,9 @@ dowait()
     local pid=$1
     local logfile=$2
     local report=$3
-    local manual=$4
-    local waitlist=("${!5}")
+    local nonet=$4
+    local manual=$5
+    local waitlist=("${!6}")
     local entries=${#waitlist[*]}
     local retcode=0
     local t=0
@@ -1117,9 +1131,36 @@ dowait()
     local dolog
     local fsize=0
     local fsize_tmp
+    local net_done=${nonet}
+    local net_passed=${nonet}
+    local net_started=0
 
     while true
     do
+	# Network test:
+	# Look for "Starting network" followed by "OK" or "FAIL".
+	if [[ "${net_done}" -eq 0 ]]; then
+	    if [[ "${net_started}" -eq 0 ]]; then
+		grep -q "Starting network:" "${logfile}"
+		if [[ $? -eq 0 ]]; then
+		    net_started=1
+		fi
+	    fi
+	    if [[ "${net_started}" -ne 0 ]]; then
+		# Look for "OK" or "FAIL" after "Starting network"
+		match="$(sed -n '/Starting network/,$p' ${logfile} | sed '/\(OK\|FAIL\)/q')"
+		echo "${match}" | grep -q "OK"
+		if [[ $? -eq 0 ]]; then
+		    net_passed=1
+		    net_done=1
+		fi
+		echo "${match}" | grep -q "FAIL"
+		if [[ $? -eq 0 ]]; then
+		    net_done=1
+		fi
+	    fi
+	fi
+
         # terminate if process is no longer running
 	if ! kill -0 ${pid} >/dev/null 2>&1; then
 	    break
@@ -1180,6 +1221,16 @@ dowait()
 	if grep -q -e "Oops: |Kernel panic|Internal error:|segfault" ${logfile}; then
 	    msg="failed (crashed)"
 	    retcode=1
+	fi
+    fi
+
+    # Look for network test failures
+    if [ ${retcode} -eq 0 ]; then
+	if [[ "${net_done}" -eq 1 ]]; then
+	    if [[ "${net_passed}" -eq 0 ]]; then
+		msg="failed (network)"
+		retcode=1
+	    fi
 	fi
     fi
 
@@ -1266,8 +1317,14 @@ execute()
     local retries=0
     local retcode
     local last=0
+    local nonet
 
     shift; shift; shift
+
+    # If we added "netdev user" to the command line, assume that we actually
+    # want to test if it works.
+    echo "${@}" | grep -q "netdev user,id"
+    nonet=$?
 
     echo -n "running ..."
 
@@ -1309,7 +1366,7 @@ execute()
 	"${cmd}" "$@" > "${logfile}" 2>&1 &
 	pid=$!
 
-	dowait "${pid}" "${logfile}" "${last}" "${waitflag}" waitlist[@]
+	dowait "${pid}" "${logfile}" "${last}" "${nonet}" "${waitflag}" waitlist[@]
 	retcode=$?
 
 	if [[ ${retcode} -eq 0 ]]; then
