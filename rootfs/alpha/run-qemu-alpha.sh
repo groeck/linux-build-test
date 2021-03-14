@@ -15,7 +15,7 @@ PREFIX=alpha-linux-
 ARCH=alpha
 
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-PATH_ALPHA=/opt/kernel/gcc-6.4.0-nolibc/alpha-linux/bin
+PATH_ALPHA=/opt/kernel/gcc-10.2.0-nolibc/alpha-linux/bin
 
 PATH=${PATH_ALPHA}:${PATH}
 
