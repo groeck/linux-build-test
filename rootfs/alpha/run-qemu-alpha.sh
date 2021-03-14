@@ -68,20 +68,15 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-# Notes:
-# - E100 network tests (all of them) crash immediately
-#   in __napi_poll() after enabling interrupts from e100_enable_irq().
-# - usb-net fails with "usbnet: failed control transaction".
-
-runkernel defconfig devtmpfs rootfs.cpio
+runkernel defconfig devtmpfs busybox-alpha.cpio
 retcode=$?
-runkernel defconfig ide:net,e1000 rootfs.ext2
+runkernel defconfig ide rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig sdhci:mmc:net,ne2k_pci rootfs.ext2
+runkernel defconfig sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-ohci:net,pcnet rootfs.ext2
+runkernel defconfig usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-ehci:net,virtio-net rootfs.ext2
+runkernel defconfig usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
@@ -89,13 +84,13 @@ runkernel defconfig usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[AM53C974]:net,tulip" rootfs.ext2
+runkernel defconfig "scsi[AM53C974]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[DC395]:net,e1000-82545em" rootfs.ext2
+runkernel defconfig "scsi[DC395]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[MEGASAS]:net,rtl8139" rootfs.ext2
+runkernel defconfig "scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[MEGASAS2]:net,e1000-82544gc" rootfs.ext2
+runkernel defconfig "scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig "scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
