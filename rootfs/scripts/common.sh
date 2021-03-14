@@ -459,6 +459,10 @@ __common_netcmd()
     local params=(${fixup//,/ })
     local netdev="${params[1]}"
 
+    if [[ "${netdev}" == "usb-net" ]]; then
+	extra_params+=" -usb"
+    fi
+
     extra_params+=" -device ${netdev},netdev=net0 -netdev user,id=net0"
 }
 
@@ -857,6 +861,11 @@ __setup_fragment()
 	    echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
 	    echo "CONFIG_NET_TULIP=y" >> ${fragment}
 	    echo "CONFIG_TULIP=y" >> ${fragment}
+	    if [[ "${nousb}" -eq 0 ]]; then
+	        echo "CONFIG_USB_USBNET=y" >> ${fragment}
+	        echo "CONFIG_USB_NET_CDCETHER=y" >> ${fragment}
+	        echo "CONFIG_USB_NET_CDC_SUBSET=y" >> ${fragment}
+	    fi
 	fi
 
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
