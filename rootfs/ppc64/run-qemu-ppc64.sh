@@ -40,9 +40,10 @@ skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 	pseries:pseries_defconfig:little:net,ne2k_pci:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:little:net,tulip:nvme:rootfs \
 	pseries:pseries_defconfig:little:net,pcnet:usb:rootfs"
-skip_49="powernv:powernv_defconfig:sdhci:mmc:rootfs \
+skip_49="powernv:powernv_defconfig:net,rtl8139:initrd \
+	powernv:powernv_defconfig:sdhci:mmc:rootfs \
 	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:net,e1000e:little:sata-sii3112:rootfs"
+	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs"
 
 patch_defconfig()
 {
