@@ -123,41 +123,43 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel virt defconfig smp:mem512 rootfs.cpio.gz
+# Failing network tests: i82551, usb-net
+
+runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:efi:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:mem512:usb-ehci rootfs.ext2.gz
+runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:mem512:usb-ohci rootfs.ext2.gz
+runkernel virt defconfig smp2:net,i82550:mem512:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:mem512:usb-uas-xhci rootfs.btrfs.gz
+runkernel virt defconfig smp4:net,ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp6:mem512:virtio rootfs.ext2.gz
+runkernel virt defconfig smp6:net,pcnet:mem512:virtio rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp8:mem512:virtio-pci rootfs.ext2.gz
+runkernel virt defconfig smp8:net,rtl8139:mem512:virtio-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:efi:mem512:virtio-blk rootfs.ext2.gz
+runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:mem512:nvme rootfs.btrfs.gz
+runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:mem512:sdhci:mmc rootfs.ext2.gz
+runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:mem512:scsi[DC395]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:efi:mem512:scsi[AM53C974]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:net,i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:mem512:scsi[MEGASAS]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:net,i82558b:mem512:scsi[MEGASAS]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:mem512:scsi[MEGASAS2]" rootfs.btrfs.gz
+runkernel virt defconfig "smp4:net,i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:mem512:scsi[53C810]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:net,e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:mem512:scsi[53C895A]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:net,e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp:mem512:scsi[FUSION]" rootfs.ext2.gz
+runkernel virt defconfig "smp:net,pcnet:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:mem512:scsi[virtio]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:net,tulip:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-versal-virt defconfig smp:mem512 rootfs.cpio.gz
