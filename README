@@ -57,7 +57,8 @@ libperl-dev
 systemtap-sdt-dev
 libdw-dev
 libslang2-dev
-libgtk2.0-de
+libgtk2.0-dev
+libgtk2.0-dev:i386 (for perf)
 binutils-dev
 libbabeltrace-dev
 openjdk-8-jdk
