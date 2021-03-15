@@ -89,9 +89,9 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel malta_defconfig smp rootfs.cpio.gz
+runkernel malta_defconfig smp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:ide rootfs.ext2.gz
+runkernel malta_defconfig smp:net,pcnet:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -eq 1 ]]; then
@@ -101,27 +101,27 @@ if [[ ${runall} -eq 1 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:usb-xhci rootfs.ext2.gz
+runkernel malta_defconfig smp:net,e1000:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-uas-xhci rootfs.ext2.gz
+runkernel malta_defconfig smp:net,e1000-82545em:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-ehci rootfs.ext2.gz
+runkernel malta_defconfig smp:net,i82801:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:sdhci:mmc rootfs.ext2.gz
+runkernel malta_defconfig smp:net,ne2k_pci:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[53C810] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,pcnet:scsi[53C810] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[53C895A] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,rtl8139:scsi[53C895A] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[DC395] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,tulip:scsi[DC395] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[AM53C974] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,virtio-net:scsi[AM53C974] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,i82550:scsi[MEGASAS] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS2] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,i82558a:scsi[MEGASAS2] rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[FUSION] rootfs.ext2.gz
+runkernel malta_defconfig smp:net,i82562:scsi[FUSION] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nosmp rootfs.cpio.gz
