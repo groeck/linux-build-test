@@ -7,7 +7,7 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
+QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -27,25 +27,26 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128 \
+skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:sabrelite:multi_v7_defconfig:mmc1:mem256 \
-	arm:virt:multi_v7_defconfig:virtio-blk:mem512 \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
+	arm:sabrelite:multi_v7_defconfig:mmc1:mem256:net,default \
+	arm:virt:multi_v7_defconfig:virtio-blk:mem512:net,virtio-net-device \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:realview-pbx-a9:realview_defconfig:realview_pb"
-skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32 \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
+skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:net,nic \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32:net,nic \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
@@ -53,25 +54,25 @@ skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
-	arm:orangepi-pc:multi_v7_defconfig:usb0 \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
+	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:palmetto-bmc:aspeed_g4_defconfig \
 	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
-skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb \
+skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128 \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128 \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
-skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd \
+skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128"
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32 \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2 \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 
@@ -290,7 +291,7 @@ runkernel()
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
-	QEMUCMD="${QEMU_MASTER}"
+	QEMUCMD="${QEMU_V60}"
 	;;
     "tacoma-bmc")
 	initcli+=" console=ttyS4,115200"
@@ -351,7 +352,7 @@ runkernel()
 	initcli+=" console=ttyAMA0,115200"
 	;;
     "xilinx-zynq-a9")
-	initcli+=" console=ttyPS0"
+	initcli+=" console=ttyPS0 earlycon"
 	extra_params+=" -serial null"
 	;;
     *)
@@ -375,40 +376,42 @@ echo "Build reference: $(git describe)"
 echo
 
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128 versatile-pb.dtb
+	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128:net,default versatile-pb.dtb
 retcode=$?
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128 versatile-pb.dtb
+	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128:net,default versatile-pb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.cpio auto aeabi:pci::mem128 versatile-pb.dtb
+	rootfs-armv5.cpio auto aeabi:pci::mem128:net,default versatile-pb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel versatile_defconfig versatileab "" \
-	rootfs-armv5.cpio auto ::mem128 versatile-ab.dtb
+	rootfs-armv5.cpio auto ::mem128:net,default versatile-ab.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.cpio manual nonand::mem128 imx25-pdk.dtb
+	rootfs-armv5.cpio manual nonand::mem128:net,default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::sd:mem128 imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::sd:mem128:net,default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::usb0:mem128 imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::usb0:mem128:net,default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::usb1:mem128 imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::usb1:mem128:net,default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+# Ethernet instantiates but fails to get an IP address
+# (no packets received on eth0)
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
@@ -426,28 +429,34 @@ runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# vexpress tests generate a warning if CONFIG_PROVE_RCU is enabled
+# vexpress tests generate a warning during reboot if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.cpio auto nolocktests::mem128 vexpress-v2p-ca9.dtb
+	rootfs-armv5.cpio auto nolocktests::mem128:net,default \
+	vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::sd:mem128 vexpress-v2p-ca9.dtb
+	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net,default \
+	vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::flash64:mem128 vexpress-v2p-ca9.dtb
+	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net,default \
+	vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128 vexpress-v2p-ca9.dtb
+	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128:net,default \
+	vexpress-v2p-ca9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
-	rootfs-armv7a.ext2 auto nolocktests::sd:mem128 vexpress-v2p-ca15-tc1.dtb
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net,default \
+	vexpress-v2p-ca15-tc1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto nolocktests::sd:mem256 vexpress-v2p-ca15_a7.dtb
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net,default \
+	vexpress-v2p-ca15_a7.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -475,17 +484,20 @@ v4.4|v4.9|v4.14|v4.19|v5.4|v5.8|v5.9)
 esac
 
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256" imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net,default" imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb0:mem256 imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual ::usb0:mem256:net,default imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb1:mem256 imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual ::usb1:mem256:net,default imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+# Network interface does not come up
+#	fec 30bf0000.ethernet eth0: Unable to connect to phy
 
 runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
@@ -499,6 +511,9 @@ runkernel multi_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.ext2 manual ::sd:mem256 imx7d-sdb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+# Network interface does not come up
+#	macb e000b000.ethernet eth0: Could not attach PHY (-19)
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
@@ -520,29 +535,29 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.cpio manual ::mem512 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.cpio manual ::mem512:net,default sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::usb:mem512 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::usb:mem512:net,default sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::sata:mem512 sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::sata:mem512:net,default sun4i-a10-cubieboard.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig raspi2 "" \
-	rootfs-armv7a.cpio manual "" bcm2836-rpi-2-b.dtb
+	rootfs-armv7a.cpio manual "::net,usb" bcm2836-rpi-2-b.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig raspi2 "" \
-	rootfs-armv7a.ext2 manual ::sd bcm2836-rpi-2-b.dtb
+	rootfs-armv7a.ext2 manual "::sd:net,usb" bcm2836-rpi-2-b.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig virt "" \
-	rootfs-armv7a.ext2 auto "::virtio-blk:mem512"
+	rootfs-armv7a.ext2 auto "::virtio-blk:mem512:net,virtio-net-device"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -555,27 +570,32 @@ if [ ${runall} -eq 1 ]; then
     checkstate ${retcode}
 fi
 
+# Driver for built-in network interface is not enabled with multi_v7_defconfig
+# Test it below with aspeed_g5_defconfig.
 runkernel multi_v7_defconfig ast2600-evb "" \
 	rootfs-armv7a.cpio automatic "" aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.cpio automatic "" sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.cpio automatic "::net,nic" sun8i-h3-orangepi-pc.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::sd sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::sd:net,nic sun8i-h3-orangepi-pc.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::usb0 sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::usb0:net,nic sun8i-h3-orangepi-pc.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::usb1 sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::usb1:net,nic sun8i-h3-orangepi-pc.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+# serial line input fails for npcm based systems (console output works, though)
+# Ethernet interface (gmac) emulation is not supported as of qemu v5.2
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
@@ -752,43 +772,43 @@ checkstate ${retcode}
 
 # selftests sometimes hang with soft CPU lockup
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
-	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-witherspoon.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-bmc-opp-witherspoon.dtb
+	rootfs-armv5.ext2 automatic notests::mtd32:net,nic aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.cpio automatic notests aspeed-ast2500-evb.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::sd aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic notests::sd:net,nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic notests::mtd32:net,nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::usb aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Repeat with armv7a root file system.
 # Both are expected to work.
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.cpio automatic notests aspeed-ast2600-evb.dtb
+	rootfs-armv7a.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.ext2 automatic notests::sd2 aspeed-ast2600-evb.dtb
+	rootfs-armv5.ext2 automatic notests::sd2:net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -803,38 +823,38 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel aspeed_g5_defconfig romulus-bmc "" \
-	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-romulus.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig romulus-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd32 aspeed-bmc-opp-romulus.dtb
+	rootfs-armv5.ext2 automatic notests::mtd32:net,nic aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.cpio automatic notests aspeed-bmc-opp-swift.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::sd1 aspeed-bmc-opp-swift.dtb
+	rootfs-armv5.ext2 automatic notests::sd1:net,nic aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc aspeed-bmc-opp-swift.dtb
+	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128 aspeed-bmc-opp-swift.dtb
+	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-opp-swift.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128 aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.cpio automatic notests aspeed-ast2600-evb.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -842,7 +862,7 @@ if [ ${runall} -eq 1 ]; then
     # SDIO (eMMC) doesn't work (yet) because of a bug in the dts file
     # (eMMC controller is not enabled).
     runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc aspeed-ast2600-evb.dtb
+	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
