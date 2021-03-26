@@ -81,19 +81,21 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-runkernel defconfig "" rootfs.cpio.gz
+# locktests takes way too long for this architecture.
+
+runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio.gz
 retcode=$?
 checkstate ${retcode}
-runkernel defconfig virtio-blk-ccw rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig scsi[virtio-ccw] rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virtio-pci rootfs.ext2.gz
+runkernel defconfig nolocktests:virtio-pci:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig scsi[virtio-pci] rootfs.ext2.gz
+runkernel defconfig nolocktests:scsi[virtio-pci]:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
