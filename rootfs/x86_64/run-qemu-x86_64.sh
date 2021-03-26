@@ -117,13 +117,13 @@ runkernel defconfig smp:net,virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig smp2:net,usb-net:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
+runkernel defconfig smp2:net,usb-ohci:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net,e1000:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp4:net,e1000-82544gc:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:net,e1000-82544gc:mem4G:scsi[FUSION] EPYC pc rootfs.btrfs
+runkernel defconfig smp:pci-bridge:net,usb-uhci:mem4G:scsi[FUSION] EPYC pc rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 # efi combined with scsi[FUSION] fails
@@ -139,7 +139,7 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,i82562:efi:mem1G Opteron_G1 q35 rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:net,i82559b:efi32:mem2G:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
+runkernel defconfig smp:net,usb:efi32:mem2G:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net,i82559a:mem4G:virtio-pci core2duo q35 rootfs.ext2
