@@ -149,7 +149,7 @@ runkernel virt defconfig "smp4:net,i82559a:mem512:scsi[MEGASAS2]" rootfs.btrfs.g
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:net,i82559b:mem512:scsi[53C810]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net,i82559c:mem512:scsi[53C895A]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:net,usb-ohci:mem512:scsi[53C895A]" rootfs.btrfs.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:net,i82559er:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
