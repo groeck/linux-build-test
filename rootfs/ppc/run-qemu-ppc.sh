@@ -62,7 +62,7 @@ runkernel()
     local earlycon=""
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local rbuild="${mach}:${defconfig}${fixup:+:${fixup}}"
-    local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|sdhci|mmc|nvme))/}"
+    local build="${defconfig}:${fixup//?(?(:)@(ata*|sata*|scsi*|usb*|sdhci|mmc|nvme|net,*))/}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	rbuild+=":initrd"
@@ -147,13 +147,17 @@ retcode=$((${retcode} + $?))
 runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
 	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
+
+# net,e1000e instantiates but does not work
+# net,sungem does not instantiate
+# net,usb-uhci does not instantiate
+runkernel mpc85xx_defconfig "net,e1000" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "scsi[53C895A]:net,ne2k_pci" mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig sata-sii3112 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "sata-sii3112:net,rtl8139" mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig sdhci:mmc mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig sdhci:mmc:net,usb-ohci mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
@@ -163,23 +167,24 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel mpc85xx_smp_defconfig scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
 fi
-runkernel mpc85xx_smp_defconfig "" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "net,e1000" mpc8544ds "" ttyS0 rootfs.cpio.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig scsi[DC395] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig scsi[DC395]:net,i82550 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig scsi[53C895A] mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig scsi[53C895A]:net,usb-ohci mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig sata-sii3112 mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig sata-sii3112:net,ne2k_pci mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+
+runkernel 44x/bamboo_defconfig "net,pcnet" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "scsi[AM53C974]:net,e1000" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig smp bamboo "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:net,tulip" bamboo "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp:scsi[DC395]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:scsi[DC395]:net,e1000" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp:scsi[AM53C974]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:scsi[AM53C974]:net,usb-ohci" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # megaraid_sas 0000:00:02.0: Command pool empty!
@@ -190,17 +195,21 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel 44x/bamboo_defconfig "smp:scsi[MEGASAS]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
     retcode=$((${retcode} + $?))
 fi
-runkernel 44x/bamboo_defconfig "smp:scsi[FUSION]" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:scsi[FUSION]:net,e1000" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp:sdhci:mmc" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:sdhci:mmc:net,ne2k_pci" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp:nvme" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/bamboo_defconfig "smp:nvme:net,pcnet" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+
+# net,tulip passes. Everything else fails with
+# "ip: SIOCSIFFLAGS: Cannot assign requested address"
+
+runkernel 44x/canyonlands_defconfig "net,tulip" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig usb sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig sdhci:mmc sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig sdhci:mmc:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig nvme sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
@@ -220,17 +229,17 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel 44x/canyonlands_defconfig scsi[MEGASAS2] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
     retcode=$((${retcode} + $?))
 fi
-runkernel pmac32_defconfig zilog mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
+runkernel pmac32_defconfig zilog:net,e1000 mac99 "" ttyPZ0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:ide mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:ide:net,usb-ohci mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:usb mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:usb:net,i82562 mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:sdhci:mmc mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:sdhci:mmc:net,ne2k_pci mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:nvme mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:nvme:net,pcnet mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog:scsi[DC395] mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
+runkernel pmac32_defconfig zilog:scsi[DC395]:net,tulip mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 
 exit ${retcode}
