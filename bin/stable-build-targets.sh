@@ -61,9 +61,11 @@ cmd_um=(defconfig)
 
 # build to skip
 
-skip_44="cris:allnoconfig cris:tinyconfig powerpc:allmodconfig"
-skip_419="riscv:allmodconfig"
-skip_54="riscv:allmodconfig"
+skip_44="crisv32:allnoconfig crisv32:tinyconfig cris:allnoconfig \
+	cris:tinyconfig powerpc:allmodconfig i386:tools/perf x86_64:tools/perf"
+skip_49="i386:tools/perf x86_64:tools/perf"
+skip_419="riscv32:allmodconfig riscv:allmodconfig"
+skip_54="riscv32:allmodconfig riscv:allmodconfig"
 
 # fixups
 

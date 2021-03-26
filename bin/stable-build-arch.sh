@@ -122,6 +122,7 @@ echo
 echo "Build reference: ${ref}"
 
 ARCH=$1
+BUILDARCH="${ARCH}"
 BRANCH=$2
 
 # clean up source directory expected to be done by caller
@@ -433,7 +434,7 @@ dumplog()
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
 do
-	build="${ARCH}:${cmd[$i]}"
+	build="${BUILDARCH}:${cmd[$i]}"
 
 	echo -n "Building ${build} ... "
 	for s in ${skip[*]}
