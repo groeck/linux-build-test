@@ -71,10 +71,10 @@ runkernel()
     local build="mips64:${defconfig}"
     local cache="${defconfig}${fixup//smp*/smp}"
 
+    build+=":${fixup}"
     if [[ "${rootfs}" == *.cpio* ]]; then
 	build+=":initrd"
     else
-	build+=":${fixup}"
 	build+=":rootfs"
     fi
 
@@ -112,26 +112,26 @@ echo
 
 retcode=0
 
-runkernel malta_defconfig smp rootfs-n32.cpio.gz
+runkernel malta_defconfig smp:net,e1000 rootfs-n32.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:net,e1000-82544gc:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:net,i82801:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    # QID timeout, hang
-    runkernel malta_defconfig smp:nvme rootfs-n32.ext2.gz
+    # interrupts are unreliable, causing random timeouts
+    runkernel malta_defconfig smp:net,pcnet:nvme rootfs-n32.ext2.gz
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:usb-xhci rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:net,ne2k_pci:usb-xhci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-ehci rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:net,pcnet:usb-ehci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:usb-uas-xhci rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:net,rtl8139:usb-uas-xhci rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[53C810] rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:net,tulip:scsi[53C810] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -140,9 +140,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:scsi[DC395] rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:net,virtio-net:scsi[DC395] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[AM53C974] rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:net,i82562:scsi[AM53C974] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:scsi[MEGASAS] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
