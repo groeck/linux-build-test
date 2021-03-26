@@ -26,11 +26,14 @@ PATH=${PATH_M68K}:${PATH}
 
 patch_defconfig()
 {
-    local defconfig=$1
-    local mach=$2
     local rootfs="$(rootfsname rootfs-5208.cpio)"
+    local defconfig=$1
+    local fixups=${2//:/ }
+    local fixup
 
-    if [[ "${mach}" = "mcf5208evb" ]]; then
+    for fixup in ${fixups}; do
+      case "${fixup}" in
+      "mcf5208evb")
 	# Enable DEVTMPFS
 	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
 	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
@@ -50,7 +53,11 @@ patch_defconfig()
 	# Boot parameters are not passed
 	sed -i -e '/CONFIG_BOOTPARAM_STRING/d' ${defconfig}
 	echo 'CONFIG_BOOTPARAM_STRING="panic=-1 console=ttyS0,115200"' >> ${defconfig}
-    fi
+	;;
+      *)
+	;;
+      esac
+    done
 }
 
 runkernel()
@@ -58,10 +65,12 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local rootfs=$4
+    local fixup=$4
+    local rootfs=$5
     local waitlist=("Rebooting" "Boot successful")
     local build="${mach}:${cpu}:${defconfig}"
     local qemu="${QEMU}"
+    local diskcmd=""
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -76,19 +85,14 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    dosetup -c "${defconfig}" -d -f "${mach}" "${rootfs}" "${defconfig}"
-    if [ $? -ne 0 ]; then
+    if ! dosetup -c "${defconfig}" -F "${mach}:${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     rootfs="$(rootfsname ${rootfs})"
     if [[ "${rootfs}" == *cpio ]]; then
 	if [[ "${mach}" = "q800" ]]; then
-	    initcli+=" rdinit=/sbin/init"
 	    diskcmd="-initrd ${rootfs}"
-	else
-	    # initrd is embedded in image
-	    diskcmd=""
 	fi
     else
 	initcli+=" root=/dev/sda rw"
@@ -109,11 +113,11 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel mcf5208evb m5208 m5208evb_defconfig rootfs-5208.cpio
+runkernel mcf5208evb m5208 m5208evb_defconfig "" rootfs-5208.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig rootfs-68040.cpio
+runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig rootfs-68040.ext2
+runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
