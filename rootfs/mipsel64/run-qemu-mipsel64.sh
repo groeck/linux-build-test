@@ -10,8 +10,8 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-skip_49="mipsel64:64r6el_defconfig:notests:smp:ide:hd
-	mipsel64:64r6el_defconfig:notests:smp:ide:cd"
+skip_49="mipsel64:64r6el_defconfig:notests:nonet:smp:ide:hd
+	mipsel64:64r6el_defconfig:notests:nonet:smp:ide:cd"
 
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
@@ -133,41 +133,46 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
-# Lack of memory for tests
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:nosmp:ide
+# Network tests:
+# - i82551 fails to instantiate
+
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net,e1000
 retcode=$?
-runkernel malta_defconfig malta rootfs.mipsel64r1.cpio r1:smp
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net,pcnet
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:ide
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net,i82550
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.iso r1:smp:ide
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net,i82558a
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-xhci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net,usb-ohci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-ehci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net,ne2k_pci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:usb-uas-xhci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net,rtl8139
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:sdhci:mmc
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci:mmc:net,i82801
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
-    # interrupts don't work, resulting in random timeouts
-    runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:nvme
+    # interrupts are unreliable, resulting in random timeouts
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net,pcnet:nvme
     retcode=$((retcode + $?))
 fi
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[DC395]
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net,virtio-net
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.ext2 r1:smp:scsi[FUSION]
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net,tulip
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1.iso r1:smp:scsi[53C895A]
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net,i82559er
 retcode=$((retcode + $?))
 # Note: Other boot configurations fail
 runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 nosmp:ide
 retcode=$((retcode + $?))
 # Image fails to boot with tests enabled
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6.ext2 notests:smp:ide
+# Network interfaces don't instantiate.
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6.iso notests:smp:ide
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.ext2 notests:nonet:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.iso notests:nonet:smp:ide
 retcode=$((retcode + $?))
 
 exit ${retcode}
