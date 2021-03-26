@@ -195,7 +195,7 @@ retcode=$((${retcode} + $?))
 runkernel pseries_defconfig little::net,ne2k_pci:sdhci:mmc pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
-runkernel pseries_defconfig little::net,tulip:nvme pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,usb-ohci:nvme pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 
