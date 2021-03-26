@@ -92,22 +92,6 @@ then
     checkexit $?
 fi
 
-if [ -z "$1" -o "$1" = "linaro" ]
-then
-    git clean -d -x -f -q
-    git checkout v2.3.50-local-linaro
-    ./configure --prefix=/opt/buildbot/qemu-install/v2.3.50-linaro \
-	--disable-user --disable-xen --disable-xen-pci-passthrough \
-	--disable-vnc-tls --disable-vnc-ws --disable-quorum \
-	--disable-vnc-png --with-gtkabi=3.0 \
-	--disable-docs --disable-werror \
-	--disable-curl \
-	--target-list=arm-softmmu
-    checkexit $?
-    make -j${parallel} install
-    checkexit $?
-fi
-
 if [ -z "$1" -o "$1" = "v3.0" ]
 then
     dobuild v3.0.1-local v3.0 \
@@ -130,17 +114,13 @@ if [ -z "$1" -o "$1" = "v4.2" ]; then
     dobuild_common v4.2.1-local v4.2
 fi
 
-if [ -z "$1" -o "$1" = "v5.0" ]; then
-    dobuild_common v5.0.1-local v5.0
-fi
-
-if [ -z "$1" -o "$1" = "v5.1" ]; then
-    dobuild_common v5.1.0-local v5.1
-fi
-
 if [ -z "$1" -o "$1" = "v5.2" ]; then
     dobuild_common v5.2.0-local v5.2
-    dobuild_common v5.2.0-local v5.2-debug \
+fi
+
+if [ -z "$1" -o "$1" = "v6.0" ]; then
+    dobuild_common v6.0.0-local v6.0
+    dobuild_common v6.0.0-local v6.0-debug \
 	"--enable-debug --disable-strip --extra-cflags=-g"
 fi
 
