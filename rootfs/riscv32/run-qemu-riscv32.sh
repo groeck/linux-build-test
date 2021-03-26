@@ -7,12 +7,14 @@ progdir=$(cd $(dirname "$0"); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-_fixup="$1"
+_mach="$1"
+_fixup="$2"
 
-QEMU=${QEMU:-${QEMU_V41_BIN}/qemu-system-riscv32}
+QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv32}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv32}
 PREFIX=riscv32-linux-
 ARCH=riscv
-PATH_RISCV=/opt/kernel/gcc-8.3.0-nolibc/riscv32-linux/bin
+PATH_RISCV=/opt/kernel/gcc-10.2.0-nolibc/riscv32-linux/bin
 
 PATH=${PATH}:${PATH_RISCV}
 
@@ -41,8 +43,8 @@ runkernel()
     local defconfig=$2
     local fixup=$3
     local rootfs=$4
-    local waitlist=("Power off" "Boot successful" "Requesting system poweroff")
-    local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
+    local build="riscv32:${mach}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -50,7 +52,7 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if ! match_params "${_fixup}@${fixup}"; then
+    if ! match_params "${_mach}@${mach}" "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -68,13 +70,25 @@ runkernel()
 	return 1
     fi
 
-    execute automatic waitlist[@] \
-      ${QEMU} -M virt -m 512M -no-reboot \
+    case "${mach}" in
+    virt)
+	con="console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200"
+	wait="automatic"
+	;;
+    sifive_u)
+	# requires qemu v6.0+
+	QEMU="${QEMU_V60}"
+	con="console=ttySIF0,115200 earlycon"
+	wait="manual"
+	;;
+    esac
+
+    execute "${wait}" waitlist[@] \
+      ${QEMU} -M "${mach}" -m 512M -no-reboot \
 	-bios default \
 	-kernel arch/riscv/boot/Image \
 	${extra_params} \
-	-netdev user,id=net0 -device virtio-net-device,netdev=net0 \
-	-append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200" \
+	-append "${initcli} ${con}" \
 	-nographic -monitor none
 
     return $?
@@ -84,35 +98,33 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel virt rv32_defconfig "" rootfs.cpio
+runkernel virt rv32_defconfig "net,e1000" rootfs.cpio
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig virtio-blk rootfs.ext2
+runkernel virt rv32_defconfig net,e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig virtio rootfs.ext2
+runkernel virt rv32_defconfig net,i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig virtio-pci rootfs.ext2
+runkernel virt rv32_defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig sdhci:mmc rootfs.ext2
+runkernel virt rv32_defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig nvme rootfs.ext2
+runkernel virt rv32_defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
 
-if [[ ${runall} -ne 0 ]]; then
-    runkernel virt defconfig usb-ohci rootfs.ext2
-    retcode=$((retcode + $?))
-fi
+runkernel virt rv32_defconfig net,virtio-net-device:usb-ohci rootfs.ext2
+retcode=$((retcode + $?))
 
-runkernel virt rv32_defconfig usb-ehci rootfs.ext2
+runkernel virt rv32_defconfig net,virtio-net-device:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig usb-xhci rootfs.ext2
+runkernel virt rv32_defconfig net,virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig usb-uas-ehci rootfs.ext2
+runkernel virt rv32_defconfig net,i82557a:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig usb-uas-xhci rootfs.ext2
+runkernel virt rv32_defconfig net,i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[53C810]" rootfs.ext2
+runkernel virt rv32_defconfig "pci-bridge:net,i82559a:scsi[53C810]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[53C895A]" rootfs.ext2
+runkernel virt rv32_defconfig "net,i82559er:pci-bridge:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -123,9 +135,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel virt rv32_defconfig "scsi[MEGASAS]" rootfs.ext2
+runkernel virt rv32_defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[MEGASAS2]" rootfs.ext2
+runkernel virt rv32_defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt rv32_defconfig "scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
@@ -133,5 +145,14 @@ runkernel virt rv32_defconfig "scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt rv32_defconfig "scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Unable to handle kernel paging request at virtual address c0c00000
+    # in __memset(), called from free_initmem()
+    runkernel sifive_u rv32_defconfig "net,default" rootfs.cpio
+    retcode=$((${retcode} + $?))
+    runkernel sifive_u rv32_defconfig "sd:net,default" rootfs.ext2
+    retcode=$((${retcode} + $?))
+fi
 
 exit ${retcode}
