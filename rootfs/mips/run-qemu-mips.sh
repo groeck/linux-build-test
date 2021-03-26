@@ -95,9 +95,9 @@ runkernel malta_defconfig smp:net,pcnet:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -eq 1 ]]; then
-    # Kernel bug detected[#1]: Workqueue: nvme-reset-wq nvme_reset_work
-    # (in nvme_pci_reg_read64)
-    runkernel malta_defconfig smp:nvme rootfs.ext2.gz
+    # Seen once during boot:
+    # nvme nvme0: I/O 219 QID 1 timeout, completion polled
+    runkernel malta_defconfig smp:net,i82558b:nvme rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
 
