@@ -93,35 +93,35 @@ echo
 # Override CPU on systems which set TI-MicroSparc-I by default.
 # On those systems, the new root file system stalls when loading
 # run.sh with endless faults and no fault reason.
-runkernel sparc32_defconfig SPARCClassic "Fujitsu-MB86904" nosmp:scsi rootfs.ext2
+runkernel sparc32_defconfig SPARCClassic "Fujitsu-MB86904" nosmp:scsi:net,default rootfs.ext2
 retcode=$?
-runkernel sparc32_defconfig SPARCbook "Fujitsu-MB86904" nosmp:scsi rootfs.iso
+runkernel sparc32_defconfig SPARCbook "Fujitsu-MB86904" nosmp:scsi:net,default rootfs.iso
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig LX "Fujitsu-MB86904" nosmp:noapc:scsi rootfs.sqf
+runkernel sparc32_defconfig LX "Fujitsu-MB86904" nosmp:noapc:scsi:net,default rootfs.sqf
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-4 "" nosmp rootfs.cpio
+runkernel sparc32_defconfig SS-4 "" nosmp:net,default rootfs.cpio
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-5 "" nosmp:scsi rootfs.ext2
+runkernel sparc32_defconfig SS-5 "" nosmp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-10 "" nosmp:scsi rootfs.iso
+runkernel sparc32_defconfig SS-10 "" nosmp:scsi:net,default rootfs.iso
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-20 "" nosmp:scsi rootfs.sqf
+runkernel sparc32_defconfig SS-20 "" nosmp:scsi:net,default rootfs.sqf
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-600MP "" nosmp:scsi rootfs.ext2
+runkernel sparc32_defconfig SS-600MP "" nosmp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig Voyager "" nosmp:noapc:scsi rootfs.ext2
+runkernel sparc32_defconfig Voyager "" nosmp:noapc:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-4 "" smp:scsi rootfs.ext2
+runkernel sparc32_defconfig SS-4 "" smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-5 "" smp:scsi rootfs.iso
+runkernel sparc32_defconfig SS-5 "" smp:scsi:net,default rootfs.iso
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-10 "" smp:scsi rootfs.sqf
+runkernel sparc32_defconfig SS-10 "" smp:scsi:net,default rootfs.sqf
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-20 "" smp:scsi rootfs.ext2
+runkernel sparc32_defconfig SS-20 "" smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-600MP "" smp:scsi rootfs.ext2
+runkernel sparc32_defconfig SS-600MP "" smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig Voyager "" smp:noapc:scsi rootfs.ext2
+runkernel sparc32_defconfig Voyager "" smp:noapc:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
