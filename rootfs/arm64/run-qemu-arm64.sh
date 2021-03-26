@@ -160,7 +160,7 @@ runkernel virt defconfig "smp8:net,e1000-82545em:mem512:scsi[53C895A]" rootfs.bt
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp:net,pcnet:mem512:scsi[FUSION]" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net,tulip:mem512:scsi[virtio]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:net,usb-ohci:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-versal-virt defconfig smp:mem512 rootfs.cpio.gz
