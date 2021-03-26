@@ -854,18 +854,14 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # SDIO (eMMC) doesn't work (yet) because of a bug in the dts file
-    # (eMMC controller is not enabled).
-    runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-ast2600-evb.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+runkernel aspeed_g5_defconfig tacoma-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-opp-tacoma.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic
 retcode=$((${retcode} + $?))
