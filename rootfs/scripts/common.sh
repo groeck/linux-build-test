@@ -23,6 +23,8 @@ else
     __cachedir="/tmp/buildbot-cache/$(basename ${__progdir})"
 fi
 
+__do_network_test=0
+
 __addtmpfile()
 {
     echo "$1" >> "${__logfiles}"
@@ -491,6 +493,7 @@ __common_netcmd()
     local params=(${fixup//,/ })
     local netdev="${params[1]}"
 
+    __do_network_test=1
     case "${netdev}" in
     "default")
 	;;
@@ -581,6 +584,7 @@ __common_fixups()
     initcli="panic=-1 ${config_initcli}"
     extra_params="-snapshot"
     __have_usb_param=0
+    __do_network_test=0
     __pcibridge_init
 
     if [[ -z "${fixups}" ]]; then
@@ -1202,9 +1206,8 @@ dowait()
     local pid=$1
     local logfile=$2
     local report=$3
-    local nonet=$4
-    local manual=$5
-    local waitlist=("${!6}")
+    local manual=$4
+    local waitlist=("${!5}")
     local entries=${#waitlist[*]}
     local retcode=0
     local t=0
@@ -1281,7 +1284,7 @@ dowait()
     fi
 
     # Look for network test failures
-    if [[ ${retcode} -eq 0 && "${nonet}" -eq 0 ]]; then
+    if [[ ${retcode} -eq 0 && "${__do_network_test}" -ne 0 ]]; then
 	if ! grep -q "Network interface test passed" ${logfile}; then
 	    msg="failed (network)"
 	    retcode=1
@@ -1371,14 +1374,8 @@ execute()
     local retries=0
     local retcode
     local last=0
-    local nonet
 
     shift; shift; shift
-
-    # If we added "netdev user" to the command line, assume that we actually
-    # want to test if it works.
-    echo "${@}" | grep -q "netdev user,id"
-    nonet=$?
 
     echo -n "running ..."
 
@@ -1420,7 +1417,7 @@ execute()
 	"${cmd}" "$@" > "${logfile}" 2>&1 &
 	pid=$!
 
-	dowait "${pid}" "${logfile}" "${last}" "${nonet}" "${waitflag}" waitlist[@]
+	dowait "${pid}" "${logfile}" "${last}" "${waitflag}" waitlist[@]
 	retcode=$?
 
 	if [[ ${retcode} -eq 0 ]]; then
