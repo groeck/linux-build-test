@@ -99,6 +99,35 @@ parse_args()
 	done
 }
 
+pcibus_set_root()
+{
+    __pcibus_root="$1"
+}
+
+__pcibridge_init()
+{
+    __pcibridge_chassis=0
+    __pcibridge_id=""
+    __pcibus_ref="${__pcibus_root:+,bus=${__pcibus_root}}"
+}
+
+__pcibridge_new_bridge()
+{
+    __pcibridge_chassis=$((__pcibridge_chassis + 1))
+    __pcibridge_id="pb${__pcibridge_chassis}"
+    __pcibridge_addr=0
+    extra_params+=" -device pci-bridge,id=${__pcibridge_id},chassis_nr=${__pcibridge_chassis}"
+    extra_params+="${__pcibus_root:+,bus=${__pcibus_root}}"
+}
+
+__pcibridge_new_port()
+{
+    if [[ -n "${__pcibridge_id}" ]]; then
+	__pcibridge_addr="$((__pcibridge_addr + 1))"
+	__pcibus_ref=",bus=${__pcibridge_id},addr=${__pcibridge_addr}"
+    fi
+}
+
 __common_scsicmd()
 {
     local fixup="$1"
@@ -159,7 +188,8 @@ __common_scsicmd()
 	sdevice="scsi-hd"
     fi
 
-    extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus}"
+    __pcibridge_new_port
+    extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus_ref}"
     extra_params+=" ${device:+-device ${sdevice},bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
     extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
     extra_params+="${media:+,media=${media}}"
@@ -171,30 +201,37 @@ __common_usbcmd()
     local rootfs="$2"
     local bus
 
+    if [[ "${__have_usb_param}" -eq 0 ]]; then
+	extra_params+=" -usb"
+	__have_usb_param=1
+    fi
+
     case "${fixup}" in
     "usb-ohci")
-	extra_params+=" -usb -device pci-ohci,id=ohci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device pci-ohci,id=ohci${__pcibus_ref}"
 	extra_params+=" -device usb-storage,bus=ohci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-ehci")
-	extra_params+=" -usb -device usb-ehci,id=ehci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
 	extra_params+=" -device usb-storage,bus=ehci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-xhci")
-	extra_params+=" -usb -device qemu-xhci,id=xhci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
 	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb")
-	extra_params+=" -usb -device usb-storage,drive=d0"
+	extra_params+=" -device usb-storage,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     usb[0-9])
 	# Same as "usb", but with explicit bus number
 	# The above must not be in quotes to enable pattern matching
-	extra_params+=" -usb"
 	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${fixup#usb}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
@@ -202,29 +239,30 @@ __common_usbcmd()
 	# Same as "usb", but with explicit bus and port number
 	# The above must not be in quotes to enable pattern matching
 	bus="${fixup#usb}"
-	extra_params+=" -usb"
 	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${bus%.*},port=${bus#*.}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-hub")
-	extra_params+=" -usb -device usb-hub,bus=usb-bus.0,port=2"
+	extra_params+=" -device usb-hub,bus=usb-bus.0,port=2"
 	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-uas-ehci")
-	extra_params+=" -usb -device usb-ehci,id=ehci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
 	extra_params+=" -device usb-uas,bus=ehci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "usb-uas-xhci")
-	extra_params+=" -usb -device qemu-xhci,id=xhci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
 	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "usb-uas")
-	extra_params+=" -usb -device usb-uas,id=uas"
+	extra_params+=" -device usb-uas,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
@@ -251,7 +289,8 @@ __common_virtcmd()
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio-pci")
-	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio")
@@ -318,7 +357,8 @@ __common_mmccmd()
 
     case "${fixup}" in
     "sdhci")
-	extra_params+=" -device sdhci-pci${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device sdhci-pci${__pcibus_ref}"
 	;;
     mmc*)
 	local devindex=${fixup#mmc}
@@ -389,15 +429,6 @@ __common_diskcmd()
     local media
     local hddev
 
-    case "${ARCH}" in
-    sparc64)
-	__pcibus=",bus=pciB"
-	;;
-    *)
-	__pcibus=""
-	;;
-    esac
-
     if [[ "${rootfs}" == *iso ]]; then
 	media="cdrom"
 	hddev="sr0"
@@ -433,7 +464,8 @@ __common_diskcmd()
 	;;
     "nvme")
 	initcli+=" root=/dev/nvme0n1 rootwait"
-	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus}"
+	__pcibridge_new_port
+	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "sata-sii3112"|"sata-cmd646"|"sata")
@@ -459,11 +491,41 @@ __common_netcmd()
     local params=(${fixup//,/ })
     local netdev="${params[1]}"
 
-    if [[ "${netdev}" == "usb-net" ]]; then
-	extra_params+=" -usb"
-    fi
-
-    extra_params+=" -device ${netdev},netdev=net0 -netdev user,id=net0"
+    case "${netdev}" in
+    "default")
+	;;
+    "nic")
+	# preinstalled network device which needs to be instantiated
+	extra_params+=" -nic user"
+	;;
+    usb*)
+	if [[ "${__have_usb_param}" -eq 0 ]]; then
+	    extra_params+=" -usb"
+	    __have_usb_param=1
+	fi
+	case "${netdev}" in
+	"usb")
+	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
+	    ;;
+	"usb-ohci")
+	    __pcibridge_new_port
+	    extra_params+=" -device pci-ohci,id=ohci_net${pcibus_ref}"
+	    extra_params+=" -device usb-net,bus=ohci_net.0,netdev=net0 -netdev user,id=net0"
+	    ;;
+	"usb-uhci")
+	    __pcibridge_new_port
+	    extra_params+=" -device vt82c686b-usb-uhci,id=uhci_net${__pcibus_ref}"
+	    extra_params+=" -device usb-net,bus=uhci_net.0,netdev=net0 -netdev user,id=net0"
+	    ;;
+	*)
+	    ;;
+	esac
+	;;
+    *)
+	__pcibridge_new_port
+	extra_params+=" -device ${netdev},netdev=net0${__pcibus_ref} -netdev user,id=net0"
+	;;
+    esac
 }
 
 __common_fixup()
@@ -472,6 +534,11 @@ __common_fixup()
     local rootfs="${2}"
 
     case "${fixup}" in
+    "pci-bridge")
+	# Instantiate a new PCI bridge. Instantiate subsequent PCI devices
+	# behind this PCI bridge.
+	__pcibridge_new_bridge
+	;;
     mmc*|sd*|"sdhci"|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
@@ -513,6 +580,8 @@ __common_fixups()
 
     initcli="panic=-1 ${config_initcli}"
     extra_params="-snapshot"
+    __have_usb_param=0
+    __pcibridge_init
 
     if [[ -z "${fixups}" ]]; then
 	return
@@ -571,6 +640,9 @@ common_diskcmd()
 
     extra_params=""
     initcli=""
+    __have_usb_param=0
+    __pcibridge_init
+
     for fixup in ${fixups}; do
 	__common_diskcmd "${fixup}" "${rootfs}"
     done
@@ -845,31 +917,33 @@ __setup_fragment()
 	    # echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
 	fi
 
-	if [[ "${nonet}" -eq 0 ]]; then
-	    echo "CONFIG_NET_VENDOR_INTEL=y" >> ${fragment}
-	    echo "CONFIG_E100=y" >> ${fragment}
-	    echo "CONFIG_E1000=y" >> ${fragment}
-	    echo "CONFIG_E1000E=y" >> ${fragment}
-	    echo "CONFIG_NET_VENDOR_REALTEK=y" >> ${fragment}
-	    # rtl8139 requires CONFIG_8139CP, not CONFIG_8139TOO
-	    echo "CONFIG_8139CP=y" >> ${fragment}
-	    # echo "CONFIG_8139TOO=y" >> ${fragment}
-	    echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
-	    echo "CONFIG_PCNET32=y" >> ${fragment}
-	    echo "CONFIG_NET_VENDOR_8390=y" >> ${fragment}
-	    echo "CONFIG_NE2K_PCI=y" >> ${fragment}
-	    echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
-	    echo "CONFIG_NET_TULIP=y" >> ${fragment}
-	    echo "CONFIG_TULIP=y" >> ${fragment}
-	    if [[ "${nousb}" -eq 0 ]]; then
-	        echo "CONFIG_USB_USBNET=y" >> ${fragment}
-	        echo "CONFIG_USB_NET_CDCETHER=y" >> ${fragment}
-	        echo "CONFIG_USB_NET_CDC_SUBSET=y" >> ${fragment}
-	    fi
-	fi
-
 	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
 	echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
+    fi
+
+    if [[ "${nonet}" -eq 0 ]]; then
+	echo "CONFIG_NET_VENDOR_INTEL=y" >> ${fragment}
+	echo "CONFIG_E100=y" >> ${fragment}
+	echo "CONFIG_E1000=y" >> ${fragment}
+	echo "CONFIG_E1000E=y" >> ${fragment}
+	echo "CONFIG_NET_VENDOR_REALTEK=y" >> ${fragment}
+	# rtl8139 requires CONFIG_8139CP, not CONFIG_8139TOO
+	echo "CONFIG_8139CP=y" >> ${fragment}
+	# echo "CONFIG_8139TOO=y" >> ${fragment}
+	echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
+	echo "CONFIG_PCNET32=y" >> ${fragment}
+	echo "CONFIG_NET_VENDOR_8390=y" >> ${fragment}
+	echo "CONFIG_NE2K_PCI=y" >> ${fragment}
+	echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
+	echo "CONFIG_NET_TULIP=y" >> ${fragment}
+	echo "CONFIG_TULIP=y" >> ${fragment}
+	if [[ "${nousb}" -eq 0 ]]; then
+	    echo "CONFIG_USB_USBNET=y" >> ${fragment}
+	    echo "CONFIG_USB_NET_CDCETHER=y" >> ${fragment}
+	    echo "CONFIG_USB_NET_CDC_SUBSET=y" >> ${fragment}
+	fi
+	# explicitly disable built-in dhcp server
+	echo "CONFIG_IP_PNP_DHCP=n" >> ${fragment}
     fi
 
     # BLK_DEV_INITRD
@@ -1140,36 +1214,9 @@ dowait()
     local dolog
     local fsize=0
     local fsize_tmp
-    local net_done=${nonet}
-    local net_passed=${nonet}
-    local net_started=0
 
     while true
     do
-	# Network test:
-	# Look for "Starting network" followed by "OK" or "FAIL".
-	if [[ "${net_done}" -eq 0 ]]; then
-	    if [[ "${net_started}" -eq 0 ]]; then
-		grep -q "Starting network:" "${logfile}"
-		if [[ $? -eq 0 ]]; then
-		    net_started=1
-		fi
-	    fi
-	    if [[ "${net_started}" -ne 0 ]]; then
-		# Look for "OK" or "FAIL" after "Starting network"
-		match="$(sed -n '/Starting network/,$p' ${logfile} | sed '/\(OK\|FAIL\)/q')"
-		echo "${match}" | grep -q "OK"
-		if [[ $? -eq 0 ]]; then
-		    net_passed=1
-		    net_done=1
-		fi
-		echo "${match}" | grep -q "FAIL"
-		if [[ $? -eq 0 ]]; then
-		    net_done=1
-		fi
-	    fi
-	fi
-
         # terminate if process is no longer running
 	if ! kill -0 ${pid} >/dev/null 2>&1; then
 	    break
@@ -1234,12 +1281,10 @@ dowait()
     fi
 
     # Look for network test failures
-    if [ ${retcode} -eq 0 ]; then
-	if [[ "${net_done}" -eq 1 ]]; then
-	    if [[ "${net_passed}" -eq 0 ]]; then
-		msg="failed (network)"
-		retcode=1
-	    fi
+    if [[ ${retcode} -eq 0 && "${nonet}" -eq 0 ]]; then
+	if ! grep -q "Network interface test passed" ${logfile}; then
+	    msg="failed (network)"
+	    retcode=1
 	fi
     fi
 
