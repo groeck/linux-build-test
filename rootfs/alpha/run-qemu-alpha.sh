@@ -97,7 +97,7 @@ runkernel defconfig "scsi[MEGASAS]:net,rtl8139" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig "scsi[MEGASAS2]:net,e1000-82544gc" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[FUSION]" rootfs.ext2
+runkernel defconfig "scsi[FUSION]:net,usb-ohci" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
