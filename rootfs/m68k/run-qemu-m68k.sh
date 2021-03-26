@@ -113,7 +113,7 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel mcf5208evb m5208 m5208evb_defconfig "" rootfs-5208.cpio
+runkernel mcf5208evb m5208 m5208evb_defconfig "noextras" rootfs-5208.cpio
 retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cpio
 retcode=$((retcode + $?))
