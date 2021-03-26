@@ -697,19 +697,6 @@ rootfsname()
 
 setup_rootfs()
 {
-    local dynamic=""
-
-    OPTIND=1
-    while getopts d opt
-    do
-	case ${opt} in
-	d) dynamic="yes";;
-	*) ;;
-	esac
-    done
-
-    shift $((OPTIND - 1))
-
     local rootfs=$1
     local rootfspath="${__progdir}/${rootfs}"
     if [[ ! -e "${rootfspath}" && -e "${rootfspath}.gz" ]]; then
@@ -723,7 +710,7 @@ setup_rootfs()
 
     # Do nothing if file checksums exist and match.
     # Checksums are copied, not regenerated, so that should always work even
-    # if the destination has been decompressed or dynamically modified.
+    # if the destination has been decompressed.
     if cmp -s "${rootfspath}.md5" "${destfile}.md5"; then
 	echo "${destfile}"
 	return
@@ -736,10 +723,6 @@ setup_rootfs()
     if [[ "${rootfs}" == *.gz ]]; then
 	gunzip -f "${destfile}.gz"
 	rootfs="${rootfs%.gz}"
-    fi
-
-    if [[ -n "${dynamic}" && "${rootfs}" == *cpio ]]; then
-	fakeroot ${__basedir}/scripts/genrootfs.sh "${__progdir}" "${destfile}"
     fi
 
     if [[ -e "${rootfspath}.md5" ]]; then
@@ -1088,7 +1071,6 @@ dosetup()
     local EXTRAS=""
     local fixup=""
     local fixups=""
-    local dynamic=""
     local cached_config=""
     local fragment=""
 
@@ -1100,7 +1082,6 @@ dosetup()
 	case ${opt} in
 	b) build="${OPTARG}";;
 	c) cached_config="${OPTARG}";;
-	d) dynamic="-d";;
 	e) EXTRAS="${OPTARG}";;
 	f) fixup="${OPTARG}";;
 	F) fixups="${OPTARG:-dummy}";;
@@ -1129,7 +1110,7 @@ dosetup()
     # system as needed. Assumes that the image was built already in
     # a previous test run.
     if [ ${nobuild:-0} -ne 0 ]; then
-	rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
+	rootfs="$(setup_rootfs ${rootfs})"
 	__common_fixups "${fixups}" "${rootfs}"
 	return 0
     fi
@@ -1148,7 +1129,7 @@ dosetup()
 	    __dosetup_rc=${__cached_results}
 	    return ${__cached_results}
 	fi
-	rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
+	rootfs="$(setup_rootfs ${rootfs})"
 	__common_fixups "${fixups}" "${rootfs}"
         [[ ${dodebug} -ne 0 ]] && echo -n "[cached] "
 	return 0
@@ -1181,7 +1162,7 @@ dosetup()
 	return ${rv}
     fi
 
-    rootfs="$(setup_rootfs ${dynamic} ${rootfs})"
+    rootfs="$(setup_rootfs ${rootfs})"
     __common_fixups "${fixups}" "${rootfs}"
 
     make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} </dev/null >/dev/null 2>${logfile}
