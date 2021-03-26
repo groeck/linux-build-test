@@ -32,7 +32,7 @@ runkernel()
     local defconfig="generic-32bit_defconfig"
     local fixup=$1
     local rootfs=$2
-    local waitlist=("reboot: Restarting system" "Boot successful" "Requesting system reboot")
+    local waitlist=("reboot: Restarting system" "Boot successful" "SeaBIOS wants SYSTEM RESET")
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
     local cache="${defconfig}:${fixup//smp*/smp}"
 
@@ -72,29 +72,36 @@ echo
 # Multi-core boots take a long time to boot, so don't test with more
 # than one CPU until qemu has been improved.
 
+# Network test notes:
+# i82550:
+#   crashes with
+#	arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map
+# ne2k_pci:
+#   eth0 does not instantiate
+#
 retcode=0
-runkernel smp rootfs.cpio.gz
+runkernel smp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:sdhci:mmc rootfs.ext2.gz
+runkernel smp:net,e1000-82544gc:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:nvme rootfs.ext2.gz
+runkernel smp:net,virtio-net:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:sata-cmd646 rootfs.ext2.gz
+runkernel smp:net,usb-ohci:sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:scsi rootfs.ext2.gz
+runkernel smp:net,pcnet:scsi rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:scsi[53C895A]" rootfs.ext2.gz
+runkernel "smp:net,pcnet:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:scsi[DC395]" rootfs.ext2.gz
+runkernel "smp:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:scsi[AM53C974]" rootfs.ext2.gz
+runkernel "smp:net,tulip:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
