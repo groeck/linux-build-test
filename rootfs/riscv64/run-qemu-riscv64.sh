@@ -10,8 +10,8 @@ shift $((OPTIND - 1))
 _mach="$1"
 _fixup="$2"
 
-QEMU40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-riscv64}
+QEMU_V40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
+QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
@@ -19,8 +19,8 @@ PATH_RISCV=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_419="riscv:sifive_u:defconfig:initrd \
-	riscv:sifive_u:defconfig:sd:rootfs"
+skip_419="riscv:sifive_u:defconfig:net,default:initrd \
+	riscv:sifive_u:defconfig:sd:net,default:rootfs"
 
 patch_defconfig()
 {
@@ -78,7 +78,7 @@ runkernel()
 	BIOS="default"
 	KERNEL="arch/riscv/boot/Image"
     else
-	QEMU="${QEMU40}"
+	QEMU="${QEMU_V40}"
 	BIOS="${progdir}/bbl"
 	KERNEL="vmlinux"
     fi
@@ -86,12 +86,11 @@ runkernel()
     case "${mach}" in
     virt)
 	con="console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200"
-	extra_params+=" -netdev user,id=net0 -device virtio-net-device,netdev=net0"
 	wait="automatic"
 	;;
     sifive_u)
-	# requires qemu v5.3+
-	QEMU="${QEMU_MASTER}"
+	# requires qemu v6.0+
+	QEMU="${QEMU_V60}"
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
 	;;
@@ -111,49 +110,51 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+# Failed network tests:
+#   ne2k_pci, pcnet: No io resource
+#   tulip: ?
+
 retcode=0
-runkernel virt defconfig "" rootfs.cpio
+runkernel virt defconfig "net,e1000" rootfs.cpio
 retcode=$((retcode + $?))
-runkernel virt defconfig virtio-blk rootfs.ext2
+runkernel virt defconfig net,e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig virtio rootfs.ext2
+runkernel virt defconfig net,i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig virtio-pci rootfs.ext2
+runkernel virt defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig sdhci:mmc rootfs.ext2
+runkernel virt defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig nvme rootfs.ext2
+runkernel virt defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
+
+runkernel virt defconfig net,virtio-net-device:usb-ohci rootfs.ext2
+retcode=$((${retcode} + $?))
+
+runkernel virt defconfig net,i82557b:usb-ehci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig pci-bridge:net,virtio-net-pci:usb-xhci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig net,i82557a:usb-uas-ehci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig net,i82558a:usb-uas-xhci rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "net,i82559a:scsi[53C810]" rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel virt defconfig "net,i82559er:scsi[53C895A]" rootfs.ext2
+retcode=$((${retcode} + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    runkernel virt defconfig usb-ohci rootfs.ext2
-    retcode=$((${retcode} + $?))
-fi
-
-runkernel virt defconfig usb-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig usb-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig usb-uas-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig usb-uas-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[53C810]" rootfs.ext2
-retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[53C895A]" rootfs.ext2
-retcode=$((${retcode} + $?))
-
-if [[ ${runall} -ne 0 ]]; then
-    # Does not instantiate
+    # Does not instantiate (am53c974 0000:01:01.0: pci I/O map failed)
     runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
     retcode=$((${retcode} + $?))
     runkernel virt defconfig "scsi[DC395]" rootfs.ext2
     retcode=$((${retcode} + $?))
 fi
 
-runkernel virt defconfig "scsi[MEGASAS]" rootfs.ext2
+runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[MEGASAS2]" rootfs.ext2
+runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
@@ -162,9 +163,9 @@ retcode=$((${retcode} + $?))
 runkernel virt defconfig "scsi[virtio-pci]" rootfs.ext2
 retcode=$((${retcode} + $?))
 
-runkernel sifive_u defconfig "" rootfs.cpio
+runkernel sifive_u defconfig "net,default" rootfs.cpio
 retcode=$((${retcode} + $?))
-runkernel sifive_u defconfig sd rootfs.ext2
+runkernel sifive_u defconfig "sd:net,default" rootfs.ext2
 retcode=$((${retcode} + $?))
 # does not work; mtd device not created
 # runkernel sifive_u defconfig mtd32 rootfs.ext2
