@@ -221,6 +221,7 @@ runkernel()
     local dtb=$7
     local ddtb="${dtb%.dtb}"
     local dtbfile="arch/arm/boot/dts/${dtb}"
+    local nonet=0
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
@@ -256,10 +257,21 @@ runkernel()
 
     case "${mach}" in
     "ast2600-evb")
-	# Network tests need v5.10 or later
+	# Network tests need v5.11 or later
+	# Older kernels only instantiate the second Ethernet interface.
 	case "${rel}" in
-	v4.4|v4.9|v4.14|v4.19|v5.4)
-	    fixup="$(echo ${fixup} | sed -e 's/:\+net,nic//')"
+	v4.4|v4.9|v4.14|v4.19|v5.4|v5.10)
+	    nonet=1
+	    ;;
+	*)
+	    ;;
+        esac
+	;;
+    "orangepi-pc")
+	# Network tests need v4.19 or later
+	case "${rel}" in
+	v4.4|v4.9|v4.14)
+	    nonet=1
 	    ;;
 	*)
 	    ;;
@@ -268,6 +280,9 @@ runkernel()
     *)
 	;;
     esac
+    if [[ "${nonet}" -ne 0 ]]; then
+	fixup="$(echo ${fixup} | sed -e 's/:\+net,nic//')"
+    fi
 
     if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
