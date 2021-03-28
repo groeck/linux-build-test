@@ -17,6 +17,8 @@ PATH_MICROBLAZE="/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin"
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
+rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+
 patch_defconfig()
 {
     :
@@ -36,6 +38,16 @@ runkernel()
     fi
 
     echo -n "Building ${ARCH}:${defconfig} ... "
+
+    case ${rel} in
+    "v4.4"|"v4.9")
+	# Older kernels get a bad case of hiccup (hang during boot)
+	# when enabling additional configuration options.
+	fixup="noextras:${fixup}"
+	;;
+    *)
+	;;
+    esac
 
     if ! dosetup -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
