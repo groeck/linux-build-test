@@ -27,6 +27,8 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
+rel="$(git describe | cut -f1 -d- | cut -f1,2 -d.)"
+
 skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
@@ -61,8 +63,8 @@ skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:ast2600-evb:multi_v7_defconfig:notests \
+	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
@@ -251,6 +253,21 @@ runkernel()
     if ! checkskip "${build}" ; then
 	return 0
     fi
+
+    case "${mach}" in
+    "ast2600-evb")
+	# Network tests need v5.10 or later
+	case "${rel}" in
+	v4.4|v4.9|v4.14|v4.19|v5.4)
+	    fixup="$(echo ${fixup} | sed -e 's/:\+net,nic//')"
+	    ;;
+	*)
+	    ;;
+        esac
+	;;
+    *)
+	;;
+    esac
 
     if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
@@ -475,7 +492,7 @@ checkstate ${retcode}
 # setting slot index via device tree alias") for reason and details.
 rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 case "${rel}" in
-v4.4|v4.9|v4.14|v4.19|v5.4|v5.8|v5.9)
+v4.4|v4.9|v4.14|v4.19|v5.4)
     sabrelite_mmc="mmc1"
     ;;
 *)
@@ -867,13 +884,13 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.cpio automatic
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic "nonet"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.ext2 automatic ::sd
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic "nonet::sd"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.sqf automatic ::flash32,26,3
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet::flash32,26,3"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
