@@ -104,13 +104,14 @@ parse_args()
 pcibus_set_root()
 {
     __pcibus_root="$1"
+    __pcibus_root_index="$2"
 }
 
 __pcibridge_init()
 {
     __pcibridge_chassis=0
     __pcibridge_id=""
-    __pcibus_ref="${__pcibus_root:+,bus=${__pcibus_root}}"
+    __pcibus_ref=""
 }
 
 __pcibridge_new_bridge()
@@ -119,7 +120,13 @@ __pcibridge_new_bridge()
     __pcibridge_id="pb${__pcibridge_chassis}"
     __pcibridge_addr=0
     extra_params+=" -device pci-bridge,id=${__pcibridge_id},chassis_nr=${__pcibridge_chassis}"
-    extra_params+="${__pcibus_root:+,bus=${__pcibus_root}}"
+    if [[ -n "${__pcibus_root}" ]]; then
+	extra_params+=",bus=${__pcibus_root}"
+	if [[ -n "${__pcibus_root_index}" ]]; then
+	    extra_params+=".${__pcibus_root_index}"
+	    __pcibus_root_index="$((__pcibus_root_index + 1))"
+	fi
+    fi
 }
 
 __pcibridge_new_port()
@@ -127,6 +134,12 @@ __pcibridge_new_port()
     if [[ -n "${__pcibridge_id}" ]]; then
 	__pcibridge_addr="$((__pcibridge_addr + 1))"
 	__pcibus_ref=",bus=${__pcibridge_id},addr=${__pcibridge_addr}"
+    elif [[ -n "${__pcibus_root}" ]]; then
+	__pcibus_ref=",bus=${__pcibus_root}"
+	if [[ -n "${__pcibus_root_index}" ]]; then
+	    __pcibus_ref+=".${__pcibus_root_index}"
+	    __pcibus_root_index="$((__pcibus_root_index + 1))"
+	fi
     fi
 }
 
@@ -512,7 +525,7 @@ __common_netcmd()
 	    ;;
 	"usb-ohci")
 	    __pcibridge_new_port
-	    extra_params+=" -device pci-ohci,id=ohci_net${pcibus_ref}"
+	    extra_params+=" -device pci-ohci,id=ohci_net${__pcibus_ref}"
 	    extra_params+=" -device usb-net,bus=ohci_net.0,netdev=net0 -netdev user,id=net0"
 	    ;;
 	"usb-uhci")
@@ -523,6 +536,9 @@ __common_netcmd()
 	*)
 	    ;;
 	esac
+	;;
+    virtio-net*)
+	extra_params+=" -device ${netdev},netdev=net0 -netdev user,id=net0"
 	;;
     *)
 	__pcibridge_new_port
