@@ -27,10 +27,10 @@ dir=$(cd $(dirname $0); pwd)
 . ${dir}/../scripts/common.sh
 
 skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
-	powernv:powernv_defconfig:nvme:rootfs \
-	powernv:powernv_defconfig:usb-xhci:rootfs \
-	powernv:powernv_defconfig:scsi[MEGASAS]:rootfs \
-	powernv:powernv_defconfig:sdhci:mmc:rootfs \
+	powernv:powernv_defconfig:nvme:net,rtl8139:rootfs \
+	powernv:powernv_defconfig:usb-xhci:net,rtl8139:rootfs \
+	powernv:powernv_defconfig:scsi[MEGASAS]:net,rtl8139:rootfs \
+	powernv:powernv_defconfig:sdhci:mmc:net,rtl8139:rootfs \
 	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:net,rtl8139:initrd \
 	pseries:pseries_defconfig:little:net,e1000:scsi:rootfs \
@@ -41,7 +41,7 @@ skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 	pseries:pseries_defconfig:little:net,tulip:nvme:rootfs \
 	pseries:pseries_defconfig:little:net,pcnet:usb:rootfs"
 skip_49="powernv:powernv_defconfig:net,rtl8139:initrd \
-	powernv:powernv_defconfig:sdhci:mmc:rootfs \
+	powernv:powernv_defconfig:sdhci:mmc:net,rtl8139:rootfs \
 	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs"
 
@@ -101,16 +101,17 @@ runkernel()
 	return 0
     fi
 
+    mem=1G
+    if [[ "${machine}" = "powernv" ]]; then
+	mem=2G
+	pcibus_set_root "pcie" 0
+    fi
+
     if ! dosetup -c "${defconfig}${fixup%::*}}" -F "${fixup:-fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
 	return 1
-    fi
-
-    mem=1G
-    if [[ "${machine}" = "powernv" ]]; then
-	mem=2G
     fi
 
     execute ${reboot} waitlist[@] \
@@ -135,9 +136,7 @@ echo
 #     rtl8139
 #     pcnet
 #     ne2k_pci
-#   powernv crashes with all non-initrd network tests
-#     This is possibly because the network device is connected to the wrong
-#     pcie bus.
+#   powernv network failures: all but rtl8139 (including virtio-net)
 #
 runkernel qemu_ppc64_book3s_defconfig smp::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
@@ -218,16 +217,16 @@ retcode=$((${retcode} + $?))
 runkernel powernv_defconfig "::net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig "::nvme" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::nvme:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig "::usb-xhci" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::usb-xhci:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig "::scsi[MEGASAS]" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::scsi[MEGASAS]:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((${retcode} + $?))
-runkernel powernv_defconfig "::sdhci:mmc" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::sdhci:mmc:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((${retcode} + $?))
 
