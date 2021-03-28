@@ -29,6 +29,9 @@ patch_defconfig()
     echo "CONFIG_TMPFS=y" >> ${defconfig}
     # We won't test btrfs. Drop it to reduce image size.
     echo "CONFIG_BTRFS_FS=n" >> ${defconfig}
+    # enable ethernet interface
+    echo "CONFIG_NET_VENDOR_SUN=y" >> ${defconfig}
+    echo "CONFIG_HAPPYMEAL=y" >> ${defconfig}
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
