@@ -56,8 +56,8 @@ skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
 	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
-	arm:palmetto-bmc:aspeed_g4_defconfig \
-	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32"
+	arm:palmetto-bmc:aspeed_g4_defconfig:net,nic \
+	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic"
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
@@ -71,7 +71,7 @@ skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
-skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32 \
+skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
@@ -762,11 +762,11 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" \
-	rootfs-armv5.cpio automatic "" aspeed-bmc-opp-palmetto.dtb
+	rootfs-armv5.cpio automatic "net,nic" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g4_defconfig palmetto-bmc "" \
-	rootfs-armv5.ext2 automatic ::mtd32 aspeed-bmc-opp-palmetto.dtb
+	rootfs-armv5.ext2 automatic "::mtd32:net,nic" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -867,13 +867,13 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic
+runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.cpio automatic
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic ::sd
+runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.ext2 automatic ::sd
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic ::flash32,26,3
+runkernel qemu_sx1_defconfig sx1 "nonet" rootfs-armv4.sqf automatic ::flash32,26,3
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
