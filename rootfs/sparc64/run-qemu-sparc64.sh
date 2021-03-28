@@ -29,6 +29,9 @@ patch_defconfig()
     echo "CONFIG_ATA=y" >> ${defconfig}
     # enable the ATA controller
     echo "CONFIG_PATA_CMD64X=y" >> ${defconfig}
+    # enable ethernet interface
+    echo "CONFIG_NET_VENDOR_SUN=y" >> ${defconfig}
+    echo "CONFIG_HAPPYMEAL=y" >> ${defconfig}
 }
 
 runkernel()
