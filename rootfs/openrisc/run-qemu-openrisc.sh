@@ -31,12 +31,25 @@ patch_defconfig()
 runkernel()
 {
     local defconfig=$1
+    local retcode
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local fixup=0
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    if ! dosetup -F "net,default" "${rootfs}" "${defconfig}"; then
-	return 1
+    # Kernel may expect elf32-or32, but toolchain produces elf32-or1k.
+    # Kludgy fix until we find a better solution.
+    if ! grep "elf32-or1k" arch/openrisc/kernel/vmlinux.lds.S >/dev/null 2>&1; then
+	fixup=1
+	sed -i -e 's/elf32-or32/elf32-or1k/g' arch/openrisc/kernel/vmlinux.lds.S
+    fi
+    dosetup -F "fixup" "${rootfs}" "${defconfig}"
+    retcode=$?
+    if [ ${fixup} -ne 0 ]; then
+	sed -i -e 's/elf32-or1k/elf32-or32/g' arch/openrisc/kernel/vmlinux.lds.S
+    fi
+    if [ ${retcode} -ne 0 ]; then
+	return ${retcode}
     fi
 
     execute manual waitlist[@] \
