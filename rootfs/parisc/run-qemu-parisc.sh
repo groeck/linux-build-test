@@ -98,7 +98,7 @@ checkstate ${retcode}
 runkernel "smp:net,pcnet:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
+runkernel "smp:pci-bridge:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel "smp:net,tulip:scsi[AM53C974]" rootfs.ext2.gz
@@ -127,30 +127,30 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 
 # Run remaining tests with SMP disabled
-runkernel nosmp:usb-ohci rootfs.ext2.gz
+runkernel nosmp:net,e1000:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:usb-ehci rootfs.ext2.gz
+runkernel nosmp:net,virtio-net:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:usb-xhci rootfs.ext2.gz
+runkernel nosmp:pci-bridge:net,pcnet:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:usb-uas-ehci rootfs.ext2.gz
+runkernel nosmp:net,usb-ohci:usb-uas-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:usb-uas-xhci rootfs.ext2.gz
+runkernel nosmp:net,rtl8139:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # duplicate some of the previous tests, with SMP disabled
-runkernel nosmp rootfs.cpio.gz
+runkernel nosmp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:sdhci:mmc rootfs.ext2.gz
+runkernel nosmp:net,tulip:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:nvme rootfs.ext2.gz
+runkernel nosmp:pci-bridge:net,e1000:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
