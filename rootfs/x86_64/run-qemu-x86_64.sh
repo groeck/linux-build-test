@@ -165,6 +165,13 @@ runkernel defconfig preempt:smp6:net,i82550:mem512 KnightsMill q35 rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
+runkernel defconfig smp2:net,usb-ohci:efi:mem1G:scsi[53C810] Cooperlake q35 rootfs-x86.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp4:net,e1000:mem2G:scsi[53C895A] EPYC-Rome q35 rootfs-x86.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
 runkernel defconfig nosmp:net,e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
