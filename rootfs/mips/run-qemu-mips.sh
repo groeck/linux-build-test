@@ -124,9 +124,9 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig smp:net,i82562:scsi[FUSION] rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nosmp rootfs.cpio.gz
+runkernel malta_defconfig nosmp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nosmp:ide rootfs.ext2.gz
+runkernel malta_defconfig nosmp:ide:net,pcnet rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
