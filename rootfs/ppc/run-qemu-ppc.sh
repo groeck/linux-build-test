@@ -207,19 +207,19 @@ retcode=$((${retcode} + $?))
 
 runkernel 44x/canyonlands_defconfig "net,tulip" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig usb sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig usb:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig sdhci:mmc:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig nvme sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig nvme:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[53C895A] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "scsi[53C895A]:net,tulip" sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[AM53C974] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig scsi[AM53C974]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[DC395] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig scsi[DC395]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[FUSION] sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig scsi[FUSION]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # megaraid_sas 0002:00:02.0: Command pool empty!
