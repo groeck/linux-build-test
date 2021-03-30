@@ -137,13 +137,13 @@ fi
 
 runkernel virt rv32_defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
+runkernel virt rv32_defconfig "pci-bridge:net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[FUSION]" rootfs.ext2
+runkernel virt rv32_defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[virtio]" rootfs.ext2
+runkernel virt rv32_defconfig "net,i82557b:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt rv32_defconfig "scsi[virtio-pci]" rootfs.ext2
+runkernel virt rv32_defconfig "net,i82557c:scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
