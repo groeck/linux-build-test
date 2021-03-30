@@ -144,16 +144,16 @@ runkernel malta_defconfig smp:net,virtio-net:scsi[DC395] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 runkernel malta_defconfig smp:net,i82562:scsi[AM53C974] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS] rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:pci-bridge:net,e1000:scsi[MEGASAS] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[MEGASAS2] rootfs-n32.ext2.gz
+runkernel malta_defconfig smp:pci-bridge:net,rtl8139:scsi[MEGASAS2] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:scsi[FUSION] rootfs-n64.ext2.gz
+runkernel malta_defconfig smp:net,ne2k_pci:scsi[FUSION] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nosmp:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig nosmp:net,pcnet:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nosmp:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nosmp:pci-bridge:net,tulip:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
