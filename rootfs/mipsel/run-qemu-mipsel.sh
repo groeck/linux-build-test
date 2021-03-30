@@ -124,9 +124,9 @@ retcode=$((retcode + $?))
 runkernel mips32r6-generic malta_qemu_32r6_defconfig nocd:smp:net,pcnet:ide rootfs-mipselr6.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel 24Kf malta_defconfig nosmp rootfs.cpio.gz
+runkernel 24Kf malta_defconfig nosmp:net,pcnet rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nosmp:ide rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nosmp:ide:net,rtl8139 rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
