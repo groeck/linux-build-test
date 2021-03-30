@@ -83,13 +83,13 @@ runkernel defconfig usb-ohci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig usb-ehci:net,virtio-net rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-xhci rootfs.ext2
+runkernel defconfig pci-bridge:usb-xhci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-uas-ehci rootfs.ext2
+runkernel defconfig usb-uas-ehci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-uas-xhci rootfs.ext2
+runkernel defconfig usb-uas-xhci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[AM53C974]:net,tulip" rootfs.ext2
+runkernel defconfig "pci-bridge:scsi[AM53C974]:net,tulip" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel defconfig "scsi[DC395]:net,e1000-82545em" rootfs.ext2
 retcode=$((retcode + $?))
@@ -115,7 +115,7 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel defconfig nvme rootfs.ext2
+runkernel defconfig nvme:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
