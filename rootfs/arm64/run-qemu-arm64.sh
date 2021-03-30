@@ -24,12 +24,12 @@ PATH=${PATH}:${PATH_ARM64}
 skip_44="virt:defconfig:smp2:net,e1000e:efi:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp:net,tulip:efi:mem512:virtio-blk:rootfs \
 	virt:defconfig:smp8:net,i82557b:efi:mem512:scsi[AM53C974]:rootfs \
-	xlnx-versal-virt:defconfig:smp2:mem512:sd0:rootfs \
+	xlnx-versal-virt:defconfig:smp2:net,default:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
-skip_49="raspi3:defconfig:smp:mem1G:initrd \
-	raspi3:defconfig:smp4:mem1G:sd:rootfs \
-	xlnx-versal-virt:defconfig:smp2:mem512:sd0:rootfs \
+skip_49="raspi3:defconfig:smp:net,usb:mem1G:initrd \
+	raspi3:defconfig:smp4:net,usb:mem1G:sd:rootfs \
+	xlnx-versal-virt:defconfig:smp2:net,default:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
@@ -163,22 +163,22 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:net,usb-ohci:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel xlnx-versal-virt defconfig smp:mem512 rootfs.cpio.gz
+runkernel xlnx-versal-virt defconfig smp:net,default:mem512 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
+runkernel xlnx-versal-virt defconfig "smp2:net,default:mem512:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # unreliable; the drive sometimes instantiates as mmcblk1 instead of
     # mmcblk0, causing spurious failures.
-    runkernel xlnx-versal-virt defconfig "smp2:mem512:sd0" rootfs.ext2.gz
+    runkernel xlnx-versal-virt defconfig "smp2:net,default:mem512:sd0" rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
 
-runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -190,9 +190,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3 defconfig smp:net,usb:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel raspi3 defconfig smp4:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3 defconfig smp4:net,usb:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio.gz
