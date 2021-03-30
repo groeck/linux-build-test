@@ -156,11 +156,11 @@ runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[FUSION]" rootfs.ext2
+runkernel virt defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[virtio]" rootfs.ext2
+runkernel virt defconfig "net,i82557b:scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "scsi[virtio-pci]" rootfs.ext2
+runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
 retcode=$((${retcode} + $?))
 
 runkernel sifive_u defconfig "net,default" rootfs.cpio
