@@ -73,31 +73,31 @@ echo
 #   in __napi_poll() after enabling interrupts from e100_enable_irq().
 # - usb-net fails with "usbnet: failed control transaction".
 
-runkernel defconfig devtmpfs rootfs.cpio
+runkernel defconfig devtmpfs:net,e1000 rootfs.cpio
 retcode=$?
-runkernel defconfig ide:net,e1000 rootfs.ext2
+runkernel defconfig devtmpfs:ide:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig sdhci:mmc:net,ne2k_pci rootfs.ext2
+runkernel defconfig devtmpfs:sdhci:mmc:net,ne2k_pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-ohci:net,pcnet rootfs.ext2
+runkernel defconfig devtmpfs:usb-ohci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-ehci:net,virtio-net rootfs.ext2
+runkernel defconfig devtmpfs:usb-ehci:net,virtio-net rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig pci-bridge:usb-xhci:net,pcnet rootfs.ext2
+runkernel defconfig devtmpfs:pci-bridge:usb-xhci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-uas-ehci:net,e1000 rootfs.ext2
+runkernel defconfig devtmpfs:usb-uas-ehci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig usb-uas-xhci:net,e1000 rootfs.ext2
+runkernel defconfig devtmpfs:usb-uas-xhci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "pci-bridge:scsi[AM53C974]:net,tulip" rootfs.ext2
+runkernel defconfig "devtmpfs:pci-bridge:scsi[AM53C974]:net,tulip" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[DC395]:net,e1000-82545em" rootfs.ext2
+runkernel defconfig "devtmpfs:scsi[DC395]:net,e1000-82545em" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[MEGASAS]:net,rtl8139" rootfs.ext2
+runkernel defconfig "devtmpfs:scsi[MEGASAS]:net,rtl8139" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[MEGASAS2]:net,e1000-82544gc" rootfs.ext2
+runkernel defconfig "devtmpfs:scsi[MEGASAS2]:net,e1000-82544gc" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel defconfig "scsi[FUSION]:net,usb-ohci" rootfs.ext2
+runkernel defconfig "devtmpfs:scsi[FUSION]:net,usb-ohci" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -107,15 +107,15 @@ if [[ ${runall} -ne 0 ]]; then
     # sym0: CACHE INCORRECTLY CONFIGURED.
     # sym0: giving up ...
     # WARNING: CPU: 0 PID: 1 at ./include/linux/dma-mapping.h:541 ___free_dma_mem_cluster+0x184/0x1a0
-    runkernel defconfig "scsi[53C810]" rootfs.ext2
+    runkernel defconfig "devtmpfs:scsi[53C810]" rootfs.ext2
     retcode=$((retcode + $?))
     # sym0: SCSI BUS has been reset.
     # sym0: unexpected disconnect
-    runkernel defconfig "scsi[53C895A]" rootfs.ext2
+    runkernel defconfig "devtmpfs:scsi[53C895A]" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
-runkernel defconfig nvme:net,e1000 rootfs.ext2
+runkernel defconfig devtmpfs:nvme:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
