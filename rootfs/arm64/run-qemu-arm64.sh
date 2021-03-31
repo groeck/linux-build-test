@@ -24,7 +24,9 @@ PATH=${PATH}:${PATH_ARM64}
 skip_44="virt:defconfig:smp2:net,e1000e:efi:mem512:usb-xhci:rootfs \
 	virt:defconfig:smp:net,tulip:efi:mem512:virtio-blk:rootfs \
 	virt:defconfig:smp8:net,i82557b:efi:mem512:scsi[AM53C974]:rootfs \
+	xlnx-versal-virt:defconfig:smp:net,default:mem512:initrd \
 	xlnx-versal-virt:defconfig:smp2:net,default:mem512:sd0:rootfs \
+	xlnx-versal-virt:defconfig:smp2:net,default:mem512:virtio-blk:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3:defconfig:smp:net,usb:mem1G:initrd \
