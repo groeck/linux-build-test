@@ -135,13 +135,13 @@ echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 
-runkernel qemu_ppc_book3s_defconfig nosmp:ide mac99 G4 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,default mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig nosmp:ide g3beige G3 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,default g3beige G3 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc_book3s_defconfig smp:ide mac99 G4 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig smp:ide:net,default mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
