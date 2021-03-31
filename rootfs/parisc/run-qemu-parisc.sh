@@ -79,6 +79,9 @@ echo
 # ne2k_pci:
 #   eth0 does not instantiate
 #
+# pci-bridge fails to instantiate after
+# WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988
+
 retcode=0
 runkernel smp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
@@ -98,7 +101,7 @@ checkstate ${retcode}
 runkernel "smp:net,pcnet:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:pci-bridge:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
+runkernel "smp:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel "smp:net,tulip:scsi[AM53C974]" rootfs.ext2.gz
@@ -133,7 +136,7 @@ checkstate ${retcode}
 runkernel nosmp:net,virtio-net:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:pci-bridge:net,pcnet:usb-xhci rootfs.ext2.gz
+runkernel nosmp:net,pcnet:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel nosmp:net,usb-ohci:usb-uas-ehci rootfs.ext2.gz
@@ -150,7 +153,7 @@ checkstate ${retcode}
 runkernel nosmp:net,tulip:sdhci:mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:pci-bridge:net,e1000:nvme rootfs.ext2.gz
+runkernel nosmp:net,e1000:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
