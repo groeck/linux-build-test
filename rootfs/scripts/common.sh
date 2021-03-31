@@ -941,6 +941,7 @@ __setup_fragment()
 	echo "CONFIG_NET_TULIP=y" >> ${fragment}
 	echo "CONFIG_TULIP=y" >> ${fragment}
 	if [[ "${nousb}" -eq 0 ]]; then
+	    echo "CONFIG_USB_NET_DRIVERS=y" >> ${fragment}
 	    echo "CONFIG_USB_USBNET=y" >> ${fragment}
 	    echo "CONFIG_USB_NET_CDCETHER=y" >> ${fragment}
 	    echo "CONFIG_USB_NET_CDC_SUBSET=y" >> ${fragment}
