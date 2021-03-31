@@ -24,8 +24,8 @@ PATH=${PATH}:${PATH_ARM64}
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
 skip_44="xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
-skip_49="raspi3:defconfig:smp:net,usb:mem1G:initrd \
-	raspi3:defconfig:smp4:net,usb:mem1G:sd:rootfs \
+skip_49="raspi3:defconfig:smp:mem1G:initrd \
+	raspi3:defconfig:smp4:mem1G:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
@@ -176,12 +176,13 @@ if [ ${runall} -eq 1 ]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3 defconfig smp:net,usb:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+# net,usb works for raspi3:arm64 but not for raspi3:arm64be
+runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 if [ ${runall} -eq 1 ]; then
     # sd emulation code in qemu seems to have endianness problems in big endian
     # mode if DMA is disabled.
-    runkernel raspi3 defconfig smp4:net,usb:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+    runkernel raspi3 defconfig smp4:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((retcode + $?))
 fi
 
