@@ -18,6 +18,8 @@ PATH_PARISC=/opt/kernel/gcc-9.2.0-nolibc/hppa-linux/bin
 # PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
 PATH=${PATH}:${PATH_PARISC}
 
+rel="$(git describe | cut -f1 -d- | cut -f1,2 -d.)"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -33,6 +35,18 @@ runkernel()
     local fixup=$1
     local rootfs=$2
     local waitlist=("reboot: Restarting system" "Boot successful" "SeaBIOS wants SYSTEM RESET")
+
+    # pcnet tests need v5.4 or later kernels. On older kernels,
+    # the pcnet driver does not clear its rx buffer ring
+    # which causes random qemu hiccups.
+    case "${rel}" in
+    v4.4|v4.9|v4.14|v4.19)
+        fixup="$(echo ${fixup} | sed -e 's/net,pcnet/net,rtl8139/')"
+        ;;
+    *)
+        ;;
+    esac
+
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
     local cache="${defconfig}:${fixup//smp*/smp}"
 
