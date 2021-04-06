@@ -12,7 +12,7 @@ _fixup="$2"
 
 QEMU_V40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
 QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv64}
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin
@@ -29,6 +29,9 @@ patch_defconfig()
     local fixup
 
     echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
+
+    # needed for net,tulip tests
+    echo "CONFIG_TULIP_MMIO=y" >> ${defconfig}
 
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
@@ -112,7 +115,10 @@ echo
 
 # Failed network tests:
 #   ne2k_pci, pcnet: No io resource
-#   tulip: ?
+#	Driver problem: The io resource starts with 0,
+#	and the drivers assume that this means 'no resource'
+#	After fixing that, ne2k_pci crashes in outsl (probably
+#	a bug in the riscv architecture code).
 
 retcode=0
 runkernel virt defconfig "net,e1000" rootfs.cpio
@@ -158,7 +164,7 @@ runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "net,i82557b:scsi[virtio]" rootfs.ext2
+runkernel virt defconfig "net,tulip:scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
 retcode=$((${retcode} + $?))
