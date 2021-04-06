@@ -61,13 +61,15 @@ MAXTIME=150	# Maximum wait time for qemu session to complete
 MAXSTIME=60	# Maximum wait time for qemu session to generate output
 __retries=1	# Default number of retries
 
+__testbuild=0
+
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
 checkstate()
 {
-    if [[ ${testbuild} != 0 && $1 != 0 ]]; then
+    if [[ ${__testbuild} != 0 && $1 != 0 ]]; then
 	exit $1
     fi
 }
@@ -79,7 +81,7 @@ parse_args()
 	nobuild=0
 	dodebug=0
 	runall=0
-	testbuild=0
+	__testbuild=0
 	verbose=0
 	extracli=""
 	while getopts ae:dnr:tv opt; do
@@ -88,7 +90,7 @@ parse_args()
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
-	t)	testbuild=1;__retries=0;;
+	t)	__testbuild=1;__retries=0;;
 	r)	__retries=${OPTARG}
 		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
 		    echo "Bad number of retries: ${__retries}"
@@ -816,7 +818,7 @@ __setup_fragment()
     local nolocktests=0
     local nonvme=0
     local noscsi=0
-    local notests=0
+    local notests="${__testbuild}"
     local nousb=0
     local novirt=0
     local preempt=0
