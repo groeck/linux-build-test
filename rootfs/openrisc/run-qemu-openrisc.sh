@@ -44,7 +44,7 @@ runkernel()
 	fixup="nonet"
 	;;
     *)
-	fixup="fixup"
+	fixup="net:default"
 	;;
     esac
 
