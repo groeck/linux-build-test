@@ -101,7 +101,7 @@ runkernel()
     fi
 
     # Needed for "FUSION" boot tests
-    initcli+=" coherent_pool=256k"
+    initcli+=" coherent_pool=512k"
 
     case "${mach}" in
     sam460ex)
