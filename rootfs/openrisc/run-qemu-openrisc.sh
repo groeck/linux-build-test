@@ -15,8 +15,6 @@ PATH_OR32=/opt/kernel/gcc-9.3.0-nolibc/or1k-linux/bin
 
 PATH=${PATH_OR32}:${PATH}
 
-rel="$(git describe | cut -f1 -d- | cut -f1,2 -d.)"
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -38,15 +36,10 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    case "${rel}" in
-    "v4.14"|"v4.19")
+    if [[ ${linux_version_code} -lt $(kernel_version 5 0) ]]; then
 	# We don't run network tests, so don't enable them
 	fixup="nonet"
-	;;
-    *)
-	fixup="net:default"
-	;;
-    esac
+    fi
 
     if ! dosetup -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
