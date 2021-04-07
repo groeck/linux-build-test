@@ -8,15 +8,11 @@ shift $((OPTIND - 1))
 
 machine=$1
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v4.9|v4.14)
-	QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
-	;;
-*)
-	QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
-	;;
-esac
+if [[ ${linux_version_code} -lt $(kernel_version 4 15) ]]; then
+    QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
+else
+    QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
+fi
 
 PREFIX=m68k-linux-
 ARCH=m68k
