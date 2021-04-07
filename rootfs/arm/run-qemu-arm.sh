@@ -27,8 +27,6 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-rel="$(git describe | cut -f1 -d- | cut -f1,2 -d.)"
-
 skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:raspi2:multi_v7_defconfig \
 	arm:raspi2:multi_v7_defconfig:sd \
@@ -259,23 +257,15 @@ runkernel()
     "ast2600-evb")
 	# Network tests need v5.11 or later
 	# Older kernels only instantiate the second Ethernet interface.
-	case "${rel}" in
-	v4.4|v4.9|v4.14|v4.19|v5.4|v5.10)
+	if [[ ${linux_version_code} -lt $(kernel_version 5 11) ]]; then
 	    nonet=1
-	    ;;
-	*)
-	    ;;
-        esac
+	fi
 	;;
     "orangepi-pc")
 	# Network tests need v4.19 or later
-	case "${rel}" in
-	v4.4|v4.9|v4.14)
+	if [[ ${linux_version_code} -lt $(kernel_version 4 19) ]]; then
 	    nonet=1
-	    ;;
-	*)
-	    ;;
-        esac
+        fi
 	;;
     *)
 	;;
@@ -505,15 +495,12 @@ checkstate ${retcode}
 # For sabrelite, the instatiated mmc device index is linux kernel release
 # specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
 # setting slot index via device tree alias") for reason and details.
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v4.4|v4.9|v4.14|v4.19|v5.4)
+
+if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
     sabrelite_mmc="mmc1"
-    ;;
-*)
+else
     sabrelite_mmc="mmc3"
-    ;;
-esac
+fi
 
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net,default" imx6dl-sabrelite.dtb
