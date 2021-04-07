@@ -17,15 +17,12 @@ PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
 
 PATH=${PATH_S390}:${PATH}
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-
 patch_defconfig()
 {
     local defconfig=$1
     local fixup=$2
 
-    case "${rel}" in
-    v4.4)
+    if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
 	# qemu only fully supports MARCH_Z900.
 	# Newer versions of qemu work for more recent CPUS with CPU model
 	# "qemu", but that does not work for v4.4.y (it crashes silently
@@ -33,10 +30,7 @@ patch_defconfig()
 	sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
 	sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
 	echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
-	;;
-    *)
-	;;
-    esac
+    fi
 
     echo "CONFIG_PCI=y" >> ${defconfig}
 }
