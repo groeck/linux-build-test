@@ -147,7 +147,6 @@ echo
 #	NETDEV WATCHDOG: eth0 (ne2k-pci): transmit queue 0 timed out
 #     ne2k_pci with pseries:little is ok.
 #   e5500 network failures:
-#     rtl8139
 #     pcnet
 #     ne2k_pci
 #   powernv network failures: all but rtl8139 (including virtio-net)
@@ -212,7 +211,7 @@ runkernel pseries_defconfig little::net,usb-ohci:nvme pseries POWER8 hvc0 vmlinu
 	rootfs-el.ext2.gz auto
 retcode=$((${retcode} + $?))
 
-runkernel corenet64_smp_defconfig e5500::net,e1000e ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,rtl8139 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.cpio.gz auto
 retcode=$((${retcode} + $?))
 runkernel corenet64_smp_defconfig e5500::net,virtio-net:nvme ppce500 e5500 ttyS0 \
