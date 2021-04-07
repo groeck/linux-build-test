@@ -91,10 +91,13 @@ echo
 #   crashes with
 #	arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map
 # ne2k_pci:
-#   eth0 does not instantiate
+#   Fails with
+#	"Dino 0x00810000: stuck interrupt 2"
+#   and
+#	"NETDEV WATCHDOG: eth0 (ne2k-pci): transmit queue 0 timed out"
 #
 # pci-bridge fails to instantiate after
-# WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988
+#	"WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988"
 
 retcode=0
 runkernel smp:net,e1000 rootfs.cpio.gz
