@@ -88,39 +88,43 @@ runkernel()
 echo "Build reference: $(git describe)"
 echo
 
+# Network test notes:
+# - ne2k_pci gets an IP address, but fails to ping the host
+# - i82557a/b/c do not get an IP address
+#
 runkernel sparc64_defconfig sun4u smp:net,default rootfs.cpio.gz
 retcode=$?
-runkernel sparc64_defconfig sun4u smp:ata:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:ata:net,rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:ata:net,default rootfs.iso.gz
+runkernel sparc64_defconfig sun4u smp:ata:net,e1000 rootfs.iso.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:ata:net,default rootfs.squashfs
+runkernel sparc64_defconfig sun4u smp:ata:net,e1000-82544gc rootfs.squashfs
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:sdhci:mmc:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:sdhci:mmc:net,rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:nvme:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:nvme:net,tulip rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u "smp:scsi[DC395]:net,default" rootfs.iso.gz
+runkernel sparc64_defconfig sun4u "smp:scsi[DC395]:net,i82559c" rootfs.iso.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u "smp:scsi[MEGASAS]:net,default" rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u "smp:scsi[MEGASAS]:net,i82559a" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u "smp:scsi[AM53C974]:net,default" rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u "smp:scsi[AM53C974]:net,usb-net" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:usb-xhci:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:usb-xhci:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:usb-uas-xhci:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:usb-uas-xhci:net,i82801 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u smp:virtio-pci:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u smp:virtio-pci:net,i82559er rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4v smp:ata:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4v smp:ata:net,i82562 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4v smp:ata:net,default rootfs.iso.gz
+runkernel sparc64_defconfig sun4v smp:ata:net,e1000-82545em rootfs.iso.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4v smp:nvme:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u nosmp:ata:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u nosmp:ata:net,e1000 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4v nosmp:ata:net,default rootfs.ext2.gz
+runkernel sparc64_defconfig sun4v nosmp:ata:net,pcnet rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
