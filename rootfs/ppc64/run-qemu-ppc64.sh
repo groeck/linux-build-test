@@ -26,8 +26,6 @@ dir=$(cd $(dirname $0); pwd)
 
 . ${dir}/../scripts/common.sh
 
-rel="$(git describe | cut -f1 -d- | cut -f1,2 -d.)"
-
 skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 	powernv:powernv_defconfig:nvme:net,rtl8139:rootfs \
 	powernv:powernv_defconfig:usb-xhci:net,rtl8139:rootfs \
@@ -109,13 +107,9 @@ runkernel()
 	mem=2G
 	pcibus_set_root "pcie" 0
 	# Network tests need v4.14 or later
-	case "${rel}" in
-	v4.4|v4.9)
+	if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
 	    fixup="$(echo ${fixup} | sed -e 's/:\+net,rtl8139//')"
-	    ;;
-	*)
-	    ;;
-        esac
+	fi
 	;;
     *)
 	;;
