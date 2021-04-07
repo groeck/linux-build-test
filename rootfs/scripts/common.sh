@@ -540,7 +540,7 @@ __common_netcmd()
 	esac
 	;;
     virtio-net*)
-	extra_params+=" -device ${netdev},netdev=net0 -netdev user,id=net0"
+	extra_params+=" -device ${netdev},netdev=net0${__pcibus_ref} -netdev user,id=net0"
 	;;
     *)
 	__pcibridge_new_port
