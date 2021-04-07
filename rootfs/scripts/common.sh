@@ -67,6 +67,19 @@ __testbuild=0
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
+# Return kernel version based on parameters
+kernel_version()
+{
+    local v1=${1:-0}
+    local v2=${2:-0}
+    local v3=${3:-0}
+
+    echo "$((v1 * 16777216 + v2 * 65536 + v3))"
+}
+
+# Current Linux kernel version
+linux_version_code="$(kernel_version $(git describe --match 'v*' | cut -f1 -d- | sed -e 's/\./ /g' | sed -e 's/v//'))"
+
 checkstate()
 {
     if [[ ${__testbuild} != 0 && $1 != 0 ]]; then
