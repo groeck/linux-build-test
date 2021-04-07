@@ -937,6 +937,7 @@ __setup_fragment()
 	# echo "CONFIG_8139TOO=y" >> ${fragment}
 	echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
 	echo "CONFIG_PCNET32=y" >> ${fragment}
+	echo "CONFIG_NET_VENDOR_NATSEMI=y" >> ${fragment}
 	echo "CONFIG_NET_VENDOR_8390=y" >> ${fragment}
 	echo "CONFIG_NE2K_PCI=y" >> ${fragment}
 	echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
