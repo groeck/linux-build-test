@@ -18,16 +18,11 @@ EARLYCON=""
 
 errlog="/tmp/err-sh.log"
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
-case "${rel}" in
-v4.4|v4.9|v4.14|v4.19)
-	;;
-*)
-	# earlycon only works with v4.20+ and otherwise results in a crash.
-	CONFIG="CONFIG_SERIAL_SH_SCI_EARLYCON=y"
-	EARLYCON="earlycon=scif,mmio16,0xffe80000"
-	;;
-esac
+if [[ ${linux_version_code} -ge $(kernel_version 5 0) ]]; then
+    # earlycon only works with v5.0+ and otherwise results in a crash.
+    CONFIG="CONFIG_SERIAL_SH_SCI_EARLYCON=y"
+    EARLYCON="earlycon=scif,mmio16,0xffe80000"
+fi
 
 PATH=${PATH_SH}:${PATH}
 
