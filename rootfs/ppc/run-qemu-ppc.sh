@@ -19,7 +19,6 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 PREFIX=powerpc64-linux-
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
 PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
 
 ARCH=powerpc
@@ -106,13 +105,13 @@ runkernel()
     case "${mach}" in
     sam460ex)
 	# Fails with v4.4.y
-	if [[ "${rel}" != "v4.4" ]]; then
+	if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
 	    earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	fi
 	;;
     virtex-ml507)
 	# fails with v4.4.y
-	if [[ "${rel}" != "v4.4" ]]; then
+	if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
 	    earlycon="earlycon"
 	fi
 	;;
