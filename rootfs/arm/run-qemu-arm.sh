@@ -488,7 +488,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.cpio manual ::mem256 imx6dl-sabrelite.dtb
+	rootfs-armv5.cpio manual ::mem256:net,default imx6dl-sabrelite.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
