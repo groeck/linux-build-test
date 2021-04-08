@@ -80,13 +80,13 @@ echo
 runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio.gz
 retcode=$?
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,default rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:virtio-pci:net,default rootfs.ext2.gz
+runkernel defconfig nolocktests:virtio-pci:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:scsi[virtio-pci]:net,default rootfs.ext2.gz
