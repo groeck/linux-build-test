@@ -44,6 +44,13 @@ patch_defconfig()
 
 cached_config=""
 
+if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+     # tulip doesn't instantiate prior to v5.4
+     tulip_netdev="tulip"
+else
+     tulip_netdev="e1000"
+fi
+
 runkernel()
 {
     local mach=$1
@@ -164,7 +171,7 @@ runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "net,tulip:scsi[virtio]" rootfs.ext2
+runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
 retcode=$((${retcode} + $?))
