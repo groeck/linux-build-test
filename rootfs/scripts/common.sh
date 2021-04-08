@@ -1252,7 +1252,7 @@ dowait()
 	    fi
 	fi
 
-	if grep -q -e "Oops: |Kernel panic|Internal error:|segfault" ${logfile}; then
+	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
 	    # x86 has the habit of crashing in restart once in a while.
 	    # Try to ignore it.
 	    if ! grep -q -e "^machine restart" ${logfile}; then
@@ -1291,7 +1291,7 @@ dowait()
     # The system may have crashed without us noticing above.
     # Try to catch it here.
     if [ ${retcode} -eq 0 ]; then
-	if grep -q -e "Oops: |Kernel panic|Internal error:|segfault" ${logfile}; then
+	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
 	    msg="failed (crashed)"
 	    retcode=1
 	fi
