@@ -105,13 +105,13 @@ runkernel()
     case "${mach}" in
     sam460ex)
 	# Fails with v4.4.y
-	if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
+	if [[ ${linux_version_code} -ge $(kernel_version 4 5) ]]; then
 	    earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	fi
 	;;
     virtex-ml507)
 	# fails with v4.4.y
-	if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
+	if [[ ${linux_version_code} -ge $(kernel_version 4 5) ]]; then
 	    earlycon="earlycon"
 	fi
 	;;
@@ -137,10 +137,10 @@ VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
 runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,default mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
-runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,default g3beige G3 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,virtio-net-pci g3beige G3 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
-runkernel qemu_ppc_book3s_defconfig smp:ide:net,default mac99 G4 ttyS0 rootfs.ext2.gz \
+runkernel qemu_ppc_book3s_defconfig smp:ide:net,e1000 mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
@@ -204,22 +204,31 @@ retcode=$((${retcode} + $?))
 # net,tulip passes. Everything else fails with
 # "ip: SIOCSIFFLAGS: Cannot assign requested address"
 
-runkernel 44x/canyonlands_defconfig "net,tulip" sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
+runkernel 44x/canyonlands_defconfig "net,tulip" \
+	sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig usb:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "usb:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig sdhci:mmc:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "sdhci:mmc:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig nvme:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "nvme:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "scsi[53C895A]:net,tulip" sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "scsi[53C895A]:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[AM53C974]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "scsi[AM53C974]:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[DC395]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "scsi[DC395]:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig scsi[FUSION]:net,tulip sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
+runkernel 44x/canyonlands_defconfig "scsi[FUSION]:net,tulip" \
+	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
+
 if [[ ${runall} -ne 0 ]]; then
     # megaraid_sas 0002:00:02.0: Command pool empty!
     # Unable to handle kernel paging request for data at address 0x00000000
