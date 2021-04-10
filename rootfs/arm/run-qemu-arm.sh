@@ -797,7 +797,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" \
-	rootfs-armv5.cpio automatic "net,nic" aspeed-bmc-opp-palmetto.dtb
+	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-opp-palmetto.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g4_defconfig palmetto-bmc "" \
