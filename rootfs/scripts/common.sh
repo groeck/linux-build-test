@@ -1243,7 +1243,7 @@ dowait()
 	# Assume first entry in waitlist points to the message
 	# we are waiting for here.
 	# We need to do this prior to checking for a crash since
-	# some kernels _do_ crash on reboot (eg sparc64)
+	# some kernels _do_ crash on reboot (eg sparc64, openrisc)
 
 	if [ "${manual}" = "manual" ]; then
 	    if grep -q "${waitlist[0]}" ${logfile}; then
@@ -1287,15 +1287,6 @@ dowait()
 	st=$((st + ${LOOPTIME}))
 	echo -n .
     done
-
-    # The system may have crashed without us noticing above.
-    # Try to catch it here.
-    if [ ${retcode} -eq 0 ]; then
-	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
-	    msg="failed (crashed)"
-	    retcode=1
-	fi
-    fi
 
     # Look for network test failures
     if [[ ${retcode} -eq 0 && "${__do_network_test}" -ne 0 ]]; then
