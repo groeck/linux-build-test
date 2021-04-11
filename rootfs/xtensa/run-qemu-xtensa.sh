@@ -155,7 +155,8 @@ fi
 
 runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:flash128:net,default rootfs-dc233c.ext2
 retcode=$((retcode + $?))
-runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256 rootfs-nommu.cpio
+
+runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256:net,default rootfs-nommu.cpio
 retcode=$((retcode + $?))
 
 exit ${retcode}
