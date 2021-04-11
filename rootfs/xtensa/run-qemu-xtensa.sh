@@ -133,27 +133,27 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel generic_kc705_defconfig lx60 dc232b lx60 mem128 rootfs-dc232b.cpio
+runkernel generic_kc705_defconfig lx60 dc232b lx60 nolocktests:mem128:net,default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig lx200 dc232b lx200 mem128:flash16 rootfs-dc232b.squashfs
+runkernel generic_kc705_defconfig lx200 dc232b lx200 nolocktests:mem128:flash16:net,default rootfs-dc232b.squashfs
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc232b kc705 mem1G rootfs-dc232b.cpio
+runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:net,default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc232b kc705 mem1G:flash128 rootfs-dc232b.ext2
+runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:flash128:net,default rootfs-dc232b.ext2
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig ml605 dc233c ml605 mem128 rootfs-dc233c.cpio
+runkernel generic_kc705_defconfig ml605 dc233c ml605 nolocktests:mem128:net,default rootfs-dc233c.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G rootfs-dc233c.cpio
+runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:net,default rootfs-dc233c.cpio
 retcode=$((retcode + $?))
 
 if [[ ${runall} -eq 1 ]]; then
     # Works but takes forever to run, and idle doesn't work well
     # (system runs at 100% CPU)
-    runkernel virt_defconfig "" dc233c virt virtio-pci:mem2G rootfs-dc233c.ext2
+    runkernel virt_defconfig "" dc233c virt nolocktests:virtio-pci:mem2G rootfs-dc233c.ext2
     retcode=$((retcode + $?))
 fi
 
-runkernel generic_kc705_defconfig kc705 dc233c kc705 mem1G:flash128 rootfs-dc233c.ext2
+runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:flash128:net,default rootfs-dc233c.ext2
 retcode=$((retcode + $?))
 runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256 rootfs-nommu.cpio
 retcode=$((retcode + $?))
