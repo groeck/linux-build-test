@@ -19,8 +19,11 @@ PATH_RISCV=/opt/kernel/gcc-9.3.0-nolibc/riscv64-linux/bin
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_419="riscv:sifive_u:defconfig:net,default:initrd \
+skip_419="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
+	riscv:sifive_u:defconfig:net,default:initrd \
 	riscv:sifive_u:defconfig:sd:net,default:rootfs"
+
+skip_54="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs"
 
 patch_defconfig()
 {
