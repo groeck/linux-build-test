@@ -3,66 +3,56 @@
 basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
-PATH_ALPHA=/opt/kernel/gcc-10.2.0-nolibc/alpha-linux/bin
-# undefined reference to `memset' with gcc 10.2.
-# PATH_AM33=/opt/kernel/gcc-10.2.0-nolibc/am33_2.0-linux/bin
-PATH_AM33=/opt/kernel/gcc-9.3.0-nolibc/am33_2.0-linux/bin
-# gcc 10.2 (affects arm and arm64):
-# "crypto/aegis128-neon-inner.c:151:3: error:
-# incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
-# This is a known gcc problem, to be fixed in gcc 10.3.
-# PATH_ARM=/opt/kernel/gcc-10.2.0-nolibc/arm-linux-gnueabi/bin
-# PATH_ARM64=/opt/kernel/gcc-10.2.0-nolibc/aarch64-linux/bin
-PATH_ARM=/opt/kernel/gcc-9.3.0-nolibc/arm-linux-gnueabi/bin
-PATH_ARM64=/opt/kernel/gcc-9.3.0-nolibc/aarch64-linux/bin
-# Assembler messages: Error: inappropriate arguments for opcode 'adc'
-# PATH_ARC=/opt/kernel/gcc-10.2.0-nolibc/arc-linux/bin
-# PATH_ARCV2=/opt/kernel/gcc-10.2.0-nolibc/arcv2-linux/bin
-PATH_ARC=/opt/kernel/gcc-9.3.0-nolibc/arc-linux/bin
-PATH_ARCV2=/opt/kernel/gcc-9.3.0-nolibc/arcv2-linux/bin
-PATH_BFIN=/opt/kernel/gcc-10.2.0-nolibc/bfin-uclinux/bin
-# ICE with gcc 9.2.0, gcc 9.3.0
+PATH_ALPHA=/opt/kernel/gcc-10.3.0-nolibc/alpha-linux/bin
+PATH_AM33=/opt/kernel/gcc-10.3.0-nolibc/am33_2.0-linux/bin
+PATH_ARM=/opt/kernel/gcc-10.3.0-nolibc/arm-linux-gnueabi/bin
+PATH_ARM64=/opt/kernel/gcc-10.3.0-nolibc/aarch64-linux/bin
+PATH_ARC=/opt/kernel/gcc-10.3.0-nolibc/arc-linux/bin
+PATH_ARCV2=/opt/kernel/gcc-10.3.0-nolibc/arcv2-linux/bin
+PATH_BFIN=/opt/kernel/gcc-10.3.0-nolibc/bfin-uclinux/bin
+# ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
 # on v4.4.y (at least), in kernel/fork.c
-# PATH_C6X=/opt/kernel/gcc-10.2.0-nolibc/c6x-elf/bin
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
+PATH_C6X=/opt/kernel/gcc-8.4.0-nolibc/c6x-elf/bin
+# PATH_C6X=/opt/kernel/gcc-10.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
 PATH_CRIS=/opt/kernel/gcc-9.3.0-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
-PATH_CSKY=/opt/kernel/gcc-10.2.0-nolibc/csky-linux/bin
-PATH_FRV=/opt/kernel/gcc-10.2.0-nolibc/frv-linux/bin
-PATH_H8300=/opt/kernel/gcc-10.2.0-nolibc/h8300-linux/bin
+PATH_CSKY=/opt/kernel/gcc-10.3.0-nolibc/csky-linux/bin
+PATH_FRV=/opt/kernel/gcc-10.3.0-nolibc/frv-linux/bin
+PATH_H8300=/opt/kernel/gcc-10.3.0-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
-PATH_IA64=/opt/kernel/gcc-10.2.0-nolibc/ia64-linux/bin
-PATH_M32R=/opt/kernel/gcc-10.2.0-nolibc/m32r-linux/bin
-PATH_M68=/opt/kernel/gcc-10.2.0-nolibc/m68k-linux/bin
+PATH_IA64=/opt/kernel/gcc-10.3.0-nolibc/ia64-linux/bin
+PATH_M32R=/opt/kernel/gcc-10.3.0-nolibc/m32r-linux/bin
+PATH_M68=/opt/kernel/gcc-10.3.0-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
-PATH_MICROBLAZE=/opt/kernel/gcc-10.2.0-nolibc/microblaze-linux/bin
-PATH_MIPS=/opt/kernel/gcc-10.2.0-nolibc/mips64-linux/bin
-# gcc-8.2.0 and 8.3.0 don't build for nds32.
-# gcc-9.2.0/10.2.0: assembler errors when compiling allmodconfig
+PATH_MICROBLAZE=/opt/kernel/gcc-10.3.0-nolibc/microblaze-linux/bin
+PATH_MIPS=/opt/kernel/gcc-10.3.0-nolibc/mips64-linux/bin
+# gcc-8.2.0, 8.3.0, and 8.4.0 don't compile for nds32.
+# gcc-9.2.0/10.2.0/10.3.0: assembler errors when compiling allmodconfig
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
-# PATH_NDS32=/opt/kernel/gcc-10.2.0-nolibc/nds32le-linux/bin
-PATH_NIOS2=/opt/kernel/gcc-10.2.0-nolibc/nios2-linux/bin
+# PATH_NDS32=/opt/kernel/gcc-10.3.0-nolibc/nds32le-linux/bin
+PATH_NIOS2=/opt/kernel/gcc-10.3.0-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
-PATH_OPENRISC=/opt/kernel/gcc-10.2.0-nolibc/or1k-linux/bin
-PATH_PARISC=/opt/kernel/gcc-10.2.0-nolibc/hppa-linux/bin
-PATH_PARISC64=/opt/kernel/gcc-10.2.0-nolibc/hppa64-linux/bin
-PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
-PATH_RISCV64=/opt/kernel/gcc-10.2.0-nolibc/riscv64-linux/bin
-PATH_RISCV32=/opt/kernel/gcc-10.2.0-nolibc/riscv32-linux/bin
+PATH_OPENRISC=/opt/kernel/gcc-10.3.0-nolibc/or1k-linux/bin
+PATH_PARISC=/opt/kernel/gcc-10.3.0-nolibc/hppa-linux/bin
+PATH_PARISC64=/opt/kernel/gcc-10.3.0-nolibc/hppa64-linux/bin
+PATH_PPC=/opt/kernel/gcc-10.3.0-nolibc/powerpc64-linux/bin
+PATH_RISCV64=/opt/kernel/gcc-10.3.0-nolibc/riscv64-linux/bin
+PATH_RISCV32=/opt/kernel/gcc-10.3.0-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
-# Invalid asm expression with gcc 9.2.0
-# invalid hard register usage with gcc 9.3.0 (4.14.y)
-# ./arch/s390/include/asm/jump_label.h:22: Error: bad expression w/ gcc 10.2.0 (4.14.y)
-# PATH_S390=/opt/kernel/gcc-10.2.0-nolibc/s390-linux/bin
-PATH_S390=/opt/kernel/gcc-8.3.0-nolibc/s390-linux/bin
-PATH_SH4=/opt/kernel/gcc-10.2.0-nolibc/sh4-linux/bin
-PATH_SPARC=/opt/kernel/gcc-10.2.0-nolibc/sparc64-linux/bin
+# S390 needs gcc 8.x or older for kernels prior to v5.0.
+# See kernel commit 146448524bdd ("s390/jump_label: Use "jdd"
+# constraint on gcc9") for details.
+# With gcc 10.3.0 (v5.4.y):
+# 	arch/s390/include/asm/atomic_ops.h:46:2: error: impossible constraint in 'asm'
+# PATH_S390=/opt/kernel/gcc-10.3.0-nolibc/s390-linux/bin
+PATH_S390=/opt/kernel/gcc-8.4.0-nolibc/s390-linux/bin
+PATH_SH4=/opt/kernel/gcc-10.3.0-nolibc/sh4-linux/bin
+PATH_SPARC=/opt/kernel/gcc-10.3.0-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
-# 9.3.0 seems to have trouble compiling x86_64 targets
-PATH_X86=/opt/kernel/gcc-10.2.0-nolibc/x86_64-linux/bin
-PATH_XTENSA=/opt/kernel/gcc-10.2.0-nolibc/xtensa-linux/bin
+PATH_X86=/opt/kernel/gcc-10.3.0-nolibc/x86_64-linux/bin
+PATH_XTENSA=/opt/kernel/gcc-10.3.0-nolibc/xtensa-linux/bin
 
 PREFIX_ARC="arc-elf-"
 PREFIX_ARCV2="arc-elf-"
