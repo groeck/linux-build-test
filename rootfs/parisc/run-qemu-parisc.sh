@@ -14,8 +14,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
 PREFIX=hppa-linux-
 ARCH=parisc
 
-PATH_PARISC=/opt/kernel/gcc-9.2.0-nolibc/hppa-linux/bin
-# PATH_PARISC=/opt/kernel/hppa/gcc-7.3.0/bin
+PATH_PARISC=/opt/kernel/gcc-10.3.0-nolibc/hppa-linux/bin
 PATH=${PATH}:${PATH_PARISC}
 
 patch_defconfig()

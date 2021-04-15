@@ -14,7 +14,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-alpha}
 PREFIX=alpha-linux-
 ARCH=alpha
 
-PATH_ALPHA=/opt/kernel/gcc-10.2.0-nolibc/alpha-linux/bin
+PATH_ALPHA=/opt/kernel/gcc-10.3.0-nolibc/alpha-linux/bin
 
 PATH=${PATH_ALPHA}:${PATH}
 

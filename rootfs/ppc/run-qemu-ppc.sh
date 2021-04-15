@@ -19,7 +19,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 PREFIX=powerpc64-linux-
 
-PATH_PPC=/opt/kernel/gcc-10.2.0-nolibc/powerpc64-linux/bin
+PATH_PPC=/opt/kernel/gcc-10.3.0-nolibc/powerpc64-linux/bin
 
 ARCH=powerpc
 

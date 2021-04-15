@@ -14,7 +14,7 @@ QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv32}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv32}
 PREFIX=riscv32-linux-
 ARCH=riscv
-PATH_RISCV=/opt/kernel/gcc-10.2.0-nolibc/riscv32-linux/bin
+PATH_RISCV=/opt/kernel/gcc-10.3.0-nolibc/riscv32-linux/bin
 
 PATH=${PATH}:${PATH_RISCV}
 

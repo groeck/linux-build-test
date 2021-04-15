@@ -19,7 +19,9 @@ ARCH=powerpc
 
 PREFIX=powerpc64-linux-
 
-PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
+# gcc 10.3.0 fails to compile arch/powerpc/mm/hugetlbpage.c in v4.4.y
+# for pseries_defconfig
+PATH_PPC=/opt/kernel/gcc-9.3.0-nolibc/powerpc64-linux/bin
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)

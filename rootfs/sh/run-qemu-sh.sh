@@ -9,6 +9,8 @@ shift $((OPTIND - 1))
 _fixup="$1"
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
+
+# boot tests hang with gcc 10.3.0 in v4.4.y.
 PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
 
 PREFIX=sh4-linux-

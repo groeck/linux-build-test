@@ -13,6 +13,7 @@ PREFIX=microblaze-linux-
 ARCH=microblaze
 rootfs=rootfs.cpio
 
+# Images built with gcc 10.3.0 fail to boot
 PATH_MICROBLAZE="/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin"
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
