@@ -21,6 +21,7 @@ ARCH=arm
 PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
+# integratorcp does not boot in v5.4.y when using gcc 10.3.0
 PATH_ARM="/opt/kernel/gcc-9.3.0-nolibc/arm-linux-gnueabi/bin"
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
 PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
@@ -792,7 +793,11 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel integrator_defconfig integratorcp "" \
-	rootfs-armv5.cpio automatic ::mem128 integratorcp.dtb
+	rootfs-armv5.cpio automatic ::mem128:net,default integratorcp.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel integrator_defconfig integratorcp "" \
+	rootfs-armv5.ext2 automatic ::mem128:sd:net,default integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
