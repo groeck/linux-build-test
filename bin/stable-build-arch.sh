@@ -11,9 +11,10 @@ PATH_ARC=/opt/kernel/gcc-10.3.0-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-10.3.0-nolibc/arcv2-linux/bin
 PATH_BFIN=/opt/kernel/gcc-10.3.0-nolibc/bfin-uclinux/bin
 # ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
-# on v4.4.y (at least), in kernel/fork.c
+# Assembler errors with gcc 8.4.0 (v4.19.y)
+# on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-PATH_C6X=/opt/kernel/gcc-8.4.0-nolibc/c6x-elf/bin
+PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # PATH_C6X=/opt/kernel/gcc-10.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
 PATH_CRIS=/opt/kernel/gcc-9.3.0-nolibc/cris-linux/bin
