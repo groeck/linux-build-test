@@ -4,7 +4,9 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 PATH_ALPHA=/opt/kernel/gcc-10.3.0-nolibc/alpha-linux/bin
-PATH_AM33=/opt/kernel/gcc-10.3.0-nolibc/am33_2.0-linux/bin
+# with gcc 10.3.0 in v4.14.y:
+# am33_2.0-linux-ld: am33_2.0-linux-ld: DWARF error: mangled line number section
+PATH_AM33=/opt/kernel/gcc-9.3.0-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-10.3.0-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-10.3.0-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-10.3.0-nolibc/arc-linux/bin
