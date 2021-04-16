@@ -21,7 +21,9 @@ PREFIX=powerpc64-linux-
 
 # gcc 10.3.0 fails to compile arch/powerpc/mm/hugetlbpage.c in v4.4.y
 # for pseries_defconfig
-PATH_PPC=/opt/kernel/gcc-9.3.0-nolibc/powerpc64-linux/bin
+# gcc 9.3.0 causes a crash for powernv targets
+# PATH_PPC=/opt/kernel/gcc-10.3.0-nolibc/powerpc64-linux/bin
+PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
