@@ -39,7 +39,7 @@ skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256:net,default \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512:net,virtio-net-device \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
-	arm:realview-pbx-a9:realview_defconfig:realview_pb"
+	arm:realview-pbx-a9:realview_defconfig:realview_pb:net,default"
 skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32:net,nic \
@@ -655,22 +655,22 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel realview_defconfig realview-pb-a8 "" \
-	rootfs-armv5.cpio auto realview_pb::mem512 arm-realview-pba8.dtb
+	rootfs-armv5.cpio auto realview_pb::mem512:net,default arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-pbx-a9 "" \
-	rootfs-armv5.cpio auto realview_pb arm-realview-pbx-a9.dtb
+	rootfs-armv5.cpio auto realview_pb::net,default arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb cortex-a8 \
-	rootfs-armv5.cpio manual realview_eb::mem512 arm-realview-eb.dtb
+	rootfs-armv5.cpio manual realview_eb::mem512:net,default arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb-mpcore "" \
-	rootfs-armv5.cpio manual realview_eb::mem512 \
+	rootfs-armv5.cpio manual realview_eb::mem512:net,default \
 	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
