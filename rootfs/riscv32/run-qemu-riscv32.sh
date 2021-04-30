@@ -37,6 +37,13 @@ patch_defconfig()
 
 cached_config=""
 
+if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+     # pcnet (currently) broken prior to v5.4
+     pcnet_netdev="pcnet"
+else
+     pcnet_netdev="rtl8139"
+fi
+
 runkernel()
 {
     local mach=$1
@@ -114,7 +121,7 @@ retcode=$((retcode + $?))
 runkernel virt rv32_defconfig net,virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
 
-runkernel virt rv32_defconfig net,virtio-net-device:usb-ehci rootfs.ext2
+runkernel virt rv32_defconfig "net,${pcnet_netdev}:usb-ehci" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt rv32_defconfig net,virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
