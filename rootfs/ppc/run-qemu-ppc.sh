@@ -140,6 +140,7 @@ retcode=$?
 runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,virtio-net-pci g3beige G3 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
+# Machine "mac99,via=pmu" works but does not auto-reboot
 runkernel qemu_ppc_book3s_defconfig smp:ide:net,e1000 mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$((${retcode} + $?))
