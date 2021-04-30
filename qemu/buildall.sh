@@ -90,6 +90,7 @@ then
     checkexit $?
     make -j${parallel} install
     checkexit $?
+    shift
 fi
 
 if [ -z "$1" -o "$1" = "v3.0" ]
@@ -97,31 +98,54 @@ then
     dobuild v3.0.1-local v3.0 \
 	"--disable-user --disable-gnutls --disable-docs \
 	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 \
+	--with-gtkabi=3.0 --disable-werror \
 	--disable-xen --disable-xen-pci-passthrough"
     checkexit $?
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v4.0" ]; then
-    dobuild_common v4.0.1-local v4.0
+    dobuild v4.0.1-local v4.0 \
+	"--disable-user --disable-gnutls --disable-docs \
+	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-werror \
+	--disable-xen --disable-xen-pci-passthrough"
+    checkexit $?
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v4.1" ]; then
     dobuild_common v4.1.1-local v4.1
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v4.2" ]; then
     dobuild_common v4.2.1-local v4.2
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v5.2" ]; then
     dobuild_common v5.2.0-local v5.2
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v6.0" ]; then
     dobuild_common v6.0.0-local v6.0
     dobuild_common v6.0.0-local v6.0-debug \
 	"--enable-debug --disable-strip --extra-cflags=-g"
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
