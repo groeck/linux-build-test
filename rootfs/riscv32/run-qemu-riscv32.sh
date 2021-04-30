@@ -10,7 +10,6 @@ shift $((OPTIND - 1))
 _mach="$1"
 _fixup="$2"
 
-QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv32}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv32}
 PREFIX=riscv32-linux-
 ARCH=riscv
@@ -36,13 +35,6 @@ patch_defconfig()
 }
 
 cached_config=""
-
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-     # pcnet (currently) broken prior to v5.4
-     pcnet_netdev="pcnet"
-else
-     pcnet_netdev="rtl8139"
-fi
 
 runkernel()
 {
@@ -83,8 +75,6 @@ runkernel()
 	wait="automatic"
 	;;
     sifive_u)
-	# requires qemu v6.0+
-	QEMU="${QEMU_V60}"
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
 	;;
@@ -121,7 +111,7 @@ retcode=$((retcode + $?))
 runkernel virt rv32_defconfig net,virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
 
-runkernel virt rv32_defconfig "net,${pcnet_netdev}:usb-ehci" rootfs.ext2
+runkernel virt rv32_defconfig "net,pcnet:usb-ehci" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt rv32_defconfig net,virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
