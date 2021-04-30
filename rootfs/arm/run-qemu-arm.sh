@@ -7,7 +7,6 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
-QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -314,7 +313,6 @@ runkernel()
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
-	QEMUCMD="${QEMU_V60}"
 	;;
     "tacoma-bmc")
 	initcli+=" console=ttyS4,115200"
