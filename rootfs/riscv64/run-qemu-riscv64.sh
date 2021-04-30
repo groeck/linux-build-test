@@ -50,8 +50,11 @@ cached_config=""
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
      # tulip doesn't instantiate prior to v5.4
      tulip_netdev="tulip"
+     # pcnet (currently) broken prior to v5.4
+     pcnet_netdev="pcnet"
 else
      tulip_netdev="e1000"
+     pcnet_netdev="rtl8139"
 fi
 
 runkernel()
@@ -124,7 +127,7 @@ echo "Build reference: $(git describe)"
 echo
 
 # Failed network tests:
-#   ne2k_pci, pcnet: No io resource
+#   ne2k_pci: No io resource
 #	Driver problem: The io resource starts with 0,
 #	and the drivers assume that this means 'no resource'
 #	After fixing that, ne2k_pci crashes in outsl (probably
@@ -172,7 +175,7 @@ runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
+runkernel virt defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
