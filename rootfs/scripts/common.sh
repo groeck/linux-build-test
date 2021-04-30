@@ -545,7 +545,7 @@ __common_netcmd()
 	    ;;
 	"usb-uhci")
 	    __pcibridge_new_port
-	    extra_params+=" -device vt82c686b-usb-uhci,id=uhci_net${__pcibus_ref}"
+	    extra_params+=" -device piix4-usb-uhci,id=uhci_net${__pcibus_ref}"
 	    extra_params+=" -device usb-net,bus=uhci_net.0,netdev=net0 -netdev user,id=net0"
 	    ;;
 	*)
