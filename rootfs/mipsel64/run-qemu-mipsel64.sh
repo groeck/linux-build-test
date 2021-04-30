@@ -108,9 +108,8 @@ runkernel()
 	kernel="vmlinux"
 	mem="256"
 	;;
-    "fulong2e")
+    "fuloong2e")
 	kernel="vmlinux"
-	extra_params+=" -vga none"	# fulong2e v3.1+ crashes if vga is enabled
 	mem="256"
 	;;
     "boston")
@@ -165,7 +164,7 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net,i82559er
 retcode=$((retcode + $?))
 # Note: Other boot configurations fail
-runkernel fuloong2e_defconfig fulong2e rootfs.mipsel.ext3 nosmp:ide
+runkernel fuloong2e_defconfig fuloong2e rootfs.mipsel.ext3 nosmp:ide
 retcode=$((retcode + $?))
 # Image fails to boot with tests enabled
 # Network interfaces don't instantiate.
