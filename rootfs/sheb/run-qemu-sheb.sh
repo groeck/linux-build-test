@@ -6,7 +6,7 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-sh4eb}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
 # PREFIX=sh4-linux-
 PREFIX=sh4eb-linux-
 ARCH=sh
