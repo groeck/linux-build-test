@@ -147,6 +147,8 @@ echo
 #   e5500 network failures:
 #     pcnet
 #     ne2k_pci
+#       Both don't instantiate as 1st PCI device, but do instantiate as 2nd
+#       (even behind a PCI bridge)
 #   powernv network failures: all but rtl8139 (including virtio-net)
 #
 runkernel qemu_ppc64_book3s_defconfig smp::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
