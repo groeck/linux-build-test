@@ -11,8 +11,7 @@ _mach="$1"
 _fixup="$2"
 
 QEMU_V40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
-QEMU_V60=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv64}
-QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV=/opt/kernel/gcc-10.3.0-nolibc/riscv64-linux/bin
@@ -48,13 +47,10 @@ patch_defconfig()
 cached_config=""
 
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-     # tulip doesn't instantiate prior to v5.4
-     tulip_netdev="tulip"
-     # pcnet (currently) broken prior to v5.4
-     pcnet_netdev="pcnet"
+    # tulip doesn't instantiate prior to v5.4
+    tulip_netdev="tulip"
 else
-     tulip_netdev="e1000"
-     pcnet_netdev="rtl8139"
+    tulip_netdev="e1000"
 fi
 
 runkernel()
@@ -90,10 +86,12 @@ runkernel()
 	return 1
     fi
 
-    if [[ -e arch/riscv/boot/Image ]]; then
+    if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
 	BIOS="default"
 	KERNEL="arch/riscv/boot/Image"
     else
+	# In v4.19, we need to use bbl to boot the image, and we need
+	# to use qemu v4.0 (later versions will report a region overlap).
 	QEMU="${QEMU_V40}"
 	BIOS="${progdir}/bbl"
 	KERNEL="vmlinux"
@@ -106,7 +104,6 @@ runkernel()
 	;;
     sifive_u)
 	# requires qemu v6.0+
-	QEMU="${QEMU_V60}"
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
 	;;
@@ -175,7 +172,7 @@ runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel virt defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
+runkernel virt defconfig "pci-bridge:net,pcnet:scsi[FUSION]" rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
 retcode=$((${retcode} + $?))
