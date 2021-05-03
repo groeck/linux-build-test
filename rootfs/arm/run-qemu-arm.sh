@@ -124,6 +124,10 @@ patch_defconfig()
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
 
+    # Build CONFIG_NOP_USB_XCEIV into kernel if enabled
+    # Needed for xilinx-zynq-a9 usb boot (and possibly others).
+    sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
+
     # Enable GPIO_MXC if supported, and build into kernel
     # See upstream kernel commit 12d16b397ce0 ("gpio: mxc: Support module build")
     if grep -F -q CONFIG_GPIO_MXC ${defconfig}; then
