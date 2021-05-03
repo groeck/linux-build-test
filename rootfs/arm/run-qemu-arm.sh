@@ -32,9 +32,9 @@ skip_44="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:raspi2:multi_v7_defconfig:sd \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256:net,default \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512:net,virtio-net-device \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
@@ -51,9 +51,9 @@ skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256 \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
 	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:palmetto-bmc:aspeed_g4_defconfig:net,nic \
@@ -65,9 +65,9 @@ skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:usb1:mem256 \
-	arm:mcimx7d-sabre:multi_v7_defconfig:sd:mem256"
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic"
 skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
@@ -123,10 +123,6 @@ patch_defconfig()
 
     # Always build PXA watchdog into kernel if enabled
     sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
-
-    # Build CONFIG_NOP_USB_XCEIV into kernel if enabled
-    # Needed for mcimx7d-sabre usb boot
-    sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
 
     # Enable GPIO_MXC if supported, and build into kernel
     # See upstream kernel commit 12d16b397ce0 ("gpio: mxc: Support module build")
@@ -431,22 +427,34 @@ runkernel imx_v4_v5_defconfig imx25-pdk "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# Ethernet instantiates but fails to get an IP address
-# (no packets received on eth0)
+# Ethernet needs double net,nic (double '-nic user') to work.
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.cpio manual nodrm::mem256 imx6ul-14x14-evk.dtb
+	rootfs-armv7a.cpio manual nodrm::mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::sd:mem256 imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::usb0:mem256 imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::usb0:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::usb1:mem256 imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.cpio manual nodrm::mem256:net,nic imx7d-sdb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic imx7d-sdb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic imx7d-sdb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -511,22 +519,6 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual ::usb1:mem256:net,default imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-# Network interface does not come up
-#	fec 30bf0000.ethernet eth0: Unable to connect to phy
-
-runkernel multi_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.cpio manual ::mem256 imx7d-sdb.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual ::usb1:mem256 imx7d-sdb.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual ::sd:mem256 imx7d-sdb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
