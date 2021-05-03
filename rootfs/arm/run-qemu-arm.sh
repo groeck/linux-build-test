@@ -522,8 +522,13 @@ runkernel multi_v7_defconfig sabrelite "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# Network interface does not come up
+# Network interface does not come up for xilinx-zynq-a9.
 #	macb e000b000.ethernet eth0: Could not attach PHY (-19)
+# The PHY for zynq-zc702.dtb is expected to be at address 7 but qemu
+# configures address 23. We could modify qemu to use address 7 (this
+# is confirmed to work) but that would mean yet another patch on top
+# of upstream qemu, and who knows if there is a board which does use
+# PHY address 23.
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
