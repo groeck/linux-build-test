@@ -526,28 +526,26 @@ runkernel multi_v7_defconfig sabrelite "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# Network interface does not come up for xilinx-zynq-a9.
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.cpio auto ::mem128:net,default zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::usb0:mem128:net,default zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc702.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
+	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc706.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+# zynq-zed.dtb expects PHY address 0. The xilinx-zynq-a9 machine
+# configures PHY address 7. This results in the following error
+# message.
 #	macb e000b000.ethernet eth0: Could not attach PHY (-19)
-# The PHY for zynq-zc702.dtb is expected to be at address 7 but qemu
-# configures address 23. We could modify qemu to use address 7 (this
-# is confirmed to work) but that would mean yet another patch on top
-# of upstream qemu, and who knows if there is a board which does use
-# PHY address 23.
-
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.cpio auto ::mem128 zynq-zc702.dtb
-retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::usb0:mem128 zynq-zc702.dtb
-retcode=$((${retcode} + $?))
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc702.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::sd:mem128 zynq-zc706.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
+# We already tested the Ethernet interface for this machine above,
+# so it is ok to skip network interface tests here.
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::usb0:mem128 zynq-zed.dtb
 retcode=$((${retcode} + $?))
