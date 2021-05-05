@@ -185,6 +185,12 @@ runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
+    # Since Linux v5.6, the entire clock tree for zynqmp depends on firmware
+    # support (which is not available in qemu). See Linux kernel upstream
+    # commit 9c8a47b484ed ("arm64: dts: xilinx: Add the clock nodes for
+    # zynqmp") for details. Without clocks, loading various io drivers
+    # including the serial port driver stalls, and it becomes all but
+    # impossible to use the emulation on any kernel later than v5.5.
     runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
     runkernel xlnx-zcu102 defconfig smp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
