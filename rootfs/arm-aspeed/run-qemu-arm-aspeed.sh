@@ -22,13 +22,6 @@ PATH_ARM="/opt/kernel/gcc-10.3.0-nolibc/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_49="arm:ast2500-evb:aspeed_g5_defconfig:notests:net,nic \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:mtd32:net,nic \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests \
-	arm:palmetto-bmc:aspeed_g4_defconfig:net,nic \
-	arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic"
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests \
