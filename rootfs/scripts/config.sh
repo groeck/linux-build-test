@@ -12,6 +12,4 @@ QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
 QEMU_BIN=${QEMU_V60_BIN}
 
-QEMU_METAG_BIN=${QEMU_INSTALL}/metag/bin
-
 config_initcli="slub_debug=FZPUA"
