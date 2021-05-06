@@ -6,6 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -24,8 +25,7 @@ PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests \
-	arm:ast2600-evb:multi_v7_defconfig:notests"
+	arm:ast2600-evb:aspeed_g5_defconfig:notests"
 skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic"
@@ -133,17 +133,13 @@ runkernel()
     kernel="arch/arm/boot/zImage"
     case ${mach} in
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
-    "witherspoon-bmc" | "swift-bmc")
+    "witherspoon-bmc" | "swift-bmc" | "g220a-bmc" | "tacoma-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "g220a-bmc")
-	initcli+=" console=ttyS4,115200"
-	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
-	extra_params+=" -nodefaults"
-	;;
-    "tacoma-bmc")
+    "rainier-bmc" | "quanta-q71l-bmc")
+        QEMUCMD="${QEMU_MASTER}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
@@ -167,6 +163,15 @@ runkernel()
 
 echo "Build reference: $(git describe)"
 echo
+
+runkernel aspeed_g4_defconfig quanta-q71l-bmc "" \
+	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-quanta-q71l.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g4_defconfig quanta-q71l-bmc "" \
+	rootfs-armv5.ext2 automatic "::mtd32:net,nic" aspeed-bmc-quanta-q71l.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g4_defconfig palmetto-bmc "" \
 	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-opp-palmetto.dtb
@@ -208,21 +213,23 @@ runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# Repeat with armv7a root file system.
+# Run the next test with armv7a root file system.
 # Both are expected to work.
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.cpio automatic notests::net,nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic notests::sd2:net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.ext2 automatic notests::sd2:net,nic aspeed-ast2600-evb.dtb
+	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
-    # SPI (NOR) Flash doesn't instantiate on ast2600-evb
-    # because drivers/mtd/spi-nor/aspeed-smc.c doesn't have a 'compatible'
-    # entry for aspeed,ast2600-fmc or aspeed,ast2600-spi.
+    # SPI (NOR) Flash doesn't instantiate on ast2600-evb.
+    # The code necessary to support aspeed,ast2600-fmc and
+    # aspeed,ast2600-spi is in the not upstream kernel. See
+    # https://patchwork.kernel.org/project/spi-devel-general/cover/20201105120331.9853-1-chin-ting_kuo@aspeedtech.com/
+    # which seems to have stalled as of this writing.
     runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
@@ -238,22 +245,27 @@ runkernel aspeed_g5_defconfig romulus-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig swift-bmc "" \
+if [ ${runall} -eq 1 ]; then
+    # swift-bmc will be deprecated starting with qemu v6.1 as the hardware
+    # was never released. See qemu commit 63a9c7e0a0 ("aspeed: Deprecate the
+    # swift-bmc machine").
+    runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-swift.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig swift-bmc "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::sd1:net,nic aspeed-bmc-opp-swift.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig swift-bmc "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-opp-swift.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig swift-bmc "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel aspeed_g5_defconfig swift-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-opp-swift.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 runkernel aspeed_g5_defconfig g220a-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-bytedance-g220a.dtb
@@ -268,10 +280,34 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig tacoma-bmc "" \
+	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-opp-tacoma.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel aspeed_g5_defconfig rainier-bmc "" \
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-ibm-rainier.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig rainier-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-ibm-rainier.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig rainier-bmc "" \
+	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-ibm-rainier.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    # Does not instantate. See comment for ast2600-evb above.
+    runkernel aspeed_g5_defconfig rainier-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-ibm-rainier.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 exit ${retcode}
