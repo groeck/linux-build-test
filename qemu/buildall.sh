@@ -78,23 +78,6 @@ dobuild_common()
     checkexit $?
 }
 
-if [ -z "$1" -o "$1" = "meta" ]
-then
-    git clean -d -x -f -q
-    git checkout meta-v1.3.1
-    ./configure --prefix=/opt/buildbot/qemu-install/metag \
-	--disable-user --disable-xen --disable-xen-pci-passthrough \
-	--disable-vnc-tls --disable-werror --disable-docs \
-	--disable-vnc-png --disable-werror \
-	--target-list=meta-softmmu
-    checkexit $?
-    make -j${parallel} install
-    checkexit $?
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
 if [ -z "$1" -o "$1" = "v3.0" ]
 then
     dobuild v3.0.1-local v3.0 \
