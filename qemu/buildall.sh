@@ -85,12 +85,14 @@ then
     ./configure --prefix=/opt/buildbot/qemu-install/metag \
 	--disable-user --disable-xen --disable-xen-pci-passthrough \
 	--disable-vnc-tls --disable-werror --disable-docs \
-	--disable-vnc-png \
+	--disable-vnc-png --disable-werror \
 	--target-list=meta-softmmu
     checkexit $?
     make -j${parallel} install
     checkexit $?
-    shift
+    if [ -n "$2" ]; then
+	shift
+    fi
 fi
 
 if [ -z "$1" -o "$1" = "v3.0" ]
@@ -141,8 +143,8 @@ fi
 
 if [ -z "$1" -o "$1" = "v6.0" ]; then
     dobuild_common v6.0.0-local v6.0
-    dobuild_common v6.0.0-local v6.0-debug \
-	"--enable-debug --disable-strip --extra-cflags=-g"
+#    dobuild_common v6.0.0-local v6.0-debug \
+#	"--enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
     fi
