@@ -1288,6 +1288,14 @@ dowait()
 	echo -n .
     done
 
+    # Look for missing root file system
+    if [[ ${retcode} -eq 0 ]]; then
+	if grep -q "Cannot open root device" ${logfile}; then
+	    msg="failed (root file system)"
+	    retcode=1
+	fi
+    fi
+
     # Look for network test failures
     if [[ ${retcode} -eq 0 && "${__do_network_test}" -ne 0 ]]; then
 	if ! grep -q "Network interface test passed" ${logfile}; then
