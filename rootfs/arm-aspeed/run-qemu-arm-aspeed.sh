@@ -26,9 +26,15 @@ PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 skip_414="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests"
-skip_419="arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic"
+skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net,nic \
+	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic \
+	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic"
+skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
+skip_511="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
 
 . ${progdir}/../scripts/common.sh
 
