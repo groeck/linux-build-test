@@ -1291,7 +1291,7 @@ dowait()
     # Look for missing root file system
     if [[ ${retcode} -eq 0 ]]; then
 	if grep -q "Cannot open root device" ${logfile}; then
-	    msg="failed (root file system)"
+	    msg="failed (no root file system)"
 	    retcode=1
 	fi
     fi
