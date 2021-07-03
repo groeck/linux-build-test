@@ -33,7 +33,13 @@ patch_defconfig()
 {
     local defconfig=$1
 
-    echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+    enable_config CONFIG_CPU_BIG_ENDIAN "${defconfig}"
+
+    # Starting with v5.14, CONFIG_USB_XHCI_PCI_RENESAS=m is enabled.
+    # This results in CONFIG_USB_XHCI_PCI=m, which in turn causes some
+    # test failures. Set CONFIG_USB_XHCI_PCI_RENESAS=y if enabled to
+    # work around the problem.
+    enable_config_cond CONFIG_USB_XHCI_PCI_RENESAS "${defconfig}"
 }
 
 runkernel()
