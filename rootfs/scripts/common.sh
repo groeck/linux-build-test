@@ -768,6 +768,22 @@ setup_rootfs()
     echo "${destfile}"
 }
 
+enable_config()
+{
+    local flag="$1"
+    local defconfig="$2"
+
+    echo "${flag}=y" >> "${defconfig}"
+}
+
+enable_config_cond()
+{
+    local flag="$1"
+    local defconfig="$2"
+
+    sed -i -e "s/${flag}=m/${flag}=y/" "${defconfig}"
+}
+
 __setup_config()
 {
     local defconfig="$1"
@@ -811,6 +827,12 @@ __setup_config()
     if [ -n "${fixup}" ]; then
 	patch_defconfig .config "${fixup}"
     fi
+    # Starting with v5.14, the absence of SHA512 causes trouble in crypto
+    # test code which mandates its presence and otherwise generates
+    # a traceback. While that is questionable, it is what it is.
+    # Always enable it.
+    enable_config CONFIG_CRYPTO_SHA512 .config
+
     if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
 	if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null; then
@@ -1291,6 +1313,16 @@ dowait()
     # Look for missing root file system
     if [[ ${retcode} -eq 0 ]]; then
 	if grep -q "Cannot open root device" ${logfile}; then
+	    msg="failed (no root file system)"
+	    retcode=1
+	fi
+    elif [[ "${msg}" = "failed (silent)" ]]; then
+	# If nothing happened for a while, we may be waiting for
+	# the root file system. Detect that situation as well.
+	# Expect the log message to be at the end of the log;
+	# we don't want to overwrite the reason if something else
+	# happened after we started waiting for the root file system.
+	if tail ${logfile} | grep -q "Waiting for root device"; then
 	    msg="failed (no root file system)"
 	    retcode=1
 	fi
