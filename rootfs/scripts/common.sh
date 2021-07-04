@@ -768,20 +768,54 @@ setup_rootfs()
     echo "${destfile}"
 }
 
+disable_config()
+{
+    local defconfig="$1"
+    local flag
+
+    shift
+
+    for flag in $*; do
+        echo "${flag}=n" >> "${defconfig}"
+    done
+}
+
 enable_config()
 {
-    local flag="$1"
-    local defconfig="$2"
+    local defconfig="$1"
+    local flag
 
-    echo "${flag}=y" >> "${defconfig}"
+    shift
+
+    for flag in $*; do
+	echo "${flag}=y" >> "${defconfig}"
+    done
+}
+
+enable_config_supported()
+{
+    local defconfig="$1"
+    local flag
+
+    shift
+
+    for flag in $*; do
+	if grep -F -q "${flag}" "${defconfig}"; then
+	    enable_config "${defconfig}" "${flag}"
+	fi
+    done
 }
 
 enable_config_cond()
 {
-    local flag="$1"
-    local defconfig="$2"
+    local defconfig="$1"
+    local flag
 
-    sed -i -e "s/${flag}=m/${flag}=y/" "${defconfig}"
+    shift
+
+    for flag in $*; do
+	sed -i -e "s/${flag}=m/${flag}=y/" "${defconfig}"
+    done
 }
 
 __setup_config()
