@@ -45,13 +45,13 @@ patch_defconfig()
     # Otherwise we can no longer boot raspi3 from mmc cards.
     # See upstream commit 9e17c1cd28cd ("mmc: bcm2835: Use dma_request_chan()
     # instead dma_request_slave_channel()") for background.
-    sed -i -e 's/CONFIG_DMA_BCM2835=m/CONFIG_DMA_BCM2835=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_DMA_BCM2835
 
     # Starting with v5.14, CONFIG_USB_XHCI_PCI_RENESAS=m is enabled.
     # This results in CONFIG_USB_XHCI_PCI=m, which in turn causes some
     # test failures. Set CONFIG_USB_XHCI_PCI_RENESAS=y if enabled to
     # work around the problem.
-    sed -i -e 's/CONFIG_USB_XHCI_PCI_RENESAS=m/CONFIG_USB_XHCI_PCI_RENESAS=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_USB_XHCI_PCI_RENESAS
 }
 
 runkernel()
