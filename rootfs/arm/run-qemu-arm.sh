@@ -42,85 +42,61 @@ patch_defconfig()
     local fixup
 
     # Disable Bluetooth and wireless. We won't ever use or test it.
-    echo "CONFIG_BT=n" >> ${defconfig}
-    echo "CONFIG_WLAN=n" >> ${defconfig}
-    echo "CONFIG_WIRELESS=n" >> ${defconfig}
+    disable_config "${defconfig}" CONFIG_BT CONFIG_WLAN CONFIG_WIRELESS
 
     # Always enable ...
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_DEVTMPFS CONFIG_DEVTMPFS_MOUNT CONFIG_BLK_DEV_INITRD
 
     # Options needed to be built into the kernel for device support
     # on pxa devices
     # MTD, squashfs
-    sed -i -e 's/CONFIG_MTD_BLOCK=m/CONFIG_MTD_BLOCK=y/' ${defconfig}
-    sed -i -e 's/CONFIG_MTD_PXA2XX=m/CONFIG_MTD_PXA2XX=y/' ${defconfig}
-    sed -i -e 's/CONFIG_SQUASHFS=m/CONFIG_SQUASHFS=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_MTD_BLOCK CONFIG_MTD_PXA2XX CONFIG_SQUASHFS
     # MMC
-    sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
-    sed -i -e 's/CONFIG_MMC_PXA=m/CONFIG_MMC_PXA=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_MMC_BLOCK CONFIG_MMC_PXA
     # PCMCIA
-    sed -i -e 's/CONFIG_ATA=m/CONFIG_ATA=y/' ${defconfig}
-    sed -i -e 's/CONFIG_BLK_DEV_SD=m/CONFIG_BLK_DEV_SD=y/' ${defconfig}
-    sed -i -e 's/CONFIG_PCCARD=m/CONFIG_PCCARD=y/' ${defconfig}
-    sed -i -e 's/CONFIG_PCMCIA=m/CONFIG_PCMCIA=y/' ${defconfig}
-    sed -i -e 's/CONFIG_PATA_PCMCIA=m/CONFIG_PATA_PCMCIA=y/' ${defconfig}
-    sed -i -e 's/CONFIG_PCMCIA_PXA2XX=m/CONFIG_PCMCIA_PXA2XX=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_ATA CONFIG_BLK_DEV_SD CONFIG_PCCARD
+    enable_config_cond "${defconfig}" CONFIG_PCMCIA CONFIG_PATA_PCMCIA CONFIG_PCMCIA_PXA2XX
     # USB
-    sed -i -e 's/CONFIG_USB=m/CONFIG_USB=y/' ${defconfig}
-    sed -i -e 's/CONFIG_USB_STORAGE=m/CONFIG_USB_STORAGE=y/' ${defconfig}
-    sed -i -e 's/CONFIG_USB_OHCI_HCD=m/CONFIG_USB_OHCI_HCD=y/' ${defconfig}
-    sed -i -e 's/CONFIG_USB_OHCI_HCD_PXA27X=m/CONFIG_USB_OHCI_HCD_PXA27X=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_USB CONFIG_USB_STORAGE CONFIG_USB_OHCI_HCD CONFIG_USB_OHCI_HCD_PXA27X
     # NAND (spitz)
     # Doesn't work as-is; it looks like NAND images need to be
     # specially prepared.
-    # sed -i -e 's/CONFIG_MTD_RAW_NAND=m/CONFIG_MTD_RAW_NAND=y/' ${defconfig}
-    # sed -i -e 's/CONFIG_MTD_NAND_SHARPSL=m/CONFIG_MTD_NAND_SHARPSL=y/' ${defconfig}
+    # enable_config_cond "${defconfig}" CONFIG_MTD_RAW_NAND CONFIG_MTD_NAND_SHARPSL
 
     # Always build PXA watchdog into kernel if enabled
-    sed -i -e 's/CONFIG_SA1100_WATCHDOG=m/CONFIG_SA1100_WATCHDOG=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_SA1100_WATCHDOG
 
     # Build CONFIG_NOP_USB_XCEIV into kernel if enabled
     # Needed for xilinx-zynq-a9 usb boot (and possibly others).
-    sed -i -e 's/CONFIG_NOP_USB_XCEIV=m/CONFIG_NOP_USB_XCEIV=y/' ${defconfig}
+    enable_config_cond "${defconfig}" CONFIG_NOP_USB_XCEIV
 
     # Enable GPIO_MXC if supported, and build into kernel
     # See upstream kernel commit 12d16b397ce0 ("gpio: mxc: Support module build")
-    if grep -F -q CONFIG_GPIO_MXC ${defconfig}; then
-	echo "CONFIG_GPIO_MXC=y" >> ${defconfig}
-    fi
+    enable_config_supported "${defconfig}" CONFIG_GPIO_MXC
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	nofdt)
-	    echo "CONFIG_MACH_PXA27X_DT=n" >> ${defconfig}
-	    echo "CONFIG_MACH_PXA3XX_DT=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_MACH_PXA27X_DT CONFIG_MACH_PXA3XX_DT
 	    ;;
 	aeabi)
-	    echo "CONFIG_AEABI=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_AEABI
 	    ;;
 	pci)
-	    echo "CONFIG_PCI=y" >> ${defconfig}
-	    echo "CONFIG_PCI_VERSATILE=y" >> ${defconfig}
-	    echo "CONFIG_OF=y" >> ${defconfig}
-	    echo "CONFIG_OF_PCI=y" >> ${defconfig}
-	    echo "CONFIG_OF_PCI_IRQ=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_PCI CONFIG_PCI_VERSATILE
+	    enable_config "${defconfig}" CONFIG_OF CONFIG_OF_PCI CONFIG_OF_PCI_IRQ
 	    ;;
 	scsi)
-	    echo "CONFIG_SCSI=y" >> ${defconfig}
-	    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-	    echo "CONFIG_BLK_DEV_SD=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_SCSI CONFIG_SCSI_SYM53C8XX_2 CONFIG_BLK_DEV_SD
 	    ;;
 	cpuidle)
 	    # CPUIDLE causes Exynos targets to run really slow
-	    echo "CONFIG_CPU_IDLE=n" >> ${defconfig}
-	    echo "CONFIG_ARM_EXYNOS_CPUIDLE=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_CPU_IDLE CONFIG_ARM_EXYNOS_CPUIDLE
 	    ;;
 	nonand)
 	    # For imx25, disable NAND (not supported as of qemu 2.5, causes
 	    # a runtime warning).
-	    echo "CONFIG_MTD_NAND_MXC=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_MTD_NAND_MXC
 	    ;;
 	nodrm)
 	    # qemu does not support CONFIG_DRM_IMX. This starts to fail
@@ -130,29 +106,23 @@ patch_defconfig()
 	    # in drm code.
 	    # It also does not support CONFIG_DRM_MXSFB; trying to enable it
 	    # crashes the kernel when running mcimx6ul-evk.
-	    echo "CONFIG_DRM_MXSFB=n" >> ${defconfig}
-	    echo "CONFIG_DRM_IMX=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_DRM_MXSFB CONFIG_DRM_IMX
 	    ;;
 	nocrypto)
 	    # Broken (hangs) for some platforms
-	    echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	    ;;
 	realview_eb)
 	    # Older versions of realview config files need additional CPU support.
-	    echo "CONFIG_REALVIEW_EB_A9MP=y" >> ${defconfig}
-	    echo "CONFIG_REALVIEW_EB_ARM11MP_REVB=y" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PB1176=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_REALVIEW_EB_A9MP CONFIG_REALVIEW_EB_ARM11MP_REVB
+	    enable_config "${defconfig}" CONFIG_MACH_REALVIEW_PBX CONFIG_MACH_REALVIEW_PB1176
 	    ;;
 	realview_pb)
 	    # Similar for PB-A8. Also disable some EB and incompatible PB
 	    # configurations.
-	    echo "CONFIG_REALVIEW_EB_A9MP=n" >> ${defconfig}
-	    echo "CONFIG_REALVIEW_EB_ARM11MP=n" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PB11MP=n" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PB1176=n" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PBX=y" >> ${defconfig}
-	    echo "CONFIG_MACH_REALVIEW_PBA8=y" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_REALVIEW_EB_A9MP CONFIG_REALVIEW_EB_ARM11MP
+	    disable_config "${defconfig}" CONFIG_MACH_REALVIEW_PB11MP CONFIG_MACH_REALVIEW_PB1176
+	    enable_config "${defconfig}" CONFIG_MACH_REALVIEW_PBX CONFIG_MACH_REALVIEW_PBA8
 	    ;;
 	esac
     done
