@@ -827,11 +827,6 @@ __setup_config()
     if [ -n "${fixup}" ]; then
 	patch_defconfig .config "${fixup}"
     fi
-    # Starting with v5.14, the absence of SHA512 causes trouble in crypto
-    # test code which mandates its presence and otherwise generates
-    # a traceback. While that is questionable, it is what it is.
-    # Always enable it.
-    enable_config CONFIG_CRYPTO_SHA512 .config
 
     if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
