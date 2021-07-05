@@ -894,10 +894,10 @@ __setup_fragment()
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	"nosmp")
-	    echo "CONFIG_SMP=n" >> ${fragment}
+	    disable_config "${fragment}" CONFIG_SMP
 	    ;;
 	smp*)
-	    echo "CONFIG_SMP=y" >> ${fragment}
+	    enable_config "${fragment}" CONFIG_SMP
 	    ;;
 	noextras)
 	    nodebug=1
@@ -931,178 +931,113 @@ __setup_fragment()
 
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
-	echo "CONFIG_EXPERT=y" >> ${fragment}
-	echo "CONFIG_DEBUG_KERNEL" >> ${fragment}
-	echo "CONFIG_LOCK_DEBUGGING_SUPPORT" >> ${fragment}
-	echo "CONFIG_DEBUG_RT_MUTEXES=y" >> ${fragment}
-	echo "CONFIG_DEBUG_SPINLOCK=y" >> ${fragment}
-	echo "CONFIG_DEBUG_MUTEXES=y" >> ${fragment}
-	echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y" >> ${fragment}
-	echo "CONFIG_DEBUG_LOCK_ALLOC=y" >> ${fragment}
-	echo "CONFIG_DEBUG_LOCKDEP=y" >> ${fragment}
-	echo "CONFIG_DEBUG_ATOMIC_SLEEP=y" >> ${fragment}
-	echo "CONFIG_DEBUG_LIST=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
+	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
+	enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC
+	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
     fi
 
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
 	# kunit
-	echo "CONFIG_KUNIT=y" >> ${fragment}
-	echo "CONFIG_KUNIT_TEST=y" >> ${fragment}
-	echo "CONFIG_PM_QOS_KUNIT_TEST=y" >> ${fragment}
-	echo "CONFIG_EXT4_KUNIT_TESTS=y" >> ${fragment}
-	echo "CONFIG_SYSCTL_KUNIT_TEST=y" >> ${fragment}
-	echo "CONFIG_LIST_KUNIT_TEST=y" >> ${fragment}
-	echo "CONFIG_SECURITY_APPARMOR_KUNIT_TEST=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_KUNIT CONFIG_KUNIT_TEST CONFIG_PM_QOS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	# other
-	echo "CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n" >> ${fragment}
-	echo "CONFIG_CRC32_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_DEBUG_LOCKING_API_SELFTESTS=y" >> ${fragment}
-	echo "CONFIG_DEBUG_NMI_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_DEBUG_RODATA_TEST=y" >> ${fragment}
-	echo "CONFIG_DEBUG_TLBFLUSH=y" >> ${fragment}
-	echo "CONFIG_DMATEST=y" >> ${fragment}
-	echo "CONFIG_GLOB_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_OF_UNITTEST=y" >> ${fragment}
-	echo "CONFIG_PCI_EPF_TEST=y" >> ${fragment}
-	echo "CONFIG_PCI_ENDPOINT_TEST=y" >> ${fragment}
-	echo "CONFIG_RCU_EQS_DEBUG=y" >> ${fragment}
-	echo "CONFIG_STATIC_KEYS_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_STRING_SELFTEST=y" >> ${fragment}
-	echo "CONFIG_TEST_BITMAP=y" >> ${fragment}
-	echo "CONFIG_TEST_FIRMWARE=y" >> ${fragment}
+	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
+	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
+	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST CONFIG_GLOB_SELFTEST
+	enable_config "${fragment}" CONFIG_OF_UNITTEST CONFIG_PCI_EPF_TEST CONFIG_PCI_ENDPOINT_TEST
+	enable_config "${fragment}" CONFIG_RCU_EQS_DEBUG CONFIG_STATIC_KEYS_SELFTEST
+	enable_config "${fragment}" CONFIG_STRING_SELFTEST CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
 	# takes too long
-	# echo "CONFIG_TEST_RHASHTABLE=y" >> ${fragment}
-	echo "CONFIG_TEST_SORT=y" >> ${fragment}
-	echo "CONFIG_TEST_SYSCTL=y" >> ${fragment}
-	echo "CONFIG_TEST_UUID=y" >> ${fragment}
-	echo "CONFIG_USB_TEST=y" >> ${fragment}
-	echo "CONFIG_USB_EHSET_TEST_FIXTURE=y" >> ${fragment}
-	echo "CONFIG_USB_LINK_LAYER_TEST=y" >> ${fragment}
+	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
+	enable_config "${fragment}" CONFIG_TEST_SORT CONFIG_TEST_SYSCTL CONFIG_TEST_UUID
+	enable_config "${fragment}" CONFIG_USB_TEST CONFIG_USB_EHSET_TEST_FIXTURE
+	enable_config "${fragment}" CONFIG_USB_LINK_LAYER_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
-	    echo "CONFIG_PROVE_RCU=y" >> ${fragment}
-	    echo "CONFIG_PROVE_LOCKING=y" >> ${fragment}
-	    echo "CONFIG_WW_MUTEX_SELFTEST=y" >> ${fragment}
-	    # echo "CONFIG_TORTURE_TEST=y" >> ${fragment}
-	    # echo "CONFIG_LOCK_TORTURE_TEST=y" >> ${fragment}
-	    # echo "CONFIG_RCU_TORTURE_TEST=y" >> ${fragment}
+	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING CONFIG_WW_MUTEX_SELFTEST
+	    # takes too long
+	    # enable_config "${fragment}" CONFIG_TORTURE_TEST CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
 	fi
 
-	echo "CONFIG_RBTREE_TEST=y" >> ${fragment}
-	echo "CONFIG_INTERVAL_TREE_TEST=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
     fi
 
     if [[ "${nonet}" -eq 0 ]]; then
-	echo "CONFIG_NET_VENDOR_INTEL=y" >> ${fragment}
-	echo "CONFIG_E100=y" >> ${fragment}
-	echo "CONFIG_E1000=y" >> ${fragment}
-	echo "CONFIG_E1000E=y" >> ${fragment}
-	echo "CONFIG_NET_VENDOR_REALTEK=y" >> ${fragment}
-	# rtl8139 requires CONFIG_8139CP, not CONFIG_8139TOO
-	echo "CONFIG_8139CP=y" >> ${fragment}
-	# echo "CONFIG_8139TOO=y" >> ${fragment}
-	echo "CONFIG_NET_VENDOR_AMD=y" >> ${fragment}
-	echo "CONFIG_PCNET32=y" >> ${fragment}
-	echo "CONFIG_NET_VENDOR_NATSEMI=y" >> ${fragment}
-	echo "CONFIG_NET_VENDOR_8390=y" >> ${fragment}
-	echo "CONFIG_NE2K_PCI=y" >> ${fragment}
-	echo "CONFIG_NET_VENDOR_DEC=y" >> ${fragment}
-	echo "CONFIG_NET_TULIP=y" >> ${fragment}
-	echo "CONFIG_TULIP=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_NET_VENDOR_INTEL CONFIG_E100 CONFIG_E1000 CONFIG_E1000E
+	enable_config "${fragment}" CONFIG_NET_VENDOR_REALTEK CONFIG_8139CP
+	enable_config "${fragment}" CONFIG_NET_VENDOR_AMD CONFIG_PCNET32
+	enable_config "${fragment}" CONFIG_NET_VENDOR_NATSEMI
+	enable_config "${fragment}" CONFIG_NET_VENDOR_8390 CONFIG_NE2K_PCI
+	enable_config "${fragment}" CONFIG_NET_VENDOR_DEC CONFIG_NET_TULIP CONFIG_TULIP
 	if [[ "${nousb}" -eq 0 ]]; then
-	    echo "CONFIG_USB_NET_DRIVERS=y" >> ${fragment}
-	    echo "CONFIG_USB_USBNET=y" >> ${fragment}
-	    echo "CONFIG_USB_NET_CDCETHER=y" >> ${fragment}
-	    echo "CONFIG_USB_NET_CDC_SUBSET=y" >> ${fragment}
+	    enable_config "${fragment}" CONFIG_USB_NET_DRIVERS CONFIG_USB_USBNET
+	    enable_config "${fragment}" CONFIG_USB_NET_CDCETHER CONFIG_USB_NET_CDC_SUBSET
 	fi
 	# explicitly disable built-in dhcp server
-	echo "CONFIG_IP_PNP_DHCP=n" >> ${fragment}
+	disable_config "${fragment}" CONFIG_IP_PNP_DHCP
     fi
 
     # BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${fragment}
+    enable_config "${fragment}" CONFIG_BLK_DEV_INITRD
 
     # DEVTMPFS
-    echo "CONFIG_DEVTMPFS=y" >> ${fragment}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${fragment}
+    enable_config "${fragment}" CONFIG_DEVTMPFS CONFIG_DEVTMPFS_MOUNT
 
     if [[ "${noscsi}" -eq 0 ]]; then
 	# SCSI and SCSI controller drivers
-	echo "CONFIG_SCSI=y" >> ${fragment}
-	echo "CONFIG_BLK_DEV_SD=y" >> ${fragment}
-	echo "CONFIG_SCSI_LOWLEVEL=y" >> ${fragment}
-	echo "CONFIG_SCSI_DC395x=y" >> ${fragment}
-	echo "CONFIG_SCSI_AM53C974=y" >> ${fragment}
-	echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${fragment}
-	echo "CONFIG_MEGARAID_SAS=y" >> ${fragment}
-	echo "CONFIG_FUSION=y" >> ${fragment}
-	echo "CONFIG_FUSION_SAS=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_SCSI CONFIG_BLK_DEV_SD CONFIG_SCSI_LOWLEVEL
+	enable_config "${fragment}" CONFIG_SCSI_DC395x CONFIG_SCSI_AM53C974 CONFIG_SCSI_SYM53C8XX_2
+	enable_config "${fragment}" CONFIG_MEGARAID_SAS CONFIG_FUSION CONFIG_FUSION_SAS
     fi
 
     # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${fragment}
-    echo "CONFIG_MMC_SDHCI=y" >> ${fragment}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${fragment}
+    enable_config "${fragment}" CONFIG_MMC CONFIG_MMC_SDHCI CONFIG_MMC_SDHCI_PCI
 
     if [[ "${nonvme}" -eq 0 ]]; then
 	# NVME support
-	echo "CONFIG_BLK_DEV_NVME=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_BLK_DEV_NVME
     fi
 
     if [[ "${nocd}" -eq 0 ]]; then
 	# CDROM support
-	echo "CONFIG_BLK_DEV_SR=y" >> ${fragment}
-	echo "CONFIG_ISO9660_FS=y" >> ${fragment}
-	echo "CONFIG_CDROM=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_BLK_DEV_SR CONFIG_ISO9660_FS CONFIG_CDROM
     else
-	echo "CONFIG_BLK_DEV_SR=n" >> ${fragment}
-	echo "CONFIG_ISO9660_FS=n" >> ${fragment}
-	echo "CONFIG_CDROM=n" >> ${fragment}
+	disable_config "${fragment}" CONFIG_BLK_DEV_SR CONFIG_ISO9660_FS CONFIG_CDROM
     fi
 
     if [[ "${nousb}" -eq 0 ]]; then
 	# USB support
-	echo "CONFIG_USB=y" >> ${fragment}
-	echo "CONFIG_USB_XHCI_HCD=y" >> ${fragment}
-	echo "CONFIG_USB_EHCI_HCD=y" >> ${fragment}
-	echo "CONFIG_USB_OHCI_HCD=y" >> ${fragment}
-	echo "CONFIG_USB_STORAGE=y" >> ${fragment}
-	echo "CONFIG_USB_UAS=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_USB CONFIG_USB_XHCI_HCD CONFIG_USB_EHCI_HCD
+	enable_config "${fragment}" CONFIG_USB_OHCI_HCD CONFIG_USB_STORAGE CONFIG_USB_UAS
     fi
 
     if [[ "${novirt}" -eq 0 ]]; then
 	# Virtualization
-	echo "CONFIG_VIRTIO=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_PCI=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_PCI_LEGACY=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_BALLOON=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_MMIO=y" >> ${fragment}
-	echo "CONFIG_BLK_MQ_VIRTIO=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_BLK=y" >> ${fragment}
-	echo "CONFIG_VIRTIO_BLK_SCSI=y" >> ${fragment}
-	echo "CONFIG_SCSI_VIRTIO=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_VIRTIO CONFIG_VIRTIO_PCI CONFIG_VIRTIO_PCI_LEGACY
+	enable_config "${fragment}" CONFIG_VIRTIO_BALLOON CONFIG_VIRTIO_MMIO CONFIG_BLK_MQ_VIRTIO
+	enable_config "${fragment}" CONFIG_VIRTIO_BLK CONFIG_VIRTIO_BLK_SCSI CONFIG_SCSI_VIRTIO
 	if [[ "${nonet}" -eq 0 ]]; then
-	    echo "CONFIG_VIRTIO_NET=y" >> ${fragment}
+	    enable_config "${fragment}" CONFIG_VIRTIO_NET
 	fi
     fi
 
     if [[ "${nofs}" -eq 0 ]]; then
 	# file systems
-	echo "CONFIG_BTRFS_FS=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_BTRFS_FS
 	# Needed to address broken dependencies in -next (around 20190708)
-	echo "CONFIG_LIBCRC32C=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_LIBCRC32C
 	# MISC_FILESYSTEMS is needed for SQUASHFS
-	echo "CONFIG_MISC_FILESYSTEMS=y" >> ${fragment}
-	echo "CONFIG_SQUASHFS=y" >> ${fragment}
-	echo "CONFIG_SQUASHFS_XATTR=y" >> ${fragment}
-	echo "CONFIG_SQUASHFS_ZLIB=y" >> ${fragment}
-	echo "CONFIG_SQUASHFS_4K_DEVBLK_SIZE=y" >> ${fragment}
-	echo "CONFIG_EXT3_FS=y" >> ${fragment}
+	enable_config "${fragment}" CONFIG_MISC_FILESYSTEMS CONFIG_SQUASHFS CONFIG_SQUASHFS_XATTR
+	enable_config "${fragment}" CONFIG_SQUASHFS_ZLIB CONFIG_SQUASHFS_4K_DEVBLK_SIZE
+	enable_config "${fragment}" CONFIG_EXT3_FS
     fi
 
     if [[ "${preempt}" -eq 1 ]]; then
-	echo "CONFIG_PREEMPT=y" >> ${fragment}
+	enable_config "${fragment}"  CONFIG_PREEMPT
     fi
 }
 
