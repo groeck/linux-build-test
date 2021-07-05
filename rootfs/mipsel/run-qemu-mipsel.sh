@@ -31,9 +31,9 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
-	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
 	elif [[ "${fixup}" == "nosmp" ]]; then
-	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP
 	fi
     done
 }
@@ -88,7 +88,7 @@ echo
 # Most images fail to instantiate CD ROM because there is an insufficient
 # amount of DMA memory.
 
-runkernel 24Kf malta_defconfig nocd:net,e1000:smp rootfs.cpio.gz
+runkernel 24Kf malta_defconfig nocd:smp:net,e1000 rootfs.cpio.gz
 retcode=$?
 runkernel 24Kf malta_defconfig nocd:smp:net,i82550:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
