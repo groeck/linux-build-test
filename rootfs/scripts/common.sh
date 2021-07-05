@@ -926,6 +926,9 @@ __setup_fragment()
 	esac
     done
 
+    # Always build with CONFIG_KALLSYMS enabled
+    enable_config "${fragment}" CONFIG_KALLSYMS
+
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
 	echo "CONFIG_EXPERT=y" >> ${fragment}
