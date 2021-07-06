@@ -31,35 +31,28 @@ patch_defconfig()
     local fixup
 
     # 64 bit build
-    echo "CONFIG_32BIT=n" >> ${defconfig}
-    echo "CONFIG_CPU_MIPS32_R1=n" >> ${defconfig}
-    echo "CONFIG_CPU_MIPS64_R1=y" >> ${defconfig}
-    echo "CONFIG_64BIT=y" >> ${defconfig}
+    disable_config "${defconfig}" CONFIG_32BIT
+    disable_config "${defconfig}" CONFIG_CPU_MIPS32_R1
+    enable_config "${defconfig}" CONFIG_CPU_MIPS64_R1
+    enable_config "${defconfig}" CONFIG_64BIT
 
     # Support N32 and O32 binaries
-    echo "CONFIG_MIPS32_O32=y" >> ${defconfig}
-    echo "CONFIG_MIPS32_N32=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_MIPS32_O32
+    enable_config "${defconfig}" CONFIG_MIPS32_N32
 
     # Build a big endian image
-    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
-    echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+    disable_config "${defconfig}" CONFIG_CPU_LITTLE_ENDIAN
+    enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
 
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
-	    echo "CONFIG_MIPS_MT_SMP=y" >> ${defconfig}
-	    echo "CONFIG_SCHED_SMT=y" >> ${defconfig}
-	    echo "CONFIG_NR_CPUS=8" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
+	    enable_config "${defconfig}" CONFIG_SCHED_SMT
 	elif [[ "${fixup}" == "nosmp" ]]; then
-	    echo "CONFIG_MIPS_MT_SMP=n" >> ${defconfig}
-	    echo "CONFIG_SCHED_SMT=n" >> ${defconfig}
+	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP
+	    disable_config "${defconfig}" CONFIG_SCHED_SMT
 	fi
     done
-
-    # Any of the following result in crashes due to lack of memory,
-    # at least with v3.18.y.
-    echo "CONFIG_DEBUG_WW_MUTEX_SLOWPATH=n" >> ${defconfig}
-    echo "CONFIG_DEBUG_LOCK_ALLOC=n" >> ${defconfig}
-    echo "CONFIG_PROVE_LOCKING=n" >> ${defconfig}
 }
 
 runkernel()
@@ -112,11 +105,13 @@ echo
 
 retcode=0
 
-runkernel malta_defconfig smp:net,e1000 rootfs-n32.cpio.gz
+# Disable CD support to avoid DMA memory allocation errors
+
+runkernel malta_defconfig nocd:smp:net,e1000 rootfs-n32.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,e1000-82544gc:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,e1000-82544gc:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,i82801:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net,i82801:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -125,35 +120,35 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:net,ne2k_pci:usb-xhci rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,ne2k_pci:usb-xhci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,pcnet:usb-ehci rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,pcnet:usb-ehci rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,rtl8139:usb-uas-xhci rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net,rtl8139:usb-uas-xhci rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,tulip:scsi[53C810] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,tulip:scsi[53C810] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # sym0: interrupted SCRIPT address not found
-    runkernel malta_defconfig smp:scsi[53C895A] rootfs-n32.ext2.gz
+    runkernel malta_defconfig nocd:smp:scsi[53C895A] rootfs-n32.ext2.gz
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig smp:net,virtio-net:scsi[DC395] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net,virtio-net:scsi[DC395] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,i82562:scsi[AM53C974] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,i82562:scsi[AM53C974] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:pci-bridge:net,e1000:scsi[MEGASAS] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:pci-bridge:net,e1000:scsi[MEGASAS] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:pci-bridge:net,rtl8139:scsi[MEGASAS2] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:pci-bridge:net,rtl8139:scsi[MEGASAS2] rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig smp:net,ne2k_pci:scsi[FUSION] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net,ne2k_pci:scsi[FUSION] rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nosmp:net,pcnet:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:nosmp:net,pcnet:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nosmp:pci-bridge:net,tulip:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:nosmp:pci-bridge:net,tulip:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
