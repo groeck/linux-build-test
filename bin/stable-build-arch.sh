@@ -60,6 +60,8 @@ PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
 
+PATH_LLVM=/opt/kernel/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-16.04/bin
+
 PREFIX_ARC="arc-elf-"
 PREFIX_ARCV2="arc-elf-"
 PREFIX_ARM="arm-linux-gnueabi-"
@@ -138,6 +140,7 @@ skip=(${!tmp})
 
 SUBARCH=""
 EXTRA_CMD=""
+CCMD=""
 declare -a fixup
 case ${ARCH} in
     alpha)
@@ -210,8 +213,18 @@ case ${ARCH} in
 	;;
     hexagon)
 	cmd=(${cmd_hexagon[*]})
-	PREFIX="hexagon-linux-"
-	PATH=${PATH_HEXAGON}:${PATH}
+	case ${rel} in
+	v4.4|v4.9|v4.14|v4.19|v5.4)
+	    PREFIX="hexagon-linux-"
+	    PATH=${PATH_HEXAGON}:${PATH}
+	    ;;
+	*)
+	    PREFIX="hexagon-unknown-linux-gnu-"
+	    PATH=${PATH_LLVM}:${PATH}
+	    CCMD="clang"
+	    EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
+	    ;;
+	esac
 	;;
     i386)
 	cmd=(${cmd_i386[*]})
@@ -382,7 +395,13 @@ if [[ -n "${!tmp}" ]]; then
     fixup+=("${!tmp}")
 fi
 
-echo "gcc version: $(${PREFIX}gcc --version | grep gcc)"
+if [[ "${CCMD}" = "clang" ]]; then
+    compiler_version="$(clang --version | grep 'clang version')"
+else
+    compiler_version="$(${PREFIX}gcc --version | grep gcc)"
+fi
+
+echo "Compiler version: ${compiler_version}"
 echo
 
 CROSS=""
@@ -452,7 +471,7 @@ do
 
 	rm -f .config
 
-	# perf build is special. Use host gcc and build based on defconfig.
+	# perf build is special. Use host compiler and build based on defconfig.
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
 	    if ! make ARCH=${ARCH} O=${BUILDDIR} defconfig >/dev/null 2>${LOG}; then
 		echo "failed (config)"
@@ -494,11 +513,6 @@ do
 	        sed -i -e "${fixup[$f]}" ${BUILDDIR}/.config
 	    done
 	fi
-	# Always disable CONFIG_GCC_PLUGIN_RANDSTRUCT.
-	# Upstream commit a148866489fb ("sched: Replace rq::wake_list")
-	# conflicts directly with it since it makes assumptions about the
-	# distance of two structure members.
-	sed -i -e 's/CONFIG_GCC_PLUGIN_RANDSTRUCT=y/# CONFIG_GCC_PLUGIN_RANDSTRUCT is not set/' ${BUILDDIR}/.config
 
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
