@@ -148,6 +148,13 @@ runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
 	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
 
+# Multi-core boot for mpc8544ds has been broken at least since upstream
+# commit 56f1ba280719 ("powerpc/mpc85xx: refactor the PM operations"),
+# which mandates a 'compatible' device ID for 'guts' which is not provided
+# by qemu. As result, the kernel crashes in mpc85xx_freeze_time_base()
+# because the 'guts' pointer is not initialized. Even with that fixed,
+# multi-core boots fail (stall) for mpc8544ds, but that maye be a qemu issue.
+#
 # net,e1000e instantiates but does not work
 # net,sungem does not instantiate
 # net,usb-uhci does not instantiate
