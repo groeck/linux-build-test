@@ -24,6 +24,9 @@ patch_defconfig()
     # Drop command line overwrite
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
 
+    # Enable MTD_BLOCK to be able to boot from flash
+    echo "CONFIG_MTD_BLOCK=y" >> ${defconfig}
+
     # Build a big endian image
     echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
@@ -106,7 +109,10 @@ runkernel rts7751r2dplus_defconfig ata rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    # Most likely those are all PCI bus endianness translation issues.
+    # Flash is found, but mounting the root file system fails.
+    runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2
+    retcode=$((retcode + $?))
+    # The following are most likely PCI bus endianness translation issues.
     # SD card does not instantiate
     runkernel rts7751r2dplus_defconfig sdhci:mmc rootfs.ext2
     retcode=$((retcode + $?))
