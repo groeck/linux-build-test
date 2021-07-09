@@ -186,7 +186,10 @@ retcode=$((retcode + $?))
 runkernel pseries_defconfig ::net,tulip:sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
-runkernel pseries_defconfig little::smp2:net,rtl8139 pseries POWER9 hvc0 vmlinux \
+
+# Multi-core boot with little endian images is unstable and may either hang
+# or take forever.
+runkernel pseries_defconfig little::net,rtl8139 pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig little::net,e1000:scsi pseries POWER8 hvc0 vmlinux \
