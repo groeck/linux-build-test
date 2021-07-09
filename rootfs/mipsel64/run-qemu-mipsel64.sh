@@ -41,21 +41,19 @@ patch_defconfig()
 	    enable_config "${defconfig}" CONFIG_CPU_MIPS64_R2
 	    ;;
 	nosmp)
-	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP
-	    disable_config "${defconfig}" CONFIG_SCHED_SMT
+	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP CONFIG_SCHED_SMT
 	    ;;
 	smp)
-	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
-	    enable_config "${defconfig}" CONFIG_SCHED_SMT
+	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP CONFIG_SCHED_SMT
 	    ;;
 	esac
     done
 
-    enable_config "${defconfig}" CONFIG_BINFMT_MISC
-    enable_config "${defconfig}" CONFIG_64BIT
+    enable_config "${defconfig}" CONFIG_BINFMT_MISC CONFIG_64BIT
+    enable_config "${defconfig}" CONFIG_MIPS32_O32 CONFIG_MIPS32_N32
 
-    enable_config "${defconfig}" CONFIG_MIPS32_O32
-    enable_config "${defconfig}" CONFIG_MIPS32_N32
+    # Avoid DMA memory allocation errors
+    disable_config "${defconfig}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC CONFIG_PROVE_LOCKING
 }
 
 runkernel()
@@ -130,32 +128,32 @@ echo
 # Network tests:
 # - i82551 fails to instantiate
 
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 nocd:r1:nosmp:ide:net,e1000
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net,e1000
 retcode=$?
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio nocd:r1:smp:net,pcnet
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net,pcnet
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 nocd:r1:smp:ide:net,i82550
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net,i82550
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso nocd:r1:smp:ide:net,i82558a
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net,i82558a
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 nocd:r1:smp:usb-xhci:net,usb-ohci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net,usb-ohci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 nocd:r1:smp:usb-ehci:net,ne2k_pci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net,ne2k_pci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 nocd:r1:smp:usb-uas-xhci:net,rtl8139
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net,rtl8139
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 nocd:r1:smp:sdhci:mmc:net,i82801
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci:mmc:net,i82801
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # interrupts are unreliable, resulting in random timeouts
-    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 nocd:r1:smp:net,pcnet:nvme
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net,pcnet:nvme
     retcode=$((retcode + $?))
 fi
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 nocd:r1:smp:scsi[DC395]:net,virtio-net
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net,virtio-net
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 nocd:r1:smp:scsi[FUSION]:net,tulip
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net,tulip
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso nocd:r1:smp:scsi[53C895A]:net,i82559er
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net,i82559er
 retcode=$((retcode + $?))
 # Note: Other boot configurations fail
 runkernel fuloong2e_defconfig fuloong2e rootfs.mipsel.ext3 nosmp:ide
