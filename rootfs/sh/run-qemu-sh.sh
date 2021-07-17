@@ -128,13 +128,12 @@ runkernel rts7751r2dplus_defconfig "scsi[53C810]:net,rtl8139" rootfs.ext2.gz
 retcode=$((${retcode} + $?))
 runkernel rts7751r2dplus_defconfig "scsi[53C895A]:net,rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig "scsi[DC395]:net,rtl8139" rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig "scsi[AM53C974]:net,rtl8139" rootfs.ext2.gz
+retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    # hang (scsi command aborts/timeouts)
-    runkernel rts7751r2dplus_defconfig "scsi[DC395]" rootfs.ext2.gz
-    retcode=$((retcode + $?))
-    runkernel rts7751r2dplus_defconfig "scsi[AM53C974]" rootfs.ext2.gz
-    retcode=$((retcode + $?))
     # Hang after "megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state"
     runkernel rts7751r2dplus_defconfig "scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
