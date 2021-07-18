@@ -30,17 +30,17 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
-    echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_PCI_HOST_GENERIC
 
     # needed for net,tulip tests
-    echo "CONFIG_TULIP_MMIO=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_TULIP_MMIO
+
+    enable_config "${defconfig}" CONFIG_MTD CONFIG_MTD_BLOCK CONFIG_MTD_SPI_NOR
 
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
     if grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
-	echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
-	echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
-	echo "CONFIG_WW_MUTEX_SELFTEST=n" >> ${defconfig}
+	disable_config "${defconfig}" CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST CONFIG_WW_MUTEX_SELFTEST
     fi
 }
 
@@ -148,46 +148,45 @@ runkernel virt defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
 
 runkernel virt defconfig net,virtio-net-device:usb-ohci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 runkernel virt defconfig net,i82557b:usb-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig pci-bridge:net,virtio-net-pci:usb-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig net,i82557a:usb-uas-ehci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig net,i82558a:usb-uas-xhci rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "net,i82559a:scsi[53C810]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "net,i82559er:scsi[53C895A]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # Does not instantiate (am53c974 0000:01:01.0: pci I/O map failed)
     runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
     runkernel virt defconfig "scsi[DC395]" rootfs.ext2
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
 fi
 
 runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 
 runkernel sifive_u defconfig "net,default" rootfs.cpio
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel sifive_u defconfig "sd:net,default" rootfs.ext2
-retcode=$((${retcode} + $?))
-# does not work; mtd device not created
-# runkernel sifive_u defconfig mtd32 rootfs.ext2
-# retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
+runkernel sifive_u defconfig "mtd32:net,default" rootfs.ext2
+retcode=$((retcode + $?))
 
 exit ${retcode}
