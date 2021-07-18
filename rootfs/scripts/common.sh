@@ -768,6 +768,15 @@ setup_rootfs()
     echo "${destfile}"
 }
 
+set_config()
+{
+    local defconfig="$1"
+    local flag="$2"
+    local value="$3"
+
+    echo "${flag}=${value}" >> "${defconfig}"
+}
+
 disable_config()
 {
     local defconfig="$1"
@@ -776,7 +785,7 @@ disable_config()
     shift
 
     for flag in $*; do
-        echo "${flag}=n" >> "${defconfig}"
+	set_config "${defconfig}" "${flag}" "n"
     done
 }
 
@@ -788,7 +797,7 @@ enable_config()
     shift
 
     for flag in $*; do
-	echo "${flag}=y" >> "${defconfig}"
+	set_config "${defconfig}" "${flag}" "y"
     done
 }
 
