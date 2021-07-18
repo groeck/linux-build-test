@@ -34,15 +34,14 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	if [ "${fixup}" = "zilog" ]; then
-	    echo "CONFIG_SERIAL_PMACZILOG=y" >> ${defconfig}
-	    echo "CONFIG_SERIAL_PMACZILOG_TTYS=n" >> ${defconfig}
-	    echo "CONFIG_SERIAL_PMACZILOG_CONSOLE=y" >> ${defconfig}
+	    enable_config "${defconfig}" CONFIG_SERIAL_PMACZILOG CONFIG_SERIAL_PMACZILOG_CONSOLE
+	    disable_config "${defconfig}" CONFIG_SERIAL_PMACZILOG_TTYS
 	fi
     done
 
     # IDE has trouble with atomic sleep.
     if grep -q "CONFIG_IDE=y" "${defconfig}"; then
-	echo "CONFIG_DEBUG_ATOMIC_SLEEP=n" >> "${defconfig}"
+	disable_config "${defconfig}" CONFIG_DEBUG_ATOMIC_SLEEP
     fi
 }
 
@@ -266,6 +265,8 @@ retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # Experimental/unstable
     # Known issues:
+    # - vof.bin is not distributed (installed) with qemu and has to be copied
+    #   manually to the linux root directory (qemu-master as of 7/16/2021).
     # - Non-standard PCI devices don't work and cause the builtin IDE controller
     #   to fail (qemu-master as of 7/16/2021).
     # - v5.12+ Linux kernels do not boot pegasos2 (as of v5.14-rc1) due to
