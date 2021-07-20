@@ -20,9 +20,11 @@ PATH=${PATH}:${PATH_RISCV}
 
 skip_419="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
 	riscv:sifive_u:defconfig:net,default:initrd \
-	riscv:sifive_u:defconfig:sd:net,default:rootfs"
+	riscv:sifive_u:defconfig:sd:net,default:rootfs \
+	riscv:sifive_u:defconfig:mtd32:net,default:rootfs"
 
-skip_54="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs"
+skip_54="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
+	riscv:sifive_u:defconfig:mtd32:net,default:rootfs"
 
 patch_defconfig()
 {
