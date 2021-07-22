@@ -91,12 +91,8 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net,pcnet:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-if [[ ${runall} -eq 1 ]]; then
-    # Seen once during boot:
-    # nvme nvme0: I/O 219 QID 1 timeout, completion polled
-    runkernel malta_defconfig nocd:smp:net,i82558b:nvme rootfs.ext2.gz
-    retcode=$((retcode + $?))
-fi
+runkernel malta_defconfig nocd:smp:net,i82558b:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:smp:net,e1000:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
