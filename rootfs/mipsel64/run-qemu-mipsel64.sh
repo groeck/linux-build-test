@@ -144,11 +144,8 @@ runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:n
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci:mmc:net,i82801
 retcode=$((retcode + $?))
-if [[ ${runall} -ne 0 ]]; then
-    # interrupts are unreliable, resulting in random timeouts
-    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net,pcnet:nvme
-    retcode=$((retcode + $?))
-fi
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net,pcnet:nvme
+retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net,virtio-net
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net,tulip
