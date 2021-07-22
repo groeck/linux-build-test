@@ -10,8 +10,7 @@ machine=$1
 option=$2
 config=$3
 
-# Several efi boots (virtio-blk, scsiAM53C974]) hang with qemu v6.0
-QEMU=${QEMU:-${QEMU_V52_BIN}/qemu-system-aarch64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
 PATH_ARM64=/opt/kernel/gcc-10.3.0-nolibc/aarch64-linux/bin
