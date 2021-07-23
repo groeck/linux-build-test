@@ -114,7 +114,7 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net,i82801:sdhci:mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig smp:net,pcnet:nvme rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net,pcnet:nvme rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:smp:net,ne2k_pci:usb-xhci rootfs-n32.ext2.gz
