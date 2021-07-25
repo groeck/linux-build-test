@@ -20,7 +20,7 @@ PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # Assembler errors with gcc 8.4.0 (v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-# internal compiiler error with gcc 11.1.0 (4.4.y, 4.9.y)
+# internal compiler error with gcc 11.1.0 (4.4.y, 4.9.y)
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
