@@ -17,4 +17,8 @@ else
     source "${vdir}/bin/activate"
 fi
 
+if [[ "$1" = "start" ]]; then
+    ${rootdir}/bin/buildcounter.py -r
+fi
+
 buildbot $*
