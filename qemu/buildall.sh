@@ -131,6 +131,13 @@ if [ -z "$1" -o "$1" = "v6.0" ]; then
     fi
 fi
 
+if [ -z "$1" -o "$1" = "v6.0-test" ]; then
+    dobuild_common v6.0.0-local-test v6.0-test
+    if [ -n "$2" ]; then
+	shift
+    fi
+fi
+
 if [ -z "$1" -o "$1" = "v6.1" ]; then
     dobuild_common v6.1.0-local v6.1
 #    dobuild_common v6.1.0-local v6.1-debug \
