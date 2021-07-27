@@ -138,6 +138,10 @@ echo
 retcode=0
 runkernel virt defconfig "net,e1000" rootfs.cpio
 retcode=$((retcode + $?))
+if [[ "${runall}" -ne 0 ]]; then
+    runkernel virt defconfig "net,ne2k_pci" rootfs.cpio
+    retcode=$((retcode + $?))
+fi
 runkernel virt defconfig net,e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig net,i82801:virtio rootfs.ext2
