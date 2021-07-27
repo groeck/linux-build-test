@@ -81,6 +81,11 @@ fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
 
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/# CONFIG_FRAME_POINTER is not set/")
 
+# riscv/riscv32 builds fail randomly if both CONFIG_STACKPROTECTOR_PER_TASK and
+# CONFIG_GCC_PLUGIN_RANDSTRUCT are enabled. Disable the latter.
+fixup_riscv=("s/CONFIG_GCC_PLUGIN_RANDSTRUCT=y/# CONFIG_GCC_PLUGIN_RANDSTRUCT is not set/")
+fixup_riscv32=("s/CONFIG_GCC_PLUGIN_RANDSTRUCT=y/# CONFIG_GCC_PLUGIN_RANDSTRUCT is not set/")
+
 # Since commit 334ef6ed06fa ("init/Kconfig: make COMPILE_TEST depend on !S390"),
 # COMPILE_TEST is not set for s390, causing lots of compile noise.
 # Work around it by disabling the offending configuration flag manually.
