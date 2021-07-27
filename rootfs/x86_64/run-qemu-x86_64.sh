@@ -110,7 +110,16 @@ runkernel defconfig smp2:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 root
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
+# Repeat 'tulip' boot for all three variants (efi, efi32, non-efi)
+# to catch potential efi related issues. Use the opportunity to also
+# test different CPUs.
 runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp:net,tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
