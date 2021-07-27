@@ -85,6 +85,9 @@ def get_reference(repository, branch):
         subprocess.run(cmd, check=True)
         os.chdir(oldpath)
 
+    # First fetch everything including tags, then the target branch into FETCH_HEAD
+    cmd = ['fetch', 'origin']
+    git_run(localdir, cmd)
     cmd = ['fetch', 'origin', branch]
     git_run(localdir, cmd)
 
