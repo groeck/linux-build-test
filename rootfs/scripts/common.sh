@@ -954,6 +954,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	# other
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	# CONFIG_CRYPTO_SHA512 is needed for crypto self tests starting with v5.14
+	enable_config "${fragment}" CONFIG_CRYPTO_SHA512
 	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
 	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST CONFIG_GLOB_SELFTEST
