@@ -92,10 +92,10 @@ echo
 # Network test notes:
 # - e1000, and variants crash with unaligned fixup in e1000_io_write
 # - pcnet crashes with unaligned access in pcnet32_probe1
-# - ne2k_pci crashes with null pointer access in ne2k_pci_init_one
-#	The crashes are likely because r2d does not support i/o ports
-#	and does not set sh_io_port_base.
-#
+# - ne2k_pci crashes with null pointer access in ne2k_pci_init_one()
+#	The crash is seen when executing the first inb() and are
+#	likely because r2d does not support i/o ports and does not set
+#	sh_io_port_base.
 retcode=0
 runkernel rts7751r2dplus_defconfig "net,rtl8139" rootfs.cpio.gz
 retcode=$((retcode + $?))
