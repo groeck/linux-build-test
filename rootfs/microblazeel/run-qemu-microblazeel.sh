@@ -28,13 +28,14 @@ runkernel()
     local console=$4
     local rootfs=$5
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local msg="${ARCH}:${mach}"
 
     if ! match_params "${machine}@${mach}"; then
-	echo "Skipping ${ARCH}:${defconfig} ... "
+	echo "Skipping ${msg} ... "
 	return 0
     fi
 
-    echo -n "Building microblazeel:${mach}:${defconfig} ... "
+    echo -n "Building ${msg} ... "
 
     if ! dosetup -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
