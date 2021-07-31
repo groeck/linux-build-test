@@ -30,13 +30,14 @@ runkernel()
     local fixup=$3
     local console=$4
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
+    local msg="${ARCH}:${mach}"
 
     if ! match_params "${machine}@${mach}"; then
-	echo "Skipping ${ARCH}:${defconfig} ... "
+	echo "Skipping ${msg} ... "
 	return 0
     fi
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${msg} ... "
 
     if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
 	# Older kernels get a bad case of hiccup (hang during boot)
