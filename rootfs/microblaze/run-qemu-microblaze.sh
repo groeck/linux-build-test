@@ -11,7 +11,6 @@ machine=$1
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblaze}
 PREFIX=microblaze-linux-
 ARCH=microblaze
-rootfs=rootfs.cpio
 
 # Images built with gcc 10.3.0 fail to boot
 PATH_MICROBLAZE="/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin"
@@ -29,8 +28,15 @@ runkernel()
     local mach=$2
     local fixup=$3
     local console=$4
+    local rootfs=$5
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local msg="${ARCH}:${mach}"
+
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
+        msg+=":initrd"
+    else
+        msg+=":rootfs"
+    fi
 
     if ! match_params "${machine}@${mach}"; then
 	echo "Skipping ${msg} ... "
@@ -54,7 +60,7 @@ runkernel()
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
-	-initrd "$(rootfsname ${rootfs})" \
+	${extra_params} \
 	-append "${initcli}" \
 	-monitor none -serial stdio -nographic
 
@@ -67,9 +73,17 @@ echo
 # locking tests result in hard lockup
 
 retcode=0
-runkernel qemu_microblaze_defconfig petalogix-s3adsp1800 "nolocktests:net,default" ttyUL0
+runkernel qemu_microblaze_defconfig petalogix-s3adsp1800 \
+		"nolocktests:net,default" ttyUL0 rootfs.cpio
 retcode=$((retcode + $?))
-runkernel qemu_microblaze_ml605_defconfig petalogix-ml605 "nolocktests" ttyS0
+runkernel qemu_microblaze_defconfig petalogix-s3adsp1800 \
+		"nolocktests:flash16:net,default" ttyUL0 rootfs.ext2
+retcode=$((retcode + $?))
+runkernel qemu_microblaze_ml605_defconfig petalogix-ml605 \
+		"nolocktests" ttyS0 rootfs.cpio
+retcode=$((retcode + $?))
+runkernel qemu_microblaze_ml605_defconfig petalogix-ml605 \
+		"nolocktests:flash32,11776K,5" ttyS0 rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
