@@ -28,7 +28,13 @@ runkernel()
     local console=$4
     local rootfs=$5
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local msg="${ARCH}:${mach}"
+    local msg="microblazeel:${mach}"
+
+    if [[ "${rootfs%.gz}" == *cpio ]]; then
+	msg+=":initrd"
+    else
+	msg+=":rootfs"
+    fi
 
     if ! match_params "${machine}@${mach}"; then
 	echo "Skipping ${msg} ... "
@@ -37,14 +43,14 @@ runkernel()
 
     echo -n "Building ${msg} ... "
 
-    if ! dosetup -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} -m 256 \
 	-kernel arch/microblaze/boot/linux.bin -no-reboot \
-	-initrd "$(rootfsname ${rootfs})" \
+	${extra_params} \
 	-append "${initcli} console=${console},115200" \
 	-monitor none -serial stdio -nographic
 
@@ -55,9 +61,17 @@ echo "Build reference: $(git describe)"
 echo
 
 retcode=0
-runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 "nolocktests:net,default" ttyUL0 rootfs.cpio
+runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
+		"nolocktests:net,default" ttyUL0 rootfs.cpio
 retcode=$((retcode + $?))
-runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 "nolocktests" ttyS0 rootfs.cpio
+runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
+		"nolocktests:flash16:net,default" ttyUL0 rootfs.ext2
+retcode=$((retcode + $?))
+runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 \
+		"nolocktests" ttyS0 rootfs.cpio
+retcode=$((retcode + $?))
+runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 \
+		"nolocktests:flash32,11776K,5" ttyS0 rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
