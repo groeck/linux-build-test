@@ -135,7 +135,7 @@ echo
 retcode=0
 runkernel generic_kc705_defconfig lx60 dc232b lx60 nolocktests:mem128:net,default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig lx200 dc232b lx200 nolocktests:mem128:flash16:net,default rootfs-dc232b.squashfs
+runkernel generic_kc705_defconfig lx60 dc232b lx200 nolocktests:mem128:flash16:net,default rootfs-dc232b.squashfs
 retcode=$((retcode + $?))
 runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:net,default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
