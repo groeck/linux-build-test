@@ -1288,6 +1288,33 @@ dowait()
 	echo -n .
     done
 
+    # Sometimes qemu exits immediately after a crash and the above code
+    # does not catch it. Catch it here, with exceptions as noted.
+    if [[ ${retcode} -eq 0 ]]; then
+	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
+	    if [[ "${ARCH}" == "xtensa" ]]; then
+		# xtensa images may crash during reboot; reason unknown.
+		# It may be because its reboot handler jumps directly to
+		# the reset address but doesn't really reset the CPU,
+		# leaving some exception handling still enabled.
+		if ! grep -q "reboot: Restarting system" ${logfile}; then
+		    msg="failed (crashed)"
+		    retcode=1
+		fi
+		if ! grep -q "Unrecoverable error in exception handler" ${logfile}; then
+		    msg="failed (crashed)"
+		    retcode=1
+		fi
+	    elif ! grep -q -e "^machine restart\|MACHINE RESTART" ${logfile}; then
+		# x86 has the habit of crashing in restart once in a while,
+		# and openrisc crashes all the time.
+		# Try to ignore it.
+		msg="failed (crashed)"
+		retcode=1
+	    fi
+	fi
+    fi
+
     # Look for missing root file system
     if [[ ${retcode} -eq 0 ]]; then
 	if grep -q "Cannot open root device" ${logfile}; then
