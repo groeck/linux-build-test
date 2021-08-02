@@ -10,7 +10,10 @@ fi
 base=/opt/buildbot
 kbase=/opt/kernel
 
-for system in saturn.roeck-us.net desktop jupiter mars hyperion titan
+SYSTEMS="saturn.roeck-us.net desktop jupiter mars hyperion titan"
+SYSTEMS="saturn desktop jupiter mars"
+
+for system in ${SYSTEMS}
 do
 	echo -n "${system}: "
 	ping -c 1 -w 1 ${system} >/dev/null
