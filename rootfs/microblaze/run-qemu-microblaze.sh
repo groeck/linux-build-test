@@ -17,6 +17,9 @@ PATH_MICROBLAZE="/opt/kernel/gcc-9.3.0-nolibc/microblaze-linux/bin"
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
+skip_44="microblaze:petalogix-ml605:rootfs"
+skip_49="microblaze:petalogix-ml605:rootfs"
+
 patch_defconfig()
 {
     :
@@ -44,6 +47,10 @@ runkernel()
     fi
 
     echo -n "Building ${msg} ... "
+
+    if ! checkskip "${msg}" ; then
+        return 0
+    fi
 
     if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
 	# Older kernels get a bad case of hiccup (hang during boot)
