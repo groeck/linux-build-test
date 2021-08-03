@@ -258,73 +258,73 @@ echo
 # Ethernet needs double net,nic (double '-nic user') to work.
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.cpio manual nodrm::mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.ext2 manual nodrm::usb0:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
 	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.cpio manual nodrm::mem256:net,nic imx7d-sdb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic imx7d-sdb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
 	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic imx7d-sdb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # vexpress tests generate a warning during reboot if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.cpio auto nolocktests::mem128:net,default \
 	vexpress-v2p-ca9.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net,default \
 	vexpress-v2p-ca9.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net,default \
 	vexpress-v2p-ca9.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128:net,default \
 	vexpress-v2p-ca9.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
 	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net,default \
 	vexpress-v2p-ca15-tc1.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net,default \
 	vexpress-v2p-ca15_a7.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig midway "" \
 	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256:net,default imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # For sabrelite, the instatiated mmc device index is linux kernel release
@@ -339,30 +339,30 @@ fi
 
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net,default" imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual ::usb0:mem256:net,default imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.ext2 manual ::usb1:mem256:net,default imx6dl-sabrelite.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128:net,default zynq-zc702.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::usb0:mem128:net,default zynq-zc702.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc702.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc706.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 # zynq-zed.dtb expects PHY address 0. The xilinx-zynq-a9 machine
 # configures PHY address 7. This results in the following error
@@ -372,34 +372,34 @@ checkstate ${retcode}
 # so it is ok to skip network interface tests here.
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::usb0:mem128 zynq-zed.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.cpio manual ::mem512:net,default sun4i-a10-cubieboard.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.ext2 manual ::usb:mem512:net,default sun4i-a10-cubieboard.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.ext2 manual ::sata:mem512:net,default sun4i-a10-cubieboard.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig raspi2 "" \
 	rootfs-armv7a.cpio manual "::net,usb" bcm2836-rpi-2-b.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig raspi2 "" \
 	rootfs-armv7a.ext2 manual "::sd:net,usb" bcm2836-rpi-2-b.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig virt "" \
 	rootfs-armv7a.ext2 auto "::virtio-blk:mem512:net,virtio-net-device"
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [ ${runall} -eq 1 ]; then
@@ -407,25 +407,25 @@ if [ ${runall} -eq 1 ]; then
     # but generates warnings to the console due to ignored SMC calls.
     runkernel multi_v7_defconfig highbank cortex-a9 \
 	rootfs-armv5.cpio auto ::mem2G highbank.dtb
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.cpio automatic "::net,nic" sun8i-h3-orangepi-pc.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::sd:net,nic sun8i-h3-orangepi-pc.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::usb0:net,nic sun8i-h3-orangepi-pc.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::usb1:net,nic sun8i-h3-orangepi-pc.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # serial line input fails for npcm based systems (console output works, though)
@@ -433,23 +433,23 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm750-evb.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-gsj.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.ext2 automatic npcm::mtd64 nuvoton-npcm730-gsj.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-gsj.dtb
-retcode=$((${retcode} + $?))
+retcode=$((retcode + $?))
 checkstate ${retcode}
 
 exit ${retcode}
