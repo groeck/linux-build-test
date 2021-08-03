@@ -428,11 +428,18 @@ runkernel multi_v7_defconfig orangepi-pc "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-# serial line input fails for npcm based systems (console output works, though)
-# Ethernet interface (gmac) emulation is not supported as of qemu v5.2
+# serial line input fails sporadically for npcm based systems (console output
+# works, though)
+# Ethernet interface (emc, gmac) emulation is not supported as of qemu
+# v5.2. emc is supposed to work with qemu 6.0, but I have not been able
+# to figure out how to make it work.
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig npcm750-evb "" \
+	rootfs-armv5.sqf automatic npcm::mtd32,6,5 nuvoton-npcm750-evb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig npcm750-evb "" \
