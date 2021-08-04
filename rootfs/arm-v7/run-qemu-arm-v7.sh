@@ -48,10 +48,13 @@ skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,defa
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic"
-skip_419="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
+skip_419="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
-skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
-skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
+skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
+skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 
 . ${progdir}/../scripts/common.sh
 
