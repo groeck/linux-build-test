@@ -31,6 +31,7 @@ patch_defconfig()
     # Build a big endian image
     disable_config "${defconfig}" CONFIG_CPU_LITTLE_ENDIAN
     enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
+    enable_config "${defconfig}" CONFIG_MTD_PHYSMAP CONFIG_MTD_PHYSMAP_OF
 
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
@@ -87,6 +88,8 @@ echo
 # Disable CD support to avoid DMA memory allocation errors
 
 runkernel malta_defconfig nocd:smp:net,e1000 rootfs.cpio.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net,pcnet:flash,4,1,1 rootfs.squashfs
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net,pcnet:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
