@@ -29,6 +29,8 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    enable_config "${defconfig}" CONFIG_MTD_PHYSMAP CONFIG_MTD_PHYSMAP_OF
+
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
 	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
@@ -90,6 +92,8 @@ echo
 
 runkernel 24Kf malta_defconfig nocd:smp:net,e1000 rootfs.cpio.gz
 retcode=$?
+runkernel 24Kf malta_defconfig nocd:smp:net,i82801:flash,4,1,1 rootfs.squashfs
+retcode=$((retcode + $?))
 runkernel 24Kf malta_defconfig nocd:smp:net,i82550:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
