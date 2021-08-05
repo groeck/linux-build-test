@@ -249,16 +249,8 @@ runkernel powernv_defconfig "::smp2:sdhci:mmc:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 
-if [[ ${runall} -ne 0 ]]; then
-    # (null): opal_flash_async_op(op=0) failed (rc -1)
-    # blk_update_request: I/O error, dev mtdblock0, sector 2 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
-    # blk_update_request: I/O error, dev mtdblock0, sector 2 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 0
-    # Buffer I/O error on dev mtdblock0, logical block 1, lost sync page write
-    # EXT4-fs (mtdblock0): I/O error while writing superblock
-    # mount: mounting /dev/root on / failed: I/O error
-    runkernel powernv_defconfig "::mtd32" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::mtd32" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
-    retcode=$((retcode + $?))
-fi
+retcode=$((retcode + $?))
 
 exit ${retcode}
