@@ -44,6 +44,9 @@ patch_defconfig()
     disable_config "${defconfig}" CONFIG_CPU_LITTLE_ENDIAN
     enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
 
+    # Enable flash boot
+    enable_config "${defconfig}" CONFIG_MTD_PHYSMAP CONFIG_MTD_PHYSMAP_OF
+
     for fixup in ${fixups}; do
 	if [[ "${fixup}" == "smp" ]]; then
 	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
@@ -108,6 +111,8 @@ retcode=0
 # Disable CD support to avoid DMA memory allocation errors
 
 runkernel malta_defconfig nocd:smp:net,e1000 rootfs-n32.cpio.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net,e1000:flash4,1,1 rootfs-n64.squashfs
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net,e1000-82544gc:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
