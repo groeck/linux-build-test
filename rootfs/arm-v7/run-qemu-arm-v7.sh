@@ -97,6 +97,9 @@ patch_defconfig()
 	echo "CONFIG_GPIO_MXC=y" >> ${defconfig}
     fi
 
+    # Enable SPI controller for sabrelite and other IMX boards
+    enable_config ${defconfig} CONFIG_SPI_IMX
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	nodrm)
@@ -327,6 +330,11 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256:net,default imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+runkernel multi_v7_defconfig sabrelite "" \
+	rootfs-armv5.sqf manual ::mtd2:mem256:net,default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
