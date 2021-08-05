@@ -52,6 +52,9 @@ patch_defconfig()
     enable_config "${defconfig}" CONFIG_BINFMT_MISC CONFIG_64BIT
     enable_config "${defconfig}" CONFIG_MIPS32_O32 CONFIG_MIPS32_N32
 
+    # Enable flash boot
+    enable_config "${defconfig}" CONFIG_MTD_PHYSMAP CONFIG_MTD_PHYSMAP_OF
+
     # Avoid DMA memory allocation errors
     disable_config "${defconfig}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC CONFIG_PROVE_LOCKING
 }
@@ -131,6 +134,8 @@ echo
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net,e1000
 retcode=$?
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net,pcnet
+retcode=$((retcode + $?))
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net,pcnet:flash4,1,1
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net,i82550
 retcode=$((retcode + $?))
