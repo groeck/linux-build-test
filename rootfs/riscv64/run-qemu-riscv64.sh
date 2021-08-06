@@ -37,7 +37,7 @@ patch_defconfig()
     # needed for net,tulip tests
     enable_config "${defconfig}" CONFIG_TULIP_MMIO
 
-    enable_config "${defconfig}" CONFIG_MTD CONFIG_MTD_BLOCK CONFIG_MTD_SPI_NOR
+    enable_config "${defconfig}" CONFIG_MTD CONFIG_MTD_BLOCK CONFIG_MTD_SPI_NOR CONFIG_MTD_CMDLINE_PARTS
 
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
@@ -111,6 +111,10 @@ runkernel()
 	# requires qemu v6.0+
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
+	# extra parameter to create mtd partition on first flash.
+	if [[ "${fixup}" == *mtd* ]]; then
+	    extra_params+=" mtdparts=spi0.0:-"
+	fi
 	;;
     esac
 
