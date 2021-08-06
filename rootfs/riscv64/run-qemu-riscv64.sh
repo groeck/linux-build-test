@@ -113,7 +113,7 @@ runkernel()
 	wait="manual"
 	# extra parameter to create mtd partition on first flash.
 	if [[ "${fixup}" == *mtd* ]]; then
-	    extra_params+=" mtdparts=spi0.0:-"
+	    initcli+=" mtdparts=spi0.0:-"
 	fi
 	;;
     esac
