@@ -31,6 +31,7 @@ skip_44="arm:raspi2:multi_v7_defconfig \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
 	arm:sabrelite:multi_v7_defconfig:mmc1:mem256:net,default \
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
 	arm:virt:multi_v7_defconfig:virtio-blk:mem512:net,virtio-net-device"
 skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
@@ -41,15 +42,18 @@ skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,defau
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
 	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic"
 skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic"
 skip_419="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
