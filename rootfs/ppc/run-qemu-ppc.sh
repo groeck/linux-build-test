@@ -213,31 +213,28 @@ retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp:nvme:net,pcnet" bamboo "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 
-# net,tulip passes. Everything else fails with
-# "ip: SIOCSIFFLAGS: Cannot assign requested address"
-
 runkernel 44x/canyonlands_defconfig "net,tulip" \
 	sam460ex "" ttyS0 rootfs.cpio.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "usb:net,tulip" \
+runkernel 44x/canyonlands_defconfig "usb:net,e1000" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "sdhci:mmc:net,tulip" \
+runkernel 44x/canyonlands_defconfig "sdhci:mmc:net,e1000e" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "nvme:net,tulip" \
+runkernel 44x/canyonlands_defconfig "nvme:net,ne2k_pci" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "scsi[53C895A]:net,tulip" \
+runkernel 44x/canyonlands_defconfig "scsi[53C895A]:net,usb-ohci" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "scsi[AM53C974]:net,tulip" \
+runkernel 44x/canyonlands_defconfig "scsi[AM53C974]:net,rtl8139" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "scsi[DC395]:net,tulip" \
+runkernel 44x/canyonlands_defconfig "scsi[DC395]:net,i82559a" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "scsi[FUSION]:net,tulip" \
+runkernel 44x/canyonlands_defconfig "scsi[FUSION]:net,pcnet" \
 	sam460ex "" ttyS0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
 
