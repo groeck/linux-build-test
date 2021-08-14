@@ -152,7 +152,6 @@ echo
 #     ne2k_pci
 #       Both don't instantiate as 1st PCI device, but do instantiate as 2nd
 #       (even behind a PCI bridge)
-#   powernv network failures: all but rtl8139 (including virtio-net)
 #
 runkernel qemu_ppc64_book3s_defconfig smp::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
@@ -233,23 +232,31 @@ runkernel corenet64_smp_defconfig e5500::net,i82562:sata-sii3112 ppce500 e5500 t
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 
+#   powernv network failures:
+#       e1000: crashes
+#       pcnet: No IO resources
+#       tulip: Missing IO region
+#       ne2k_pci: no IO resource
+#       virtio-net: ?
+#       i82551: ip: SIOCSIFFLAGS: No such file or directory
+#
 runkernel powernv_defconfig "::net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((retcode + $?))
-runkernel powernv_defconfig "::smp2:nvme:net,rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::smp2:nvme:net,i82559a" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
-runkernel powernv_defconfig "::usb-xhci:net,rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::usb-xhci:net,i82562" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
-runkernel powernv_defconfig "::scsi[MEGASAS]:net,rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::scsi[MEGASAS]:net,i82557a" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
-runkernel powernv_defconfig "::smp2:sdhci:mmc:net,rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::smp2:sdhci:mmc:net,i82801" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 
-runkernel powernv_defconfig "::mtd32" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::mtd32:net,rtl8139" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 
