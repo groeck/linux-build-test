@@ -447,7 +447,8 @@ checkstate ${retcode}
 # works, though)
 # Ethernet interface (emc, gmac) emulation is not supported as of qemu
 # v5.2. emc is supposed to work with qemu 6.0, but I have not been able
-# to figure out how to make it work.
+# to figure out how to make it work (it looks like the upstream Linux kernel
+# doesn't support it).
 
 runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
