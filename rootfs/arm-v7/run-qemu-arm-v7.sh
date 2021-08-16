@@ -60,8 +60,6 @@ skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 
-. ${progdir}/../scripts/common.sh
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -305,6 +303,7 @@ runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net,default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net,default \
 	vexpress-v2p-ca9.dtb
@@ -368,9 +367,11 @@ checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.cpio auto ::mem128:net,default zynq-zc702.dtb
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::usb0:mem128:net,default zynq-zc702.dtb
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
 	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc702.dtb
 retcode=$((retcode + $?))
