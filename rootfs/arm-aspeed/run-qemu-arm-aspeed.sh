@@ -36,8 +36,6 @@ skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
 skip_511="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
 
-. ${progdir}/../scripts/common.sh
-
 patch_defconfig()
 {
     local defconfig=$1
