@@ -28,8 +28,6 @@ PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
-. ${dir}/../scripts/common.sh
-
 skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 	powernv:powernv_defconfig:nvme:net,rtl8139:rootfs \
 	powernv:powernv_defconfig:usb-xhci:net,rtl8139:rootfs \
@@ -47,8 +45,10 @@ skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
 skip_49="powernv:powernv_defconfig:sdhci:mmc:net,rtl8139:rootfs \
 	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs \
-	powernv:powernv_defconfig:smp2:nvme:net,rtl8139:rootfs \
-	powernv:powernv_defconfig:smp2:sdhci:mmc:net,rtl8139:rootfs \
+	powernv:powernv_defconfig:smp2:nvme:net,i82559a:rootfs \
+	powernv:powernv_defconfig:usb-xhci:net,i82562:rootfs \
+	powernv:powernv_defconfig:scsi[MEGASAS]:net,i82557a:rootfs \
+	powernv:powernv_defconfig:smp2:sdhci:mmc:net,i82801:rootfs \
 	"
 
 patch_defconfig()
