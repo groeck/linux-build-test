@@ -11,7 +11,9 @@ machine=$1
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
 PREFIX=microblazeel-linux-
 ARCH=microblaze
-PATH_MICROBLAZE="/opt/kernel/microblazeel/gcc-4.9.1/usr/bin"
+# Images built with gcc 10.x/11.x fail to boot
+PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblazeel-linux/bin"
+
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
