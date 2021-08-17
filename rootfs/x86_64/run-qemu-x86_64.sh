@@ -13,7 +13,7 @@ cputype=$2
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-x86_64}
 ARCH=x86_64
 
-PATH_X86=/opt/kernel/gcc-10.3.0-nolibc/x86_64-linux/bin
+PATH_X86="/opt/kernel/${DEFAULT_CC}/x86_64-linux/bin"
 PREFIX="x86_64-linux-"
 
 PATH=${PATH_X86}:${PATH}
