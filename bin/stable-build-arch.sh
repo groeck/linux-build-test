@@ -10,21 +10,21 @@ PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
 # am33_2.0-linux-ld: am33_2.0-linux-ld: DWARF error: mangled line number section
 # PATH_AM33=/opt/kernel/gcc-${CV}-nolibc/am33_2.0-linux/bin
-PATH_AM33=/opt/kernel/gcc-9.3.0-nolibc/am33_2.0-linux/bin
+PATH_AM33=/opt/kernel/gcc-9.4.0-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
-# Assembler errors with gcc 8.4.0 (v4.19.y)
+# Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
 # internal compiler error with gcc 11.1.0 (4.4.y, 4.9.y)
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
-PATH_CRIS=/opt/kernel/gcc-9.3.0-nolibc/cris-linux/bin
+PATH_CRIS=/opt/kernel/gcc-9.4.0-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_FRV=/opt/kernel/gcc-${CV}-nolibc/frv-linux/bin
@@ -36,8 +36,8 @@ PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-# gcc-8.2.0, 8.3.0, and 8.4.0 don't compile for nds32.
-# gcc-9.2.0/10.2.0/10.3.0/11.1.0: assembler errors when compiling allmodconfig
+# gcc-8.{2,3,4,5}.0 don't compile for nds32.
+# gcc-9.x/10.x//11.x: assembler errors when compiling allmodconfig
 # PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
 PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
@@ -51,7 +51,7 @@ PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-${CV}-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-${CV}-nolibc/sh4-linux/bin
-# gcc 11.1.0:
+# gcc 11.x:
 # arch/sparc/kernel/mdesc.c:404:22: error: 'strcmp' reading 1 or more bytes from a region of size 0
 # with all kernels v4.9.x and later
 # PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
