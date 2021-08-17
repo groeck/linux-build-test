@@ -15,9 +15,9 @@ ARCH=s390
 # Kernels prior to v5.0 need gcc 8.x or older. See kernel commit
 # 146448524bdd ("s390/jump_label: Use "jdd" constraint on gcc9").
 if [[ ${linux_version_code} -lt $(kernel_version 5 0) ]]; then
-    PATH_S390=/opt/kernel/gcc-8.4.0-nolibc/s390-linux/bin
+    PATH_S390="/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin"
 else
-    PATH_S390=/opt/kernel/gcc-10.3.0-nolibc/s390-linux/bin
+    PATH_S390="/opt/kernel/${DEFAULT_CC}/s390-linux/bin"
 fi
 
 PATH=${PATH_S390}:${PATH}
