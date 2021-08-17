@@ -14,7 +14,7 @@ config=$3
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
-PATH_ARM64=/opt/kernel/gcc-10.3.0-nolibc/aarch64-linux/bin
+PATH_ARM64="/opt/kernel/${DEFAULT_CC}/aarch64-linux/bin"
 
 PATH=${PATH}:${PATH_ARM64}
 
