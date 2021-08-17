@@ -4,7 +4,7 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 # default compiler version
-CV="11.1.0"
+CV="11.2.0"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
