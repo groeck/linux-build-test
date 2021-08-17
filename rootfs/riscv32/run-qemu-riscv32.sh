@@ -13,7 +13,7 @@ _fixup="$2"
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv32}
 PREFIX=riscv32-linux-
 ARCH=riscv
-PATH_RISCV=/opt/kernel/gcc-10.3.0-nolibc/riscv32-linux/bin
+PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv32-linux/bin"
 
 PATH=${PATH}:${PATH_RISCV}
 
