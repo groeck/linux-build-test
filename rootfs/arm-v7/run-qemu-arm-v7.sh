@@ -19,7 +19,7 @@ ARCH=arm
 
 PREFIX="arm-linux-gnueabi-"
 
-PATH_ARM="/opt/kernel/gcc-10.3.0-nolibc/arm-linux-gnueabi/bin"
+PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
