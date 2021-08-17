@@ -104,15 +104,15 @@ v4.4)
 	# S390 needs gcc 8.x or older for kernels prior to v5.0.
 	# See kernel commit 146448524bdd ("s390/jump_label: Use "jdd"
 	# constraint on gcc9") for details.
-	PATH_S390=/opt/kernel/gcc-8.4.0-nolibc/s390-linux/bin
+	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
 	;;
 v4.9)
 	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
 	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-	PATH_S390=/opt/kernel/gcc-8.4.0-nolibc/s390-linux/bin
+	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
 	;;
 v4.14|v4.19)
-	PATH_S390=/opt/kernel/gcc-8.4.0-nolibc/s390-linux/bin
+	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
 	;;
 *)
 	;;
