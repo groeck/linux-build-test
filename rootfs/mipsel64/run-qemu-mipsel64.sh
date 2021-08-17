@@ -15,10 +15,14 @@ skip_49="mipsel64:64r6el_defconfig:notests:nonet:smp:ide:hd
 
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
-# gcc 9.x and 10.x refuse to compile fuloong2e_defconfig
-# for older kernels.
-# cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
-PATH_MIPS=/opt/kernel/gcc-8.4.0-nolibc/mips64-linux/bin
+if [[ ${linux_version_code} -lt $(kernel_version 4 9) ]]; then
+    # gcc 9.x and later refuse to compile fuloong2e_defconfig for linux-4.4.y.
+    # cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
+    PATH_MIPS="/opt/kernel/gcc-8.5.0-nolibc/mips64-linux/bin"
+else
+    PATH_MIPS="/opt/kernel/${DEFAULT_CC}/mips64-linux/bin"
+fi
+
 PREFIX=mips64-linux-
 
 # machine specific information
