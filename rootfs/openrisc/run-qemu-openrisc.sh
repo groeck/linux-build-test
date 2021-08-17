@@ -11,7 +11,7 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-or1k}
 PREFIX=or1k-linux-
 ARCH=openrisc
 rootfs=rootfs.cpio
-PATH_OR32=/opt/kernel/gcc-10.3.0-nolibc/or1k-linux/bin
+PATH_OR32="/opt/kernel/${DEFAULT_CC}/or1k-linux/bin"
 
 PATH=${PATH_OR32}:${PATH}
 
