@@ -12,7 +12,7 @@ variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
-PATH_MIPS=/opt/kernel/gcc-10.3.0-nolibc/mips64-linux/bin
+PATH_MIPS="/opt/kernel/${DEFAULT_CC}/mips64-linux/bin"
 PREFIX=mips64-linux-
 
 cpu="-cpu 5KEc"
