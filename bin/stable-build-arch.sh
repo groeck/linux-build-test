@@ -45,7 +45,9 @@ PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
-PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
+# gcc 11.2.0/binutils 2.37:
+# Cannot find symbol for section 11: .text.unlikely in kernel/kexec_file.o
+PATH_PPC=/opt/kernel/gcc-11.2.0-2.36.1-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-${CV}-nolibc/riscv64-linux/bin
 PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
