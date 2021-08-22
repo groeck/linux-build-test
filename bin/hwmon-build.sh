@@ -6,7 +6,7 @@ ERR=/tmp/error.$$
 
 BRANCH=$(git branch | egrep "^\*" | cut -f2 -d' ')
 
-PATH_X86=/opt/kernel/x86_64/gcc-11.2.0/usr/bin/
+PATH_X86=/opt/kernel/x86_64/gcc-11.2.0/bin/
 PATH_ARM=/opt/kernel/gcc-11.2.0-nolibc/arm-linux-gnueabi/bin
 PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
 
