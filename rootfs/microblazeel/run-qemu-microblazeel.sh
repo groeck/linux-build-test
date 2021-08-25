@@ -11,9 +11,15 @@ machine=$1
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
 PREFIX=microblazeel-linux-
 ARCH=microblaze
-# Images built with gcc 10.x/11.x fail to boot
-PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblazeel-linux/bin"
 
+if [[ ${linux_version_code} -ge $(kernel_version 4 14) ]]; then
+    # Images built with gcc 10.x/11.x fail to boot
+    # (possibly due to binutils 2.37)
+    PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblazeel-linux/bin"
+else
+    # older kernels fail to boot with more recent compilers
+    PATH_MICROBLAZE="/opt/kernel/microblazeel/gcc-4.9.1/usr/bin"
+fi
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
