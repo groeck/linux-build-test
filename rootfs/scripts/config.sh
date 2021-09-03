@@ -12,7 +12,7 @@ QEMU_V60_TEST_BIN=${QEMU_INSTALL}/v6.0-test/bin
 QEMU_V61_BIN=${QEMU_INSTALL}/v6.0/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
-QEMU_BIN=${QEMU_V60_BIN}
+QEMU_BIN=${QEMU_V61_BIN}
 
 # default compiler
 DEFAULT_CC="gcc-11.2.0-nolibc"
