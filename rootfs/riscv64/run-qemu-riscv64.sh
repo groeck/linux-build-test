@@ -102,6 +102,7 @@ runkernel()
 	KERNEL="vmlinux"
     fi
 
+    memsize="512M"
     case "${mach}" in
     virt)
 	con="console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200"
@@ -116,10 +117,21 @@ runkernel()
 	    initcli+=" mtdparts=spi0.0:-"
 	fi
 	;;
+    microchip-icicle-kit)
+	# -icicle-kit requires qemu v6.1.
+	con="console=ttySIF0,115200 earlycon"
+	wait="manual"
+	# extra command line parameter to create mtd partition on first flash.
+	if [[ "${fixup}" == *mtd* ]]; then
+	    initcli+=" mtdparts=spi0.0:-"
+	fi
+	extra_params+=" -dtb arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dtb"
+	memsize="2G"
+	;;
     esac
 
     execute "${wait}" waitlist[@] \
-      ${QEMU} -M "${mach}" -m 512M -no-reboot \
+      ${QEMU} -M "${mach}" -m "${memsize}" -no-reboot \
 	-bios "${BIOS}" \
 	-kernel "${KERNEL}" \
 	${extra_params} \
@@ -198,5 +210,11 @@ runkernel sifive_u defconfig "sd:net,default" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel sifive_u defconfig "mtd32:net,default" rootfs.ext2
 retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Stuck bringing up 2nd CPU
+    runkernel microchip-icicle-kit defconfig "net,default" rootfs.cpio
+    retcode=$((retcode + $?))
+fi
 
 exit ${retcode}
