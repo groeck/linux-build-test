@@ -871,10 +871,6 @@ __setup_config()
 	patch_defconfig .config "${fixup}"
     fi
 
-    # Always disable CONFIG_WERROR. We care about boot
-    # failures, not about compiler warnings.
-    disable_config ".config" CONFIG_WERROR
-
     if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
 	if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null; then
