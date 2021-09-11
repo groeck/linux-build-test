@@ -522,7 +522,10 @@ do
 	# of failures for both compile and boot test images. This hides real
 	# compile and boot failures and thus isn't useful for this testbed.
 	# Disable it.
-	sed -i -e 's/CONFIG_WERROR=y/# CONFIG_WERROR is not set/' ${BUILDDIR}/.config
+
+	# Temporary: Let's see if the problems get resolved.
+	# Uncomment if the situation does not improve by v5.15.
+	# sed -i -e 's/CONFIG_WERROR=y/# CONFIG_WERROR is not set/' ${BUILDDIR}/.config
 
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
@@ -537,6 +540,10 @@ do
 	fi
     	builds=$(expr ${builds} + 1)
 	if ! make ${CROSS} -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} </dev/null >/dev/null 2>"${LOG}"; then
+	    if grep -q "CONFIG_WERROR=y" ${BUILDDIR}/.config; then
+		# If this was a test build, repeat and report _all_ errors.
+		make ${CROSS} -i -j${maxload} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} </dev/null >/dev/null 2>"${LOG}"
+	    fi
 	    echo "failed"
 	    dumplog 3000 "${LOG}"
 	    errors=$(expr ${errors} + 1)
