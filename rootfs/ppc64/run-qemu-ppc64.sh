@@ -170,6 +170,7 @@ retcode=$((retcode + $?))
 runkernel qemu_ppc64_book3s_defconfig smp::net,virtio-net:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
+
 runkernel pseries_defconfig ::smp2:net,pcnet pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((retcode + $?))
@@ -186,6 +187,9 @@ runkernel pseries_defconfig ::net,virtio-net:nvme pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig ::net,tulip:sata-sii3112 pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((retcode + $?))
+runkernel pseries_defconfig ::net,e1000:virtio-pci pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 
