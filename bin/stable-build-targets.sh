@@ -69,9 +69,6 @@ skip_54="riscv32:allmodconfig riscv:allmodconfig"
 
 # fixups
 
-# 6PACK is broken on alpha
-fixup_alpha=("/CONFIG_6PACK/d")
-
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
 
 fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
