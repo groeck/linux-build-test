@@ -36,10 +36,8 @@ PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-# gcc-8.{2,3,4,5}.0 don't compile for nds32.
-# gcc-9.x/10.x//11.x: assembler errors when compiling allmodconfig
-# PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
-PATH_NDS32=/opt/kernel/gcc-8.1.0-nolibc/nds32le-linux/bin
+# nds32 needs workaround in stable-build-target for gcc 9.x and later
+PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin

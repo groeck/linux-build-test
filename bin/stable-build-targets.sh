@@ -80,3 +80,13 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
 
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/# CONFIG_FRAME_POINTER is not set/")
+
+# CONFIG_FUNCTION_TRACER results in compile errors with gcc 9.x and later,
+# and CONFIG_STACK_TRACER selects it. CONFIG_TRACE_IRQFLAGS depends on
+# CONFIG_FUNCTION_TRACER for nds32 but doesn't specify that dependency.
+# IRQSOFF_TRACER selects CONFIG_TRACE_IRQFLAGS.
+fixup_nds32=("s/CONFIG_STACK_TRACER=y/# CONFIG_STACK_TRACER is not set/"
+	"s/CONFIG_FUNCTION_TRACER=y/# CONFIG_FUNCTION_TRACER is not set/"
+	"s/IRQSOFF_TRACER=y/# IRQSOFF_TRACER is not set/"
+	"s/CONFIG_TRACE_IRQFLAGS=y/# CONFIG_TRACE_IRQFLAGS is not set/"
+	)
