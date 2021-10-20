@@ -146,7 +146,7 @@ if [ -z "$1" -o "$1" = "v6.0-test" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v6.1" ]; then
-    dobuild_common v6.1.0-local v6.1
+    dobuild_common v6.1.0-local v6.1 "--disable-strip --extra-cflags=-g"
 #    dobuild_common v6.1.0-local v6.1-debug \
 #	"--enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
