@@ -23,7 +23,7 @@ cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_cris=(defconfig allnoconfig tinyconfig etrax-100lx_defconfig)
 cmd_crisv32=(artpec_3_defconfig etraxfs_defconfig)
-cmd_csky=(defconfig allnoconfig tinyconfig)
+cmd_csky=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_frv=(defconfig)
 cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-sim_defconfig)
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
@@ -65,7 +65,9 @@ skip_44="crisv32:allnoconfig crisv32:tinyconfig cris:allnoconfig \
 	cris:tinyconfig powerpc:allmodconfig i386:tools/perf x86_64:tools/perf"
 skip_49="i386:tools/perf x86_64:tools/perf"
 skip_419="riscv32:allmodconfig riscv:allmodconfig"
-skip_54="riscv32:allmodconfig riscv:allmodconfig"
+skip_54="riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig"
+skip_510="csky:allmodconfig"
+skip_514="csky:allmodconfig"
 
 # fixups
 
@@ -80,13 +82,3 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
 
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/# CONFIG_FRAME_POINTER is not set/")
-
-# CONFIG_FUNCTION_TRACER results in compile errors with gcc 9.x and later,
-# and CONFIG_STACK_TRACER selects it. CONFIG_TRACE_IRQFLAGS depends on
-# CONFIG_FUNCTION_TRACER for nds32 but doesn't specify that dependency.
-# IRQSOFF_TRACER selects CONFIG_TRACE_IRQFLAGS.
-fixup_nds32=("s/CONFIG_STACK_TRACER=y/# CONFIG_STACK_TRACER is not set/"
-	"s/CONFIG_FUNCTION_TRACER=y/# CONFIG_FUNCTION_TRACER is not set/"
-	"s/IRQSOFF_TRACER=y/# IRQSOFF_TRACER is not set/"
-	"s/CONFIG_TRACE_IRQFLAGS=y/# CONFIG_TRACE_IRQFLAGS is not set/"
-	)
