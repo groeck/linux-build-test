@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 machine=$1
 cputype=$2
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-x86_64}
+QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-x86_64}
 ARCH=x86_64
 
 PATH_X86="/opt/kernel/${DEFAULT_CC}/x86_64-linux/bin"
@@ -140,6 +140,12 @@ runkernel defconfig smp2:net,e1000-82545em:efi:mem8G:scsi[MEGASAS] EPYC-IBPB q35
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp4:net,i82559c:efi32:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp4:net,i82559c:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp4:net,i82559c:mem256:scsi[MEGASAS2] Opteron_G5 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,i82559er:mem512 phenom pc rootfs.cpio

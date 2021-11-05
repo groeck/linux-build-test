@@ -11,7 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
+QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-i386}
 ARCH=i386
 
 PATH_X86="/opt/kernel/${DEFAULT_CC}/x86_64-linux/bin"
