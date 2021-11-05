@@ -1359,6 +1359,9 @@ dowait()
     fi
 
     dolog=${retcode}
+    if grep -q "cannot create duplicate filename" ${logfile}; then
+	dolog=1
+    fi
     if grep -q "\[ cut here \]" ${logfile}; then
 	dolog=1
     fi
