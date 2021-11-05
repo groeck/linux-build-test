@@ -36,7 +36,6 @@ PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-# nds32 needs workaround in stable-build-target for gcc 9.x and later
 PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
 PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
@@ -51,11 +50,7 @@ PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-${CV}-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-${CV}-nolibc/sh4-linux/bin
-# gcc 11.x:
-# arch/sparc/kernel/mdesc.c:404:22: error: 'strcmp' reading 1 or more bytes from a region of size 0
-# with all kernels v4.9.x and later
-# PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
-PATH_SPARC=/opt/kernel/gcc-10.3.0-nolibc/sparc64-linux/bin
+PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
 PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
