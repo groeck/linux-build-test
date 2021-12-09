@@ -15,13 +15,7 @@ skip_49="mipsel64:64r6el_defconfig:notests:nonet:smp:ide:hd
 
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
-if [[ ${linux_version_code} -lt $(kernel_version 4 9) ]]; then
-    # gcc 9.x and later refuse to compile fuloong2e_defconfig for linux-4.4.y.
-    # cc1: error: '-mloongson-mmi' must be used with '-mhard-float'
-    PATH_MIPS="/opt/kernel/gcc-8.5.0-nolibc/mips64-linux/bin"
-else
-    PATH_MIPS="/opt/kernel/${DEFAULT_CC}/mips64-linux/bin"
-fi
+PATH_MIPS="/opt/kernel/${DEFAULT_CC}/mips64-linux/bin"
 
 PREFIX=mips64-linux-
 
@@ -107,10 +101,6 @@ runkernel()
 	kernel="vmlinux"
 	mem="256"
 	;;
-    "fuloong2e")
-	kernel="vmlinux"
-	mem="256"
-	;;
     "boston")
 	mem=1G
 	kernel="arch/mips/boot/vmlinux.gz.itb"
@@ -160,9 +150,6 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net,tulip
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net,i82559er
-retcode=$((retcode + $?))
-# Note: Other boot configurations fail
-runkernel fuloong2e_defconfig fuloong2e rootfs.mipsel.ext3 nosmp:ide
 retcode=$((retcode + $?))
 # Image fails to boot with tests enabled
 # Network interfaces don't instantiate.
