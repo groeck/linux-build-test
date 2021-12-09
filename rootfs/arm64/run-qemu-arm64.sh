@@ -29,8 +29,8 @@ skip_44="virt:defconfig:smp2:net,e1000e:efi:mem512:usb-xhci:rootfs \
 	xlnx-versal-virt:defconfig:smp2:net,default:mem512:virtio-blk:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
-skip_49="raspi3:defconfig:smp:net,usb:mem1G:initrd \
-	raspi3:defconfig:smp4:net,usb:mem1G:sd:rootfs \
+skip_49="raspi3b:defconfig:smp:net,usb:mem1G:initrd \
+	raspi3b:defconfig:smp4:net,usb:mem1G:sd:rootfs \
 	xlnx-versal-virt:defconfig:smp2:net,default:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
@@ -41,7 +41,7 @@ patch_defconfig()
 
     # Starting with v5.6, we need to have DMA_BCM2835 built into the
     # kernel because MMC code using may otherwise fail with -EPROBE_DEFER.
-    # Otherwise we can no longer boot raspi3 from mmc cards.
+    # Otherwise we can no longer boot raspi3b from mmc cards.
     # See upstream commit 9e17c1cd28cd ("mmc: bcm2835: Use dma_request_chan()
     # instead dma_request_slave_channel()") for background.
     enable_config_cond "${defconfig}" CONFIG_DMA_BCM2835
@@ -105,7 +105,7 @@ runkernel()
 	extra_params+=" -cpu cortex-a57"
 	waitflag="manual"
 	;;
-    "raspi3")
+    "raspi3b")
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
@@ -204,9 +204,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3 defconfig smp:net,usb:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp:net,usb:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel raspi3 defconfig smp4:net,usb:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp4:net,usb:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio.gz
