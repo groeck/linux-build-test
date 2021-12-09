@@ -10,7 +10,6 @@ machine=$1
 option=$2
 config=$3
 
-# raspi3 crashes with qemu v5.0.1/v5.1
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -24,8 +23,8 @@ PATH=${PATH}:${PATH_ARM64}
 # - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
 skip_44="xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
-skip_49="raspi3:defconfig:smp:mem1G:initrd \
-	raspi3:defconfig:smp4:mem1G:sd:rootfs \
+skip_49="raspi3b:defconfig:smp:mem1G:initrd \
+	raspi3b:defconfig:smp4:mem1G:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
@@ -94,7 +93,7 @@ runkernel()
 	extra_params+=" -cpu cortex-a57"
 	waitflag="manual"
 	;;
-    "raspi3")
+    "raspi3b")
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
@@ -182,13 +181,13 @@ if [ ${runall} -eq 1 ]; then
     retcode=$((retcode + $?))
 fi
 
-# net,usb works for raspi3:arm64 but not for raspi3:arm64be
-runkernel raspi3 defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+# net,usb works for raspi3b:arm64 but not for raspi3b:arm64be
+runkernel raspi3b defconfig smp:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 if [ ${runall} -eq 1 ]; then
     # sd emulation code in qemu seems to have endianness problems in big endian
     # mode if DMA is disabled.
-    runkernel raspi3 defconfig smp4:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
+    runkernel raspi3b defconfig smp4:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((retcode + $?))
 fi
 
