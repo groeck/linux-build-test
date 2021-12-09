@@ -18,11 +18,6 @@ PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv64-linux/bin"
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_419="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
-	riscv:sifive_u:defconfig:net,default:initrd \
-	riscv:sifive_u:defconfig:sd:net,default:rootfs \
-	riscv:sifive_u:defconfig:mtd32:net,default:rootfs"
-
 skip_54="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
 	riscv:sifive_u:defconfig:mtd32:net,default:rootfs"
 
@@ -48,15 +43,8 @@ patch_defconfig()
 
 cached_config=""
 
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    # tulip doesn't instantiate prior to v5.4
-    tulip_netdev="tulip"
-    # pcnet (currently) broken prior to v5.4
-    pcnet_netdev="pcnet"
-else
-    tulip_netdev="e1000"
-    pcnet_netdev="rtl8139"
-fi
+tulip_netdev="tulip"
+pcnet_netdev="pcnet"
 
 runkernel()
 {
@@ -91,16 +79,8 @@ runkernel()
 	return 1
     fi
 
-    if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-	BIOS="default"
-	KERNEL="arch/riscv/boot/Image"
-    else
-	# In v4.19, we need to use bbl to boot the image, and we need
-	# to use qemu v4.0 (later versions will report a region overlap).
-	QEMU="${QEMU_V40}"
-	BIOS="${progdir}/bbl"
-	KERNEL="vmlinux"
-    fi
+    BIOS="default"
+    KERNEL="arch/riscv/boot/Image"
 
     memsize="512M"
     case "${mach}" in
