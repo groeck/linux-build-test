@@ -154,6 +154,15 @@ if [ -z "$1" -o "$1" = "v6.1" ]; then
     fi
 fi
 
+if [ -z "$1" -o "$1" = "v6.2" ]; then
+    dobuild_common v6.2.0-local v6.2 "--disable-strip --extra-cflags=-g"
+#    dobuild_common v6.2.0-local v6.2-debug \
+#	"--enable-debug --disable-strip --extra-cflags=-g"
+    if [ -n "$2" ]; then
+	shift
+    fi
+fi
+
 if [ -z "$1" -o "$1" = "master" ]; then
     dobuild_common master-local master "--disable-strip"
     # While it would be desirable to have debugging enabled in general,
