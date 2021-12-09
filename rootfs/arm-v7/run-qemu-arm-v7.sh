@@ -6,7 +6,6 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_MIDWAY=${QEMU:-${QEMU_V30_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -23,8 +22,8 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
-skip_44="arm:raspi2:multi_v7_defconfig \
-	arm:raspi2:multi_v7_defconfig:sd \
+skip_44="arm:raspi2b:multi_v7_defconfig \
+	arm:raspi2b:multi_v7_defconfig:sd \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256:net,nic:net,nic \
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
@@ -216,7 +215,7 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	initcli+=" console=ttyS0"
 	;;
-    "raspi2")
+    "raspi2b")
 	initcli+=" earlycon=pl011,0x3f201000"
 	initcli+=" console=ttyAMA0"
 	;;
@@ -229,11 +228,6 @@ runkernel()
 	initcli+=" earlycon=ec_imx6q,mmio,0x30860000,115200n8"
 	initcli+=" console=ttymxc0,115200"
 	extra_params+=" -display none"
-	;;
-    "midway")
-	initcli+=" console=ttyAMA0,115200"
-	# Fails silently with later versions of qemu (up to at least 4.2)
-	QEMUCMD="${QEMU_MIDWAY}"
 	;;
     "highbank" | "virt" | \
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
@@ -326,11 +320,6 @@ runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig midway "" \
-	rootfs-armv7a.cpio auto ::mem2G ecx-2000.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
 runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual ::mem256:net,default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
@@ -404,11 +393,11 @@ runkernel multi_v7_defconfig cubieboard "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig raspi2 "" \
+runkernel multi_v7_defconfig raspi2b "" \
 	rootfs-armv7a.cpio manual "::net,usb" bcm2836-rpi-2-b.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel multi_v7_defconfig raspi2 "" \
+runkernel multi_v7_defconfig raspi2b "" \
 	rootfs-armv7a.ext2 manual "::sd:net,usb" bcm2836-rpi-2-b.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
