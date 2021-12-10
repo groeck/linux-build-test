@@ -10,6 +10,7 @@ shift $((OPTIND - 1))
 machine=$1
 cputype=$2
 
+# qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
 QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-x86_64}
 ARCH=x86_64
 

@@ -11,6 +11,7 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
+# qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
 QEMU=${QEMU:-${QEMU_V60_BIN}/qemu-system-i386}
 ARCH=i386
 
