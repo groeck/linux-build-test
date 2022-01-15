@@ -516,10 +516,6 @@ do
 	# compile and boot failures and thus isn't useful for this testbed.
 	# Disable it.
 
-	# Temporary: Let's see if the problems get resolved.
-	# Uncomment if the situation does not improve by v5.15.
-	# sed -i -e 's/CONFIG_WERROR=y/# CONFIG_WERROR is not set/' ${BUILDDIR}/.config
-
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
 	then
