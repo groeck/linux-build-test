@@ -6,6 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_V62=${QEMU:-${QEMU_V62_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -207,6 +208,12 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "npcm750-evb" | "quanta-gsj")
+	initcli+=" console=ttyS3,115200"
+	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
+	extra_params+=" -nodefaults -serial null -serial null -serial null"
+	;;
+    "kudo-bmc")
+	QEMUCMD="${QEMU_V62}"
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
@@ -452,6 +459,7 @@ runkernel multi_v7_defconfig npcm750-evb "" \
 	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm750-evb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
+
 runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
@@ -462,6 +470,19 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-gsj.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+runkernel multi_v7_defconfig kudo-bmc "" \
+	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-kudo.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig kudo-bmc "" \
+	rootfs-armv5.ext2 automatic npcm::mtd64,8,3 nuvoton-npcm730-kudo.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig kudo-bmc "" \
+	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
