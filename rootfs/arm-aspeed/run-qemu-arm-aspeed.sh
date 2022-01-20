@@ -7,6 +7,7 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
+QEMU_V62=${QEMU:-${QEMU_V62_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -137,15 +138,22 @@ runkernel()
     kernel="arch/arm/boot/zImage"
     case ${mach} in
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
-    "witherspoon-bmc" | "swift-bmc" | "g220a-bmc" | "tacoma-bmc")
+    "witherspoon-bmc" | "swift-bmc" | "g220a-bmc" | "tacoma-bmc" | \
+    "supermicrox11-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "rainier-bmc" | "quanta-q71l-bmc")
-        QEMUCMD="${QEMU_MASTER}"
+    "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc")
+        QEMUCMD="${QEMU_V62}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
+	extra_params+=" -nodefaults"
+	;;
+    "fuji-bmc")
+        QEMUCMD="${QEMU_V62}"
+	initcli+=" console=ttyS0,115200"
+	# initcli+=" earlycon"
 	extra_params+=" -nodefaults"
 	;;
     *)
@@ -186,6 +194,19 @@ runkernel aspeed_g4_defconfig palmetto-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+if [ ${runall} -eq 1 ]; then
+    # causes repeated soft lockup warnings
+    # watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [swapper:1]
+    runkernel aspeed_g4_defconfig supermicrox11-bmc "" \
+	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-supermicro-x11spi.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel aspeed_g4_defconfig supermicrox11-bmc "" \
+	rootfs-armv5.ext2 automatic "::mtd32:net,nic" aspeed-bmc-supermicro-x11spi.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
 # selftests sometimes hang with soft CPU lockup
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-witherspoon.dtb
@@ -193,6 +214,15 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd32:net,nic aspeed-bmc-opp-witherspoon.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+
+runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-inspur-fp5280g2.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd64:net,nic aspeed-bmc-inspur-fp5280g2.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -236,6 +266,18 @@ if [ ${runall} -eq 1 ]; then
     # which seems to have stalled as of this writing.
     runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
+if [ ${runall} -eq 1 ]; then
+    # No console output
+    runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-fuji.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-facebook-fuji.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
