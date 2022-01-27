@@ -13,7 +13,6 @@ machine=$1
 variant=$2
 config=$3
 
-QEMU_PEGASOS=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
@@ -114,10 +113,6 @@ runkernel()
 	if [[ ${linux_version_code} -ge $(kernel_version 4 5) ]]; then
 	    earlycon="earlycon"
 	fi
-	;;
-    pegasos2)
-	QEMU="${QEMU_PEGASOS}"
-	extra_params+=" -serial stdio"
 	;;
     *)
 	;;
@@ -258,18 +253,5 @@ runkernel pmac32_defconfig zilog:nvme:net,pcnet mac99 "" ttyPZ0 rootfs.ext2.gz v
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:scsi[DC395]:net,tulip mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
-
-if [[ ${runall} -ne 0 ]]; then
-    # Experimental/unstable
-    # Known issues:
-    # - vof.bin is not distributed (installed) with qemu and has to be copied
-    #   manually to the linux root directory (qemu-master as of 7/16/2021).
-    # - Non-standard PCI devices don't work and cause the builtin IDE controller
-    #   to fail (qemu-master as of 7/16/2021).
-    # - v5.12+ Linux kernels do not boot pegasos2 (as of v5.14-rc1) due to
-    #   commit 407d418f2fd4 ("powerpc/chrp: Move PHB discovery")
-    runkernel chrp32_defconfig nosmp:ide:net,usb pegasos2 "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/zImage.chrp
-    retcode=$((retcode + $?))
-fi
 
 exit ${retcode}
