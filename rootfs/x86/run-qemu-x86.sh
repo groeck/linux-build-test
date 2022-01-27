@@ -135,15 +135,21 @@ runkernel defconfig smp:ata:net,i82559a Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:efi32:usb:net,i82559er core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+runkernel defconfig smp:nvme:net,i82562 pentium3 q35 rootfs.ext2
+retcode=$((${retcode} + $?))
 runkernel defconfig pae:smp:net,e1000 Penryn pc rootfs.cpio
 retcode=$((${retcode} + $?))
 runkernel defconfig pae:smp:efi32:usb:net,pcnet Westmere pc rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig pae:smp:nvme:net,i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:usb:net,e1000 Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:efi32:ata:net,pcnet Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig nosmp:ata:net,rtl8139 n270 q35 rootfs.ext2
+retcode=$((${retcode} + $?))
+runkernel defconfig nosmp:nvme:net,i82562 Westmere q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 runkernel defconfig pae:nosmp:net,ne2k_pci pentium3 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
