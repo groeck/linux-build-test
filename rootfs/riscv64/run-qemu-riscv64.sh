@@ -10,7 +10,6 @@ shift $((OPTIND - 1))
 _mach="$1"
 _fixup="$2"
 
-QEMU_V40=${QEMU:-${QEMU_V40_BIN}/qemu-system-riscv64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
@@ -26,6 +25,11 @@ patch_defconfig()
     local defconfig=$1
     local fixups=${2//:/ }
     local fixup
+
+    # The latest kernel assumes SBI version 0.3, but that doesn't match qemu
+    # at least up to version 6.2 and results in hangup/crashes during reboot
+    # with sifive_u emulations.
+    enable_config "${defconfig}" CONFIG_RISCV_SBI_V01
 
     enable_config "${defconfig}" CONFIG_PCI_HOST_GENERIC
 
@@ -134,36 +138,50 @@ echo
 retcode=0
 runkernel virt defconfig "net,e1000" rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 if [[ "${runall}" -ne 0 ]]; then
     runkernel virt defconfig "net,ne2k_pci" rootfs.cpio
     retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 runkernel virt defconfig net,e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel virt defconfig net,virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel virt defconfig net,i82557b:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig pci-bridge:net,virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,i82557a:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig net,i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "net,i82559a:scsi[53C810]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "net,i82559er:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Does not instantiate (am53c974 0000:01:01.0: pci I/O map failed)
@@ -175,21 +193,29 @@ fi
 
 runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel sifive_u defconfig "net,default" rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel sifive_u defconfig "sd:net,default" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel sifive_u defconfig "mtd32:net,default" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Stuck bringing up 2nd CPU
