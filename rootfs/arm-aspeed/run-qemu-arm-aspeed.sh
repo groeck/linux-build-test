@@ -6,8 +6,6 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
-QEMU_V62=${QEMU:-${QEMU_V62_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -145,13 +143,11 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc")
-        QEMUCMD="${QEMU_V62}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "fuji-bmc")
-        QEMUCMD="${QEMU_V62}"
 	initcli+=" console=ttyS0,115200"
 	# initcli+=" earlycon"
 	extra_params+=" -nodefaults"
