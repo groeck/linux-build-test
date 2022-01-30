@@ -44,7 +44,8 @@ cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig tinyconfig)
 cmd_parisc=(allnoconfig tinyconfig allmodconfig generic-32bit_defconfig)
 cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
-cmd_powerpc=(defconfig allmodconfig allnoconfig tinyconfig ppc64e_defconfig cell_defconfig \
+cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
+	ppc64e_defconfig cell_defconfig skiroot_defconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
 	tqm8xx_defconfig \
 	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig)
