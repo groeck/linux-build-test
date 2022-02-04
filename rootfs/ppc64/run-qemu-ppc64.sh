@@ -19,29 +19,14 @@ ARCH=powerpc
 
 PREFIX=powerpc64-linux-
 
-# gcc 10.3.0/11.2.0 fails to compile arch/powerpc/mm/hugetlbpage.c
-# in v4.4.y for pseries_defconfig
 # gcc 9.3.0 causes a crash for powernv targets
 # gcc 11.2.0 fails to compile powernv_defconfig
 PATH_PPC="/opt/kernel/powerpc64/gcc-7.4.0/bin"
+# PATH_PPC="/opt/kernel/gcc-11.2.0-2.36.1-nolibc/powerpc64-linux/bin"
 
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
-skip_44="powernv:powernv_defconfig:net,rtl8139:initrd \
-	powernv:powernv_defconfig:nvme:net,rtl8139:rootfs \
-	powernv:powernv_defconfig:usb-xhci:net,rtl8139:rootfs \
-	powernv:powernv_defconfig:scsi[MEGASAS]:net,rtl8139:rootfs \
-	powernv:powernv_defconfig:sdhci:mmc:net,rtl8139:rootfs \
-	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:net,rtl8139:initrd \
-	pseries:pseries_defconfig:little:net,e1000:scsi:rootfs \
-	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs \
-	pseries:pseries_defconfig:little:net,virtio-net:scsi[MEGASAS]:rootfs \
-	pseries:pseries_defconfig:little:net,i82562:scsi[FUSION]:rootfs \
-	pseries:pseries_defconfig:little:net,ne2k_pci:sdhci:mmc:rootfs \
-	pseries:pseries_defconfig:little:net,tulip:nvme:rootfs \
-	pseries:pseries_defconfig:little:net,pcnet:usb:rootfs"
 skip_49="powernv:powernv_defconfig:sdhci:mmc:net,rtl8139:rootfs \
 	pseries:pseries_defconfig:net,tulip:sata-sii3112:rootfs \
 	pseries:pseries_defconfig:little:net,e1000e:sata-sii3112:rootfs \

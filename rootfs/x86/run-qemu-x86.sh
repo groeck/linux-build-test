@@ -20,9 +20,6 @@ PREFIX="x86_64-linux-"
 
 PATH=${PATH_X86}:${PATH}
 
-skip_44="defconfig:smp6:scsi[AM53C974]:net,pcnet \
-	defconfig:smp4:scsi[DC395]:net,ne2k_pci"
-
 patch_defconfig()
 {
     local defconfig=$1

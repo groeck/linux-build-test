@@ -20,7 +20,7 @@ PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-# internal compiler error with gcc 11.1.0 (4.4.y, 4.9.y)
+# internal compiler error with gcc 11.1.0 (4.9.y)
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
@@ -89,18 +89,6 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v4.4)
-	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
-	# Don't touch version; other compiler versions have various issues.
-	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-	# sparc images prior to v4.9 don't build with gcc 7+
-	# (see commit 0fde7ad71ee3, 009615ab7fd4, and more)
-	PATH_SPARC=/opt/kernel/gcc-6.4.0-nolibc/sparc64-linux/bin
-	# S390 needs gcc 8.x or older for kernels prior to v5.0.
-	# See kernel commit 146448524bdd ("s390/jump_label: Use "jdd"
-	# constraint on gcc9") for details.
-	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
-	;;
 v4.9)
 	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
 	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
@@ -209,7 +197,7 @@ case ${ARCH} in
     hexagon)
 	cmd=(${cmd_hexagon[*]})
 	case ${rel} in
-	v4.4|v4.9|v4.14|v4.19|v5.4)
+	v4.9|v4.14|v4.19|v5.4)
 	    PREFIX="hexagon-linux-"
 	    PATH=${PATH_HEXAGON}:${PATH}
 	    ;;
@@ -281,7 +269,7 @@ case ${ARCH} in
     openrisc)
 	cmd=(${cmd_openrisc[*]})
 	case ${rel} in
-	v4.4|v4.9)
+	v4.9)
 		PREFIX="or32-linux-"
 		PATH=${PATH_OPENRISC_45}:${PATH}
 		;;
@@ -362,7 +350,7 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	case ${rel} in
-	v4.4|v4.9|v4.14|v4.19)
+	v4.9|v4.14|v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
 		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
 		PREFIX="${PREFIX_X86}"

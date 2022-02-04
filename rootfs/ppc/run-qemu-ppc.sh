@@ -103,16 +103,10 @@ runkernel()
 
     case "${mach}" in
     sam460ex)
-	# Fails with v4.4.y
-	if [[ ${linux_version_code} -ge $(kernel_version 4 5) ]]; then
-	    earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
-	fi
+	earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	;;
     virtex-ml507)
-	# fails with v4.4.y
-	if [[ ${linux_version_code} -ge $(kernel_version 4 5) ]]; then
-	    earlycon="earlycon"
-	fi
+	earlycon="earlycon"
 	;;
     *)
 	;;

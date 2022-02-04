@@ -19,8 +19,6 @@ PREFIX="x86_64-linux-"
 
 PATH=${PATH_X86}:${PATH}
 
-skip_44="defconfig:smp4:net,tulip:efi32:mem256:scsi[DC395]"
-
 patch_defconfig()
 {
     local defconfig=$1

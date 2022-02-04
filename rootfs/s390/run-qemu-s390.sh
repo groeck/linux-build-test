@@ -27,16 +27,6 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
-    if [[ ${linux_version_code} -lt $(kernel_version 4 5) ]]; then
-	# qemu only fully supports MARCH_Z900.
-	# Newer versions of qemu work for more recent CPUS with CPU model
-	# "qemu", but that does not work for v4.4.y (it crashes silently
-	# when trying to boot with the default configuration).
-	sed -i -e '/CONFIG_MARCH_Z/d' ${defconfig}
-	sed -i -e '/HAVE_MARCH_Z/d' ${defconfig}
-	echo "CONFIG_MARCH_Z900=y" >> ${defconfig}
-    fi
-
     echo "CONFIG_PCI=y" >> ${defconfig}
 }
 

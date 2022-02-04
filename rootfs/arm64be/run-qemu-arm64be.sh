@@ -17,12 +17,6 @@ PATH_ARM64="/opt/kernel/${DEFAULT_CC}/aarch64-linux/bin"
 
 PATH=${PATH}:${PATH_ARM64}
 
-# Root file systems only work in v4.9+ (virt) and v4.14 (Xilinx).
-# Exceptions:
-# - virt:defconfig:smp:virtio:rootfs works from v4.4
-# - xlnx-zcu102:defconfig:smp:sata:rootfs:xilinx/zynqmp-zcu102 works from v4.4
-skip_44="xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 skip_49="raspi3b:defconfig:smp:mem1G:initrd \
 	raspi3b:defconfig:smp4:mem1G:sd:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
