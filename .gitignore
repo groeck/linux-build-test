@@ -1,4 +1,5 @@
 aboriginal
+cache
 slave/qemu*
 slave/hwmon*
 slave/stable*
@@ -18,7 +19,7 @@ master/next*
 master/master*
 master/testing
 master/gitpoller-workdir/
-master/*.log
+master/*.log*
 master/queue-workdir*/
 master/staging-workdir/
 master/state.sqlite*
