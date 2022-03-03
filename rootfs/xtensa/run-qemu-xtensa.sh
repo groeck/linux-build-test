@@ -37,7 +37,7 @@ patch_defconfig()
         dc232b)
 	    sed -i -e '/CONFIG_XTENSA_VARIANT/d' ${defconfig}
 	    echo "CONFIG_XTENSA_VARIANT_DC232B=y" >> ${defconfig}
-	    echo "# CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX is not set" >> ${defconfig}
+	    echo "CONFIG_INITIALIZE_XTENSA_MMU_INSIDE_VMLINUX=n" >> ${defconfig}
 	    echo "CONFIG_KERNEL_LOAD_ADDRESS=0xd0003000" >> ${defconfig}
 	    ;;
         dc233c)
