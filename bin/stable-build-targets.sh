@@ -70,14 +70,16 @@ skip_514="csky:allmodconfig"
 
 # fixups
 
-fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/")
+fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
+	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
 
-fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
+fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
-fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/# CONFIG_BLK_DEV_INITRD is not set/"
+fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
-fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/")
+fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
+	"s/CONFIG_LD_NO_RELAX=n/CONFIG_LD_NO_RELAX=y/")
 
-fixup_csky=("s/CONFIG_FRAME_POINTER=y/# CONFIG_FRAME_POINTER is not set/")
+fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
