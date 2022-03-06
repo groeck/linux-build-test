@@ -136,7 +136,7 @@ runkernel()
     kernel="arch/arm/boot/zImage"
     case ${mach} in
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
-    "witherspoon-bmc" | "swift-bmc" | "g220a-bmc" | "tacoma-bmc" | \
+    "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
     "supermicrox11-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
@@ -286,28 +286,6 @@ runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd32:net,nic aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # swift-bmc will be deprecated starting with qemu v6.1 as the hardware
-    # was never released. See qemu commit 63a9c7e0a0 ("aspeed: Deprecate the
-    # swift-bmc machine").
-    runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-swift.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::sd1:net,nic aspeed-bmc-opp-swift.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc:net,nic aspeed-bmc-opp-swift.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel aspeed_g5_defconfig swift-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-opp-swift.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
 
 runkernel aspeed_g5_defconfig g220a-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-bytedance-g220a.dtb
