@@ -124,6 +124,8 @@ skip=(${!tmp})
 SUBARCH=""
 EXTRA_CMD=""
 CCMD=""
+PREFIX=""
+PREFIX32=""
 declare -a fixup
 case ${ARCH} in
     alpha)
@@ -287,7 +289,8 @@ case ${ARCH} in
     parisc64)
 	cmd=(${cmd_parisc64[*]})
 	PREFIX="hppa64-linux-"
-	PATH=${PATH_PARISC64}:${PATH}
+	PREFIX32="hppa-linux-"
+	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	ARCH=parisc
 	;;
     powerpc)
@@ -392,6 +395,11 @@ if [ "${PREFIX}" != "" ]; then
 	CROSS="CROSS_COMPILE=${PREFIX}"
 fi
 
+CROSS32=""
+if [ "${PREFIX32}" != "" ]; then
+	CROSS32="CROSS32_COMPILE=${PREFIX32}"
+fi
+
 if [ -n "${SUBARCH}" ]
 then
 	EXTRA_CMD="${EXTRA_CMD} SUBARCH=${SUBARCH}"
@@ -474,7 +482,7 @@ do
 	    continue
 	fi
 
-	if ! make ${CROSS} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} </dev/null >${LOG} 2>&1; then
+	if ! make ${CROSS} ${CROSS32} ARCH=${ARCH} O=${BUILDDIR} ${EXTRA_CMD} ${cmd[$i]} </dev/null >${LOG} 2>&1; then
 	    # Only report an error if the default configuration
 	    # does not exist.
 	    if grep -q "No rule to make target" ${LOG}; then
