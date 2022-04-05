@@ -6,6 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_V70=${QEMU_V70_BIN:-${QEMU_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -143,6 +144,12 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc")
+	initcli+=" console=ttyS4,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
+	extra_params+=" -nodefaults"
+	;;
+    "bletchley-bmc")
+	QEMUCMD="${QEMU_V70}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
@@ -326,6 +333,14 @@ if [ ${runall} -eq 1 ]; then
     # Does not instantate. See comment for ast2600-evb above.
     runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-ibm-rainier.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
+if [ ${runall} -eq 1 ]; then
+    # needs more testing
+    runkernel aspeed_g5_defconfig bletchley-bmc "" \
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-bletchley.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
