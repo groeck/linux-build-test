@@ -7,6 +7,7 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
+QEMU_V70=${QEMU:-${QEMU_V70_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -196,12 +197,13 @@ runkernel()
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "npcm750-evb" | "quanta-gsj")
+    "npcm750-evb" | "quanta-gsj" | "kudo-bmc")
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
-    "kudo-bmc")
+    "mori-bmc")
+	QEMUCMD="${QEMU_V70}"
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
