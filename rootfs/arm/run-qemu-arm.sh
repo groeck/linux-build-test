@@ -217,7 +217,7 @@ runkernel()
     "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | \
     "integratorcp")
-	initcli+=" console=ttyAMA0,115200"
+	initcli+=" console=ttyAMA0,115200 earlycon"
 	;;
     *)
 	;;
