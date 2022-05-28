@@ -711,9 +711,7 @@ doclean()
 {
 	local ARCH=$1
 
-	pwd | grep buildbot >/dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
+	if pwd | grep -q buildbot; then
 		git clean -x -d -f -q
 	else
 		make ARCH=${ARCH} mrproper >/dev/null 2>&1
