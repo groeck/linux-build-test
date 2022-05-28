@@ -1,3 +1,7 @@
+#!/bin/bash
+
+TOOLCHAIN_DIR="/opt/toolchains"
+
 if [ -z "$1" ]; then
     echo "Need parameter"
     exit 1
@@ -12,5 +16,7 @@ else
     exit 1
 fi
 
-sudo mv $f /opt/toolchains
-sudo tar xf /opt/toolchains/$(basename $f) -C /opt/kernel
+if [[ "$(dirname $f)" != "${TOOLCHAIN_DIR}" ]]; then
+    sudo mv $f "${TOOLCHAIN_DIR}"
+fi
+sudo tar xf "${TOOLCHAIN_DIR}/$(basename $f)" -C /opt/kernel
