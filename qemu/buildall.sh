@@ -72,7 +72,7 @@ dobuild_common()
 {
     dobuild $1 $2 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
+	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
 	--disable-libssh $3"
     checkexit $?
@@ -104,76 +104,69 @@ if [ -z "$1" -o "$1" = "v4.0" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v4.1" ]; then
-    dobuild_common v4.1.1-local v4.1
+    dobuild_common v4.1.1-local v4.1 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v4.2" ]; then
-    dobuild_common v4.2.1-local v4.2
+    dobuild_common v4.2.1-local v4.2 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v5.1" ]; then
-    dobuild_common v5.1.0-local v5.1
+    dobuild_common v5.1.0-local v5.1 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v5.2" ]; then
-    dobuild_common v5.2.0-local v5.2
+    dobuild_common v5.2.0-local v5.2 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v6.0" ]; then
-    dobuild_common v6.0.0-local v6.0
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v6.0-test" ]; then
-    dobuild_common v6.0.0-local-test v6.0-test
+    dobuild_common v6.0.0-local v6.0 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v6.1" ]; then
-    dobuild_common v6.1.1-local v6.1 "--disable-strip --extra-cflags=-g"
+    dobuild_common v6.1.1-local v6.1 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v6.2" ]; then
-    dobuild_common v6.2.0-local v6.2 "--disable-strip --extra-cflags=-g"
+    dobuild_common v6.2.0-local v6.2 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v7.0" ]; then
-    dobuild_common v7.0.0-local v7.0 "--disable-strip --extra-cflags=-g"
+    dobuild_common v7.0.0-local v7.0 "--disable-vnc-png --disable-strip --extra-cflags=-g"
 #    dobuild_common v7.0.0-local v7.0-debug \
-#	"--enable-debug --disable-strip --extra-cflags=-g"
+#	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
-    dobuild_common master-local master "--disable-strip"
+    dobuild_common master-local master "--disable-png --disable-strip"
     # While it would be desirable to have debugging enabled in general,
     # it slows down the system too much. Generate separate master-debug
     # specifically for to have images with debugging enabled available
     # if needed.
     dobuild_common master-local master-debug \
-	"--enable-debug --disable-strip --extra-cflags=-g"
+	"--disable-png --enable-debug --disable-strip --extra-cflags=-g"
 fi
