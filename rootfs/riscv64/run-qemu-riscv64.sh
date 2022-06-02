@@ -93,7 +93,9 @@ runkernel()
 	wait="automatic"
 	;;
     sifive_u)
-	# requires qemu v6.0+
+	# qemu v7.0 fails to reboot with sifive_u
+	# "sbi_srst_reset: type=0x0 reason=0x0 failed"
+	QEMU=${QEMU_V62_BIN}/qemu-system-riscv64
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
 	# extra parameter to create mtd partition on first flash.
@@ -102,14 +104,10 @@ runkernel()
 	fi
 	;;
     microchip-icicle-kit)
-	# -icicle-kit requires qemu v6.1.
-	con="console=ttySIF0,115200 earlycon"
+	con="console=ttyS1,115200 earlycon"
 	wait="manual"
-	# extra command line parameter to create mtd partition on first flash.
-	if [[ "${fixup}" == *mtd* ]]; then
-	    initcli+=" mtdparts=spi0.0:-"
-	fi
 	extra_params+=" -dtb arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dtb"
+	extra_params+=" -display none -serial null -serial stdio -smp 5"
 	memsize="2G"
 	;;
     esac
@@ -218,8 +216,14 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
-    # Stuck bringing up 2nd CPU
+    # Needs qemu v7.0+, generates warning backtraces
+    # clk_ahb: Zero divisor and CLK_DIVIDER_ALLOW_ZERO not set
+    # clk_rtcref: Zero divisor and CLK_DIVIDER_ALLOW_ZERO not set
+    # Ethernet interface fails to instantiate
+    # macb 20112000.ethernet eth0: Could not attach PHY (-22)
     runkernel microchip-icicle-kit defconfig "net,default" rootfs.cpio
+    retcode=$((retcode + $?))
+    runkernel microchip-icicle-kit defconfig "sd:net,default" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
