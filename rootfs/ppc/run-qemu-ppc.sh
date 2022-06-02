@@ -19,7 +19,9 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 PREFIX=powerpc64-linux-
 
-PATH_PPC="/opt/kernel/${DEFAULT_CC}/powerpc64-linux/bin"
+# 44x/bamboo_defconfig doesn't compile with gcc 11.3/binutils 2.38
+# PATH_PPC="/opt/kernel/${DEFAULT_CC}/powerpc64-linux/bin"
+PATH_PPC="/opt/kernel/gcc-11.2.0-nolibc/powerpc64-linux/bin"
 
 ARCH=powerpc
 
