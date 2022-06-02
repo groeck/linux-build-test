@@ -14,9 +14,9 @@ QEMU_V62_BIN=${QEMU_INSTALL}/v6.2/bin
 QEMU_V70_BIN=${QEMU_INSTALL}/v7.0/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
-QEMU_BIN=${QEMU_V62_BIN}
+QEMU_BIN=${QEMU_V70_BIN}
 
 # default compiler
-DEFAULT_CC="gcc-11.2.0-nolibc"
+DEFAULT_CC="gcc-11.3.0-2.38-nolibc"
 
 config_initcli="slub_debug=FZPUA"
