@@ -40,8 +40,9 @@ cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63x
 	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
+# nios2 allmodconfig: "Internal error in nios2_align" (binutils)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
-cmd_openrisc=(defconfig allnoconfig tinyconfig)
+cmd_openrisc=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_parisc=(allnoconfig tinyconfig allmodconfig generic-32bit_defconfig)
 cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
 cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
@@ -63,7 +64,7 @@ cmd_um=(defconfig)
 # build to skip
 
 skip_49="i386:tools/perf x86_64:tools/perf"
-skip_419="riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig"
+skip_419="riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig openrisc:allmodconfig"
 skip_54="riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig"
 skip_510="csky:allmodconfig"
 skip_514="csky:allmodconfig"
