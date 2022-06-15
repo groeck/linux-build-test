@@ -942,6 +942,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
 	enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC
 	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
+	enable_config "${fragment}" CONFIG_KFENCE
     fi
 
     if [[ "${notests}" -eq 0 ]]; then
@@ -950,6 +951,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_KUNIT CONFIG_KUNIT_TEST CONFIG_PM_QOS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST CONFIG_MEMCPY_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_TIME_UNIT_TEST CONFIG_HASH_UNIT_TEST
 	# other
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
@@ -1370,6 +1374,9 @@ dowait()
 	dolog=1
     fi
     if grep -q "stack backtrace" ${logfile}; then
+	dolog=1
+    fi
+    if grep -q "Call Trace" ${logfile}; then
 	dolog=1
     fi
 
