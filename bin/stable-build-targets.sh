@@ -36,7 +36,7 @@ cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 cmd_metag=(defconfig allnoconfig tinyconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
 cmd_microblaze=(mmu_defconfig nommu_defconfig allnoconfig tinyconfig)
 cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
-	nlm_xlp_defconfig ath79_defconfig ar7_defconfig \
+	nlm_xlp_defconfig ath79_defconfig ar7_defconfig loongson2k_defconfig \
 	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
@@ -53,7 +53,8 @@ cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
 cmd_riscv=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig performance_defconfig)
 cmd_score=(defconfig)
-cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig shx3_defconfig)
+cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig \
+	shx3_defconfig se7619_defconfig)
 cmd_sparc32=(defconfig allnoconfig tinyconfig)
 cmd_sparc64=(allmodconfig defconfig allnoconfig tinyconfig)
 cmd_tile=(tilegx_defconfig)
