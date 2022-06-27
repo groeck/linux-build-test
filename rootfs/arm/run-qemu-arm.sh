@@ -111,6 +111,8 @@ patch_defconfig()
 	    # Older versions of realview config files need additional CPU support.
 	    enable_config "${defconfig}" CONFIG_REALVIEW_EB_A9MP CONFIG_REALVIEW_EB_ARM11MP_REVB
 	    enable_config "${defconfig}" CONFIG_MACH_REALVIEW_PBX CONFIG_MACH_REALVIEW_PB1176
+	    # KFENCE results in a warning with realview-eb-mpcore.
+	    disable_config "${defconfig}" CONFIG_KFENCE
 	    ;;
 	realview_pb)
 	    # Similar for PB-A8. Also disable some EB and incompatible PB
