@@ -1,4 +1,5 @@
 buildarch=(alpha arm arm64 blackfin c6x cris frv hexagon i386 ia64 \
+	   loongarch \
 	   m32r m68k m68k_nommu \
 	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc \
 	   s390 score sh sparc32 sparc64 \
@@ -29,6 +30,7 @@ cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-s
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
 cmd_ia64=(defconfig allnoconfig tinyconfig)
+cmd_loongarch=(defconfig allnoconfig tinyconfig)
 cmd_m32r=(defconfig)
 cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
