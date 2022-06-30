@@ -5,6 +5,7 @@ basedir=$(cd $(dirname $0); pwd)
 
 # default compiler version
 CV="11.3.0-2.38"
+CV12="12.1.0-2.38"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
@@ -31,6 +32,7 @@ PATH_FRV=/opt/kernel/gcc-${CV}-nolibc/frv-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-${CV}-nolibc/ia64-linux/bin
+PATH_LOONGARCH=/opt/kernel/gcc-${CV12}-nolibc/loongarch64-linux-gnu/bin
 PATH_M32R=/opt/kernel/gcc-${CV}-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
@@ -220,6 +222,11 @@ case ${ARCH} in
 	cmd=(${cmd_ia64[*]})
 	PREFIX="ia64-linux-"
 	PATH=${PATH_IA64}:${PATH}
+	;;
+    loongarch)
+	cmd=(${cmd_loongarch[*]})
+	PREFIX="loongarch64-linux-gnu-"
+	PATH=${PATH_LOONGARCH}:${PATH}
 	;;
     m32r)
 	cmd=(${cmd_m32r[*]})
