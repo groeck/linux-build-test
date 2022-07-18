@@ -943,6 +943,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC
 	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_KFENCE
+	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
     fi
 
     if [[ "${notests}" -eq 0 ]]; then
