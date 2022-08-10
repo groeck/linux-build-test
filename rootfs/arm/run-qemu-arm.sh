@@ -198,7 +198,7 @@ runkernel()
 	initcli=""
 	kernel="vmlinux"
 	;;
-    "akita" | "borzoi" | "spitz" | "tosa" | "terrier" | "z2" | "mainstone")
+    "akita" | "borzoi" | "spitz" | "terrier")
 	initcli+=" console=ttyS0"
 	;;
     "collie")
@@ -340,27 +340,6 @@ runkernel pxa_defconfig borzoi "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel pxa_defconfig mainstone "" \
-	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net,usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig mainstone "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::flash32,4352k,2:net,usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig mainstone "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net,usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig mainstone "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net,usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.cpio automatic \
 	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net,usb
@@ -400,28 +379,6 @@ checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.ext2 automatic \
 	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net,usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel pxa_defconfig tosa "" \
-	rootfs-armv5.cpio automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig tosa "" \
-	rootfs-armv5.ext2 automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel pxa_defconfig z2 "" \
-	rootfs-armv5.cpio automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig z2 "" \
-	rootfs-armv5.sqf automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::flash8,384k,2
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig z2 "" \
-	rootfs-armv5.ext2 automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
