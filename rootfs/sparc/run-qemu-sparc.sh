@@ -32,6 +32,8 @@ patch_defconfig()
     # enable ethernet interface
     echo "CONFIG_NET_VENDOR_SUN=y" >> ${defconfig}
     echo "CONFIG_HAPPYMEAL=y" >> ${defconfig}
+    # We don't currently test IPv6 so drop it to reduce image size
+    echo "CONFIG_IPV6=n" >> ${defconfig}
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
