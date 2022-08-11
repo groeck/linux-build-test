@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_V70=${QEMU:-${QEMU_V70_BIN}/qemu-system-arm}
+QEMU_V71=${QEMU:-${QEMU_V71_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -138,13 +138,8 @@ runkernel()
     case ${mach} in
     "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
-    "supermicrox11-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc")
-	initcli+=" console=ttyS4,115200"
-	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
-	extra_params+=" -nodefaults"
-	;;
+    "supermicrox11-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "bletchley-bmc")
-	QEMUCMD="${QEMU_V70}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
@@ -152,6 +147,12 @@ runkernel()
     "fuji-bmc")
 	initcli+=" console=ttyS0,115200"
 	# initcli+=" earlycon"
+	extra_params+=" -nodefaults"
+	;;
+    "qcom-dc-scm-v1-bmc")
+	QEMUCMD="${QEMU_V71}"
+	initcli+=" console=ttyS4,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     *)
@@ -323,7 +324,6 @@ runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
 if [ ${runall} -eq 1 ]; then
     # Does not instantate. See comment for ast2600-evb above.
     runkernel aspeed_g5_defconfig rainier-bmc "" \
@@ -336,17 +336,25 @@ runkernel aspeed_g5_defconfig bletchley-bmc "" \
     rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+runkernel aspeed_g5_defconfig bletchley-bmc "" \
+    rootfs-armv5.ext2 automatic notests::usb0:net,nic aspeed-bmc-facebook-bletchley.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # Does not instantate. See comment for ast2600-evb above.
      runkernel aspeed_g5_defconfig bletchley-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-facebook-bletchley.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
-    # usb not supported (?)
-    runkernel aspeed_g5_defconfig bletchley-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-facebook-bletchley.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
 fi
+
+runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 exit ${retcode}
