@@ -14,30 +14,3 @@ qemu-system-arm -M n800 -kernel arch/arm/boot/zImage \
 It will start but crash with
 	Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
 and also generate a lot of backtraces.
-
-
-spitz and related
------------------
-
-Flash probe fails with
-
-physmap-flash physmap-flash: physmap platform flash device: [mem 0x00000000-0x007fffff]
-physmap-flash physmap-flash: map_probe failed
-
-This is because the ROM is at address 0, and the root file system
-starts at offset 0x00140000. The qemu spitz code supports the
-address range, but allocates it as ROM at address 0, and doesn't
-support attaching a file to it.
-
-There is a NAND flash at PXA_CS3_PHYS (0x0c000000), to be instantiated
-with IF_MTD. Instantiating it requires CONFIG_MTD_RAW_NAND=y and
-CONFIG_MTD_NAND_SHARPSL=y, but that only results in "bad erase block"
-and uncorrectable ECC errors. The problem is seen even with old kernel
-versions and with old versions of qemu, so it doesn't look like it was
-introduced recently.
-
-collie
-------
-
-Collie supports flash, but it doesn't instantiate. do_map_probe()
-from the Linux kernel returns an error, and pflash trace is inconclusive.
