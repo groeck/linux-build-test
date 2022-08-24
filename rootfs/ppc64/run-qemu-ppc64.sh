@@ -170,13 +170,16 @@ retcode=$((retcode + $?))
 runkernel pseries_defconfig ::net,i82559a:sdhci:mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
-runkernel pseries_defconfig ::net,virtio-net:nvme pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig ::net,virtio-net-old:nvme pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig ::net,tulip:sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig ::net,e1000:virtio-pci pseries POWER9 hvc0 vmlinux \
+	rootfs.ext2.gz auto
+retcode=$((retcode + $?))
+runkernel pseries_defconfig ::net,e1000:virtio-pci-old pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 
@@ -195,6 +198,9 @@ runkernel pseries_defconfig little::net,e1000e:sata-sii3112 pseries POWER8 hvc0 
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig little::net,virtio-net:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
+	rootfs-el.ext2.gz auto
+retcode=$((retcode + $?))
+runkernel pseries_defconfig little::net,virtio-net-old:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel pseries_defconfig little::net,i82562:scsi[FUSION] pseries POWER8 hvc0 vmlinux \
