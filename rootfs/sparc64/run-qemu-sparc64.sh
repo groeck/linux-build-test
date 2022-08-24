@@ -112,9 +112,13 @@ runkernel sparc64_defconfig sun4u "nodebug:smp:scsi[AM53C974]:net,usb-net" rootf
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nodebug:smp:usb-xhci:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u nodebug:smp:usb-xhci:net,virtio-net-pci-old rootfs.ext2.gz
+retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nodebug:smp:usb-uas-xhci:net,i82801 rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nodebug:smp:virtio-pci:net,i82559er rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel sparc64_defconfig sun4u nodebug:smp:virtio-pci-old:net,i82559er rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4v nodebug:smp:ata:net,i82562 rootfs.ext2.gz
 retcode=$((retcode + $?))
