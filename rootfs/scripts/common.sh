@@ -201,6 +201,9 @@ __common_scsicmd()
     "scsi[virtio-pci]")
 	device="virtio-scsi-pci"
 	;;
+    "scsi[virtio-pci-old]")
+	device="virtio-scsi-pci,disable-modern=on"
+	;;
     "scsi[virtio-ccw]")
 	# s390 only
 	device="virtio-scsi-ccw,devno=fe.0.0001"
@@ -321,6 +324,11 @@ __common_virtcmd()
     "virtio-pci")
 	__pcibridge_new_port
 	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus_ref}"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    "virtio-pci-old")
+	__pcibridge_new_port
+	extra_params+=" -device virtio-blk-pci,disable-modern=on,drive=d0${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio")
@@ -552,8 +560,11 @@ __common_netcmd()
 	    ;;
 	esac
 	;;
-    virtio-net*)
+    "virtio-net"|"virtio-net-pci"|"virtio-net-device")
 	extra_params+=" -device ${netdev},netdev=net0${__pcibus_ref} -netdev user,id=net0"
+	;;
+    "virtio-net-old"|"virtio-net-pci-old")
+	extra_params+=" -device ${netdev%%-old},disable-modern=on,netdev=net0${__pcibus_ref} -netdev user,id=net0"
 	;;
     *)
 	__pcibridge_new_port
@@ -885,6 +896,7 @@ __setup_fragment()
     local fixup
     local nocd=0
     local nodebug=0
+    local nolockup=0
     local nofs=0
     local nolocktests=0
     local nonvme=0
@@ -921,6 +933,7 @@ __setup_fragment()
 	nocd) nocd=1 ;;
 	nofs) nofs=1 ;;
 	nolocktests) nolocktests=1 ;;
+	nolockup) nolockup=1 ;;
 	nonvme) nonvme=1 ;;
 	noscsi) noscsi=1 ;;
 	notests) notests=1 ;;
@@ -944,6 +957,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
+	if [[ "${nolockup}" -eq 0 ]]; then
+	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
+	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
+	fi
     fi
 
     if [[ "${notests}" -eq 0 ]]; then
