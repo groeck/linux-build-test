@@ -78,7 +78,7 @@ runkernel()
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} console=ttyS0" \
 	-d unimp,guest_errors \
-	-nographic
+	-nographic -monitor none
 
     return $?
 }
@@ -100,6 +100,9 @@ runkernel defconfig smp2:net,i82801:efi:mem512:nvme IvyBridge q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
