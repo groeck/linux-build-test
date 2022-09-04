@@ -298,7 +298,13 @@ case ${ARCH} in
 	PREFIX="hppa64-linux-"
 	PREFIX32="hppa-linux-"
 	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
-	ARCH=parisc
+	case ${rel} in
+	v4.9|v4.14|v4.19|v5.4|v5.10)
+	    ARCH=parisc
+	    ;;
+	*)
+	    ;;
+	esac
 	;;
     powerpc)
 	cmd=(${cmd_powerpc[*]})
@@ -538,6 +544,8 @@ do
 	    fi
 	    echo "failed"
 	    dumplog 3000 "${LOG}"
+	    # if needed for testing
+	    # cp "${BUILDDIR}/.config" "/tmp/config.${build}.$$"
 	    errors=$(expr ${errors} + 1)
 	else
 	    echo "passed"
