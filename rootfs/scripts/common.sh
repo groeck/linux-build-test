@@ -280,6 +280,21 @@ __common_usbcmd()
 	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
+    usb-hub[0-9])
+	# Same as "usb-hub", but with explicit bus number
+	# The above must not be in quotes to enable pattern matching
+	extra_params+=" -device usb-hub,bus=usb-bus.${fixup#usb-hub},port=2"
+	extra_params+=" -device usb-storage,bus=usb-bus.${fixup#usb-hub},port=2.1,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
+    usb-hub[0-9].[0-9])
+	# Same as "usb-hub", but with explicit bus and port number
+	# The above must not be in quotes to enable pattern matching
+	bus="${fixup#usb-hub}"
+	extra_params+=" -device usb-hub,bus=usb-bus.${bus%.*},port=${bus#*.}"
+	extra_params+=" -device usb-storage,bus=usb-bus.${bus%.*},port=${bus#*.}.1,drive=d0"
+	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	;;
     "usb-uas-ehci")
 	__pcibridge_new_port
 	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
