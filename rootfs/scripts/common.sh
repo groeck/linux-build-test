@@ -964,6 +964,12 @@ __setup_fragment()
     # Always build with CONFIG_KALLSYMS enabled
     enable_config "${fragment}" CONFIG_KALLSYMS
 
+    # We do not use a userspace helper to download firmware.
+    # Disable it to avoid long (60 second) timeouts with
+    # rtnl lock held.
+    disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER
+    disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER_FALLBACK
+
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
@@ -973,8 +979,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 	if [[ "${nolockup}" -eq 0 ]]; then
-	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
+	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
+	    enable_config "${fragment}" CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
 	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
+	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 20
 	fi
     fi
 
