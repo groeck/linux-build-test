@@ -982,7 +982,7 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
 	    enable_config "${fragment}" CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
 	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
-	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 30
+	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 20
 	fi
     fi
 
