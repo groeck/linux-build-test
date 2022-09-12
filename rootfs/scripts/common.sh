@@ -1013,8 +1013,10 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING CONFIG
 	    # takes too long
 	    # enable_config "${fragment}" CONFIG_TORTURE_TEST CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
-	    # Interferes with CONFIG_PREEMPT=y
-	    # enable_config CONFIG_WW_MUTEX_SELFTEST
+	    if ! grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
+	        # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y
+	        enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
+	    fi
 	fi
 
 	enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
