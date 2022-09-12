@@ -41,7 +41,7 @@ patch_defconfig()
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
     if grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
-	disable_config "${defconfig}" CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST CONFIG_WW_MUTEX_SELFTEST
+	disable_config "${defconfig}" CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
     fi
 }
 
