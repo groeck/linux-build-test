@@ -38,6 +38,9 @@ patch_defconfig()
 
     enable_config "${defconfig}" CONFIG_MTD CONFIG_MTD_BLOCK CONFIG_MTD_SPI_NOR CONFIG_MTD_CMDLINE_PARTS
 
+    # avoid backtrace warnings
+    disable_config "${defconfig}" CONFIG_CGROUP_FREEZER
+
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
     if grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
