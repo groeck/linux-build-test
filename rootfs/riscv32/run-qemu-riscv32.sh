@@ -24,6 +24,7 @@ patch_defconfig()
     local fixup
 
     echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
+    echo "CONFIG_CGROUP_FREEZER=n" >> ${defconfig}
 
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
