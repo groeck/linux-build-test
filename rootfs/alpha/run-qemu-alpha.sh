@@ -74,30 +74,43 @@ echo
 
 runkernel defconfig devtmpfs:net,e1000 rootfs.cpio
 retcode=$?
+checkstate ${retcode}
 runkernel defconfig devtmpfs:ide:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:sdhci:mmc:net,ne2k_pci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:usb-ohci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:usb-ehci:net,virtio-net rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:pci-bridge:usb-xhci:net,pcnet rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:usb-uas-ehci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig devtmpfs:usb-uas-xhci:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig "devtmpfs:pci-bridge:scsi[AM53C974]:net,tulip" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig "devtmpfs:scsi[DC395]:net,e1000-82545em" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig "devtmpfs:scsi[MEGASAS]:net,rtl8139" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig "devtmpfs:scsi[MEGASAS2]:net,e1000-82544gc" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig "devtmpfs:scsi[FUSION]:net,usb-ohci" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # broken
