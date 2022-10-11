@@ -191,6 +191,8 @@ class AnalyzeQemuBuildLog(LogLineObserver):
                 self.step.setProgress('skipped', self.numSkipped)
 	if line.find('[ cut here ]') != -1:
 	    self.tracebacks = True
+	elif line.find('Call Trace:') != -1:
+	    self.tracebacks = True
 	elif line.find('Call trace:') != -1:
 	    self.tracebacks = True
 	elif line.find('stack backtrace') != -1:
