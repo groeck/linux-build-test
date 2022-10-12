@@ -140,21 +140,21 @@ echo
 #       Both don't instantiate as 1st PCI device, but do instantiate as 2nd
 #       (even behind a PCI bridge)
 #
-runkernel qemu_ppc64_book3s_defconfig smp:notests:nokfence::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,ne2k_pci mac99 ppc64 ttyS0 vmlinux \
 	rootfs.cpio.gz manual
 retcode=$?
-runkernel qemu_ppc64_book3s_defconfig smp:notests:nokfence::net,pcnet:ide mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,pcnet:ide mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:notests:nokfence::net,e1000:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,e1000:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
 # Upstream qemu generates a traceback during reboot.
 # irq 30: nobody cared (try booting with the "irqpoll" option)
-runkernel qemu_ppc64_book3s_defconfig smp:notests:nokfence::net,e1000e:nvme mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,e1000e:nvme mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
-runkernel qemu_ppc64_book3s_defconfig smp:notests:nokfence::net,virtio-net:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,virtio-net:scsi[DC395] mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
 
