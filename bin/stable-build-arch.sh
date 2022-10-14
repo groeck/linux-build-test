@@ -5,7 +5,7 @@ basedir=$(cd $(dirname $0); pwd)
 
 # default compiler version
 CV="11.3.0-2.38"
-CV12="12.1.0-2.38"
+CV12="12.2.0-2.39"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
