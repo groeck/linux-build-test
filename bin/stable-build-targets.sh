@@ -71,7 +71,7 @@ skip_419="riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig ope
 skip_54="riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig"
 skip_510="csky:allmodconfig"
 skip_514="csky:allmodconfig"
-skip_519="loongarch:allnoconfig"
+skip_519="loongarch:allnoconfig loongarch:tinyconfig"
 
 # fixups
 
