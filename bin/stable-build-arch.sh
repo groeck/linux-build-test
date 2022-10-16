@@ -21,7 +21,7 @@ PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-# internal compiler error with gcc 11.1.0 (4.9.y)
+# internal compiler error with gcc 11.1.0, 12.2.0 (4.9.y)
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
@@ -46,6 +46,10 @@ PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 # gcc 11.2.0/binutils 2.37:
 # Cannot find symbol for section 11: .text.unlikely in kernel/kexec_file.o
+# gcc 11.3.0/binutils 2.38:
+# Assembler: Error: unrecognized opcode: `mfpmr'
+# Assembler: Error: unrecognized opcode: `dcbfl'
+# PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
 PATH_PPC=/opt/kernel/gcc-11.2.0-2.36.1-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-${CV}-nolibc/riscv64-linux/bin
 PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
