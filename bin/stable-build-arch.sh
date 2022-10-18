@@ -4,12 +4,14 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 # default compiler version
-CV="11.3.0-2.38"
+CV="11.3.0-2.39"
 CV12="12.2.0-2.39"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
 # am33_2.0-linux-ld: am33_2.0-linux-ld: DWARF error: mangled line number section
+# gcc 11.3.0/binutils 2.39:
+# misc.c:(.text+0x189): undefined reference to `memset'
 # PATH_AM33=/opt/kernel/gcc-${CV}-nolibc/am33_2.0-linux/bin
 PATH_AM33=/opt/kernel/gcc-9.4.0-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
@@ -49,8 +51,8 @@ PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 # gcc 11.3.0/binutils 2.38:
 # Assembler: Error: unrecognized opcode: `mfpmr'
 # Assembler: Error: unrecognized opcode: `dcbfl'
-# PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
-PATH_PPC=/opt/kernel/gcc-11.2.0-2.36.1-nolibc/powerpc64-linux/bin
+# PATH_PPC=/opt/kernel/gcc-11.2.0-2.36.1-nolibc/powerpc64-linux/bin
+PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-${CV}-nolibc/riscv64-linux/bin
 PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
@@ -399,12 +401,18 @@ if [[ -n "${!tmp}" ]]; then
 fi
 
 if [[ "${CCMD}" = "clang" ]]; then
-    compiler_version="$(clang --version | grep 'clang version')"
+    compiler_version="$(clang --version | head -n 1)"
+    assembler_version=""
 else
-    compiler_version="$(${PREFIX}gcc --version | grep gcc)"
+    compiler_version="$(${PREFIX}gcc --version | head -n 1)"
+    assembler_version="$(${PREFIX}gcc -Wa,--version -c -x assembler /dev/null -o /dev/null 2>/dev/null | head -n 1)"
 fi
 
 echo "Compiler version: ${compiler_version}"
+if [[ -n "${assembler_version}" ]]; then
+    echo "Assembler version: ${assembler_version}"
+fi
+
 echo
 
 CROSS=""
