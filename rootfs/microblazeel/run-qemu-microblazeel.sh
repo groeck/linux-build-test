@@ -14,7 +14,6 @@ ARCH=microblaze
 
 if [[ ${linux_version_code} -ge $(kernel_version 4 14) ]]; then
     # Images built with gcc 10.x/11.x fail to boot
-    # (possibly due to binutils 2.37)
     PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblazeel-linux/bin"
 else
     # older kernels fail to boot with more recent compilers
