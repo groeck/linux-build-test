@@ -18,6 +18,6 @@ QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 QEMU_BIN=${QEMU_V70_BIN}
 
 # default compiler
-DEFAULT_CC="gcc-11.3.0-2.38-nolibc"
+DEFAULT_CC="gcc-11.3.0-2.39-nolibc"
 
 config_initcli="slub_debug=FZPUA"
