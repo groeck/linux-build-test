@@ -12,7 +12,8 @@ variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips}
 
-PATH_MIPS=/opt/kernel/mips/gcc-5.4.0/usr/bin
+# PATH_MIPS=/opt/kernel/mips/gcc-5.4.0/usr/bin
+PATH_MIPS=/opt/kernel/${DEFAULT_CC}/mips-linux/bin
 PREFIX=mips-linux-
 
 # machine specific information
