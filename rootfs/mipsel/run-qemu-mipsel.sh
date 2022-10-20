@@ -11,8 +11,7 @@ _cpu=$1
 config=$2
 variant=$3
 
-# Compile failure with gcc 10.3.0 in v5.10.y and malta_qemu_32r6_defconfig
-PATH_MIPS=/opt/kernel/gcc-9.4.0-nolibc/mips-linux/bin
+PATH_MIPS=/opt/kernel/${DEFAULT_CC}/mips-linux/bin
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mipsel}
 PREFIX=mips-linux-
 
