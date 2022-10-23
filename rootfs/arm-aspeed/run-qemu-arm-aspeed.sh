@@ -356,5 +356,10 @@ runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+# Also test booting from the second SPI controller
+runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 exit ${retcode}
