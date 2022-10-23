@@ -373,7 +373,7 @@ __common_flashcmd()
     # Sub-parameters are separated by '.'.
     # First sub-parameter is flash size (in MB),
     # second parameter is partition offset (default in MB, accepts units),
-    # third parameter is partition index.
+    # third parameter is partition index, 4th parameter is device index.
     local plist=(${params//,/ })
     local flashsize="${plist[0]}"
     local seek="${plist[1]}"
@@ -395,10 +395,14 @@ __common_flashcmd()
     if [[ -z "${partition}" ]]; then
 	partition="0"
     fi
+    local devindex="${plist[3]}"
 
     dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
     dd if="${rootfs}" of="${tmpfile}" ${seek} conv=notrunc status=none
     extra_params+=" -drive file=${tmpfile},format=raw,if=${flashif}"
+    if [[ -n "${devindex}" ]]; then
+        extra_params+=",index=${devindex}"
+    fi
     initcli+=" root=/dev/mtdblock${partition}"
 }
 
