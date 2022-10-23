@@ -298,6 +298,11 @@ runkernel aspeed_g5_defconfig g220a-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+# Test booting from second SPI controller
+runkernel aspeed_g5_defconfig g220a-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-bytedance-g220a.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-tacoma.dtb
