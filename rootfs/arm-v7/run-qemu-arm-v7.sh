@@ -23,7 +23,7 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
-skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:nokfence:flash64:mem128:net,default \
+skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \
 	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
@@ -34,7 +34,7 @@ skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:nokfence:flash64:mem128:
 	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
 	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
 	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic"
-skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:nokfence:flash64:mem128:net,default \
+skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \
 	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
@@ -44,7 +44,7 @@ skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:nokfence:flash64:mem128
 skip_419="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
 	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:nokfence:flash64:mem128:net,default"
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
@@ -91,6 +91,9 @@ patch_defconfig()
 
     # Enable SPI controller for sabrelite and other IMX boards
     enable_config ${defconfig} CONFIG_SPI_IMX
+
+    # KFENCE results in useless warnings
+    disable_config "${defconfig}" CONFIG_KFENCE
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -287,32 +290,32 @@ checkstate ${retcode}
 
 # vexpress tests generate a warning during reboot if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.cpio auto nolocktests:nokfence::mem128:net,default \
+	rootfs-armv5.cpio auto nolocktests::mem128:net,default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests:nokfence::sd:mem128:net,default \
-	vexpress-v2p-ca9.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests:nokfence::flash64:mem128:net,default \
+	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net,default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests:nokfence::virtio-blk:mem128:net,default \
+	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net,default \
+	vexpress-v2p-ca9.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128:net,default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
-	rootfs-armv7a.ext2 auto nolocktests:nokfence::sd:mem128:net,default \
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net,default \
 	vexpress-v2p-ca15-tc1.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto nolocktests:nokfence::sd:mem256:net,default \
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net,default \
 	vexpress-v2p-ca15_a7.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
