@@ -615,8 +615,6 @@ __common_fixup()
     efi|efi64)
         if [[ "${ARCH}" == "arm64" ]]; then
 	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-aarch64.fd"
-	elif [[ "${ARCH}" == "loongarch" ]]; then
-	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-loongarch64.fd"
 	else
 	    extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
 	fi
@@ -923,7 +921,6 @@ __setup_fragment()
     local novirt=0
     local preempt=0
     local nonet=0
-    local nokfence=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -958,7 +955,6 @@ __setup_fragment()
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
 	nonet) nonet=1;;
-	nokfence) nokfence=1;;
 	preempt) preempt=1 ;;
 	*)
 	    ;;
@@ -980,9 +976,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
 	enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC
 	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
-	if [[ "${nokfence}" -eq 0 ]]; then
-	    enable_config "${fragment}" CONFIG_KFENCE
-	fi
+	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 	if [[ "${nolockup}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
