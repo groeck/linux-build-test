@@ -32,9 +32,18 @@ skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic"
-skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
-skip_511="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic"
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net,nic"
+skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net,nic"
+skip_515="arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net,nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net,nic \
+	arm:g220a-bmc:aspeed_g5_defconfig:notests:mtd128,0,12,2:net,nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:notests:net,nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:notests:sd2:net,nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:notests:usb:net,nic "
 
 patch_defconfig()
 {
@@ -136,9 +145,9 @@ runkernel()
 
     kernel="arch/arm/boot/zImage"
     case ${mach} in
-    "ast2500-evb" | "ast2600-evb" | "palmetto-bmc" | "romulus-bmc" | \
+    "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
-    "supermicrox11-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
+    "supermicrox11-spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "bletchley-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
@@ -146,10 +155,10 @@ runkernel()
 	;;
     "fuji-bmc")
 	initcli+=" console=ttyS0,115200"
-	# initcli+=" earlycon"
+	initcli+=" earlycon=uart8250,mmio32,0x1e783000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
-    "qcom-dc-scm-v1-bmc")
+    "qcom-dc-scm-v1-bmc" | "ast2600-evb")
 	QEMUCMD="${QEMU_V71}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
@@ -193,18 +202,18 @@ runkernel aspeed_g4_defconfig palmetto-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # causes repeated soft lockup warnings
-    # watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [swapper:1]
-    runkernel aspeed_g4_defconfig supermicrox11-bmc "" \
+runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
 	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-supermicro-x11spi.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-    runkernel aspeed_g4_defconfig supermicrox11-bmc "" \
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
 	rootfs-armv5.ext2 automatic "::mtd32:net,nic" aspeed-bmc-supermicro-x11spi.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
+	rootfs-armv5.ext2 automatic "::mtd32,0,6,1:net,nic" aspeed-bmc-supermicro-x11spi.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 # selftests sometimes hang with soft CPU lockup
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
@@ -256,25 +265,33 @@ runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # SPI (NOR) Flash doesn't instantiate on ast2600-evb.
-    # The code necessary to support aspeed,ast2600-fmc and
-    # aspeed,ast2600-spi is in the not upstream kernel. See
-    # https://patchwork.kernel.org/project/spi-devel-general/cover/20201105120331.9853-1-chin-ting_kuo@aspeedtech.com/
-    # which seems to have stalled as of this writing.
-    runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic notests::mtd64 aspeed-ast2600-evb.dtb
+# The following tests require qemu 7.1+ and Linux v5.18+
+# Boot from 1st SPI controller (fmc)
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic notests::mtd64:net,nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
-fi
+# Boot from 2nd SPI controller
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic notests::mtd64,0,6,1:net,nic aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # No console output
-    runkernel aspeed_g5_defconfig fuji-bmc "" \
+runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-fuji.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.ext2 automatic notests::sd2:net,nic aspeed-bmc-facebook-fuji.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-facebook-fuji.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+if [ ${runall} -eq 1 ]; then
+    # SPI interfaces fail to instantiate in Linux:
+    # spi-aspeed-smc 1e620000.spi: ioremap failed for resource [mem 0x20000000-0x2fffffff]
     runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-facebook-fuji.dtb
     retcode=$((${retcode} + $?))
@@ -330,7 +347,7 @@ runkernel aspeed_g5_defconfig rainier-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
-    # Does not instantate. See comment for ast2600-evb above.
+    # does not instantiate (SPI controller not supported by qemu)
     runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-ibm-rainier.dtb
     retcode=$((${retcode} + $?))
@@ -338,17 +355,20 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel aspeed_g5_defconfig bletchley-bmc "" \
-    rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig bletchley-bmc "" \
-    rootfs-armv5.ext2 automatic notests::usb0:net,nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.ext2 automatic notests::usb0:net,nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
-    # Does not instantate. See comment for ast2600-evb above.
-     runkernel aspeed_g5_defconfig bletchley-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-facebook-bletchley.dtb
+    # requires qemu v7.1 and Linux v5.18+
+    # Still fails with error:
+    # spi-nor spi0.0: unrecognized JEDEC id bytes: ef 40 21 00 00 00
+    # [The SPI chip used on this board is not supported by Linux as of Linux 6.1]
+    runkernel aspeed_g5_defconfig bletchley-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mtd256:net,nic aspeed-bmc-facebook-bletchley.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
@@ -361,7 +381,7 @@ runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# Also test booting from the second SPI controller
+# Also test booting from second SPI controller
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
