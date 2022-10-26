@@ -10,6 +10,7 @@ shift $((OPTIND - 1))
 _mach="$1"
 _fixup="$2"
 
+QEMU_V71=${QEMU:-${QEMU_V71_BIN}/qemu-system-riscv64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
@@ -86,7 +87,6 @@ runkernel()
 	return 1
     fi
 
-    BIOS="default"
     KERNEL="arch/riscv/boot/Image"
 
     memsize="512M"
@@ -94,6 +94,7 @@ runkernel()
     virt)
 	con="console=ttyS0,115200 earlycon=uart8250,mmio,0x10000000,115200"
 	wait="automatic"
+	extra_params+=" -bios default"
 	;;
     sifive_u)
 	# qemu v7.0 fails to reboot with sifive_u
@@ -105,11 +106,13 @@ runkernel()
 	if [[ "${fixup}" == *mtd* ]]; then
 	    initcli+=" mtdparts=spi0.0:-"
 	fi
+	extra_params+=" -bios default"
 	;;
     microchip-icicle-kit)
+	QEMU="${QEMU_V71}"
 	con="console=ttyS1,115200 earlycon"
 	wait="manual"
-	extra_params+=" -dtb arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dtb"
+	extra_params+=" -dtb arch/riscv/boot/dts/microchip/mpfs-icicle-kit.dtb"
 	extra_params+=" -display none -serial null -serial stdio -smp 5"
 	memsize="2G"
 	;;
@@ -117,7 +120,6 @@ runkernel()
 
     execute "${wait}" waitlist[@] \
       ${QEMU} -M "${mach}" -m "${memsize}" -no-reboot \
-	-bios "${BIOS}" \
 	-kernel "${KERNEL}" \
 	${extra_params} \
 	-append "${initcli} ${con}" \
