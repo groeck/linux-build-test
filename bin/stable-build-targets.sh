@@ -12,12 +12,12 @@ cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig omap1_defconfig \
 	footbridge_defconfig davinci_all_defconfig mini2440_defconfig \
-	axm55xx_defconfig mxs_defconfig keystone_defconfig \
+	axm55xx_defconfig mxs_defconfig keystone_defconfig imxrt_defconfig \
 	vexpress_defconfig imx_v4_v5_defconfig at91_dt_defconfig \
 	s3c6400_defconfig lpc32xx_defconfig shmobile_defconfig \
-	nhk8815_defconfig bcm2835_defconfig sama5_defconfig orion5x_defconfig \
-	exynos_defconfig cm_x2xx_defconfig s5pv210_defconfig \
-	integrator_defconfig efm32_defconfig \
+	nhk8815_defconfig bcm2835_defconfig sama5_defconfig sama7_defconfig \
+	orion5x_defconfig exynos_defconfig s5pv210_defconfig \
+	integrator_defconfig sp7021_defconfig \
 	pxa910_defconfig clps711x_defconfig)
 cmd_arm64=(allnoconfig tinyconfig defconfig allmodconfig)
 cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
