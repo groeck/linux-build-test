@@ -193,8 +193,6 @@ with 'jump target out of range' errors. Also, it won't let you run
 the qemu target. Note that you _must_ use the same toolchain for both
 kernel and rootfs builds.
 
-qemu 2.1.0 is required.
-
 ---
 arm:
 
@@ -238,13 +236,14 @@ Build gcc-6.5.0 using buildroot.
 qemu
 
 Local patches are required. See groeck/qemu repository at kernel.org.
-Look for local and linaro branches.
+Look for local branches.
 
 Packages needed to build:
 	libglib2.0-dev
 	libssh2-1-dev
 	libcurl4-openssl-dev
 	libiscsi-dev
+	libslirp-dev
 	autoconf
 	libpixman-1-dev
 	ninja-build
