@@ -78,68 +78,8 @@ dobuild_common()
     checkexit $?
 }
 
-if [ -z "$1" -o "$1" = "v3.0" ]
-then
-    dobuild v3.0.1-local v3.0 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--with-gtkabi=3.0 --disable-werror \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v4.0" ]; then
-    dobuild v4.0.1-local v4.0 \
-	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-vnc-png \
-	--disable-werror \
-	--disable-xen --disable-xen-pci-passthrough"
-    checkexit $?
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v4.1" ]; then
-    dobuild_common v4.1.1-local v4.1 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
 if [ -z "$1" -o "$1" = "v4.2" ]; then
     dobuild_common v4.2.1-local v4.2 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v5.1" ]; then
-    dobuild_common v5.1.0-local v5.1 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v5.2" ]; then
-    dobuild_common v5.2.0-local v5.2 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v6.0" ]; then
-    dobuild_common v6.0.0-local v6.0 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v6.1" ]; then
-    dobuild_common v6.1.1-local v6.1 "--disable-vnc-png"
     if [ -n "$2" ]; then
 	shift
     fi
@@ -160,8 +100,15 @@ if [ -z "$1" -o "$1" = "v7.0" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v7.1" ]; then
-    dobuild_common v7.1.0-local v7.1 "--disable-png --disable-strip --extra-cflags=-g"
-#    dobuild_common v7.1.0-local v7.1-debug \
+    dobuild_common v7.1.0-local v7.1 "--disable-png"
+    if [ -n "$2" ]; then
+	shift
+    fi
+fi
+
+if [ -z "$1" -o "$1" = "v7.2" ]; then
+    dobuild_common v7.2.0-local v7.2 "--disable-png --disable-strip --extra-cflags=-g"
+#    dobuild_common v7.2.0-local v7.2-debug \
 #	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
