@@ -155,7 +155,7 @@ retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:net,i82562:mem512:scsi[virtio]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel xlnx-versal-virt defconfig "smp2:mem512:virtio-blk" rootfs.ext2.gz
+runkernel xlnx-versal-virt defconfig "smp4:mem512:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
