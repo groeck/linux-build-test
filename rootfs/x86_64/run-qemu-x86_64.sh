@@ -175,7 +175,7 @@ runkernel defconfig smp2:net,i82558a:efi32:mem1G:virtio Nehalem q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig preempt:smp4:net,ne2k_pci:efi:mem2G:virtio Icelake-Client q35 rootfs.iso
+runkernel defconfig preempt:smp4:net,ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig preempt:smp8:net,i82557a:mem4G:nvme Icelake-Server q35 rootfs.btrfs
