@@ -915,6 +915,7 @@ __setup_fragment()
     local fixup
     local nocd=0
     local nodebug=0
+    local nodebugobj=0
     local nolockup=0
     local nofs=0
     local nolocktests=0
@@ -949,6 +950,7 @@ __setup_fragment()
 	    nonet=1
 	    ;;
 	nodebug) nodebug=1 ;;
+	nodebugobj) nodebugobj=1 ;;
 	nocd) nocd=1 ;;
 	nofs) nofs=1 ;;
 	nolocktests) nolocktests=1 ;;
@@ -982,6 +984,13 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
+	if [[ "${nodebugobj}" -eq 0 ]]; then
+	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS CONFIG_DEBUG_OBJECTS_FREE
+	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS_TIMERS CONFIG_DEBUG_OBJECTS_WORK
+	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS_RCU_HEAD
+	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS_PERCPU_COUNTER
+	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS_SELFTEST
+	fi
 	if [[ "${nolockup}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
 	    enable_config "${fragment}" CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
