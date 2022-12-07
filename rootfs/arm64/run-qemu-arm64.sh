@@ -19,7 +19,7 @@ PATH=${PATH}:${PATH_ARM64}
 
 skip_49="raspi3b:defconfig:smp:net,usb:mem1G:initrd \
 	raspi3b:defconfig:smp4:net,usb:mem1G:sd:rootfs \
-	xlnx-versal-virt:defconfig:smp2:net,default:mem512:sd0:rootfs \
+	xlnx-versal-virt:defconfig:smp4:net,default:mem512:sd0:rootfs \
 	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
 	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
 
@@ -161,12 +161,12 @@ retcode=$((retcode + $?))
 
 runkernel xlnx-versal-virt defconfig smp:net,default:mem512 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel xlnx-versal-virt defconfig "smp2:net,default:mem512:virtio-blk" rootfs.ext2.gz
+runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:virtio-blk" rootfs.ext2.gz
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # unreliable; the drive sometimes instantiates as mmcblk1 instead of
     # mmcblk0, causing spurious failures.
-    runkernel xlnx-versal-virt defconfig "smp2:net,default:mem512:sd0" rootfs.ext2.gz
+    runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:sd0" rootfs.ext2.gz
     retcode=$((retcode + $?))
 fi
 
