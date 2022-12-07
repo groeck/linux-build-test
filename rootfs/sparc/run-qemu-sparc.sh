@@ -115,17 +115,17 @@ runkernel sparc32_defconfig SS-600MP "" nosmp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
 runkernel sparc32_defconfig Voyager "" nosmp:noapc:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-4 "" smp:scsi:net,default rootfs.ext2
+runkernel sparc32_defconfig SS-4 "" nodebugobj:smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-5 "" smp:scsi:net,default rootfs.iso
+runkernel sparc32_defconfig SS-5 "" nodebugobj:smp:scsi:net,default rootfs.iso
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-10 "" smp:scsi:net,default rootfs.sqf
+runkernel sparc32_defconfig SS-10 "" nodebugobj:smp:scsi:net,default rootfs.sqf
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-20 "" smp:scsi:net,default rootfs.ext2
+runkernel sparc32_defconfig SS-20 "" nodebugobj:smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig SS-600MP "" smp:scsi:net,default rootfs.ext2
+runkernel sparc32_defconfig SS-600MP "" nodebugobj:smp:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
-runkernel sparc32_defconfig Voyager "" smp:noapc:scsi:net,default rootfs.ext2
+runkernel sparc32_defconfig Voyager "" nodebugobj:smp:noapc:scsi:net,default rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
