@@ -9,7 +9,13 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+# Kernels older than v5.4 need qemu version 7.1 or older
+if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
+    QEMU=${QEMU:-${QEMU_V71_BIN}/qemu-system-s390x}
+else
+    QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+fi
+
 PREFIX=s390-linux-
 ARCH=s390
 # Kernels prior to v5.0 need gcc 8.x or older. See kernel commit
