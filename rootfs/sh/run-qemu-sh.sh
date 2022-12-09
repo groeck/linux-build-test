@@ -8,12 +8,14 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
+# Kernels are unstable (crash randomly) with upstream qemu v7.2.
+# Requires local qemu build with offending patch reverted.
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
-# boot tests hang with gcc 9.3.0/9.4.0/10.3.0/11.2.0 in v4.4.y
-# when using binutils 2.37. binutils 2.32 seems to work, though,
-# at least to some degree.
-PATH_SH=/opt/kernel/gcc-9.2.0-nolibc/sh4-linux/bin
+# boot tests hang with gcc 9.x and later in v4.9.y and v4.14.y
+# when using recent binutils (2.37 or later).
+# Use gcc 11.3.0 with binutils 2.32 instead.
+PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4-linux/bin
 
 PREFIX=sh4-linux-
 ARCH=sh
