@@ -9,12 +9,14 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-# Kernels older than v5.4 need qemu version 7.1 or older
+# Kernels older than v5.4 do not support prno-trng
 if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-    QEMU=${QEMU:-${QEMU_V71_BIN}/qemu-system-s390x}
+    cpu="qemu,prno-trng=off"
 else
-    QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+    cpu="qemu"
 fi
+
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 
 PREFIX=s390-linux-
 ARCH=s390
@@ -63,7 +65,7 @@ runkernel()
 
     execute automatic waitlist[@] \
       ${QEMU} \
-	-cpu qemu \
+	-cpu "${cpu}" \
 	-kernel arch/s390/boot/bzImage \
         ${extra_params} \
 	-append "${initcli}" \
