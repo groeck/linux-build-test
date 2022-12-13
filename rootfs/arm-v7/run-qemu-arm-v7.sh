@@ -331,11 +331,15 @@ checkstate ${retcode}
 # For sabrelite, the instatiated mmc device index is linux kernel release
 # specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
 # setting slot index via device tree alias") for reason and details.
+# On top of that, there is commit 2a43322ca7f3 ("ARM: dts: imx6qdl-sabre:
+# Add mmc aliases") after v6.1. This changes the alias back from mmc3 to
+# mmc1, just to make things even more complicated.
 
-if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-    sabrelite_mmc="mmc1"
-else
-    sabrelite_mmc="mmc3"
+sabrelite_mmc="mmc1"
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    if ! grep -q mmc1 arch/arm/boot/dts/imx6qdl-sabrelite.dtsi; then
+	sabrelite_mmc="mmc3"
+    fi
 fi
 
 runkernel multi_v7_defconfig sabrelite "" \
