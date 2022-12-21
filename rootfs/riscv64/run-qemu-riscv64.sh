@@ -99,7 +99,7 @@ runkernel()
     sifive_u)
 	# qemu v7.0 fails to reboot with sifive_u
 	# "sbi_srst_reset: type=0x0 reason=0x0 failed"
-	QEMU=${QEMU_V62_BIN}/qemu-system-riscv64
+	QEMU=${QEMU_BIN}/qemu-system-riscv64
 	con="console=ttySIF0,115200 earlycon"
 	wait="manual"
 	# extra parameter to create mtd partition on first flash.
