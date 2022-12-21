@@ -995,7 +995,7 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
 	    enable_config "${fragment}" CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
 	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
-	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 30
+	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 45
 	fi
     fi
 
@@ -1406,6 +1406,9 @@ dowait()
 		# Look for alternate.
 	        if [[ $i -eq 0 ]]; then
 		    if grep -q "Requesting system reboot" ${logfile}; then
+			continue
+		    fi
+		    if grep -q "Rebooting" ${logfile}; then
 			continue
 		    fi
 		fi
