@@ -91,7 +91,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 # Override CPU on systems which set TI-MicroSparc-I by default.

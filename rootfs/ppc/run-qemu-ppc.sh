@@ -124,7 +124,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts

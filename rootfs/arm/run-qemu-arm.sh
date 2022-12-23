@@ -239,7 +239,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 runkernel versatile_defconfig versatilepb "" \

@@ -117,7 +117,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 # Failing network tests: i82551, usb-net

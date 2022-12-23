@@ -72,7 +72,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 # run initial set of tests with SMP enabled.

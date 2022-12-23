@@ -1134,7 +1134,7 @@ match_params()
 checkskip()
 {
     local build=$1
-    local rel=$(git describe | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
+    local rel=$(git describe --match 'v*' | cut -f1 -d- | cut -f1,2 -d. | sed -e 's/\.//' | sed -e 's/v//')
     local tmp="skip_${rel}"
     local skip=(${!tmp})
     local s

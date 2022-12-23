@@ -72,8 +72,8 @@ do_import()
 			return $?
 		fi
 	fi
-	echo "describe source: $(git describe ${source})"
-	echo "describe target: $(git describe local/${target})"
+	echo "describe source: $(git describe --match 'v*' ${source})"
+	echo "describe target: $(git describe --match 'v*' local/${target})"
 	return 0
 }
 

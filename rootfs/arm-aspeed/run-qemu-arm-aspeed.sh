@@ -181,7 +181,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 runkernel aspeed_g4_defconfig quanta-q71l-bmc "" \

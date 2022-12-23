@@ -90,7 +90,7 @@ runkernel()
     return ${rv}
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 # Network test notes:

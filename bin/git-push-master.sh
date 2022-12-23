@@ -20,11 +20,11 @@ git pull
 
 echo "Remotes:"
 git remote -v
-echo "Reference: $(git describe)"
+echo "Reference: $(git describe --match 'v*')"
 
 git push local master
 
-echo "Updated reference: $(git describe local/master)"
+echo "Updated reference: $(git describe --match 'v*' local/master)"
 
 epoch=$(date +%s)
 mepoch=$((${epoch} - 2500000))  # ~ one month back

@@ -79,7 +79,7 @@ __cleanup()
     exit ${rv}
 }
 
-rel=$(git describe | cut -f1 -d- | cut -f1,2 -d.)
+rel=$(git describe --match 'v*' | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
 
@@ -109,7 +109,7 @@ maxload=$(($(nproc) * 3 / 2))
 errors=0
 builds=0
 
-ref=$(git describe)
+ref=$(git describe --match 'v*')
 echo
 echo "Build reference: ${ref}"
 

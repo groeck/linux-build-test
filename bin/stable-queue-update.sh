@@ -45,7 +45,7 @@ do_import()
 		git checkout -b ${branch} ${ref}
 	else
 		git checkout ${branch}
-		bref=$(git describe | cut -f1 -d-)
+		bref=$(git describe --match 'v*' | cut -f1 -d-)
 		git reset --hard origin/${branch}
 	fi
 

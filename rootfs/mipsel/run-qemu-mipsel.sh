@@ -83,7 +83,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe)"
+echo "Build reference: $(git describe --match 'v*')"
 echo
 
 # Most images fail to instantiate CD ROM because there is an insufficient
