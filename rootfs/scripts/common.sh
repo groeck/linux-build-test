@@ -745,6 +745,7 @@ doclean()
 		git clean -x -d -f -q
 	else
 		make ARCH=${ARCH} mrproper >/dev/null 2>&1
+		rm -f .config
 	fi
 }
 
@@ -995,7 +996,7 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_LOCKUP_DETECTOR CONFIG_SOFTLOCKUP_DETECTOR
 	    enable_config "${fragment}" CONFIG_BOOTPARAM_SOFTLOCKUP_PANIC
 	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
-	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 45
+	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 30
 	fi
     fi
 
@@ -1006,7 +1007,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST CONFIG_MEMCPY_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_TIME_UNIT_TEST CONFIG_HASH_UNIT_TEST
 	# other
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
