@@ -11,9 +11,15 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
 PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
-# PATH_SH=/opt/kernel/gcc-4.6.3-nolibc/sh4-linux/bin
-# PATH_SH=/opt/kernel/gcc-7.3.0-nolibc/sh4-linux/bin
-PATH_SH=/opt/kernel/sh4eb/gcc-6.3.0/usr/bin
+
+if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
+    # boot tests hang with gcc 9.x and later in kernels older than v5.10
+    # when using recent binutils (2.37 or later).
+    # Use gcc 11.3.0 with binutils 2.32 instead.
+    PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4eb-linux/bin
+else
+    PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
+fi
 
 PATH=${PATH_SH}:${PATH}
 
