@@ -12,10 +12,6 @@ _fixup="$1"
 # Requires local qemu build with offending patch reverted.
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
-# boot tests hang with gcc 9.x and later in v4.9.y and v4.14.y
-# when using recent binutils (2.37 or later).
-# Use gcc 11.3.0 with binutils 2.32 instead.
-PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4-linux/bin
 
 PREFIX=sh4-linux-
 ARCH=sh
@@ -23,6 +19,15 @@ CONFIG=""
 EARLYCON=""
 
 errlog="/tmp/err-sh.log"
+
+if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
+    # boot tests hang with gcc 9.x and later kernels older than v5.10
+    # when using recent binutils (2.37 or later).
+    # Use gcc 11.3.0 with binutils 2.32 instead.
+    PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4-linux/bin
+else
+    PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4-linux/bin
+fi
 
 if [[ ${linux_version_code} -ge $(kernel_version 5 0) ]]; then
     # earlycon only works with v5.0+ and otherwise results in a crash.
