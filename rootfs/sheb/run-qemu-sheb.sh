@@ -12,6 +12,13 @@ PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
 
+skip_414="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_419="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_54="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_510="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_515="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_61="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+
 if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
     # boot tests hang with gcc 9.x and later in kernels older than v5.10
     # when using recent binutils (2.37 or later).
@@ -83,6 +90,10 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
+
     # Do not use -F: If we do, sheb will fail to run in ToT Linux
     if ! dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"; then
 	return 1
@@ -114,16 +125,22 @@ retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2
 retcode=$((retcode + $?))
 
+runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2
+retcode=$((retcode + $?))
+
 if [[ ${runall} -ne 0 ]]; then
-    # Flash is found, but mounting the root file system fails.
-    runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2
-    retcode=$((retcode + $?))
     # The following are most likely PCI bus endianness translation issues.
-    # SD card does not instantiate
+    #
+    # sdhci-pci 0000:00:01.0: SDHCI controller found [1b36:0007] (rev 0)
+    # sdhci-pci 0000:00:01.0: enabling device (0000 -> 0002)
+    # mmc0: Unknown controller version (36). You may experience problems.
+    # mmc0: SDHCI controller on PCI [0000:00:01.0] using PIO
+    # MMC card does not instantiate.
     runkernel rts7751r2dplus_defconfig sdhci:mmc rootfs.ext2
     retcode=$((retcode + $?))
-    # nvme nvme0: Device not ready; aborting initialisation
-    # nvme nvme0: Removing after probe failure status: -19
+    # nvme nvme0: pci function 0000:00:01.0
+    # nvme 0000:00:01.0: enabling device (0000 -> 0002)
+    # nvme nvme0: Minimum device page size 1048576 too large for host (4096)
     runkernel rts7751r2dplus_defconfig nvme rootfs.ext2
     retcode=$((retcode + $?))
     # sm501 sm501: incorrect device id a0000105
@@ -147,13 +164,17 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel rts7751r2dplus_defconfig "scsi[53C895A]" rootfs.ext2
     retcode=$((retcode + $?))
     # hang (scsi command aborts/timeouts)
+    # sd 0:0:0:0: Device offlined - not ready after error recovery
     runkernel rts7751r2dplus_defconfig "scsi[DC395]" rootfs.ext2
     retcode=$((retcode + $?))
+    # sd 0:0:0:0: Device offlined - not ready after error recovery
     runkernel rts7751r2dplus_defconfig "scsi[AM53C974]" rootfs.ext2
     retcode=$((retcode + $?))
     # Hang after "megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state"
     runkernel rts7751r2dplus_defconfig "scsi[MEGASAS]" rootfs.ext2
     retcode=$((retcode + $?))
+    # megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state^M
+    # megaraid_sas 0000:00:01.0: FW in FAULT state, Fault code:0x30000 subcode:0x5000 func:megasas_transition_to_ready^M
     runkernel rts7751r2dplus_defconfig "scsi[MEGASAS2]" rootfs.ext2
     retcode=$((retcode + $?))
     # mptbase: ioc0: ERROR - Enable Diagnostic mode FAILED! (00h)
