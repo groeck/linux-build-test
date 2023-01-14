@@ -96,11 +96,8 @@ retcode=$((retcode + $?))
 runkernel 24Kf malta_defconfig nocd:smp:net,i82550:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
-if [[ ${runall} -ne 0 ]]; then
-    # nvme nvme0: I/O 97 QID 1 timeout, completion polled
-    runkernel 24Kf malta_defconfig nocd:smp:nvme rootfs-mipselr1.ext2.gz
-    retcode=$((retcode + $?))
-fi
+runkernel 24Kf malta_defconfig nocd:smp:nvme rootfs-mipselr1.ext2.gz
+retcode=$((retcode + $?))
 
 runkernel 24Kf malta_defconfig nocd:smp:net,i82801:usb-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
