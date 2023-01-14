@@ -150,6 +150,10 @@ retcode=$((${retcode} + $?))
 # because the 'guts' pointer is not initialized. Even with that fixed,
 # multi-core boots fail (stall) for mpc8544ds, but that maye be a qemu issue.
 #
+# Note: The guts problem was fixed with linux kernel upstream commit
+# 3c2172c1c47b4 ("powerpc/85xx: Fix oops when mpc85xx_smp_guts_ids node
+# cannot be found").
+#
 # net,e1000e instantiates but does not work
 # net,sungem does not instantiate
 # net,usb-uhci does not instantiate
@@ -163,6 +167,7 @@ runkernel mpc85xx_defconfig sdhci:mmc:net,usb-ohci mpc8544ds "" ttyS0 rootfs.ext
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
+    # NVME interrupts (or more generally PCI interrupts) are not received by host OS
     runkernel mpc85xx_defconfig nvme mpc8544ds "" ttyS0 rootfs.ext2.gz arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
     # timeout, no error message
