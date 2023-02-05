@@ -72,7 +72,7 @@ dobuild_common()
 {
     dobuild $1 $2 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt \
+	--disable-nettle --disable-gcrypt --disable-hax \
 	--disable-xen --disable-xen-pci-passthrough \
 	--disable-libssh $3"
     checkexit $?
