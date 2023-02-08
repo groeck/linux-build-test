@@ -51,12 +51,6 @@ runkernel()
         return 0
     fi
 
-    if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
-	# Older kernels get a bad case of hiccup (hang during boot)
-	# when enabling additional configuration options.
-	fixup="noextras:${fixup}"
-    fi
-
     if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi

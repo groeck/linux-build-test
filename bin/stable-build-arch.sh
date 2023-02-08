@@ -43,7 +43,6 @@ PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
 PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
-PATH_OPENRISC_45=/opt/kernel/gcc-4.5.1-nolibc/or32-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
@@ -92,11 +91,6 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v4.9)
-	# 9.2.0 array subscript out of bounds in arch/powerpc/lib/feature-fixups.c
-	PATH_PPC=/opt/kernel/powerpc64/gcc-7.4.0/bin
-	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
-	;;
 v4.14|v4.19)
 	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
 	;;
@@ -202,7 +196,7 @@ case ${ARCH} in
     hexagon)
 	cmd=(${cmd_hexagon[*]})
 	case ${rel} in
-	v4.9|v4.14|v4.19|v5.4)
+	v4.14|v4.19|v5.4)
 	    PREFIX="hexagon-linux-"
 	    PATH=${PATH_HEXAGON}:${PATH}
 	    ;;
@@ -278,16 +272,8 @@ case ${ARCH} in
 	;;
     openrisc)
 	cmd=(${cmd_openrisc[*]})
-	case ${rel} in
-	v4.9)
-		PREFIX="or32-linux-"
-		PATH=${PATH_OPENRISC_45}:${PATH}
-		;;
-	*)
-		PREFIX="or1k-linux-"
-		PATH=${PATH_OPENRISC}:${PATH}
-		;;
-	esac
+	PREFIX="or1k-linux-"
+	PATH=${PATH_OPENRISC}:${PATH}
 	;;
     parisc)
 	cmd=(${cmd_parisc[*]})
@@ -300,7 +286,7 @@ case ${ARCH} in
 	PREFIX32="hppa-linux-"
 	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	case ${rel} in
-	v4.9|v4.14|v4.19|v5.4|v5.10)
+	v4.14|v4.19|v5.4|v5.10)
 	    ARCH=parisc
 	    ;;
 	*)
@@ -367,7 +353,7 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	case ${rel} in
-	v4.9|v4.14|v4.19)
+	v4.14|v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
 		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
 		PREFIX="${PREFIX_X86}"
