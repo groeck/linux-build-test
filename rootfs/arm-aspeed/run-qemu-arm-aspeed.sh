@@ -6,7 +6,6 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_V71=${QEMU:-${QEMU_V71_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -159,7 +158,6 @@ runkernel()
 	extra_params+=" -nodefaults"
 	;;
     "qcom-dc-scm-v1-bmc" | "ast2600-evb")
-	QEMUCMD="${QEMU_V71}"
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
