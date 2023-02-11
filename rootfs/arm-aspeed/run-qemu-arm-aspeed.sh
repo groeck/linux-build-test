@@ -147,7 +147,7 @@ runkernel()
     case ${mach} in
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
-    "supermicrox11-spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
+    "supermicro-x11spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "bletchley-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
@@ -202,15 +202,15 @@ runkernel aspeed_g4_defconfig palmetto-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
+runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 	rootfs-armv5.cpio automatic "::net,nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
+runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 	rootfs-armv5.ext2 automatic "::mtd32:net,nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel aspeed_g5_defconfig supermicrox11-spi-bmc "" \
+runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 	rootfs-armv5.ext2 automatic "::mtd32,0,6,1:net,nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
