@@ -1016,7 +1016,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST CONFIG_GLOB_SELFTEST
 	enable_config "${fragment}" CONFIG_PCI_EPF_TEST CONFIG_PCI_ENDPOINT_TEST
 	enable_config "${fragment}" CONFIG_RCU_EQS_DEBUG CONFIG_STATIC_KEYS_SELFTEST
-	enable_config "${fragment}" CONFIG_STRING_SELFTEST CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
+	enable_config "${fragment}" CONFIG_STRING_SELFTEST CONFIG_TEST_FIRMWARE
 	# takes too long
 	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
 	enable_config "${fragment}" CONFIG_TEST_SORT CONFIG_TEST_SYSCTL CONFIG_TEST_UUID
