@@ -17,7 +17,7 @@ PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv64-linux/bin"
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_54="riscv:virt:defconfig:net,virtio-net-device:usb-ohci:rootfs \
+skip_54="riscv:virt:rv64,zbb=no:defconfig:net,virtio-net-device:usb-ohci:rootfs \
 	riscv:sifive_u:defconfig:mtd32:net,default:rootfs"
 
 patch_defconfig()
@@ -56,11 +56,12 @@ pcnet_netdev="pcnet"
 runkernel()
 {
     local mach=$1
-    local defconfig=$2
-    local fixup=$3
-    local rootfs=$4
+    local cpu=$2
+    local defconfig=$3
+    local fixup=$4
+    local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
-    local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local build="${ARCH}:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -114,7 +115,7 @@ runkernel()
     esac
 
     execute "${wait}" waitlist[@] \
-      ${QEMU} -M "${mach}" -m "${memsize}" -no-reboot \
+      ${QEMU} -M "${mach}" ${cpu:+-cpu ${cpu}} -m "${memsize}" -no-reboot \
 	-kernel "${KERNEL}" \
 	${extra_params} \
 	-append "${initcli} ${con}" \
@@ -134,84 +135,84 @@ echo
 #	a bug in the riscv architecture code).
 
 retcode=0
-runkernel virt defconfig "net,e1000" rootfs.cpio
+runkernel virt "" defconfig "net,e1000" rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
 if [[ "${runall}" -ne 0 ]]; then
-    runkernel virt defconfig "net,ne2k_pci" rootfs.cpio
+    runkernel virt "rv64,zbb=no" defconfig "net,ne2k_pci" rootfs.cpio
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
-runkernel virt defconfig net,e1000e:virtio-blk rootfs.ext2
+runkernel virt "" defconfig net,e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,i82801:virtio rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig net,i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,i82550:virtio-pci rootfs.ext2
+runkernel virt "" defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,usb-ohci:nvme rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
-runkernel virt defconfig net,virtio-net-device:usb-ohci rootfs.ext2
+runkernel virt "" defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel virt defconfig net,i82557b:usb-ehci rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig net,virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig pci-bridge:net,virtio-net-pci:usb-xhci rootfs.ext2
+
+runkernel virt "" defconfig net,i82557b:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,i82557a:usb-uas-ehci rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig pci-bridge:net,virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig net,i82558a:usb-uas-xhci rootfs.ext2
+runkernel virt "" defconfig net,i82557a:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "net,i82559a:scsi[53C810]" rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig net,i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "net,i82559er:scsi[53C895A]" rootfs.ext2
+runkernel virt "" defconfig "net,i82559a:scsi[53C810]" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel virt "rv64,zbb=no" defconfig "net,i82559er:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Does not instantiate (am53c974 0000:01:01.0: pci I/O map failed)
-    runkernel virt defconfig "scsi[AM53C974]" rootfs.ext2
+    runkernel virt "rv64,zbb=no" defconfig "scsi[AM53C974]" rootfs.ext2
     retcode=$((retcode + $?))
-    runkernel virt defconfig "scsi[DC395]" rootfs.ext2
+    runkernel virt "" defconfig "scsi[DC395]" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
-runkernel virt defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
+runkernel virt "" defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig "net,i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
+runkernel virt "" defconfig "pci-bridge:net,${pcnet_netdev}:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig "net,${tulip_netdev}:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
+runkernel virt "" defconfig "net,i82558b:scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel sifive_u defconfig "net,default" rootfs.cpio
+runkernel sifive_u "" defconfig "net,default" rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sifive_u defconfig "sd:net,default" rootfs.ext2
+runkernel sifive_u "" defconfig "sd:net,default" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sifive_u defconfig "mtd32:net,default" rootfs.ext2
+runkernel sifive_u "" defconfig "mtd32:net,default" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -221,9 +222,9 @@ if [[ ${runall} -ne 0 ]]; then
     # clk_rtcref: Zero divisor and CLK_DIVIDER_ALLOW_ZERO not set
     # Ethernet interface fails to instantiate
     # macb 20112000.ethernet eth0: Could not attach PHY (-22)
-    runkernel microchip-icicle-kit defconfig "net,default" rootfs.cpio
+    runkernel microchip-icicle-kit "" defconfig "net,default" rootfs.cpio
     retcode=$((retcode + $?))
-    runkernel microchip-icicle-kit defconfig "sd:net,default" rootfs.ext2
+    runkernel microchip-icicle-kit "" defconfig "sd:net,default" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
