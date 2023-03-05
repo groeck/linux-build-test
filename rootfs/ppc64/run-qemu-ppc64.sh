@@ -223,7 +223,7 @@ retcode=$((retcode + $?))
 runkernel corenet64_smp_defconfig e5500::net,virtio-net:nvme ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
-runkernel corenet64_smp_defconfig e5500::net,e1000:sdhci:mmc ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,eTSEC:sdhci:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 # requires qemu v8.0+ (Freescale eSDHC controller enabled)
