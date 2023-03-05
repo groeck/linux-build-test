@@ -13,6 +13,7 @@ machine=$1
 variant=$2
 config=$3
 
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
@@ -34,6 +35,10 @@ patch_defconfig()
     local fixup
 
     for fixup in ${fixups}; do
+	if [ "${fixup}" = "e500" ]; then
+	    echo "CONFIG_PPC_QEMU_E500=y" >> ${defconfig}
+	fi
+
 	if [ "${fixup}" = "zilog" ]; then
 	    enable_config "${defconfig}" CONFIG_SERIAL_PMACZILOG CONFIG_SERIAL_PMACZILOG_CONSOLE
 	    disable_config "${defconfig}" CONFIG_SERIAL_PMACZILOG_TTYS
@@ -109,6 +114,9 @@ runkernel()
 	;;
     virtex-ml507)
 	earlycon="earlycon"
+	;;
+    "ppce500")
+	QEMU="${QEMU_MASTER}"
 	;;
     *)
 	;;
@@ -254,5 +262,31 @@ runkernel pmac32_defconfig zilog:nvme:net,pcnet mac99 "" ttyPZ0 rootfs.ext2.gz v
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog:scsi[DC395]:net,tulip mac99 "" ttyPZ0 rootfs.ext2.gz vmlinux
 retcode=$((${retcode} + $?))
+
+runkernel corenet32_smp_defconfig e500:net,rtl8139 ppce500 e500mc ttyS0 \
+	rootfs.cpio.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
+runkernel corenet32_smp_defconfig e500:net,virtio-net:nvme ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
+runkernel corenet32_smp_defconfig e500:net,eTSEC:sdhci:mmc ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
+# requires qemu v8.0+ (Freescale eSDHC controller enabled)
+runkernel corenet32_smp_defconfig e500:net,e1000:mmc ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
+if [[ ${runall} -ne 0 ]]; then
+    # Fails to mount flash (mtdblock0)
+    runkernel corenet32_smp_defconfig e500:net,e1000:flash64 ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+    retcode=$((retcode + $?))
+fi
+runkernel corenet32_smp_defconfig e500:net,tulip:scsi[53C895A] ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
+runkernel corenet32_smp_defconfig e500:net,i82562:sata-sii3112 ppce500 e500mc ttyS0 \
+	rootfs.ext2.gz arch/powerpc/boot/uImage
+retcode=$((retcode + $?))
 
 exit ${retcode}
