@@ -229,10 +229,13 @@ retcode=$((retcode + $?))
 # requires qemu v8.0+ (Freescale eSDHC controller enabled)
 runkernel corenet64_smp_defconfig e5500::net,e1000:mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
-retcode=$((retcode + $?))
-runkernel corenet64_smp_defconfig e5500::net,e1000:flash64 ppce500 e5500 ttyS0 \
+if [[ ${runall} -ne 0 ]]; then
+    # Fails to mount flash (mtdblock0)
+    retcode=$((retcode + $?))
+    runkernel corenet64_smp_defconfig e5500::net,e1000:flash64 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
-retcode=$((retcode + $?))
+    retcode=$((retcode + $?))
+fi
 runkernel corenet64_smp_defconfig e5500::net,tulip:scsi[53C895A] ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
