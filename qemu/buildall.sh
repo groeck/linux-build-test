@@ -11,6 +11,28 @@ checkexit()
 	fi
 }
 
+clear_submodule()
+{
+    local sdir=".git/modules/$1"
+    local force=0
+
+    # If the submodule is initialized, check if its remote location has changed.
+    # If so, remove the local cache as well to enfore the new location.
+    # Do this only conditionally because otherwise we have to keep cloning
+    # the submodule for each build.
+    if [[ -d "${sdir}" && -d "$2" ]]; then
+	remote1="$(git -C "${sdir}" remote get-url origin)"
+	remote2="$(git -C "$1" remote get-url origin)"
+	if [[ "${remote1}" != "${remote2}" ]]; then
+	    force=1
+	fi
+    fi
+    git submodule deinit -f "$1" 2>/dev/null
+    if [[ "${force}" -ne 0 ]]; then
+	rm -rf "${sdir}"
+    fi
+}
+
 rinse()
 {
 	git clean -d -x -f -q
@@ -20,7 +42,14 @@ rinse()
 	# slirp doesn't always exist as submodule.
 	# If it does, it creates havoc if one tries to check out
 	# an older branch.
-	git submodule deinit slirp 2>/dev/null
+	clear_submodule slirp
+	# Location of other submodules may have changed.
+	# Make sure they are all reinitialized.
+	clear_submodule tests/fp/berkeley-softfloat-3
+	clear_submodule tests/fp/berkeley-testfloat-3
+	clear_submodule ui/keycodemapdb
+	clear_submodule meson
+	# git submodule deinit -f dtc 2>/dev/null
 }
 
 dobuild()
