@@ -12,6 +12,7 @@ shift $((OPTIND - 1))
 mach=$1
 variant=$2
 
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 # machine specific information
@@ -104,6 +105,9 @@ runkernel()
 	if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
 	    fixup="$(echo ${fixup} | sed -e 's/:\+net,rtl8139//')"
 	fi
+	;;
+    "ppce500")
+	QEMU="${QEMU_MASTER}"
 	;;
     *)
 	;;
@@ -220,6 +224,13 @@ runkernel corenet64_smp_defconfig e5500::net,virtio-net:nvme ppce500 e5500 ttyS0
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel corenet64_smp_defconfig e5500::net,e1000:sdhci:mmc ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
+retcode=$((retcode + $?))
+# requires qemu v8.0+ (Freescale eSDHC controller enabled)
+runkernel corenet64_smp_defconfig e5500::net,e1000:mmc ppce500 e5500 ttyS0 \
+	arch/powerpc/boot/uImage rootfs.ext2.gz auto
+retcode=$((retcode + $?))
+runkernel corenet64_smp_defconfig e5500::net,e1000:flash64 ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 runkernel corenet64_smp_defconfig e5500::net,tulip:scsi[53C895A] ppce500 e5500 ttyS0 \
