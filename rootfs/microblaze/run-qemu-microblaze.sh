@@ -17,8 +17,6 @@ PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblaze-linux/bin"
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
-skip_49="microblaze:petalogix-ml605:rootfs"
-
 patch_defconfig()
 {
     :

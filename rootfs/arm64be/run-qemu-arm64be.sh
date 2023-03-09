@@ -17,11 +17,6 @@ PATH_ARM64="/opt/kernel/${DEFAULT_CC}/aarch64-linux/bin"
 
 PATH=${PATH}:${PATH_ARM64}
 
-skip_49="raspi3b:defconfig:smp:mem1G:initrd \
-	raspi3b:defconfig:smp4:mem1G:sd:rootfs \
-	xlnx-zcu102:defconfig:smp:mem2G:sd:rootfs \
-	xlnx-zcu102:defconfig:nosmp:mem2G:sd:rootfs"
-
 patch_defconfig()
 {
     local defconfig=$1

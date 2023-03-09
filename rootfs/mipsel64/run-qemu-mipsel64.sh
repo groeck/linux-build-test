@@ -10,9 +10,6 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-skip_49="mipsel64:64r6el_defconfig:notests:nonet:smp:ide:hd
-	mipsel64:64r6el_defconfig:notests:nonet:smp:ide:cd"
-
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
 PATH_MIPS="/opt/kernel/${DEFAULT_CC}/mips64-linux/bin"

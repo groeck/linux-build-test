@@ -22,17 +22,6 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
-skip_49="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
-	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
-	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:mem256 \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:sd:mem256 \
-	arm:mcimx6ul-evk:imx_v6_v7_defconfig:nodrm:usb0:mem256:net,nic:net,nic \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic \
-	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
-	arm:orangepi-pc:multi_v7_defconfig:usb0:net,nic"
 skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \

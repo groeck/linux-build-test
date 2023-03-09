@@ -27,8 +27,6 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_49="arm:imx25-pdk:imx_v4_v5_defconfig:nonand:sd:mem128:net,default \
-	arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default"
 skip_414="arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default"
 
 patch_defconfig()
