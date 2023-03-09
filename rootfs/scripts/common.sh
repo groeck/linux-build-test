@@ -617,11 +617,17 @@ __common_fixup()
 	extra_params+=" -smp ${fixup#smp}"
 	;;
     efi|efi64)
-        if [[ "${ARCH}" == "arm64" ]]; then
+	case "${ARCH}" in
+	"arm64")
 	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-aarch64.fd"
-	else
+	    ;;
+	"loongarch")
+	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-loongarch64.fd"
+	    ;;
+	*)
 	    extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
-	fi
+	    ;;
+	esac
 	;;
     efi32)
 	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-32.fd"
