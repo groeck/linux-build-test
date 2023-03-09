@@ -101,5 +101,7 @@ runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:scsi[FUSION]:net,
 retcode=$((retcode + $?))
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:scsi[MEGASAS]:net,default"
 retcode=$((retcode + $?))
+runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:sdhci:mmc:net,default"
+retcode=$((retcode + $?))
 
 exit ${retcode}
