@@ -11,7 +11,8 @@ machine=$1
 cputype=$2
 
 # Note: Upstream qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-x86_64}
+QEMU_MASTER="${QEMU:-${QEMU_MASTER_BIN}/qemu-system-x86_64}"
+QEMU="${QEMU:-${QEMU_BIN}/qemu-system-x86_64}"
 ARCH=x86_64
 
 PATH_X86="/opt/kernel/${DEFAULT_CC}/x86_64-linux/bin"
@@ -22,6 +23,9 @@ PATH=${PATH_X86}:${PATH}
 patch_defconfig()
 {
     local defconfig=$1
+
+    # Needed for IGB network interface tests
+    echo "CONFIG_IGB=y" >> ${defconfig}
 
     # Causes problems on shutdown (lack of reboot message)
     echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
@@ -47,6 +51,11 @@ runkernel()
 	pbuild+=":cd"
     else
 	pbuild+=":hd"
+    fi
+
+    # igb network interface test requires qemu v8.0+
+    if echo "${fixup}" | grep -q "net,igb"; then
+	QEMU="${QEMU_MASTER}"
     fi
 
     if ! match_params "${machine}@${mach}" "${cputype}@${cpu}"; then
@@ -191,7 +200,15 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,usb-ohci:efi:mem1G:scsi[53C810] Cooperlake q35 rootfs-x86.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net,e1000:mem2G:scsi[53C895A] EPYC-Rome q35 rootfs-x86.ext2
+
+# igb needs kernel version 5.10 or later
+if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
+    netdev="e1000"
+else
+    netdev="igb"
+fi
+
+runkernel defconfig "smp4:net,${netdev}:mem2G:scsi[53C895A]" EPYC-Rome q35 rootfs-x86.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
