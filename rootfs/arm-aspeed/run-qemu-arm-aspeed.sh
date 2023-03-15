@@ -50,21 +50,19 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # F2FS filesystem support
+    enable_config ${defconfig} CONFIG_F2FS_FS
+
     # Disable Bluetooth and wireless. We won't ever use or test it.
-    echo "CONFIG_BT=n" >> ${defconfig}
-    echo "CONFIG_WLAN=n" >> ${defconfig}
-    echo "CONFIG_WIRELESS=n" >> ${defconfig}
+    disable_config ${defconfig} CONFIG_BT CONFIG_WLAN CONFIG_WIRELESS
 
     # Options needed to be built into the kernel for device support
     # MMC
-    sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
+    enable_config ${defconfig} CONFIG_MMC_BLOCK
     # PCMCIA
-    sed -i -e 's/CONFIG_ATA=m/CONFIG_ATA=y/' ${defconfig}
-    sed -i -e 's/CONFIG_BLK_DEV_SD=m/CONFIG_BLK_DEV_SD=y/' ${defconfig}
+    enable_config ${defconfig} CONFIG_ATA CONFIG_BLK_DEV_SD
     # USB
-    sed -i -e 's/CONFIG_USB=m/CONFIG_USB=y/' ${defconfig}
-    sed -i -e 's/CONFIG_USB_STORAGE=m/CONFIG_USB_STORAGE=y/' ${defconfig}
-    sed -i -e 's/CONFIG_USB_OHCI_HCD=m/CONFIG_USB_OHCI_HCD=y/' ${defconfig}
+    enable_config ${defconfig} CONFIG_USB CONFIG_USB_STORAGE CONFIG_USB_OHCI_HCD
 }
 
 runkernel()
@@ -310,10 +308,10 @@ runkernel aspeed_g5_defconfig g220a-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.f2fs automatic notests::mtd128:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# Test booting from second SPI controller
+# Test booting from second SPI controller, this time with ext2
 runkernel aspeed_g5_defconfig g220a-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
@@ -376,7 +374,7 @@ runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.f2fs automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Also test booting from second SPI controller
