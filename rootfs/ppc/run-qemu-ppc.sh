@@ -13,7 +13,7 @@ machine=$1
 variant=$2
 config=$3
 
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc}
+QEMU_V80=${QEMU:-${QEMU_V80_BIN}/qemu-system-ppc}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
@@ -120,7 +120,7 @@ runkernel()
 	earlycon="earlycon"
 	;;
     "ppce500")
-	QEMU="${QEMU_MASTER}"
+	QEMU="${QEMU_V80}"
 	;;
     *)
 	;;
