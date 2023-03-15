@@ -12,7 +12,7 @@ shift $((OPTIND - 1))
 mach=$1
 variant=$2
 
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-ppc64}
+QEMU_V80=${QEMU:-${QEMU_V80_BIN}/qemu-system-ppc64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 # machine specific information
@@ -102,7 +102,7 @@ runkernel()
 	fi
 	;;
     "ppce500")
-	QEMU="${QEMU_MASTER}"
+	QEMU="${QEMU_V80}"
 	;;
     *)
 	;;
