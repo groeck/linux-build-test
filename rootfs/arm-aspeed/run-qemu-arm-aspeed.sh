@@ -42,6 +42,8 @@ skip_515="arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net,nic \
 	arm:g220a-bmc:aspeed_g5_defconfig:notests:mtd128,0,12,2:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:sd2:net,nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:notests:mem1G:mtd128:net,nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:notests:mem1G:mtd128,0,8,1:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:usb:net,nic "
 
 patch_defconfig()
@@ -145,7 +147,7 @@ runkernel()
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
-    "bletchley-bmc")
+    bletchley-bmc*)
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	extra_params+=" -nodefaults"
@@ -285,14 +287,16 @@ runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.ext2 automatic notests::usb:net,nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-if [ ${runall} -eq 1 ]; then
-    # SPI interfaces fail to instantiate in Linux:
-    # spi-aspeed-smc 1e620000.spi: ioremap failed for resource [mem 0x20000000-0x2fffffff]
-    runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net,nic aspeed-bmc-facebook-fuji.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+# Default memory size (2G) prevents SPI device instantiation,
+# so limit memory size to 1G
+runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.ext2 automatic notests::mem1G:mtd128:net,nic aspeed-bmc-facebook-fuji.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig fuji-bmc "" \
+	rootfs-armv5.f2fs automatic notests::mem1G:mtd128,0,8,1:net,nic aspeed-bmc-facebook-fuji.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-opp-romulus.dtb
@@ -358,16 +362,14 @@ runkernel aspeed_g5_defconfig bletchley-bmc "" \
 	rootfs-armv5.ext2 automatic notests::usb0:net,nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-if [ ${runall} -eq 1 ]; then
-    # requires qemu v7.1 and Linux v5.18+
-    # Still fails with error:
-    # spi-nor spi0.0: unrecognized JEDEC id bytes: ef 40 21 00 00 00
-    # [The SPI chip used on this board is not supported by Linux as of Linux 6.1]
-    runkernel aspeed_g5_defconfig bletchley-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd256:net,nic aspeed-bmc-facebook-bletchley.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
+# The default SPI chips used on this board are not supported by Linux as of
+# Linux 6.1/6.2, so select supported chips. Also, the default RAM size of
+# 2G prevents SPI interface instantiation, so limit RAM size for SPI tests
+# to 1G.
+runkernel aspeed_g5_defconfig bletchley-bmc,fmc-model=mt25qu02g,spi-model=mt25qu02g "" \
+	rootfs-armv5.ext2 automatic notests::mem1G:mtd256:net,nic aspeed-bmc-facebook-bletchley.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
