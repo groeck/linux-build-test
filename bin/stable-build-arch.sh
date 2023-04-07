@@ -470,12 +470,12 @@ do
 
 	# perf build is special. Use host compiler and build based on defconfig.
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
-	    if ! make ARCH=${ARCH} O=${BUILDDIR} CC=gcc-9 defconfig >/dev/null 2>${LOG}; then
+	    if ! make ARCH=${ARCH} O=${BUILDDIR} CC=gcc-10 defconfig >/dev/null 2>${LOG}; then
 		echo "failed (config)"
 		dumplog 100 "${LOG}"
 		continue
 	    fi
-	    make ARCH=${ARCH} O=${BUILDDIR} CC=gcc-9 "${cmd[$i]}" >/dev/null 2>${LOG}
+	    make ARCH=${ARCH} O=${BUILDDIR} CC=gcc-10 NO_LIBTRACEEVENT=1 NO_BPF_SKEL=1 "${cmd[$i]}" >/dev/null 2>${LOG}
 	    rv=$?
 	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
