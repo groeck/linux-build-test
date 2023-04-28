@@ -136,7 +136,7 @@ if [ -z "$1" -o "$1" = "v7.1" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v7.2" ]; then
-    dobuild_common v7.2.1-local v7.2 "--disable-png"
+    dobuild_common v7.2.2-local v7.2 "--disable-png"
     if [ -n "$2" ]; then
 	shift
     fi
