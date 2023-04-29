@@ -39,7 +39,7 @@ skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net,nic"
 skip_515="arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net,nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net,nic \
-	arm:g220a-bmc:aspeed_g5_defconfig:notests:mtd128,0,12,2:net,nic \
+	arm:g220a-bmc:aspeed_g5_defconfig:notests:mtd32,0,12,2:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:sd2:net,nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:notests:mem1G:mtd128:net,nic \
@@ -312,12 +312,12 @@ runkernel aspeed_g5_defconfig g220a-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.f2fs automatic notests::mtd128:net,nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.ext2 automatic notests::mtd64:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# Test booting from second SPI controller, this time with ext2
+# Test booting from second SPI controller
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.ext2 automatic notests::mtd32,0,12,2:net,nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -367,7 +367,7 @@ checkstate ${retcode}
 # 2G prevents SPI interface instantiation, so limit RAM size for SPI tests
 # to 1G.
 runkernel aspeed_g5_defconfig bletchley-bmc,fmc-model=mt25qu02g,spi-model=mt25qu02g "" \
-	rootfs-armv5.ext2 automatic notests::mem1G:mtd256:net,nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.f2fs automatic notests::mem1G:mtd256:net,nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -376,12 +376,12 @@ runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.f2fs automatic notests::mtd128:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.ext2 automatic notests::mtd64:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Also test booting from second SPI controller
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128,0,12,2:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.ext2 automatic notests::mtd64,0,12,2:net,nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
