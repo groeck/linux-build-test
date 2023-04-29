@@ -12,7 +12,6 @@ shift $((OPTIND - 1))
 mach=$1
 variant=$2
 
-QEMU_V80=${QEMU:-${QEMU_V80_BIN}/qemu-system-ppc64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc64}
 
 # machine specific information
@@ -101,13 +100,6 @@ runkernel()
     "powernv")
 	mem=2G
 	pcibus_set_root "pcie" 0
-	# Network tests need v4.14 or later
-	if [[ ${linux_version_code} -lt $(kernel_version 4 14) ]]; then
-	    fixup="$(echo ${fixup} | sed -e 's/:\+net,rtl8139//')"
-	fi
-	;;
-    "ppce500")
-	QEMU="${QEMU_V80}"
 	;;
     *)
 	;;
