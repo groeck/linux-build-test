@@ -114,27 +114,6 @@ if [ -z "$1" -o "$1" = "v4.2" ]; then
     fi
 fi
 
-if [ -z "$1" -o "$1" = "v6.2" ]; then
-    dobuild_common v6.2.0-local v6.2 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v7.0" ]; then
-    dobuild_common v7.0.0-local v7.0 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v7.1" ]; then
-    dobuild_common v7.1.0-local v7.1 "--disable-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
 if [ -z "$1" -o "$1" = "v7.2" ]; then
     dobuild_common v7.2.2-local v7.2 "--disable-png"
     if [ -n "$2" ]; then
