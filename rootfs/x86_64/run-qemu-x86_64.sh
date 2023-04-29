@@ -11,7 +11,6 @@ machine=$1
 cputype=$2
 
 # Note: Upstream qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
-QEMU_V80="${QEMU:-${QEMU_V80_BIN}/qemu-system-x86_64}"
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-x86_64}"
 ARCH=x86_64
 
@@ -51,11 +50,6 @@ runkernel()
 	pbuild+=":cd"
     else
 	pbuild+=":hd"
-    fi
-
-    # igb network interface test requires qemu v8.0+
-    if echo "${fixup}" | grep -q "net,igb"; then
-	QEMU="${QEMU_V80}"
     fi
 
     if ! match_params "${machine}@${mach}" "${cputype}@${cpu}"; then
