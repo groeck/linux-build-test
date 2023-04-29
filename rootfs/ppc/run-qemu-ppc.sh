@@ -13,7 +13,6 @@ machine=$1
 variant=$2
 config=$3
 
-QEMU_V80=${QEMU:-${QEMU_V80_BIN}/qemu-system-ppc}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
 # machine specific information
@@ -118,9 +117,6 @@ runkernel()
 	;;
     virtex-ml507)
 	earlycon="earlycon"
-	;;
-    "ppce500")
-	QEMU="${QEMU_V80}"
 	;;
     *)
 	;;
