@@ -449,7 +449,7 @@ runkernel multi_v7_defconfig quanta-gsj "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
-	rootfs-armv5.ext2 automatic npcm::mtd64 nuvoton-npcm730-gsj.dtb
+	rootfs-armv5.ext2 automatic npcm::mtd32 nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
