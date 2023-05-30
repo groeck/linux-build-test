@@ -22,8 +22,10 @@ patch_defconfig()
     local defconfig=$1
 
     # ATA
-    echo "CONFIG_ATA=y" >> ${defconfig}
-    echo "CONFIG_PATA_CMD64X=y" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_ATA CONFIG_PATA_CMD64X
+
+    # Disable for now until warning messages have been fixed
+    disable_config "${defconfig}" CONFIG_PROVE_LOCKING
 }
 
 runkernel()
