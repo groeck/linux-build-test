@@ -6,6 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_V72=${QEMU:-${QEMU_V72_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -184,11 +185,15 @@ runkernel()
     kernel="arch/arm/boot/zImage"
     case ${mach} in
     "orangepi-pc")
+	# Avoid boot stalls seen with qemu v8.0.
+	QEMUCMD="${QEMU_V72}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	extra_params+=" -nodefaults"
 	;;
     "npcm750-evb" | "quanta-gsj" | "kudo-bmc")
+	# Avoid boot stalls seen with qemu v8.0.
+	QEMUCMD="${QEMU_V72}"
 	initcli+=" console=ttyS3,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0004000,115200n8"
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
@@ -199,6 +204,8 @@ runkernel()
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
     "cubieboard")
+	# Avoid crash during shutdown due to locked tasks, seen with qemu v8.0.
+	QEMUCMD="${QEMU_V72}"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	initcli+=" console=ttyS0"
 	;;
