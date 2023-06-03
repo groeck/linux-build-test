@@ -204,8 +204,6 @@ runkernel()
 	extra_params+=" -nodefaults -serial null -serial null -serial null"
 	;;
     "cubieboard")
-	# Avoid crash during shutdown due to locked tasks, seen with qemu v8.0.
-	QEMUCMD="${QEMU_V72}"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
 	initcli+=" console=ttyS0"
 	;;
