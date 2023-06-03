@@ -122,8 +122,8 @@ if [ -z "$1" -o "$1" = "v7.2" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v8.0" ]; then
-    dobuild_common v8.0.0-local v8.0 "--disable-png --disable-strip --extra-cflags=-g"
-#    dobuild_common v8.0.0-local v8.0-debug \
+    dobuild_common v8.0.2-local v8.0 "--disable-png --disable-strip --extra-cflags=-g"
+#    dobuild_common v8.0.2-local v8.0-debug \
 #	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
