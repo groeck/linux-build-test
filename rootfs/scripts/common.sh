@@ -61,7 +61,8 @@ MAXTIME=150	# Maximum wait time for qemu session to complete
 MAXSTIME=60	# Maximum wait time for qemu session to generate output
 __retries=1	# Default number of retries
 
-__testbuild=0
+__testbuild=0	# test build, do not run tests
+___testbuild=0	# test build, run tests but abort after first failure
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -82,7 +83,7 @@ linux_version_code="$(kernel_version $(git describe --match 'v*' | cut -f1 -d- |
 
 checkstate()
 {
-    if [[ ${__testbuild} != 0 && $1 != 0 ]]; then
+    if [[ ${___testbuild} != 0 && $1 != 0 ]]; then
 	exit $1
     fi
 }
@@ -95,15 +96,17 @@ parse_args()
 	dodebug=0
 	runall=0
 	__testbuild=0
+	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dnr:tv opt; do
+	while getopts ae:dnr:tTv opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
-	t)	__testbuild=1;__retries=0;;
+	t)	__testbuild=1;___testbuild=1;__retries=0;;
+	T)	___testbuild=1;__retries=0;;
 	r)	__retries=${OPTARG}
 		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
 		    echo "Bad number of retries: ${__retries}"
