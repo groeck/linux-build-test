@@ -63,6 +63,7 @@ __retries=1	# Default number of retries
 
 __testbuild=0	# test build, do not run tests
 ___testbuild=0	# test build, run tests but abort after first failure
+_log_abort=0	# abort after warnings / backtraces
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -96,10 +97,11 @@ parse_args()
 	dodebug=0
 	runall=0
 	__testbuild=0
+	__log_abort=0
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dnr:tTv opt; do
+	while getopts ae:dnr:tTvW opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
@@ -114,6 +116,7 @@ parse_args()
 		fi
 		;;
 	v)	verbose=1;;
+	W)	__log_abort=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
 	done
@@ -1485,6 +1488,9 @@ dowait()
 	    echo "qemu log:"
 	    head -5000 ${logfile}
 	    echo "------------"
+	fi
+	if [[ ${dolog} -ne 0 && ${__log_abort} -ne 0 ]]; then
+	    retcode=1
 	fi
     fi
 
