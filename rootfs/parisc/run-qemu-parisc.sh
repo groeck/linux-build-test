@@ -25,7 +25,7 @@ patch_defconfig()
     enable_config ${defconfig} CONFIG_ATA CONFIG_PATA_CMD64X
 
     # Disable for now until warning messages have been fixed
-    disable_config "${defconfig}" CONFIG_PROVE_LOCKING
+    disable_config "${defconfig}" CONFIG_PROVE_LOCKING CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_LOCK_ALLOC CONFIG_DEBUG_WW_MUTEX_SLOWPATH
 }
 
 runkernel()
