@@ -74,9 +74,8 @@ kernel_version()
 {
     local v1=${1:-0}
     local v2=${2:-0}
-    local v3=${3:-0}
 
-    echo "$((v1 * 16777216 + v2 * 65536 + v3))"
+    echo "$((v1 * 65536 + v2))"
 }
 
 # Current Linux kernel version
