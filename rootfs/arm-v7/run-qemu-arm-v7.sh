@@ -154,19 +154,6 @@ runkernel()
 	if [[ ${linux_version_code} -lt $(kernel_version 4 19) ]]; then
 	    nonet=1
         fi
-	# Timer debug object support is broken in 5.15.y due to commit
-	# 503e554782c9 ("debugobject: Ensure pool refill (again)").
-	# Reason is unknown. Impact is stalled boots on various arm-v7
-	# systems. Instead of struggling with retries, disable timer debug
-	# object testing for v5.15.y boot tests.
-	if [[ ${linux_version_code} -eq $(kernel_version 5 15) ]]; then
-	    fixup="nodebugtimers:${fixup}"
-	fi
-	;;
-    "npcm750-evb" | "quanta-gsj" | "kudo-bmc")
-	if [[ ${linux_version_code} -eq $(kernel_version 5 15) ]]; then
-	    fixup="nodebugtimers:${fixup}"
-	fi
 	;;
     *)
 	;;
