@@ -6,6 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -183,6 +184,11 @@ runkernel()
 
     kernel="arch/arm/boot/zImage"
     case ${mach} in
+    "bpim2u")
+	initcli+=" console=ttyS0,115200"
+	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
+	QEMUCMD="${QEMU_MASTER}"
+	;;
     "orangepi-pc")
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
@@ -476,5 +482,18 @@ runkernel multi_v7_defconfig kudo-bmc "" \
 	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    # various backtraces in crypto/testmgr.c due to DMA timeouts
+    # memory allocation/free problem in (failed) thermal zone initialization
+    runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.cpio automatic "::net,nic" sun8i-r40-bananapi-m2-ultra.dtb
+    checkstate ${retcode}
+    # sd card association is not fixed (randomly instantiated as mmc0, mmc1,
+    # or mmc2)
+    runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.ext2 automatic "::sd:net,nic" sun8i-r40-bananapi-m2-ultra.dtb
+    checkstate ${retcode}
+fi
 
 exit ${retcode}
