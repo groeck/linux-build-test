@@ -1,5 +1,11 @@
 aboriginal
+bin/swtpm_bios
+bin/swtpm_ioctl
+bin/swtpm_localca
+bin/swtpm_setup
 cache
+etc
+libtpms
 slave/qemu*
 slave/hwmon*
 slave/stable*
@@ -35,6 +41,7 @@ buildall
 sparse
 buildbot
 smatch
+swtpm
 u-boot
 rootfs.new
 include
