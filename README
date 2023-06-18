@@ -71,6 +71,14 @@ sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386
 
 ---
 
+swtpm:
+
+Install libjson-glib-dev, expect
+Clone and install libtpms (https://github.com/stefanberger/libtpms.git)
+Clone and install swtpm (https://github.com/stefanberger/swtpm.git)
+
+---
+
 Install on new builder:
 
 - install all packages listed above
