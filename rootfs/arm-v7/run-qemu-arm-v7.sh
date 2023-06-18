@@ -491,6 +491,22 @@ if [ ${runall} -eq 1 ]; then
     checkstate ${retcode}
     # sd card association is not fixed (randomly instantiated as mmc0, mmc1,
     # or mmc2)
+    # The following change in sun8i-r40-bananapi-m2-ultra.dts appears to fix
+    # the problem.
+    # diff --git a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+    # index 28197bbcb1d5..475183ab9bf5 100644
+    # --- a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+    # +++ b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+    # @@ -54,6 +54,9 @@ / {
+    #         aliases {
+    #                 ethernet0 = &gmac;
+    #                 serial0 = &uart0;
+    # +               mmc0 = &mmc0;
+    # +               mmc1 = &mmc1;
+    # +               mmc2 = &mmc2;
+    #         };
+    # No idea if that would be acceptable. Also see mmc comments for sabrelite
+    # above.
     runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::sd:net,nic" sun8i-r40-bananapi-m2-ultra.dtb
     checkstate ${retcode}
