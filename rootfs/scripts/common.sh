@@ -15,6 +15,10 @@ ulimit -f $((1500 * 1024))
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
 __basedir="${__progdir}/.."
+__swtpmdir=$(mktemp -d "/tmp/mytpmXXXXX")
+__swtpmsock="${__swtpmdir}/swtpm-sock"
+__swtpmpid=""
+
 . "${__basedir}/scripts/config.sh"
 
 if [[ -w /var/cache/buildbot ]]; then
@@ -24,10 +28,23 @@ else
 fi
 
 __do_network_test=0
+__do_tpm_test=0
 
 __addtmpfile()
 {
     echo "$1" >> "${__logfiles}"
+}
+
+__stop_tpm()
+{
+    if [[ -n "${__swtpmpid}" ]]; then
+	# swtpm exits on its own when the emulation terminates.
+	# Make sure that it is gone if it is still running for some reason.
+	if kill -0 "${__swtpmpid}" >/dev/null 2>&1; then
+	    kill "${__swtpmpid}"
+	fi
+	__swtpmpid=""
+    fi
 }
 
 __cleanup()
@@ -38,6 +55,11 @@ __cleanup()
 	rm -f $(cat "${__logfiles}")
     fi
     rm -f "${__logfiles}"
+
+    __stop_tpm
+    if [[ -d "${__swtpmdir}" ]]; then
+	rm -rf "${__swtpmdir}"
+    fi
 
     exit ${rv}
 }
@@ -597,12 +619,52 @@ __common_netcmd()
     esac
 }
 
+__start_tpm()
+{
+    __stop_tpm
+    /opt/buildbot/bin/swtpm socket --tpmstate dir="${__swtpmdir}" \
+		--ctrl type=unixio,path="${__swtpmsock}" --tpm2 &
+    __swtpmpid=$!
+    sleep 1
+    # Abort if swtpm is not running
+    if ! kill -0 "${__swtpmpid}" >/dev/null 2>&1; then
+	echo "Failed to start swtpm"
+	__swtpmpid=""
+	return 1
+    fi
+    return 0
+}
+
 __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
+    local tpmdev=""
 
     case "${fixup}" in
+    "tpm")
+	__do_tpm_test=1
+	# the QEMU TPM device name depends on the architecture
+	case "${ARCH}" in
+	"arm64")
+	    tpmdev="tpm-tis-device"
+	   ;;
+	"x86_64")
+	    tpmdev="tpm-tis"
+	    ;;
+	"powerpc")
+	    tpmdev="tpm-spapr"
+	    ;;
+	*)
+	    ;;
+	esac
+
+	if [[ -n "${tpmdev}" ]]; then
+	    extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
+	    extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
+	    extra_params+=" -device ${tpmdev},tpmdev=tpm0"
+	fi
+	;;
     "pci-bridge")
 	# Instantiate a new PCI bridge. Instantiate subsequent PCI devices
 	# behind this PCI bridge.
@@ -657,6 +719,7 @@ __common_fixups()
     extra_params="-snapshot"
     __have_usb_param=0
     __do_network_test=0
+    __do_tpm_test=0
     __pcibridge_init
 
     if [[ -z "${fixups}" ]]; then
@@ -1419,6 +1482,14 @@ dowait()
 	fi
     fi
 
+    # Look for TPM test failures
+    if [[ ${retcode} -eq 0 && "${__do_tpm_test}" -ne 0 ]]; then
+	if ! grep -q "TPM selftest passed" ${logfile}; then
+	    msg="failed (tpm)"
+	    retcode=1
+	fi
+    fi
+
     if [ ${retcode} -eq 0 ]; then
 	for i in $(seq 0 $((${entries} - 1)))
 	do
@@ -1554,6 +1625,13 @@ execute()
 	fi
 	if [[ ${retries} -ne 0 ]]; then
 	    echo -n "R"
+	fi
+
+	if [[ "${__do_tpm_test}" -ne 0 ]]; then
+	    if ! __start_tpm; then
+		retries=$((retries + 1))
+		continue
+	    fi
 	fi
 
 	"${cmd}" "$@" > "${logfile}" 2>&1 &
