@@ -23,6 +23,10 @@ patch_defconfig()
 {
     local defconfig=$1
 
+    # Enable TPM testing
+    echo "CONFIG_TCG_TPM=y" >> ${defconfig}
+    echo "CONFIG_TCG_TIS=y" >> ${defconfig}
+
     # Needed for IGB network interface tests
     echo "CONFIG_IGB=y" >> ${defconfig}
 
@@ -108,7 +112,7 @@ checkstate ${retcode}
 runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
+runkernel defconfig smp:tpm:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 rootfs.ext2
@@ -124,7 +128,7 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:net,tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
+runkernel defconfig smp:tpm:net,tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
