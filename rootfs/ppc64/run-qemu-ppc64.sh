@@ -163,7 +163,7 @@ runkernel pseries_defconfig big::smp2:net,pcnet pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig big::net,rtl8139:scsi pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig big::tpm-spapr:net,rtl8139:scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -198,7 +198,7 @@ runkernel pseries_defconfig little::net,rtl8139 pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig little::net,e1000:scsi pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::tpm-spapr:net,e1000:scsi pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
