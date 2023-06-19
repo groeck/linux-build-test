@@ -33,6 +33,9 @@ patch_defconfig()
     # test failures. Set CONFIG_USB_XHCI_PCI_RENESAS=y if enabled to
     # work around the problem.
     enable_config_cond "${defconfig}" CONFIG_USB_XHCI_PCI_RENESAS
+
+    # For TPM testing
+    enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
 }
 
 runkernel()
@@ -118,7 +121,7 @@ echo
 
 runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:tpm:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
