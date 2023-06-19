@@ -1,0 +1,5 @@
+Flash sizes
+
+Machine		dtb					fmc	spi
+yosemitev2-bmc	aspeed-bmc-facebook-yosemitev2.dtb	32	32
+tiogapass-bmc	aspeed-bmc-facebook-tiogapass.dtb	32	32
