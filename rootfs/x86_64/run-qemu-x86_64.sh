@@ -26,6 +26,7 @@ patch_defconfig()
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
     echo "CONFIG_TCG_TIS=y" >> ${defconfig}
+    echo "CONFIG_TCG_CRB=y" >> ${defconfig}
 
     # Needed for IGB network interface tests
     echo "CONFIG_IGB=y" >> ${defconfig}
