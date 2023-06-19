@@ -17,7 +17,7 @@ __progdir="$(cd $(dirname $0); pwd)"
 __basedir="${__progdir}/.."
 __swtpmdir=$(mktemp -d "/tmp/mytpmXXXXX")
 __swtpmsock="${__swtpmdir}/swtpm-sock"
-__swtpmpid=""
+__swtpmpidfile="${__swtpmdir}/pid"
 
 . "${__basedir}/scripts/config.sh"
 
@@ -37,14 +37,15 @@ __addtmpfile()
 
 __stop_tpm()
 {
-    if [[ -n "${__swtpmpid}" ]]; then
+    local swtpmpid
+
+    if [[ -s "${__swtpmpidfile}" ]]; then
+	swtpmpid="$(cat "${__swtpmpidfile}")"
 	# swtpm exits on its own when the emulation terminates.
 	# Make sure that it is gone if it is still running for some reason.
-	if kill -0 "${__swtpmpid}" >/dev/null 2>&1; then
-	    kill "${__swtpmpid}"
-	fi
-	__swtpmpid=""
+	kill "${swtpmpid}"
     fi
+    rm -f "${__swtpmpidfile}"
 }
 
 __cleanup()
@@ -623,13 +624,13 @@ __start_tpm()
 {
     __stop_tpm
     /opt/buildbot/bin/swtpm socket --tpmstate dir="${__swtpmdir}" \
-		--ctrl type=unixio,path="${__swtpmsock}" --tpm2 &
-    __swtpmpid=$!
+		--ctrl type=unixio,path="${__swtpmsock}" --tpm2 \
+		-d --pid file="${__swtpmpidfile}"
     sleep 1
-    # Abort if swtpm is not running
-    if ! kill -0 "${__swtpmpid}" >/dev/null 2>&1; then
+    # Abort if swtpm failed to start
+    if [[ ! -s "${__swtpmpidfile}" ]]; then
 	echo "Failed to start swtpm"
-	__swtpmpid=""
+	rm -f "${__swtpmpidfile}"
 	return 1
     fi
     return 0
