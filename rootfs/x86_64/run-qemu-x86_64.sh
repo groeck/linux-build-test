@@ -129,7 +129,7 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:tpm-cbr:net,tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
+runkernel defconfig smp:tpm-crb:net,tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
