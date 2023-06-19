@@ -1516,6 +1516,9 @@ dowait()
     if grep -q "Call Trace" ${logfile}; then
 	dolog=1
     fi
+    if grep -q "BUG: KFENCE:" ${logfile}; then
+	dolog=1
+    fi
 
     # Store coredump in well defined location
     if [[ -e core ]]; then
