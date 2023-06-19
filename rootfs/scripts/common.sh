@@ -640,31 +640,15 @@ __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
-    local tpmdev=""
 
     case "${fixup}" in
-    "tpm")
+    tpm*)
 	__do_tpm_test=1
-	# the QEMU TPM device name depends on the architecture
-	case "${ARCH}" in
-	"arm64")
-	    tpmdev="tpm-tis-device"
-	   ;;
-	"x86_64")
-	    tpmdev="tpm-tis"
-	    ;;
-	"powerpc")
-	    tpmdev="tpm-spapr"
-	    ;;
-	*)
-	    ;;
-	esac
-
-	if [[ -n "${tpmdev}" ]]; then
-	    extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
-	    extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
-	    extra_params+=" -device ${tpmdev},tpmdev=tpm0"
-	fi
+	# the QEMU TPM device name depends on the architecture.
+	# Assume the calling code provides the correct device.
+	extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
+	extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
+	extra_params+=" -device ${fixup},tpmdev=tpm0"
 	;;
     "pci-bridge")
 	# Instantiate a new PCI bridge. Instantiate subsequent PCI devices
