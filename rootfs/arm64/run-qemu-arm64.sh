@@ -121,7 +121,7 @@ echo
 
 runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:tpm:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
