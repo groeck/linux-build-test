@@ -31,6 +31,9 @@ patch_defconfig()
     # with sifive_u emulations.
     enable_config "${defconfig}" CONFIG_RISCV_SBI_V01
 
+    # Needed for TPM tests
+    enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
+
     enable_config "${defconfig}" CONFIG_PCI_HOST_GENERIC
 
     # needed for net,tulip tests
@@ -152,6 +155,12 @@ checkstate ${retcode}
 runkernel virt "" defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
+if [[ "${runall}" -ne 0 ]]; then
+    # TPM does not instantiate (as of v6.4-rc7)
+    runkernel virt "" defconfig tpm-tis-device:net,i82550:virtio-pci rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 runkernel virt "rv64,zbb=no" defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
