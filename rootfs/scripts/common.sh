@@ -643,12 +643,16 @@ __common_fixup()
 
     case "${fixup}" in
     tpm*)
-	__do_tpm_test=1
-	# the QEMU TPM device name depends on the architecture.
-	# Assume the calling code provides the correct device.
-	extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
-	extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
-	extra_params+=" -device ${fixup},tpmdev=tpm0"
+	if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+	    # Skip tpm tests for earlier kernels because the TPM version
+	    # file is missing there but the root file system expects it.
+	    __do_tpm_test=1
+	    # the QEMU TPM device name depends on the architecture.
+	    # Assume the calling code provides the correct device.
+	    extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
+	    extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
+	    extra_params+=" -device ${fixup},tpmdev=tpm0"
+	fi
 	;;
     "pci-bridge")
 	# Instantiate a new PCI bridge. Instantiate subsequent PCI devices
