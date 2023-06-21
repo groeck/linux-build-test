@@ -17,6 +17,12 @@ PATH_ARM64="/opt/kernel/${DEFAULT_CC}/aarch64-linux/bin"
 
 PATH=${PATH}:${PATH_ARM64}
 
+# TPM selftest fails with v5.4.y for unknown reasons.
+tpm=""
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    tpm="tpm-tis-device:"
+fi
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -121,7 +127,7 @@ echo
 
 runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio.gz
 retcode=$?
-runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:${tpm}net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
