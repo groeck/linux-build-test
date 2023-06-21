@@ -116,7 +116,7 @@ checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -139,10 +139,10 @@ runkernel defconfig smp:net,virtio-net-old:mem512:scsi[AM53C974] Nehalem q35 roo
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig smp2:net,usb-ohci:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
+runkernel defconfig smp2:tpm-crb:net,usb-ohci:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net,e1000-82544gc:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
+runkernel defconfig smp4:tpm-tis:net,e1000-82544gc:efi32:mem2G:scsi[53C895A] Skylake-Server q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:pci-bridge:net,usb-uhci:mem4G:scsi[FUSION] EPYC pc rootfs.btrfs
