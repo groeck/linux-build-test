@@ -36,6 +36,11 @@ patch_defconfig()
 	esac
     done
 
+    # Enable TPM testing
+    echo "CONFIG_TCG_TPM=y" >> ${defconfig}
+    echo "CONFIG_TCG_TIS=y" >> ${defconfig}
+    echo "CONFIG_TCG_CRB=y" >> ${defconfig}
+
     # Causes problems on shutdown (lack of reboot message)
     echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
     echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
@@ -98,9 +103,9 @@ retcode=0
 
 runkernel defconfig smp:ata:net,rtl8139 Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp:ata:net,e1000 Icelake-Server q35 rootfs.iso
+runkernel defconfig smp:tpm-tis:ata:net,e1000 Icelake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:efi32:nvme:net,e1000e IvyBridge q35 rootfs.btrfs
+runkernel defconfig smp2:tpm-tis:efi32:nvme:net,e1000e IvyBridge q35 rootfs.btrfs
 retcode=$((${retcode} + $?))
 runkernel defconfig smp4:usb:net,i82550 SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
@@ -114,9 +119,9 @@ retcode=$((${retcode} + $?))
 runkernel defconfig smp6:scsi[AM53C974]:net,pcnet Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
-runkernel defconfig smp:efi32:scsi[53C810]:net,virtio-net-pci Westmere-IBRS q35 rootfs.ext2
+runkernel defconfig smp:tpm-crb:efi32:scsi[53C810]:net,virtio-net-pci Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
-runkernel defconfig smp2:scsi[53C895A]:net,tulip Skylake-Server q35 rootfs.iso
+runkernel defconfig smp2:tpm-crb:scsi[53C895A]:net,tulip Skylake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
 runkernel defconfig smp:efi32:pci-bridge:scsi[MEGASAS]:net,e1000 EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
