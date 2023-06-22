@@ -87,6 +87,7 @@ __retries=1	# Default number of retries
 __testbuild=0	# test build, do not run tests
 ___testbuild=0	# test build, run tests but abort after first failure
 _log_abort=0	# abort after warnings / backtraces
+_log_always=0	# log always
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -120,10 +121,11 @@ parse_args()
 	runall=0
 	__testbuild=0
 	__log_abort=0
+	__log_always=0
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dnr:tTvW opt; do
+	while getopts ae:dlnr:tTvW opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
@@ -139,6 +141,7 @@ parse_args()
 		;;
 	v)	verbose=1;;
 	W)	__log_abort=1;;
+	l)	__log_always=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
 	done
@@ -1501,7 +1504,7 @@ dowait()
 	done
     fi
 
-    dolog=${retcode}
+    dolog=$((retcode + __log_always))
     if grep -q "cannot create duplicate filename" ${logfile}; then
 	dolog=1
     fi
