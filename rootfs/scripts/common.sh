@@ -646,7 +646,7 @@ __common_fixup()
 
     case "${fixup}" in
     tpm*)
-	if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+	if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
 	    # Skip tpm tests for earlier kernels because the TPM version
 	    # file is missing there but the root file system expects it.
 	    __do_tpm_test=1
