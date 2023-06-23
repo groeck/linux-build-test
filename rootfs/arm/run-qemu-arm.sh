@@ -134,7 +134,7 @@ runkernel()
     local fixup=$6
     local dtb=$7
     local ddtb="${dtb%.dtb}"
-    local dtbfile="arch/arm/boot/dts/${dtb}"
+    local dtbfile=""
     local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
@@ -178,8 +178,9 @@ runkernel()
     # If a dtb file was specified but does not exist, skip the build.
     local dtbcmd=""
     if [[ -n "${dtb}" ]]; then
-	if [[ ! -e "${dtbfile}" ]]; then
-	    echo "skipped"
+	dtbfile="$(find arch/arm/boot/dts -name "${dtb}")"
+	if [[ -z "${dtbfile}" ]]; then
+	    echo "skipped (dtb)"
 	    return 0
 	fi
 	dtbcmd="-dtb ${dtbfile}"
