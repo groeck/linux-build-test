@@ -4,9 +4,10 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
 
 # default compiler version
-CV="11.3.0-2.39"
-CV113_238="11.3.0-2.38"
-CV12="12.2.0-2.39"
+CV9="9.4.0"
+CV="11.4.0-2.40"
+CV12="12.3.0-2.40"
+CV13="13.1.0-2.40"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # with gcc 10.3.0,11.1.0 in v4.14.y:
@@ -14,7 +15,7 @@ PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 # gcc 11.3.0/binutils 2.39:
 # misc.c:(.text+0x189): undefined reference to `memset'
 # PATH_AM33=/opt/kernel/gcc-${CV}-nolibc/am33_2.0-linux/bin
-PATH_AM33=/opt/kernel/gcc-9.4.0-nolibc/am33_2.0-linux/bin
+PATH_AM33=/opt/kernel/gcc-${CV9}-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
@@ -24,18 +25,20 @@ PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
 # "unrecognized emulation mode: big-endian" with gcc 10.2.0
-# internal compiler error with gcc 11.1.0, 11.3.0, 12.2.0 (4.9.y)
+# internal compiler error with gcc 11.1.0, 11.3.0, 11.4.0, 12.2.0
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 # No cris support in gcc 10.x.
-PATH_CRIS=/opt/kernel/gcc-9.4.0-nolibc/cris-linux/bin
+PATH_CRIS=/opt/kernel/gcc-${CV9}-nolibc/cris-linux/bin
 PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_FRV=/opt/kernel/gcc-${CV}-nolibc/frv-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-${CV}-nolibc/ia64-linux/bin
-PATH_LOONGARCH=/opt/kernel/gcc-${CV12}-nolibc/loongarch64-linux-gnu/bin
+# loongarch either needs 12.x.0-2.39 or 13.1-2.40.
+# 12.x.0-2.40 doesn't work due to compiler/assembler interdependencies.
+PATH_LOONGARCH=/opt/kernel/gcc-${CV13}-nolibc/loongarch64-linux-gnu/bin
 PATH_M32R=/opt/kernel/gcc-${CV}-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
@@ -47,8 +50,8 @@ PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
-PATH_RISCV64=/opt/kernel/gcc-${CV113_238}-nolibc/riscv64-linux/bin
-PATH_RISCV32=/opt/kernel/gcc-${CV113_238}-nolibc/riscv32-linux/bin
+PATH_RISCV64=/opt/kernel/gcc-${CV}-nolibc/riscv64-linux/bin
+PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
 PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-${CV}-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-${CV}-nolibc/sh4-linux/bin
