@@ -19,7 +19,7 @@ ARCH=arm
 PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
-# integratorcp does not boot in v5.4.y when using gcc 10.3.0/11.2.0/11.3.0
+# integratorcp does not boot in v5.4.y when using gcc 10.3/11.x/12.x
 PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
 # PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
