@@ -12,7 +12,8 @@ variant=$2
 
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-loongarch64}"
 
-PATH_LOONGARCH="/opt/kernel/gcc-12.2.0-2.39-nolibc/loongarch64-linux-gnu/bin"
+# loongarch needs gcc 13.x+ when using binutils 2.40.
+PATH_LOONGARCH="/opt/kernel/${DEFAULT_CC13}/loongarch64-linux-gnu/bin"
 
 PREFIX=loongarch64-linux-gnu-
 
