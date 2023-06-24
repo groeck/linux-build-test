@@ -20,8 +20,9 @@ skip_515="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_61="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 
 if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-    # boot tests hang with gcc 9.x and later in kernels older than v5.10
-    # when using recent binutils (2.37 or later).
+    # boot tests hang with gcc 9.x and later (including 11.4.0)
+    # for kernels older than v5.10 when using recent binutils
+    # (2.37 or later).
     # Use gcc 11.3.0 with binutils 2.32 instead.
     PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4eb-linux/bin
 else
