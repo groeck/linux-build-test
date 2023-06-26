@@ -333,7 +333,9 @@ checkstate ${retcode}
 
 sabrelite_mmc="mmc1"
 if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    if ! grep -q mmc1 arch/arm/boot/dts/imx6qdl-sabrelite.dtsi; then
+    # devicetree file moved in v6.5.
+    dtsifile="$(find arch/arm/boot/dts -name imx6qdl-sabrelite.dtsi)"
+    if ! grep -q mmc1 "${dtsifile}"; then
 	sabrelite_mmc="mmc3"
     fi
 fi
