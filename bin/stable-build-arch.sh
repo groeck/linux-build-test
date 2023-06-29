@@ -6,7 +6,7 @@ basedir=$(cd $(dirname $0); pwd)
 # default compiler version
 CV9="9.4.0"
 CV="11.4.0-2.40"
-CV12="12.3.0-2.40"
+CV12="12.2.0-2.39"
 CV13="13.1.0-2.40"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
@@ -38,7 +38,8 @@ PATH_HEXAGON=/opt/kernel/hexagon/bin
 PATH_IA64=/opt/kernel/gcc-${CV}-nolibc/ia64-linux/bin
 # loongarch either needs 12.x.0-2.39 or 13.1-2.40.
 # 12.x.0-2.40 doesn't work due to compiler/assembler interdependencies.
-PATH_LOONGARCH=/opt/kernel/gcc-${CV13}-nolibc/loongarch64-linux-gnu/bin
+# 13.1.0-2.40 results in __write_overflow_field in drivers/infiniband/hw/irdma/uk.c.
+PATH_LOONGARCH=/opt/kernel/gcc-${CV12}-nolibc/loongarch64-linux-gnu/bin
 PATH_M32R=/opt/kernel/gcc-${CV}-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
