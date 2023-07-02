@@ -113,9 +113,6 @@ runkernel()
     sam460ex)
 	earlycon="earlycon=uart8250,mmio,0x4ef600300,115200n8"
 	;;
-    virtex-ml507)
-	earlycon="earlycon"
-	;;
     *)
 	;;
     esac
@@ -133,8 +130,6 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
-VIRTEX440_DTS=arch/powerpc/boot/dts/virtex440-ml507.dts
-
 runkernel qemu_ppc_book3s_defconfig nosmp:ide:net,default mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
 retcode=$?
@@ -144,9 +139,6 @@ retcode=$((${retcode} + $?))
 # Machine "mac99,via=pmu" works but does not auto-reboot
 runkernel qemu_ppc_book3s_defconfig smp:ide:net,e1000 mac99 G4 ttyS0 rootfs.ext2.gz \
 	vmlinux
-retcode=$((${retcode} + $?))
-runkernel 44x/virtex5_defconfig "" virtex-ml507 "" ttyS0 rootfs.cpio.gz \
-	vmlinux ${VIRTEX440_DTS}
 retcode=$((${retcode} + $?))
 
 # Multi-core boot for mpc8544ds has been broken at least since upstream
