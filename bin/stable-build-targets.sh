@@ -7,11 +7,12 @@ buildarch=(alpha arm arm64 blackfin c6x cris frv hexagon i386 ia64 \
 
 cmd_alpha=(defconfig allmodconfig allnoconfig tinyconfig)
 cmd_arc=(tb10x_defconfig)
-cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig nsim_hs_smp_defconfig vdk_hs38_smp_defconfig)
+cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig \
+	nsimosci_hs_smp_defconfig vdk_hs38_smp_defconfig)
 cmd_arm=(allmodconfig allnoconfig tinyconfig \
-	s3c2410_defconfig omap2plus_defconfig imx_v6_v7_defconfig \
+	omap2plus_defconfig imx_v6_v7_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig omap1_defconfig \
-	footbridge_defconfig davinci_all_defconfig mini2440_defconfig \
+	footbridge_defconfig davinci_all_defconfig \
 	axm55xx_defconfig mxs_defconfig keystone_defconfig imxrt_defconfig \
 	vexpress_defconfig imx_v4_v5_defconfig at91_dt_defconfig \
 	s3c6400_defconfig lpc32xx_defconfig shmobile_defconfig \
@@ -36,24 +37,24 @@ cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
 cmd_metag=(defconfig allnoconfig tinyconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
-cmd_microblaze=(mmu_defconfig nommu_defconfig allnoconfig tinyconfig)
+cmd_microblaze=(defconfig allnoconfig tinyconfig)
 cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
-	nlm_xlp_defconfig ath79_defconfig ar7_defconfig loongson2k_defconfig \
-	e55_defconfig cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
+	ath79_defconfig ar7_defconfig loongson2k_defconfig \
+	cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
 cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
 # nios2 allmodconfig: "Internal error in nios2_align" (binutils)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_parisc=(allnoconfig tinyconfig allmodconfig generic-32bit_defconfig)
-cmd_parisc64=(a500_defconfig generic-64bit_defconfig)
+cmd_parisc=(allnoconfig tinyconfig allmodconfig defconfig)
+cmd_parisc64=(allnoconfig defconfig)
 cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
 	ppc64e_defconfig cell_defconfig skiroot_defconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
 	tqm8xx_defconfig \
-	85xx/sbc8548_defconfig 83xx/mpc834x_mds_defconfig)
+	85xx/tqm8548_defconfig 83xx/mpc834x_itx_defconfig)
 cmd_riscv=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig performance_defconfig)
+cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
 cmd_score=(defconfig)
 cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig \
 	shx3_defconfig se7619_defconfig)
