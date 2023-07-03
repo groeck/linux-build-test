@@ -27,6 +27,9 @@ patch_defconfig()
     local defconfig=$1
     local fixups=${2//:/ }
     local fixup
+
+    # Needed for TPM tests
+    enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
 }
 
 runkernel()
@@ -94,14 +97,27 @@ echo
 # traceback at do_vint+0x80/0xb4
 runkernel defconfig virt rootfs.cpio "nodebug:nolocktests::efi:net,default"
 retcode=$?
+checkstate ${retcode}
+if [[ ${runall} -ne 0 ]]; then
+    # This does not work, at least not with qemu v8.0 and Linux v6.4/v6.5.
+    # Qemu for loongarch is not built with tpm support enabled,
+    # and enabling it causes a boot hang.
+    runkernel defconfig virt rootfs.cpio "nodebug:nolocktests::tpm-tis-device:efi:net,default"
+    retcode=$?
+    checkstate ${retcode}
+fi
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:nvme:net,default"
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:usb-xhci:net,default"
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:scsi[FUSION]:net,default"
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:scsi[MEGASAS]:net,default"
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "nodebug:nolocktests::efi:sdhci:mmc:net,default"
 retcode=$((retcode + $?))
 
