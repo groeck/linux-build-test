@@ -46,8 +46,8 @@ cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
 # nios2 allmodconfig: "Internal error in nios2_align" (binutils)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_parisc=(allnoconfig tinyconfig allmodconfig defconfig)
-cmd_parisc64=(allnoconfig defconfig)
+cmd_parisc=(allnoconfig tinyconfig allmodconfig generic-32bit_defconfig)
+cmd_parisc64=(allnoconfig generic-64bit_defconfig)
 cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
 	ppc64e_defconfig cell_defconfig skiroot_defconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
