@@ -7,6 +7,7 @@ basedir=$(cd $(dirname $0); pwd)
 CV9="9.4.0"
 CV="11.4.0-2.40"
 CV12="12.2.0-2.39"
+CV123="12.3.0-2.40"
 CV13="13.1.0-2.40"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
@@ -288,16 +289,26 @@ case ${ARCH} in
 	cmd=(${cmd_parisc64[*]})
 	PREFIX="hppa64-linux-"
 	PREFIX32="hppa-linux-"
-	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	case ${rel} in
 	v4.14|v4.19|v5.4|v5.10)
 	    ARCH=parisc
 	    ;;
+	v5.15|v6.1|v6.3)
+	    # FIXME
+	    # include v6.4 after v6.5-rc1 has been released
+	    # possibly include v6.5 after v6.6-rc1 has been released
+	    #
+	    ;;
 	*)
+	    # parisc after v6.4 wants at least gcc v12.0
+	    PATH_PARISC=/opt/kernel/gcc-${CV123}-nolibc/hppa-linux/bin
+	    PATH_PARISC64=/opt/kernel/gcc-${CV123}-nolibc/hppa64-linux/bin
 	    ;;
 	esac
+	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	;;
     powerpc)
+	    PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 	cmd=(${cmd_powerpc[*]})
 	PREFIX="${PREFIX_PPC}"
 	PATH=${PATH_PPC}:${PATH}
