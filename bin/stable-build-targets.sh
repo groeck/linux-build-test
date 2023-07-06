@@ -67,10 +67,10 @@ cmd_um=(defconfig)
 
 # build to skip
 
-skip_414="x86_64:tools/perf i386:tools/perf"
-skip_419="riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig openrisc:allmodconfig"
-skip_54="riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig"
-skip_510="csky:allmodconfig"
+skip_414="x86_64:tools/perf i386:tools/perf parisc64:allnoconfig"
+skip_419="riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig openrisc:allmodconfig parisc64:allnoconfig"
+skip_54="riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig parisc64:allnoconfig"
+skip_510="csky:allmodconfig parisc64:allnoconfig"
 
 # fixups
 
