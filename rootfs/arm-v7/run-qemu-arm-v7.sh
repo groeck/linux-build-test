@@ -84,6 +84,10 @@ patch_defconfig()
     # KFENCE results in useless warnings
     disable_config "${defconfig}" CONFIG_KFENCE
 
+    # Does not work as of qemu v8.0 due to DMA error.
+    # Disable if enabled to avoid warning backtrace.
+    disable_config "${defconfig}" CONFIG_CRYPTO_DEV_SUN8I_CE
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	nodrm)
@@ -508,10 +512,13 @@ if [ ${runall} -eq 1 ]; then
     # +               mmc1 = &mmc1;
     # +               mmc2 = &mmc2;
     #         };
-    # No idea if that would be acceptable. Also see mmc comments for sabrelite
-    # above.
+    # No idea if that would be acceptable in the upstream kernel. Also see mmc
+    # comments for sabrelite above for more details.
+    # Alternatively, we can specify the block device number (b300) as root device.
+    # See qemu patch 7ea47af390 ("tests/avocado: Make the test_arm_bpim2u_gmac
+    # test more reliable") for details. That is hackish, but it works.
     runkernel sunxi_defconfig bpim2u "" \
-	rootfs-armv7a.ext2 automatic "::sd:net,nic" sun8i-r40-bananapi-m2-ultra.dtb
+	rootfs-armv7a.ext2 automatic "::sd,b300:net,nic" sun8i-r40-bananapi-m2-ultra.dtb
     checkstate ${retcode}
 fi
 
