@@ -122,15 +122,15 @@ if [ -z "$1" -o "$1" = "v7.1" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v7.2" ]; then
-    dobuild_common v7.2.3-local v7.2 "--disable-png"
+    dobuild_common v7.2.4-local v7.2 "--disable-png"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v8.0" ]; then
-    dobuild_common v8.0.2-local v8.0 "--disable-png --disable-strip --extra-cflags=-g"
-#    dobuild_common v8.0.2-local v8.0-debug \
+    dobuild_common v8.0.3-local v8.0 "--disable-png --disable-strip --extra-cflags=-g"
+#    dobuild_common v8.0.3-local v8.0-debug \
 #	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
