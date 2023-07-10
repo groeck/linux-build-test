@@ -462,6 +462,10 @@ __common_mmccmd()
     sd[0-9])	# sd drive at index [0-9]
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=${fixup#sd}"
 	;;
+    sd,*)	# sd followed by root device name
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
+	rootdev="${fixup#sd,}"
+	;;
     *)
 	;;
     esac
