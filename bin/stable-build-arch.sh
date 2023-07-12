@@ -293,11 +293,7 @@ case ${ARCH} in
 	v4.14|v4.19|v5.4|v5.10)
 	    ARCH=parisc
 	    ;;
-	v5.15|v6.1|v6.3)
-	    # FIXME
-	    # include v6.4 after v6.5-rc1 has been released
-	    # possibly include v6.5 after v6.6-rc1 has been released
-	    #
+	v5.15|v6.1|v6.4)
 	    ;;
 	*)
 	    # parisc after v6.4 wants at least gcc v12.0
