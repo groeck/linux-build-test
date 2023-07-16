@@ -189,6 +189,22 @@ __pcibridge_new_port()
     fi
 }
 
+# Use the following functions to ensure that usb-xhci is loaded exactly once
+# if needed.
+__init_usb_xhci()
+{
+    __have_xhci=0
+}
+
+__load_usb_xhci()
+{
+    if [[ ${__have_xhci} -eq 0 ]]; then
+	__pcibridge_new_port
+	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
+	__have_xhci=1
+    fi
+}
+
 __common_scsicmd()
 {
     local fixup="$1"
@@ -284,9 +300,8 @@ __common_usbcmd()
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-xhci")
-	__pcibridge_new_port
-	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
-	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
+	__load_usb_xhci
+	extra_params+=" -device usb-storage,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb")
@@ -334,9 +349,8 @@ __common_usbcmd()
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
     "usb-uas-xhci")
-	__pcibridge_new_port
-	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
-	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
+	__load_usb_xhci
+	extra_params+=" -device usb-uas,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
@@ -597,6 +611,10 @@ __common_netcmd()
 	    __have_usb_param=1
 	fi
 	case "${netdev}" in
+	"usb-xhci")
+	    __load_usb_xhci
+	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
+	    ;;
 	"usb")
 	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
 	    ;;
@@ -710,6 +728,8 @@ __common_fixups()
     local fixups="${1//:/ }"
     local rootfs="$2"
     local fixup
+
+    __init_usb_xhci
 
     initcli="panic=-1 ${config_initcli}"
     extra_params="-snapshot"
