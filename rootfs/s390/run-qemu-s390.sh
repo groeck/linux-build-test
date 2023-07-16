@@ -16,7 +16,7 @@ else
     cpu="qemu"
 fi
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-s390x}
 
 PREFIX=s390-linux-
 ARCH=s390
@@ -35,7 +35,9 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
-    echo "CONFIG_PCI=y" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_PCI
+
+    enable_config ${defconfig} CONFIG_IGB CONFIG_USB_SUPPORT CONFIG_USB
 }
 
 runkernel()
@@ -86,13 +88,19 @@ checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,igb rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:virtio-pci:net,virtio-net-pci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:scsi[virtio-pci]:net,default rootfs.ext2.gz
+runkernel defconfig nolocktests:scsi[virtio-pci]:net,usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nolocktests:usb-xhci:net,e1000e rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nolocktests:usb-uas-xhci:net,usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}
