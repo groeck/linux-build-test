@@ -301,7 +301,7 @@ __common_usbcmd()
 	;;
     "usb-xhci")
 	__load_usb_xhci
-	extra_params+=" -device usb-storage,drive=d0"
+	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb")
@@ -350,7 +350,7 @@ __common_usbcmd()
 	;;
     "usb-uas-xhci")
 	__load_usb_xhci
-	extra_params+=" -device usb-uas,id=uas"
+	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
 	;;
@@ -613,7 +613,7 @@ __common_netcmd()
 	case "${netdev}" in
 	"usb-xhci")
 	    __load_usb_xhci
-	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
+	    extra_params+=" -device usb-net,bus=xhci.0,netdev=net0 -netdev user,id=net0"
 	    ;;
 	"usb")
 	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
