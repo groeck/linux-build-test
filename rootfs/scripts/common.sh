@@ -1107,7 +1107,20 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_CPUMASK_KUNIT_TEST CONFIG_BITFIELD_KUNIT
 	enable_config "${fragment}" CONFIG_HASH_KUNIT_TEST CONFIG_HASHTABLE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_OVERFLOW_KUNIT_TEST CONFIG_STRSCPY_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_KUNIT_DEBUGFS CONFIG_MPTCP_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_KUNIT_DEBUGFS
+	# RTC library unit tests hang in many qemu emulations
+	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_MPTCP_KUNIT_TEST CONFIG_NET_HANDSHAKE_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_IIO_FORMAT_KUNIT_TEST CONFIG_IIO_RESCALE_KUNIT_TEST
+	# regmap unit tests may be executed under spinlock, but allocate memory.
+	# This results in a traceback (mips, arm-aspeed, and others)
+	# enable_config "${fragment}" CONFIG_REGMAP_KUNIT
+	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST CONFIG_CHECKSUM_KUNIT
+	# clock unit tests seem to introduce noise warning tracebacks
+	# enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST CONFIG_STACKINIT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
 	# other
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
