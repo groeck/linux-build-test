@@ -30,6 +30,11 @@ fi
 
 PATH=${PATH_S390}:${PATH}
 
+# net,igb only works starting with 5.10
+skip_414="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
+skip_419="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
+skip_54="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
+
 patch_defconfig()
 {
     local defconfig=$1
@@ -61,6 +66,10 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
+    if ! checkskip "${build}" ; then
+	return 0
+    fi
+
     if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
@@ -86,6 +95,9 @@ runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio.gz
 retcode=$?
 checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,igb rootfs.ext2.gz
