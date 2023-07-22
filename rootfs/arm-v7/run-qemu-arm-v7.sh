@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-arm}
+QEMU_V81=${QEMU:-${QEMU_V81_BIN}/qemu-system-arm}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
@@ -192,7 +192,7 @@ runkernel()
     "bpim2u")
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
-	QEMUCMD="${QEMU_MASTER}"
+	QEMUCMD="${QEMU_V81}"
 	;;
     "orangepi-pc")
 	initcli+=" console=ttyS0,115200"
