@@ -1405,7 +1405,12 @@ dowait()
     while true
     do
         # terminate if process is no longer running
-	if ! kill -0 ${pid} >/dev/null 2>&1; then
+	if [[ ! -d "/proc/${pid}" ]]; then
+	    wait ${pid}
+	    if [[ $? -ne 0 ]]; then
+		msg="failed (qemu)"
+		retcode=1
+	    fi
 	    break
 	fi
 
@@ -1595,7 +1600,7 @@ dowait()
 
 	if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
 	    # Empty lines are irrelevant / don't add value.
-	    sed -i -e '/^ *$/d' "${logfile}"
+	    sed -i -e '/^[ \t]*$/d' "${logfile}"
 	    echo "------------"
 	    echo "qemu log:"
 	    head -5000 ${logfile}
