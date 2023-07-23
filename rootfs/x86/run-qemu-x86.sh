@@ -103,60 +103,87 @@ retcode=0
 
 runkernel defconfig smp:ata:net,rtl8139 Broadwell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:ata:net,e1000 Icelake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp2:tpm-tis:efi32:nvme:net,e1000e IvyBridge q35 rootfs.btrfs
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp4:usb:net,i82550 SandyBridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:usb-uas:net,i82562 Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp2:efi32:sdhci:mmc:net,i82801 Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel defconfig smp4:scsi[DC395]:net,ne2k_pci Conroe q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp6:scsi[AM53C974]:net,pcnet Nehalem q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel defconfig smp:tpm-crb:efi32:scsi[53C810]:net,virtio-net-pci Westmere-IBRS q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp2:tpm-crb:scsi[53C895A]:net,tulip Skylake-Server q35 rootfs.iso
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:efi32:pci-bridge:scsi[MEGASAS]:net,e1000 EPYC pc rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:pci-bridge:scsi[MEGASAS2]:net,e1000 EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:efi32:scsi[FUSION]:net,usb Opteron_G5 q35 rootfs.squashfs
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:net,i82557a phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:efi32:net,i82558a Opteron_G1 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:ata:net,i82559a Opteron_G2 pc rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:efi32:usb:net,i82559er core2duo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig smp:nvme:net,i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:smp:net,e1000 Penryn pc rootfs.cpio
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:smp:efi32:usb:net,pcnet Westmere pc rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:smp:nvme:net,i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig nosmp:usb:net,e1000 Opteron_G3 pc rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig nosmp:efi32:ata:net,pcnet Opteron_G4 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig nosmp:ata:net,rtl8139 n270 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig nosmp:nvme:net,i82562 Westmere q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:nosmp:net,ne2k_pci pentium3 q35 rootfs.cpio
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:nosmp:nvme:net,i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel defconfig pae:nosmp:efi32:sdhci:mmc:net,i82557b coreduo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
