@@ -335,6 +335,12 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
+# Not supported by upstream kernel as of v6.5 (missing bindings)
+# Requires qemu v8.1
+# runkernel aspeed_g5_defconfig rainier-bmc "" \
+# 	rootfs-armv5.cpio automatic \
+# 	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.12,address=0x2e:net,nic \
+# 	aspeed-bmc-ibm-rainier.dtb
 runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.cpio automatic notests::net,nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
