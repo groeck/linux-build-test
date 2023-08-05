@@ -7,8 +7,9 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-machine=$1
-cputype=$2
+machine="$1"
+cputype="$2"
+options="$3"
 
 # Note: Upstream qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-x86_64}"
@@ -57,7 +58,7 @@ runkernel()
 	pbuild+=":hd"
     fi
 
-    if ! match_params "${machine}@${mach}" "${cputype}@${cpu}"; then
+    if ! match_params "${machine}@${mach}" "${cputype}@${cpu}" "${options}@${fixup}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
