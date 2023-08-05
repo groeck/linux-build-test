@@ -323,10 +323,16 @@ runkernel multi_v7_defconfig sabrelite "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel multi_v7_defconfig sabrelite "" \
+if [ ${runall} -eq 1 ]; then
+    # Flash size is 2 MB. Latest root file system is larger than that,
+    # so we can't really support that unless reducing root file system
+    # size which isn't worth it. Maybe we can figure out how to attach
+    # a different flash at some point.
+    runkernel multi_v7_defconfig sabrelite "" \
 	rootfs-armv5.sqf manual ::mtd2:mem256:net,default imx6dl-sabrelite.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 
 # For sabrelite, the instatiated mmc device index is linux kernel release
 # specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
