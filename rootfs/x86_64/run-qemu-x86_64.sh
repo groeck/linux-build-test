@@ -24,6 +24,11 @@ patch_defconfig()
 {
     local defconfig=$1
 
+    # Enable f2fs and erofs
+    echo "CONFIG_F2FS_FS=y" >> ${defconfig}
+    echo "CONFIG_EROFS_FS=y" >> ${defconfig}
+    echo "CONFIG_EROFS_FS_ZIP=y" >> ${defconfig}
+
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
     echo "CONFIG_TCG_TIS=y" >> ${defconfig}
@@ -50,12 +55,12 @@ runkernel()
     local build="${defconfig}:${fixup}"
     local config="${defconfig}:${fixup//smp*/smp}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	pbuild+=":initrd"
-    elif [[ "${rootfs%.gz}" == *iso ]]; then
+    elif [[ "${rootfs}" == *iso ]]; then
 	pbuild+=":cd"
     else
-	pbuild+=":hd"
+	pbuild+=":${rootfs##*.}"
     fi
 
     if ! match_params "${machine}@${mach}" "${cputype}@${cpu}" "${options}@${fixup}"; then
@@ -111,7 +116,7 @@ checkstate ${retcode}
 runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 rootfs.ext2
+runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
@@ -124,7 +129,7 @@ checkstate ${retcode}
 # Repeat 'tulip' boot for all three variants (efi, efi32, non-efi)
 # to catch potential efi related issues. Use the opportunity to also
 # test different CPUs.
-runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
+runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395] Conroe q35 rootfs.erofs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
@@ -184,19 +189,6 @@ runkernel defconfig smp2:net,i82558a:efi32:mem1G:virtio Nehalem q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig preempt:smp4:net,ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel defconfig preempt:smp8:net,i82557a:mem4G:nvme Icelake-Server q35 rootfs.btrfs
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel defconfig preempt:smp6:net,i82550:mem512 KnightsMill q35 rootfs.cpio
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
 runkernel defconfig smp2:net,usb-ohci:efi:mem1G:scsi[53C810] Cooperlake q35 rootfs-x86.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -209,6 +201,19 @@ else
 fi
 
 runkernel defconfig "smp4:net,${netdev}:mem2G:scsi[53C895A]" EPYC-Rome q35 rootfs-x86.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+runkernel defconfig preempt:smp4:net,ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig preempt:smp8:net,i82557a:mem4G:nvme Icelake-Server q35 rootfs.btrfs
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig preempt:smp6:net,i82550:mem512 KnightsMill q35 rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
