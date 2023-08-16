@@ -127,7 +127,7 @@ runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio
 retcode=$?
 runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.erofs
+runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,i82550:mem512:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
@@ -141,7 +141,7 @@ runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc rootfs.ext2
+runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc rootfs.erofs
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" rootfs.f2fs
 retcode=$((retcode + $?))
