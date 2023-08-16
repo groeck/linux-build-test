@@ -146,11 +146,11 @@ runkernel()
     fi
 
     local _boot
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	pbuild+=":initrd"
 	_boot="initrd"
     else
-	pbuild+=":rootfs"
+	pbuild+=":${rootfs##*.}"
 	_boot="rootfs"
     fi
 
