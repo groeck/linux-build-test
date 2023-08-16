@@ -451,11 +451,56 @@ __common_flashcmd()
     initcli+=" root=/dev/mtdblock${partition}"
 }
 
+__highest_bit_set()
+{
+    local cnt=0
+    local var="$1"
+
+    while [[ "${var}" -gt 0 ]]; do
+	: $((cnt+=1, var>>=1))
+    done
+    echo "$cnt"
+}
+
+__bits_set()
+{
+    local cnt=0
+    local var="$1"
+
+    while [[ "${var}" -gt 0 ]]; do
+	: $((cnt+=var&1, var>>=1))
+    done
+    echo "$cnt"
+}
+
 __common_mmccmd()
 {
     local fixup="$1"
     local rootfs="$2"
     local rootdev="/dev/mmcblk0"
+    local fsize="$(stat --format="%s" "${rootfs}")"
+    local bits="$(__bits_set ${fsize})"
+
+    if [[ "${bits}" -ne 1 ]]; then
+	# ssd/mmc file system size must be an exponent of 2
+	# Create temporary file with the appropriate size if the root
+	# file system does not meet the criteria.
+	local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
+	local highest="$(__highest_bit_set "${fsize}")"
+	local flashsize
+
+	if [[ "${highest}" -lt 20 ]]; then
+	    flashsize=1
+	else
+	    flashsize="$((1<<highest-20))"
+	fi
+
+	# adjust file system size to next exponent of 2
+	dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
+	dd if="${rootfs}" of="${tmpfile}" ${seek} conv=notrunc status=none
+
+	rootfs="${tmpfile}"
+    fi
 
     case "${fixup}" in
     "sdhci")
