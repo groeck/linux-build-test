@@ -21,6 +21,10 @@ patch_defconfig()
 {
     local defconfig=$1
 
+    # Enable f2fs and erofs
+    enable_config ${defconfig} CONFIG_F2FS_FS
+    enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
+
     # Starting with v5.6, we need to have DMA_BCM2835 built into the
     # kernel because MMC code using may otherwise fail with -EPROBE_DEFER.
     # Otherwise we can no longer boot raspi3b from mmc cards.
@@ -48,10 +52,10 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${defconfig}:${fixup}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     local pbuild="${ARCH}:${build}${dtb:+:${dtb%.dtb}}"
@@ -119,59 +123,59 @@ echo
 
 # Failing network tests: i82551, usb-net
 
-runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio.gz
+runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio
 retcode=$?
-runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2.gz
+runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2.gz
+runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.erofs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,i82550:mem512:usb-ohci rootfs.ext2.gz
+runkernel virt defconfig smp2:net,i82550:mem512:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs.gz
+runkernel virt defconfig smp4:net,ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp6:net,pcnet:mem512:virtio rootfs.ext2.gz
+runkernel virt defconfig smp6:net,pcnet:mem512:virtio rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp8:net,rtl8139:mem512:virtio-pci rootfs.ext2.gz
+runkernel virt defconfig smp8:net,rtl8139:mem512:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2.gz
+runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs.gz
+runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc rootfs.ext2.gz
+runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" rootfs.f2fs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net,i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:net,i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net,i82558b:mem512:scsi[MEGASAS]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:net,i82558b:mem512:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:net,i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs.gz
+runkernel virt defconfig "smp4:net,i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net,e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2.gz
+runkernel virt defconfig "smp6:net,e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net,e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs.gz
+runkernel virt defconfig "smp8:net,e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp:net,pcnet:mem512:scsi[FUSION]" rootfs.ext2.gz
+runkernel virt defconfig "smp:net,pcnet:mem512:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net,usb-ohci:mem512:scsi[virtio]" rootfs.ext2.gz
+runkernel virt defconfig "smp2:net,usb-ohci:mem512:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
 
-runkernel xlnx-versal-virt defconfig smp:net,default:mem512 rootfs.cpio.gz
+runkernel xlnx-versal-virt defconfig smp:net,default:mem512 rootfs.cpio
 retcode=$((retcode + $?))
-runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:virtio-blk" rootfs.ext2.gz
+runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:virtio-blk" rootfs.ext2
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # unreliable; the drive sometimes instantiates as mmcblk1 instead of
     # mmcblk0, causing spurious failures.
-    runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:sd0" rootfs.ext2.gz
+    runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:sd0" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
-runkernel "xlnx-zcu102" defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G rootfs.cpio xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel "xlnx-zcu102" defconfig smp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G:sd rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
-runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -181,31 +185,31 @@ if [[ ${runall} -ne 0 ]]; then
     # zynqmp") for details. Without clocks, loading various io drivers
     # including the serial port driver stalls, and it becomes all but
     # impossible to use the emulation on any kernel later than v5.5.
-    runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig smp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig smp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.btrfs.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.btrfs xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3b defconfig smp:net,usb:mem1G rootfs.cpio.gz broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp:net,usb:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel raspi3b defconfig smp4:net,usb:mem1G:sd rootfs.ext2.gz broadcom/bcm2837-rpi-3-b.dtb
-retcode=$((retcode + $?))
-
-runkernel virt defconfig nosmp:mem512 rootfs.cpio.gz
+runkernel raspi3b defconfig smp4:net,usb:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 
-runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-ep108.dtb
+runkernel virt defconfig nosmp:mem512 rootfs.cpio
 retcode=$((retcode + $?))
-runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd rootfs.ext2.gz xilinx/zynqmp-ep108.dtb
+
+runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio xilinx/zynqmp-ep108.dtb
+retcode=$((retcode + $?))
+runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd rootfs.ext2 xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2.gz xilinx/zynqmp-zcu102-rev1.0.dtb
+    runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
     retcode=$((retcode + $?))
 fi
 
