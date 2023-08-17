@@ -17,6 +17,9 @@ PATH_ARM64="/opt/kernel/${DEFAULT_CC}/aarch64-linux/bin"
 
 PATH=${PATH}:${PATH_ARM64}
 
+skip_414="virt:defconfig:smp4:net,virtio-net:mem512:sdhci:mmc:erofs"
+skip_419="virt:defconfig:smp4:net,virtio-net:mem512:sdhci:mmc:erofs"
+
 patch_defconfig()
 {
     local defconfig=$1
