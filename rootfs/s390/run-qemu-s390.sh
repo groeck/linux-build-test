@@ -53,7 +53,7 @@ runkernel()
     local waitlist=("Requesting system reboot" "Boot successful" "Rebooting")
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
 	build+=":rootfs"
@@ -91,28 +91,28 @@ echo
 
 # locktests takes way too long for this architecture.
 
-runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio.gz
+runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio
 retcode=$?
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,igb rootfs.ext2.gz
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,igb rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:virtio-pci:net,virtio-net-pci rootfs.ext2.gz
+runkernel defconfig nolocktests:virtio-pci:net,virtio-net-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:scsi[virtio-pci]:net,usb-xhci rootfs.ext2.gz
+runkernel defconfig nolocktests:scsi[virtio-pci]:net,usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-xhci:net,e1000e rootfs.ext2.gz
+runkernel defconfig nolocktests:usb-xhci:net,e1000e rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-uas-xhci:net,usb-xhci rootfs.ext2.gz
+runkernel defconfig nolocktests:usb-uas-xhci:net,usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}

@@ -293,6 +293,9 @@ runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mem1G:mtd128:net,nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+
+# Note: f2fs generates lockdep splats. Only run with lockdep tests
+# disabled.
 runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.f2fs automatic notests::mem1G:mtd128,0,8,1:net,nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
