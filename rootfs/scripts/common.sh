@@ -1447,11 +1447,20 @@ dowait()
     local fsize=0
     local fsize_tmp
 
+    # Give the process some time to start
+    sleep 2
+
+    # Sometimes the log file goes missing
+    if [[ ! -e "${logfile}" ]]; then
+	echo " failed (missing log file)"
+	return 1
+    fi
+
     while true
     do
         # terminate if process is no longer running
 	if [[ ! -d "/proc/${pid}" ]]; then
-	    wait ${pid}
+	    wait ${pid} >/dev/null 2>&1
 	    if [[ $? -ne 0 ]]; then
 		msg="failed (qemu)"
 		retcode=1
@@ -1665,7 +1674,7 @@ execute()
     local waitlist=("${!2}")
     local cmd="$3"
     local pid
-    local logfile="$(__mktemp)"
+    local logfile="$(__mktemp /tmp/run.XXXXX)"
     local retries=0
     local retcode
     local last=0
