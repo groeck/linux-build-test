@@ -106,6 +106,14 @@ echo
 
 retcode=0
 
+# f2fs has known lockdep issues which the maintainers don't seem
+# to care about.
+if [[ "${runall}" -ne 0 ]]; then
+	f2fs="f2fs"
+else
+	f2fs="ext2"
+fi
+
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
 runkernel defconfig smp:net,e1000:mem256:ata Broadwell-noTSX q35 rootfs.ext2
@@ -120,7 +128,7 @@ checkstate ${retcode}
 runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 rootfs.f2fs
+runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
