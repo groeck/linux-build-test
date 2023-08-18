@@ -40,6 +40,11 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
+    # Enable f2fs after lockdep issues have been fixed
+    # enable_config ${defconfig} CONFIG_F2FS_FS
+    # Enable erofs
+    enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
+
     enable_config ${defconfig} CONFIG_PCI
 
     enable_config ${defconfig} CONFIG_IGB CONFIG_USB_SUPPORT CONFIG_USB
@@ -89,6 +94,13 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
+# erofs is not supported in older kernels
+if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+    erofs="erofs"
+else
+    erofs="ext2"
+fi
+
 # locktests takes way too long for this architecture.
 
 runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio
@@ -109,7 +121,7 @@ checkstate ${retcode}
 runkernel defconfig nolocktests:scsi[virtio-pci]:net,usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-xhci:net,e1000e rootfs.ext2
+runkernel defconfig nolocktests:usb-xhci:net,e1000e "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:usb-uas-xhci:net,usb-xhci rootfs.ext2
