@@ -91,41 +91,39 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
-# lock tests result in traceback, sometimes hang with endless
-# traceback at do_vint+0x80/0xb4
-if [[ "${runall}" -eq 0 ]]; then
-    nolocktests=":nolocktests"
-else
-    nolocktests=""
+nodebug=""
+if [[ ${linux_version_code} -lt $(kernel_version 6 4) && "${runall}" -eq 0 ]]; then
+    # nodebug to reduce boot time
+    nodebug="nodebug"
+    # lock tests result in traceback, sometimes hang with endless
+    # traceback at do_vint+0x80/0xb4
+    nodebug+=":nolocktests"
 fi
 
-# nodebug to reduce boot time (it is already bad because EFI
-# takes forever to initialize)
-
-runkernel defconfig virt rootfs.cpio "nodebug${nolocktests}::efi:net,default"
+runkernel defconfig virt rootfs.cpio "${nodebug}:efi:net,default"
 retcode=$?
 checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
-    # This does not work, at least not with qemu v8.0 and Linux v6.4/v6.5.
+    # This does not work, at least not with qemu v8.0/v8.1 and Linux v6.4/v6.5.
     # Qemu for loongarch is not built with tpm support enabled,
     # and enabling it causes a boot hang.
-    runkernel defconfig virt rootfs.cpio "nodebug${nolocktests}::tpm-tis-device:efi:net,default"
+    runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net,default"
     retcode=$?
     checkstate ${retcode}
 fi
-runkernel defconfig virt rootfs.ext2 "nodebug${nolocktests}::efi:nvme:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:nvme:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "nodebug${nolocktests}::efi:usb-xhci:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:usb-xhci:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "nodebug${nolocktests}::efi:scsi[FUSION]:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[FUSION]:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "nodebug${nolocktests}::efi:scsi[MEGASAS]:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "nodebug${nolocktests}::efi:sdhci:mmc:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:sdhci:mmc:net,default"
 retcode=$((retcode + $?))
 
 exit ${retcode}
