@@ -117,6 +117,14 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
+# f2fs has known lockdep issues which the maintainers don't seem
+# to care about.
+if [[ "${runall}" -ne 0 ]]; then
+	f2fs="f2fs"
+else
+	f2fs="ext2"
+fi
+
 # kown net test failures:
 #	i82551, usb-net, i82557a, i82557b
 
@@ -140,7 +148,7 @@ runkernel virt defconfig smp2:net,tulip:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:net,virtio-net:mem512:sdhci:mmc rootfs.erofs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net,i82558b:mem512:scsi[DC395]" rootfs.f2fs
+runkernel virt defconfig "smp6:net,i82558b:mem512:scsi[DC395]" "rootfs.${f2fs}"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp8:net,pcnet:mem512:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
