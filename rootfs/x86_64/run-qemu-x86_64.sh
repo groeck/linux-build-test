@@ -20,10 +20,6 @@ PREFIX="x86_64-linux-"
 
 PATH=${PATH_X86}:${PATH}
 
-# erofs is not supported in older kernels
-skip_414="q35:Skylake-Client:smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc"
-skip_419="q35:Skylake-Client:smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc"
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -114,6 +110,13 @@ else
 	f2fs="ext2"
 fi
 
+# erofs is not supported in older kernels
+if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+    erofs="erofs"
+else
+    erofs="ext2"
+fi
+
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
 runkernel defconfig smp:net,e1000:mem256:ata Broadwell-noTSX q35 rootfs.ext2
@@ -134,7 +137,7 @@ checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 rootfs.erofs
+runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
