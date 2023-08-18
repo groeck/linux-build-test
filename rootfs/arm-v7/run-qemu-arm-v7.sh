@@ -124,7 +124,6 @@ runkernel()
     local ddtb="${dtb%.dtb}"
     local dtbfile=""
     local nonet=0
-    local logfile="$(__mktemp)"
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
