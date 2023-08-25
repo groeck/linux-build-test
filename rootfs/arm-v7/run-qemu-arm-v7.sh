@@ -55,6 +55,8 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
 
+    echo "CONFIG_CRAMFS=y" >> ${defconfig}
+
     # MMC
     sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
     # PCMCIA
@@ -487,7 +489,7 @@ if [ ${runall} -eq 1 ]; then
     checkstate ${retcode}
 fi
 runkernel multi_v7_defconfig kudo-bmc "" \
-	rootfs-armv5.ext2 automatic npcm::mtd64,8,3 nuvoton-npcm730-kudo.dtb
+	rootfs-armv7a.cramfs automatic npcm::mtd64,8,3 nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig kudo-bmc "" \
