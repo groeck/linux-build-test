@@ -395,13 +395,14 @@ runkernel integrator_defconfig integratorcp "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic "nonet"
+# Limit configuration options to avoid running out of memory
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic "nonet::sd"
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt::sd"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet::flash32,26,3"
+runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt::flash32,26,3"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
