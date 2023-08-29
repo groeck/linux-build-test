@@ -5,18 +5,17 @@
 {% block content -%}
 
 {% set arches = [ "alpha", "arc", "arcv2", "arm", "arm64",
-		  "blackfin",
-		  "c6x", "cris", "crisv32", 'csky', "frv",
+		  "c6x", 'csky',
 		  "h8300", "hexagon", "i386",
 		  "loongarch",
-		  "m32r", "m68k",
-		  "m68k_nommu", "metag", "microblaze", "mips", "mn10300",
+		  "m68k", "m68k_nommu",
+		  "microblaze", "mips",
 		  "nds32", "nios2",
 		  "openrisc",
 		  "parisc", "parisc64", "powerpc",
 		  "riscv32", "riscv",
-		  "s390", "score", "sh", "sparc32", "sparc64",
-		  "tile", "um", "x86_64", "xtensa" ] -%}
+		  "s390", "sh", "sparc32", "sparc64",
+		  "um", "x86_64", "xtensa" ] -%}
 
 {% set qemu_arches = [ "alpha", "arm", "arm-v7", "arm-aspeed", "arm64", "arm64be",
 			"loongarch",
