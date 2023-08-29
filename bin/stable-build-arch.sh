@@ -36,7 +36,6 @@ PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_FRV=/opt/kernel/gcc-${CV}-nolibc/frv-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
-PATH_IA64=/opt/kernel/gcc-${CV}-nolibc/ia64-linux/bin
 # loongarch either needs 12.x.0-2.39 or 13.1-2.40.
 # 12.x.0-2.40 doesn't work due to compiler/assembler interdependencies.
 # 13.1.0-2.40 results in __write_overflow_field in drivers/infiniband/hw/irdma/uk.c.
@@ -217,11 +216,6 @@ case ${ARCH} in
 	cmd=(${cmd_i386[*]})
 	PREFIX=${PREFIX_X86}
 	PATH=${PATH_X86}:${PATH}
-	;;
-    ia64)
-	cmd=(${cmd_ia64[*]})
-	PREFIX="ia64-linux-"
-	PATH=${PATH_IA64}:${PATH}
 	;;
     loongarch)
 	cmd=(${cmd_loongarch[*]})
