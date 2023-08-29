@@ -10,7 +10,7 @@ cmd_arc=(tb10x_defconfig)
 cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig \
 	nsimosci_hs_smp_defconfig vdk_hs38_smp_defconfig)
 cmd_arm=(allmodconfig allnoconfig tinyconfig \
-	omap2plus_defconfig imx_v6_v7_defconfig \
+	omap2plus_defconfig imx_v6_v7_defconfig ep93xx_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig omap1_defconfig \
 	footbridge_defconfig davinci_all_defconfig \
 	axm55xx_defconfig mxs_defconfig keystone_defconfig imxrt_defconfig \
