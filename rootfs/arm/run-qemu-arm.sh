@@ -324,7 +324,7 @@ runkernel pxa_defconfig borzoi "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.ext2 automatic \
+	rootfs-armv5.cramfs automatic \
 	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net,usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -371,7 +371,7 @@ runkernel pxa_defconfig terrier "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.ext2 automatic \
+	rootfs-armv5.cramfs automatic \
 	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net,usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -392,6 +392,10 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.ext2 automatic ::mem128:sd:net,default integratorcp.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel integrator_defconfig integratorcp "" \
+	rootfs-armv5.cramfs automatic ::mem128:sd:net,default integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
