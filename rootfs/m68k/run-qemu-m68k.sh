@@ -71,7 +71,7 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     if ! match_params "${machine}@${mach}"; then
@@ -114,6 +114,8 @@ retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cpio
 retcode=$((retcode + $?))
 runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.ext2
+retcode=$((retcode + $?))
+runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cramfs
 retcode=$((retcode + $?))
 
 exit ${retcode}
