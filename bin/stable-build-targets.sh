@@ -1,10 +1,3 @@
-buildarch=(alpha arm arm64 blackfin c6x cris frv hexagon i386 \
-	   loongarch \
-	   m32r m68k m68k_nommu \
-	   metag microblaze mips mn10300 openrisc parisc parisc64 powerpc \
-	   s390 score sh sparc32 sparc64 \
-	   tile x86_64 xtensa um)
-
 cmd_alpha=(defconfig allmodconfig allnoconfig tinyconfig)
 cmd_arc=(tb10x_defconfig)
 cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig \
@@ -21,26 +14,19 @@ cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	integrator_defconfig sp7021_defconfig \
 	pxa910_defconfig clps711x_defconfig)
 cmd_arm64=(allnoconfig tinyconfig defconfig allmodconfig)
-cmd_blackfin=(defconfig BF561-EZKIT-SMP_defconfig)
 cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
-cmd_cris=(defconfig allnoconfig tinyconfig etrax-100lx_defconfig)
-cmd_crisv32=(artpec_3_defconfig etraxfs_defconfig)
 cmd_csky=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_frv=(defconfig)
 cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-sim_defconfig)
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
 cmd_loongarch=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_m32r=(defconfig)
 cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
-cmd_metag=(defconfig allnoconfig tinyconfig meta1_defconfig meta2_defconfig meta2_smp_defconfig)
 cmd_microblaze=(defconfig allnoconfig tinyconfig)
 cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
 	ath79_defconfig ar7_defconfig loongson2k_defconfig mtx1_defconfig db1xxx_defconfig \
 	cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
-cmd_mn10300=(asb2303_defconfig asb2364_defconfig)
 cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
 # nios2 allmodconfig: "Internal error in nios2_align" (binutils)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
@@ -54,12 +40,10 @@ cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
 	85xx/tqm8548_defconfig 83xx/mpc834x_itx_defconfig)
 cmd_riscv=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
-cmd_score=(defconfig)
 cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig \
 	shx3_defconfig se7619_defconfig)
 cmd_sparc32=(defconfig allnoconfig tinyconfig)
 cmd_sparc64=(allmodconfig defconfig allnoconfig tinyconfig)
-cmd_tile=(tilegx_defconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
 cmd_xtensa=(defconfig allmodconfig allnoconfig tinyconfig)
 cmd_um=(defconfig)
@@ -75,9 +59,6 @@ skip_510="csky:allmodconfig parisc64:allnoconfig"
 
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
 	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
-
-fixup_tile=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
-	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 	"/CONFIG_INITRAMFS_SOURCE/d")

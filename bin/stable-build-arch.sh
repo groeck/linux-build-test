@@ -11,17 +11,10 @@ CV123="12.3.0-2.40"
 CV13="13.1.0-2.40"
 
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
-# with gcc 10.3.0,11.1.0 in v4.14.y:
-# am33_2.0-linux-ld: am33_2.0-linux-ld: DWARF error: mangled line number section
-# gcc 11.3.0/binutils 2.39:
-# misc.c:(.text+0x189): undefined reference to `memset'
-# PATH_AM33=/opt/kernel/gcc-${CV}-nolibc/am33_2.0-linux/bin
-PATH_AM33=/opt/kernel/gcc-${CV9}-nolibc/am33_2.0-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
-PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
 # Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
 # on v4.4.y (at least), in kernel/fork.c:
@@ -29,20 +22,14 @@ PATH_BFIN=/opt/kernel/gcc-${CV}-nolibc/bfin-uclinux/bin
 # internal compiler error with gcc 11.1.0, 11.3.0, 11.4.0, 12.2.0
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
-# No cris support in gcc 10.x.
-PATH_CRIS=/opt/kernel/gcc-${CV9}-nolibc/cris-linux/bin
-PATH_CRISV32=/opt/kernel/gcc-4.6.3-nolibc/crisv32-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
-PATH_FRV=/opt/kernel/gcc-${CV}-nolibc/frv-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
 # loongarch either needs 12.x.0-2.39 or 13.1-2.40.
 # 12.x.0-2.40 doesn't work due to compiler/assembler interdependencies.
 # 13.1.0-2.40 results in __write_overflow_field in drivers/infiniband/hw/irdma/uk.c.
 PATH_LOONGARCH=/opt/kernel/gcc-${CV12}-nolibc/loongarch64-linux-gnu/bin
-PATH_M32R=/opt/kernel/gcc-${CV}-nolibc/m32r-linux/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
-PATH_METAG=/opt/kernel/metag/gcc-4.2.4/usr/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
 PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
@@ -53,11 +40,9 @@ PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 PATH_PPC=/opt/kernel/gcc-${CV}-nolibc/powerpc64-linux/bin
 PATH_RISCV64=/opt/kernel/gcc-${CV}-nolibc/riscv64-linux/bin
 PATH_RISCV32=/opt/kernel/gcc-${CV}-nolibc/riscv32-linux/bin
-PATH_SCORE=/opt/kernel/score/bin
 PATH_S390=/opt/kernel/gcc-${CV}-nolibc/s390-linux/bin
 PATH_SH4=/opt/kernel/gcc-${CV}-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
-PATH_TILE=/opt/kernel/gcc-4.6.2-nolibc/tilegx-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
 
@@ -88,7 +73,7 @@ branch=$(git branch | cut -f2 -d' ')
 
 # Limit file size to ~3.5 GB to prevent log file sizes from getting
 # out of control while at the same time supporting large images
-# (x86_64/allyesconfig: above 1GB, cris/defconfig: 3.2GB).
+# (x86_64/allyesconfig: above 1GB).
 ulimit -f $((3500*1024))
 
 configcmd="olddefconfig"
@@ -160,37 +145,16 @@ case ${ARCH} in
 	PREFIX="aarch64-linux-"
 	PATH=${PATH_ARM64}:${PATH}
 	;;
-    blackfin)
-	cmd=(${cmd_blackfin[*]})
-	PREFIX="bfin-uclinux-"
-	PATH=${PATH_BFIN}:${PATH}
-	;;
     c6x)
 	cmd=(${cmd_c6x[*]})
 	PREFIX="c6x-elf-"
 	# PREFIX="tic6x-uclinux-"
 	PATH=${PATH_C6X}:${PATH}
 	;;
-    crisv32)
-	ARCH=cris
-	cmd=(${cmd_crisv32[*]})
-	PREFIX="crisv32-linux-"
-	PATH=${PATH_CRISV32}:${PATH}
-	;;
-    cris)
-	cmd=(${cmd_cris[*]})
-	PREFIX="cris-linux-"
-	PATH=${PATH_CRIS}:${PATH}
-	;;
     csky)
 	cmd=(${cmd_csky[*]})
 	PREFIX="csky-linux-"
 	PATH=${PATH_CSKY}:${PATH}
-	;;
-    frv)
-	cmd=(${cmd_frv[*]})
-	PREFIX="frv-linux-"
-	PATH=${PATH_FRV}:${PATH}
 	;;
     h8300)
 	cmd=(${cmd_h8300[*]})
@@ -222,11 +186,6 @@ case ${ARCH} in
 	PREFIX="loongarch64-linux-gnu-"
 	PATH=${PATH_LOONGARCH}:${PATH}
 	;;
-    m32r)
-	cmd=(${cmd_m32r[*]})
-	PREFIX="m32r-linux-"
-	PATH=${PATH_M32R}:${PATH}
-	;;
     m68k)
 	cmd=(${cmd_m68k[*]})
 	PREFIX="m68k-linux-"
@@ -239,11 +198,6 @@ case ${ARCH} in
 	PATH=${PATH_M68}:${PATH}
 	ARCH=m68k
         ;;
-    metag)
-	cmd=(${cmd_metag[*]})
-	PREFIX="metag-unknown-linux-uclibc-"
-	PATH=${PATH_METAG}:${PATH}
-	;;
     microblaze)
 	cmd=(${cmd_microblaze[*]})
 	PREFIX="microblaze-linux-"
@@ -253,11 +207,6 @@ case ${ARCH} in
 	cmd=(${cmd_mips[*]});
 	PREFIX="mips64-linux-"
 	PATH=${PATH_MIPS}:${PATH}
-	;;
-    mn10300)
-	cmd=(${cmd_mn10300[*]})
-	PREFIX="am33_2.0-linux-"
-	PATH=${PATH_AM33}:${PATH}
 	;;
     nds32)
 	cmd=(${cmd_nds32[*]})
@@ -329,16 +278,6 @@ case ${ARCH} in
 	cmd=(${cmd_s390[*]})
 	PREFIX=${PREFIX_S390}
 	PATH=${PATH_S390}:${PATH}
-	;;
-    score)
-	cmd=(${cmd_score[*]})
-	PREFIX="score-elf-"
-	PATH=${PATH_SCORE}:${PATH}
-	;;
-    tile)
-	cmd=(${cmd_tile[*]})
-	PREFIX="tilegx-linux-"
-	PATH=${PATH_TILE}:${PATH}
 	;;
     sh)
 	cmd=(${cmd_sh[*]})
