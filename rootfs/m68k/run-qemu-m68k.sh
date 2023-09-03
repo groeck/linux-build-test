@@ -62,7 +62,7 @@ runkernel()
     local fixup=$4
     local rootfs=$5
     local waitlist=("Rebooting" "Boot successful")
-    local build="${mach}:${cpu}:${defconfig}"
+    local build="${ARCH}:${mach}:${cpu}:${defconfig}"
     local qemu="${QEMU}"
     local diskcmd=""
 
