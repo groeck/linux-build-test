@@ -27,16 +27,14 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # Build CRAMFS into kernel if enabled
+    enable_config_cond ${defconfig} CONFIG_CRAMFS
+
     for fixup in ${fixups}; do
       case "${fixup}" in
       "mcf5208evb")
 	# Enable DEVTMPFS
-	sed -i -e '/CONFIG_BLK_DEV_INITRD/d' ${defconfig}
-	echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-	sed -i -e '/CONFIG_DEVTMPFS/d' ${defconfig}
-	echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-	sed -i -e '/CONFIG_DEVTMPFS_MOUNT/d' ${defconfig}
-	echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
+	enable_config ${defconfig} CONFIG_BLK_DEV_INITRD CONFIG_DEVTMPFS CONFIG_DEVTMPFS_MOUNT
 
 	# Specify initramfs file name
 	sed -i -e '/CONFIG_INITRAMFS_SOURCE/d' ${defconfig}
@@ -111,11 +109,11 @@ echo
 retcode=0
 runkernel mcf5208evb m5208 m5208evb_defconfig "noextras" rootfs-5208.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cpio
+runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.ext2
+runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.ext2
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "net,default" rootfs-68040.cramfs
+runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.cramfs
 retcode=$((retcode + $?))
 
 exit ${retcode}
