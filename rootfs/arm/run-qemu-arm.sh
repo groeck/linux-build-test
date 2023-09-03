@@ -38,6 +38,9 @@ patch_defconfig()
     # Disable Bluetooth and wireless. We won't ever use or test it.
     disable_config "${defconfig}" CONFIG_BT CONFIG_WLAN CONFIG_WIRELESS
 
+    # Disable NTFS. It won't be tested.
+    disable_config CONFIG_NTFS_FS
+
     # Always enable ...
     enable_config "${defconfig}" CONFIG_DEVTMPFS CONFIG_DEVTMPFS_MOUNT CONFIG_BLK_DEV_INITRD
 
@@ -56,6 +59,9 @@ patch_defconfig()
     # Doesn't work as-is; it looks like NAND images need to be
     # specially prepared.
     # enable_config_cond "${defconfig}" CONFIG_MTD_RAW_NAND CONFIG_MTD_NAND_SHARPSL
+
+    # Build cramfs into kernel if enabled
+    enable_config_cond "${defconfig}" CONFIG_CRAMFS
 
     # Always build PXA watchdog into kernel if enabled
     enable_config_cond "${defconfig}" CONFIG_SA1100_WATCHDOG
