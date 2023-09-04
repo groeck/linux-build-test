@@ -144,6 +144,7 @@ echo
 # net,e1000e and net,igb (qemu v8.0+) instantiate but do not work
 # net,sungem does not instantiate
 # net,usb-uhci does not instantiate
+retcode=0
 runkernel mpc85xx_defconfig "::net,e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "::scsi[53C895A]:net,ne2k_pci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
@@ -234,10 +235,13 @@ fi
 runkernel pmac32_defconfig zilog:smp::ide:net,e1000 mac99 G4 ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 
-runkernel pmac32_defconfig zilog::ide:net,default mac99 G4 ttyS0 rootfs.ext2 vmlinux
-retcode=$?
 
 runkernel pmac32_defconfig zilog::ide:net,virtio-net-pci g3beige G3 ttyS0 rootfs.ext2 vmlinux
+retcode=$((${retcode} + $?))
+runkernel pmac32_defconfig zilog::ide:net,default g3beige G3 ttyS0 rootfs.btrfs vmlinux
+retcode=$((${retcode} + $?))
+
+runkernel pmac32_defconfig zilog::ide:net,default mac99 G4 ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog::net,e1000 mac99 "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
