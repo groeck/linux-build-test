@@ -42,28 +42,30 @@ patch_defconfig()
     local fixup
 
     for fixup in ${fixups}; do
-	if [ "${fixup}" = "e5500" ]; then
-	    echo "CONFIG_E5500_CPU=y" >> ${defconfig}
-	    echo "CONFIG_PPC_QEMU_E500=y" >> ${defconfig}
-	fi
-
-	if [ "${fixup}" = "little" ]; then
-	    echo "CONFIG_CPU_BIG_ENDIAN=n" >> ${defconfig}
-	    echo "CONFIG_CPU_LITTLE_ENDIAN=y" >> ${defconfig}
-	fi
-
-	if [ "${fixup}" = "big" ]; then
-	    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
-	    echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
-	fi
+	case "${fixup}" in
+	"e5500")
+	    enable_config "${defconfig}" CONFIG_E5500_CPU
+	    enable_config "${defconfig}" CONFIG_PPC_QEMU_E500
+	    ;;
+	"little")
+	    enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
+	    enable_config "${defconfig}" CONFIG_CPU_LITTLE_ENDIAN
+	    ;;
+	"big")
+	    enable_config "${defconfig}" CONFIG_CPU_LITTLE_ENDIAN
+	    enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
+	    ;;
+	*)
+	    ;;
+	esac
     done
 
     # TPM testing
-    echo "CONFIG_TCG_TPM=y" >> ${defconfig}
-    echo "CONFIG_TCG_IBMVTPM=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_TCG_TPM
+    enable_config "${defconfig}" CONFIG_TCG_IBMVTPM
 
     # extra SATA config
-    echo "CONFIG_SATA_SIL=y" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_SATA_SIL
 }
 
 runkernel()
