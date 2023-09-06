@@ -21,11 +21,14 @@ __swtpmpidfile="${__swtpmdir}/pid"
 
 . "${__basedir}/scripts/config.sh"
 
-if [[ -w /var/cache/buildbot ]]; then
-    __cachedir="/var/cache/buildbot/$(basename ${__progdir})"
+if [[ -w "/var/cache/buildbot" ]]; then
+    __buildbot_cachedir="/var/cache/buildbot"
 else
-    __cachedir="/tmp/buildbot-cache/$(basename ${__progdir})"
+    __buildbot_cachedir="/tmp/buildbot-cache"
 fi
+
+__cachedir="${__buildbot_cachedir}/$(basename ${__progdir})"
+__fscachedir="${__buildbot_cachedir}/filesystems"
 
 __do_network_test=0
 __do_tpm_test=0
@@ -209,6 +212,7 @@ __init_disk()
 {
     __disk_index=0
     __disk_id="d0"
+    unset __primary_diskcmd
 }
 
 __next_disk()
@@ -221,6 +225,13 @@ __init_rootdev()
 {
     unset __rootdev
     unset __rootwait
+    unset __fstest_dev
+}
+
+__devname()
+{
+    local char="$((__disk_index + 97))"
+    printf "/dev/$1\x$(printf %x ${char})"
 }
 
 __set_rootdev()
@@ -228,6 +239,8 @@ __set_rootdev()
     if [[ -z "${__rootdev}" ]]; then
 	__rootdev="$1"
 	__rootwait="$2"
+    elif [[ -z "${__fstest_dev}" ]]; then
+	__fstest_dev="$1"
     fi
 }
 
@@ -266,7 +279,7 @@ __common_scsicmd()
     "scsi[FUSION]")
 	device="mptsas1068"
 	# wwn (World Wide Name) is mandatory for this device
-	wwn="0x5000c50015ea71ac"
+	wwn="0x5000c50015ea71$(printf "%02x" "${__disk_index}")"
 	;;
     "scsi[virtio]")
 	device="virtio-scsi-device"
@@ -290,12 +303,15 @@ __common_scsicmd()
 	media="cdrom"
 	sdevice="scsi-cd"
     else
-	__set_rootdev "/dev/sda"
+	__set_rootdev "$(__devname sd)"
 	sdevice="scsi-hd"
     fi
 
     __pcibridge_new_port
-    extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus_ref}"
+    # instantiate device only once
+    if [[ ${__disk_index} -eq 0 ]]; then
+	extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus_ref}"
+    fi
     extra_params+=" ${device:+-device ${sdevice},bus=scsi.0,drive=${__disk_id}${wwn:+,wwn=${wwn}}}"
     extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=${__disk_id}}"
     extra_params+="${media:+,media=${media}}"
@@ -389,7 +405,7 @@ __common_usbcmd()
 	;;
     esac
 
-    __set_rootdev "/dev/sda" 1
+    __set_rootdev "$(__devname sd)" 1
 }
 
 __common_virtcmd()
@@ -577,7 +593,7 @@ __common_satacmd()
 	rootdev="sr0"
     else
 	idedevice="ide-hd"
-	__set_rootdev "/dev/sda"
+	__set_rootdev "$(__devname sd)"
     fi
 
     case "${fixup}" in
@@ -613,7 +629,7 @@ __common_diskcmd()
 	media="cdrom"
 	rootdev="/dev/sr0"
     else
-	rootdev="/dev/sda"
+	rootdev="$(__devname sd)"
     fi
 
     case "${fixup}" in
@@ -630,7 +646,7 @@ __common_diskcmd()
 	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
 	# With CONFIG_IDE, the device is /dev/hda for both hdd and cdrom.
 	if ! grep -q "CONFIG_ATA=y" .config; then
-	    rootdev="/dev/hda"
+	    rootdev="$(__devname hd)"
 	fi
 	__set_rootdev "${rootdev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
@@ -664,6 +680,29 @@ __common_diskcmd()
     esac
 
     __next_disk
+}
+
+# Set up secondary file system.
+# Format is "fstest,<file system type>".
+# A file named filesystem.<file system type> is expected to exist in the
+# filesystems/ directory. The primary disk must be specified first in the
+# list of fixups.
+__common_fscmd()
+{
+    local fixup=$1
+    local params=(${fixup//,/ })
+    local fstype="${params[1]}"
+    local fspath="$(setup_filesystem "filesystem.${fstype}")"
+
+    if [[ -z "${__primary_diskcmd}" ]]; then
+	return 1
+    fi
+    if [[ -z "${fspath}" ]]; then
+	return 1
+    fi
+
+    __common_diskcmd "${__primary_diskcmd}" "${fspath}"
+    return 0
 }
 
 __common_netcmd()
@@ -762,6 +801,11 @@ __common_fixup()
     sdhci-mmc*|mmc*|sd*|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
+	__primary_diskcmd="${fixup}"
+	;;
+    fstest,*)
+	# Instantiate disk to run file system tests
+	__common_fscmd "${fixup}"
 	;;
     pci*)
 	# __common_pcicmd "${fixup}" "${rootfs}"
@@ -832,6 +876,8 @@ __common_fixups()
 
     # Specify root file system and rootwait on command line if requested
     initcli+="${__rootdev+ root=${__rootdev}}${__rootwait+" rootwait"}"
+    # Also specify file system test device if available
+    initcli+="${__fstest_dev+ fstest=${__fstest_dev}}"
 
     # trim leading whitespaces, if any
     initcli="${initcli##*( )}"
@@ -884,7 +930,9 @@ common_diskcmd()
 	__common_diskcmd "${fixup}" "${rootfs}"
     done
     diskcmd="${extra_params}"
-    __set_rootdev "/dev/sda"
+    if [[ -z "${__rootdev}" ]]; then
+	__set_rootdev "$(__devname sd)"
+    fi
 
     initcli+=" root=${__rootdev}${__rootwait+" rootwait"}"
 }
@@ -923,7 +971,7 @@ doclean()
 
 rootfsname()
 {
-    rootfs="$(basename $1)"
+    local rootfs="$(basename $1)"
     echo "${__cachedir}/${rootfs%.gz}"
 }
 
@@ -959,6 +1007,62 @@ setup_rootfs()
 
     if [[ -e "${rootfspath}.md5" ]]; then
 	cp "${rootfspath}.md5" "${destfile}.md5"
+    fi
+
+    # Cached files must not be modified.
+    chmod 444 "${destfile}"
+    if [[ -e "${destfile}.md5" ]]; then
+	chmod 444 "${destfile}.md5"
+    fi
+    echo "${destfile}"
+}
+
+fscachepath()
+{
+    local fname="$(basename $1)"
+    echo "${__fscachedir}/${fname%.gz}"
+}
+
+setup_filesystem()
+{
+    local fsfile=$1
+    local fspath="${__basedir}/filesystems/${fsfile}"
+
+    if [[ ! -e "${fspath}" && -e "${fspath}.gz" ]]; then
+	fsfile="${fsfile}.gz"
+	fspath="${fspath}.gz"
+    fi
+
+    if [[ ! -e "${fspath}" ]]; then
+	return
+    fi
+
+    local destfile="$(fscachepath ${fsfile})"
+
+    # TODO: Handle the rest in a common function between root file
+    # system setup and this code.
+
+    mkdir -p "${__fscachedir}"
+
+    # Do nothing if file checksums exist and match.
+    # Checksums are copied, not regenerated, so that should always work even
+    # if the destination has been decompressed.
+    if cmp -s "${fspath}.md5" "${destfile}.md5"; then
+	echo "${destfile}"
+	return
+    fi
+
+    # If we get here, clean up the cache first.
+    rm -f "${destfile}" "${destfile}.md5"
+
+    cp "${fspath}" "${__fscachedir}"
+    if [[ "${fsfile}" == *.gz ]]; then
+	gunzip -f "${destfile}.gz"
+	fsfile="${fsfile%.gz}"
+    fi
+
+    if [[ -e "${fspath}.md5" ]]; then
+	cp "${fspath}.md5" "${destfile}.md5"
     fi
 
     # Cached files must not be modified.
