@@ -117,13 +117,13 @@ checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:usb-xhci:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[FUSION]:net,default"
+runkernel defconfig virt rootfs.btrfs "${nodebug}::efi:scsi[FUSION]:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:sdhci-mmc:net,default"
+runkernel defconfig virt rootfs.squashfs "${nodebug}::efi:sdhci-mmc:net,default"
 retcode=$((retcode + $?))
 
 exit ${retcode}
