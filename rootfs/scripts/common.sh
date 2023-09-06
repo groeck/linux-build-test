@@ -529,10 +529,6 @@ __common_mmccmd()
     fi
 
     case "${fixup}" in
-    "sdhci")
-	__pcibridge_new_port
-	extra_params+=" -device sdhci-pci${__pcibus_ref}"
-	;;
     mmc*)
 	local devindex=${fixup#mmc}
 	extra_params+=" -device sd-card,drive=${__disk_id}"
@@ -631,7 +627,7 @@ __common_diskcmd()
 	__set_rootdev "${rootdev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
-    mmc*|sd*|"sdhci")
+    mmc*|sd*)
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
     flash*|mtd*)
@@ -755,7 +751,12 @@ __common_fixup()
 	# behind this PCI bridge.
 	__pcibridge_new_bridge
 	;;
-    mmc*|sd*|"sdhci"|"nvme"|\
+    "sdhci")
+	# instantiate sdhci-pci (may be needed as pre-requisite for mmc)
+	__pcibridge_new_port
+	extra_params+=" -device sdhci-pci${__pcibus_ref}"
+	;;
+    mmc*|sd*|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
@@ -837,9 +838,8 @@ __common_fixups()
 # using common fixup strings.
 # Supports:
 # - initrd / rootfs separation
-# - mmc/mmc[0-9]/sd/sd[0-9]/sdhci
+# - mmc/mmc[0-9]/sd/sd[0-9]
 #   Difference:
-#   - sdhci instantiates sdhci-pci, as pre-requisite of mmc
 #   - mmc/mmc[0-9] instantiates sd-card
 #     mmc[0-9] uses mmcblk[0-9] as root device
 #   - sd/sd[0-9] uses if=sd
@@ -875,7 +875,16 @@ common_diskcmd()
     __init_disk
 
     for fixup in ${fixups}; do
-	__common_diskcmd "${fixup}" "${rootfs}"
+	case "${fixup}" in
+	"sdhci")
+	    # instantiate sdhci-pci (may be needed as pre-requisite for mmc)
+	    __pcibridge_new_port
+	    extra_params+=" -device sdhci-pci${__pcibus_ref}"
+	    ;;
+	*)
+	    __common_diskcmd "${fixup}" "${rootfs}"
+	    ;;
+	esac
     done
     diskcmd="${extra_params}"
     __set_rootdev "/dev/sda"
