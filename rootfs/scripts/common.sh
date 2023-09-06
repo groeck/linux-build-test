@@ -806,6 +806,7 @@ __common_fixups()
 
     __init_usb_xhci
     __init_disk
+    __init_rootdev
 
     initcli="panic=-1 ${config_initcli}"
     extra_params="-snapshot"
@@ -841,8 +842,9 @@ __common_fixups()
 # using common fixup strings.
 # Supports:
 # - initrd / rootfs separation
-# - mmc/mmc[0-9]/sd/sd[0-9]
+# - sdhci-mmc/sdhci-mmc[0-9]/mmc/mmc[0-9]/sd/sd[0-9]
 #   Difference:
+#   - sdhci-mmc instantiates sdhci and then sd card
 #   - mmc/mmc[0-9] instantiates sd-card
 #     mmc[0-9] uses mmcblk[0-9] as root device
 #   - sd/sd[0-9] uses if=sd
@@ -876,6 +878,7 @@ common_diskcmd()
     __have_usb_param=0
     __pcibridge_init
     __init_disk
+    __init_rootdev
 
     for fixup in ${fixups}; do
 	__common_diskcmd "${fixup}" "${rootfs}"
