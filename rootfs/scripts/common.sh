@@ -529,7 +529,7 @@ __common_mmccmd()
     fi
 
     if [[ "${fixup}" == sdhci-mmc* ]]; then
-	# instantiate sdhci-pci (may be needed as pre-requisite for mmc)
+	# instantiate sdhci-pci (needed as pre-requisite for mmc)
 	__pcibridge_new_port
 	extra_params+=" -device sdhci-pci${__pcibus_ref}"
 	# continue with rest of mmc handling
