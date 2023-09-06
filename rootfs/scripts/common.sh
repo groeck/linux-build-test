@@ -528,6 +528,14 @@ __common_mmccmd()
 	rootfs="${tmpfile}"
     fi
 
+    if [[ "${fixup}" == sdhci-mmc* ]]; then
+	# instantiate sdhci-pci (may be needed as pre-requisite for mmc)
+	__pcibridge_new_port
+	extra_params+=" -device sdhci-pci${__pcibus_ref}"
+	# continue with rest of mmc handling
+	fixup="${fixup##sdhci-}"
+    fi
+
     case "${fixup}" in
     mmc*)
 	local devindex=${fixup#mmc}
@@ -627,7 +635,7 @@ __common_diskcmd()
 	__set_rootdev "${rootdev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
-    mmc*|sd*)
+    sdhci-mmc*|mmc*|sd*)
 	__common_mmccmd "${fixup}" "${rootfs}"
 	;;
     flash*|mtd*)
@@ -756,7 +764,7 @@ __common_fixup()
 	__pcibridge_new_port
 	extra_params+=" -device sdhci-pci${__pcibus_ref}"
 	;;
-    mmc*|sd*|"nvme"|\
+    sdhci-mmc*|mmc*|sd*|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
