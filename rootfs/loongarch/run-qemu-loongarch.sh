@@ -49,7 +49,7 @@ runkernel()
     elif [[ "${rootfs%.gz}" == *iso ]]; then
 	build+=":cd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     build="${build//+(:)/:}"
@@ -100,7 +100,7 @@ if [[ ${linux_version_code} -lt $(kernel_version 6 4) && "${runall}" -eq 0 ]]; t
     nodebug+=":nolocktests"
 fi
 
-runkernel defconfig virt rootfs.cpio "${nodebug}:efi:net,default"
+runkernel defconfig virt rootfs.cpio "${nodebug}::efi:net,default"
 retcode=$?
 checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
