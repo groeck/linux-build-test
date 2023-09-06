@@ -25,9 +25,9 @@ ARCH=powerpc
 
 PATH=${PATH_PPC}:${PATH}
 
-skip_414="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci:mmc:ext2"
-skip_419="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci:mmc:ext2"
-skip_54="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci:mmc:ext2"
+skip_414="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci-mmc:ext2"
+skip_419="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci-mmc:ext2"
+skip_54="ppce500:corenet32_smp_defconfig:e500:net,eTSEC:sdhci-mmc:ext2"
 
 patch_defconfig()
 {
@@ -151,7 +151,7 @@ runkernel mpc85xx_defconfig "::scsi[53C895A]:net,ne2k_pci" mpc8544ds "" ttyS0 ro
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "::sata-sii3112:net,rtl8139" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig ::sdhci:mmc:net,usb-ohci mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig ::sdhci-mmc:net,usb-ohci mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
@@ -192,7 +192,7 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 runkernel 44x/bamboo_defconfig "smp::scsi[FUSION]:net,e1000" bamboo "" ttyS0 rootfs.btrfs vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "smp::sdhci:mmc:net,ne2k_pci" bamboo "" ttyS0 rootfs.cramfs vmlinux
+runkernel 44x/bamboo_defconfig "smp::sdhci-mmc:net,ne2k_pci" bamboo "" ttyS0 rootfs.cramfs vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp::nvme:net,pcnet" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
@@ -203,7 +203,7 @@ retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig "::usb:net,e1000" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/canyonlands_defconfig "::sdhci:mmc:net,e1000e" \
+runkernel 44x/canyonlands_defconfig "::sdhci-mmc:net,e1000e" \
 	sam460ex "" ttyS0 rootfs.cramfs vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/canyonlands_defconfig "::nvme:net,ne2k_pci" \
@@ -249,7 +249,7 @@ runkernel pmac32_defconfig zilog::ide:net,usb-ohci mac99 "" ttyS0 rootfs.ext2 vm
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog::usb:net,i82562 mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
-runkernel pmac32_defconfig zilog::sdhci:mmc:net,ne2k_pci mac99 "" ttyS0 rootfs.ext2 vmlinux
+runkernel pmac32_defconfig zilog::sdhci-mmc:net,ne2k_pci mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 runkernel pmac32_defconfig zilog::nvme:net,pcnet mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
@@ -262,7 +262,7 @@ retcode=$((retcode + $?))
 runkernel corenet32_smp_defconfig e500::net,virtio-net:nvme ppce500 e500mc ttyS0 \
 	rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
-runkernel corenet32_smp_defconfig e500::net,eTSEC:sdhci:mmc ppce500 e500mc ttyS0 \
+runkernel corenet32_smp_defconfig e500::net,eTSEC:sdhci-mmc ppce500 e500mc ttyS0 \
 	rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
 # requires qemu v8.0+ (Freescale eSDHC controller enabled)

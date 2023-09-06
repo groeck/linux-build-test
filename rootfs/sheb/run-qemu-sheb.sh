@@ -137,7 +137,7 @@ if [[ ${runall} -ne 0 ]]; then
     # mmc0: Unknown controller version (36). You may experience problems.
     # mmc0: SDHCI controller on PCI [0000:00:01.0] using PIO
     # MMC card does not instantiate.
-    runkernel rts7751r2dplus_defconfig sdhci:mmc rootfs.ext2
+    runkernel rts7751r2dplus_defconfig sdhci-mmc rootfs.ext2
     retcode=$((retcode + $?))
     # nvme nvme0: pci function 0000:00:01.0
     # nvme 0000:00:01.0: enabling device (0000 -> 0002)

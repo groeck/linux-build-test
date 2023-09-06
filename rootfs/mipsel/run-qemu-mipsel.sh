@@ -105,7 +105,7 @@ runkernel 24Kf malta_defconfig nocd:smp:net,i82550:usb-ehci rootfs-mipselr1.ext2
 retcode=$((retcode + $?))
 runkernel 24Kc malta_defconfig nocd:smp:net,ne2k_pci:usb-uas-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24KEc malta_defconfig nocd:smp:net,pcnet:sdhci:mmc rootfs-mipselr1.ext2.gz
+runkernel 24KEc malta_defconfig nocd:smp:net,pcnet:sdhci-mmc rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 runkernel 34Kf malta_defconfig nocd:smp:net,rtl8139:scsi[53C810] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))

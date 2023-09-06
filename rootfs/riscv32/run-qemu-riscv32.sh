@@ -107,7 +107,7 @@ runkernel virt "" rv32_defconfig net,i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt "rv32,zbb=no" rv32_defconfig net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig tpm-tis-device:net,e1000-82544gc:sdhci:mmc rootfs.ext2
+runkernel virt "" rv32_defconfig tpm-tis-device:net,e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt "rv32,zbb=no" rv32_defconfig net,usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))

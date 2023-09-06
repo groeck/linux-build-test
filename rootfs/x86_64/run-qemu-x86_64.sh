@@ -137,7 +137,7 @@ checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci:mmc Skylake-Client q35 "rootfs.${erofs}"
+runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci-mmc Skylake-Client q35 "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -225,7 +225,7 @@ checkstate ${retcode}
 runkernel defconfig preempt:smp8:net,i82557a:mem4G:nvme Icelake-Server q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci:mmc Skylake-Client-IBRS q35 rootfs.ext2
+runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci-mmc Skylake-Client-IBRS q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig preempt:smp6:net,i82550:mem512 KnightsMill q35 rootfs.cpio

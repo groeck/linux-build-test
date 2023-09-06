@@ -98,7 +98,7 @@ retcode=0
 runkernel smp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net,e1000-82544gc:sdhci:mmc rootfs.ext2.gz
+runkernel smp:net,e1000-82544gc:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel smp:net,virtio-net:nvme rootfs.ext2.gz
@@ -162,7 +162,7 @@ checkstate ${retcode}
 runkernel nosmp:net,e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,tulip:sdhci:mmc rootfs.ext2.gz
+runkernel nosmp:net,tulip:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel nosmp:net,e1000:nvme rootfs.ext2.gz

@@ -24,9 +24,9 @@ PATH_PPC="/opt/kernel/${DEFAULT_CC}/powerpc64-linux/bin"
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
-skip_414="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci:mmc:rootfs"
-skip_419="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci:mmc:rootfs"
-skip_54="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci:mmc:rootfs"
+skip_414="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci-mmc:rootfs"
+skip_419="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci-mmc:rootfs"
+skip_54="ppce500:corenet64_smp_defconfig:e5500:net,eTSEC:sdhci-mmc:rootfs"
 
 # We are (currently) testing TPM version 2. TPM version 2 support for pseries
 # was only added after 5.4.
@@ -152,7 +152,7 @@ runkernel qemu_ppc64_book3s_defconfig smp::net,pcnet:ide mac99 ppc64 ttyS0 vmlin
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel qemu_ppc64_book3s_defconfig smp::net,e1000:sdhci:mmc mac99 ppc64 ttyS0 vmlinux \
+runkernel qemu_ppc64_book3s_defconfig smp::net,e1000:sdhci-mmc mac99 ppc64 ttyS0 vmlinux \
 	rootfs.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -179,7 +179,7 @@ runkernel pseries_defconfig big::net,e1000e:usb pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig big::net,i82559a:sdhci:mmc pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig big::net,i82559a:sdhci-mmc pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -230,7 +230,7 @@ runkernel pseries_defconfig little::net,i82562:scsi[FUSION] pseries POWER8 hvc0 
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig little::net,ne2k_pci:sdhci:mmc pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::net,ne2k_pci:sdhci-mmc pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -247,7 +247,7 @@ runkernel corenet64_smp_defconfig e5500::net,virtio-net:nvme ppce500 e5500 ttyS0
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel corenet64_smp_defconfig e5500::net,eTSEC:sdhci:mmc ppce500 e5500 ttyS0 \
+runkernel corenet64_smp_defconfig e5500::net,eTSEC:sdhci-mmc ppce500 e5500 ttyS0 \
 	arch/powerpc/boot/uImage rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -295,7 +295,7 @@ runkernel powernv_defconfig "::scsi[MEGASAS]:net,i82557a" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel powernv_defconfig "::smp2:sdhci:mmc:net,i82801" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::smp2:sdhci-mmc:net,i82801" powernv POWER9 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}

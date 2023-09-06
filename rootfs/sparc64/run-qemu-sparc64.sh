@@ -100,7 +100,7 @@ runkernel sparc64_defconfig sun4u nodebug:smp:ata:net,e1000 rootfs.iso.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nodebug:smp:ata:net,e1000-82544gc rootfs.squashfs
 retcode=$((retcode + $?))
-runkernel sparc64_defconfig sun4u nodebug:smp:sdhci:mmc:net,rtl8139 rootfs.ext2.gz
+runkernel sparc64_defconfig sun4u nodebug:smp:sdhci-mmc:net,rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel sparc64_defconfig sun4u nodebug:smp:nvme:net,tulip rootfs.ext2.gz
 retcode=$((retcode + $?))

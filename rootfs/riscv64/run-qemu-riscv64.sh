@@ -155,7 +155,7 @@ checkstate ${retcode}
 runkernel virt "" defconfig tpm-tis-device:net,i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt "rv64,zbb=no" defconfig net,e1000-82544gc:sdhci:mmc rootfs.ext2
+runkernel virt "rv64,zbb=no" defconfig net,e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel virt "" defconfig net,usb-ohci:nvme rootfs.ext2

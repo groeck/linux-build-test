@@ -78,7 +78,7 @@ checkstate ${retcode}
 runkernel defconfig devtmpfs:ide:net,e1000 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig devtmpfs:sdhci:mmc:net,ne2k_pci rootfs.ext2
+runkernel defconfig devtmpfs:sdhci-mmc:net,ne2k_pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig devtmpfs:usb-ohci:net,pcnet rootfs.ext2

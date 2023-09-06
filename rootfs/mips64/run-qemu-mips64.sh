@@ -116,7 +116,7 @@ runkernel malta_defconfig nocd:smp:net,e1000:flash4,1,1 rootfs-n64.squashfs
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net,e1000-82544gc:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,i82801:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net,i82801:sdhci-mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:smp:net,pcnet:nvme rootfs-n32.ext2.gz
@@ -150,7 +150,7 @@ retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:nosmp:net,pcnet:ide rootfs-n32.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:nosmp:pci-bridge:net,tulip:sdhci:mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:nosmp:pci-bridge:net,tulip:sdhci-mmc rootfs-n64.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

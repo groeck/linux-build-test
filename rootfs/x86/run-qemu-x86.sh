@@ -116,7 +116,7 @@ checkstate ${retcode}
 runkernel defconfig smp:usb-uas:net,i82562 Haswell q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:efi32:sdhci:mmc:net,i82801 Skylake-Client q35 rootfs.ext2
+runkernel defconfig smp2:efi32:sdhci-mmc:net,i82801 Skylake-Client q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -184,7 +184,7 @@ checkstate ${retcode}
 runkernel defconfig pae:nosmp:nvme:net,i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig pae:nosmp:efi32:sdhci:mmc:net,i82557b coreduo q35 rootfs.ext2
+runkernel defconfig pae:nosmp:efi32:sdhci-mmc:net,i82557b coreduo q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 
 exit ${retcode}

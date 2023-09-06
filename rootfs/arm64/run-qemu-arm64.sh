@@ -156,7 +156,7 @@ runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,e1000:mem512:sdhci:mmc "rootfs.${erofs}"
+runkernel virt defconfig smp4:net,e1000:mem512:sdhci-mmc "rootfs.${erofs}"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" "rootfs.${f2fs}"
 retcode=$((retcode + $?))

@@ -112,7 +112,7 @@ runkernel rts7751r2dplus_defconfig flash16,2304K,3:net,usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata:net,virtio-net rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig sdhci:mmc:net,i82801 rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig sdhci-mmc:net,i82801 rootfs.ext2.gz
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig nvme:net,tulip rootfs.ext2.gz
 retcode=$((retcode + $?))
