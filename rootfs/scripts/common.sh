@@ -1719,6 +1719,14 @@ dowait()
 	fi
     fi
 
+    # Look for file system test failures
+    if [[ ${retcode} -eq 0 ]]; then
+	if grep -q "File system test failed" ${logfile}; then
+	    msg="failed (file system)"
+	    retcode=1
+	fi
+    fi
+
     if [ ${retcode} -eq 0 ]; then
 	for i in $(seq 0 $((${entries} - 1)))
 	do
