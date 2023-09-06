@@ -217,6 +217,20 @@ __next_disk()
     __disk_id="d${__disk_index}"
 }
 
+__init_rootdev()
+{
+    unset __rootdev
+    unset __rootwait
+}
+
+__set_rootdev()
+{
+    if [[ -z "${__rootdev}" ]]; then
+	__rootdev="$1"
+	__rootwait="$2"
+    fi
+}
+
 __common_scsicmd()
 {
     local fixup="$1"
@@ -272,11 +286,11 @@ __common_scsicmd()
     esac
 
     if [[ "${rootfs}" == *iso ]]; then
-	initcli+=" root=/dev/sr0"
+	__set_rootdev "/dev/sr0"
 	media="cdrom"
 	sdevice="scsi-cd"
     else
-	initcli+=" root=/dev/sda"
+	__set_rootdev "/dev/sda"
 	sdevice="scsi-hd"
     fi
 
@@ -375,7 +389,7 @@ __common_usbcmd()
 	;;
     esac
 
-    initcli+=" root=/dev/sda rootwait"
+    __set_rootdev "/dev/sda" 1
 }
 
 __common_virtcmd()
@@ -410,7 +424,7 @@ __common_virtcmd()
 	;;
     esac
 
-    initcli+=" root=/dev/vda"
+    __set_rootdev "/dev/vda"
 }
 
 __common_flashcmd()
@@ -460,7 +474,7 @@ __common_flashcmd()
     if [[ -n "${devindex}" ]]; then
         extra_params+=",index=${devindex}"
     fi
-    initcli+=" root=/dev/mtdblock${partition}"
+    __set_rootdev "/dev/mtdblock${partition}"
 }
 
 __highest_bit_set()
@@ -541,7 +555,7 @@ __common_mmccmd()
 	;;
     esac
 
-    initcli+=" root=${rootdev} rootwait"
+    __set_rootdev "${rootdev}" 1
 }
 
 __common_satacmd()
@@ -550,16 +564,16 @@ __common_satacmd()
     local rootfs="$2"
     local idedevice
     local media
-    local rootdev
     local satadev
 
     if [[ "${rootfs}" == *iso ]]; then
 	media="cdrom"
 	idedevice="ide-cd"
+	__set_rootdev "/dev/sr0"
 	rootdev="sr0"
     else
 	idedevice="ide-hd"
-	rootdev="sda"
+	__set_rootdev "/dev/sda"
     fi
 
     case "${fixup}" in
@@ -582,7 +596,6 @@ __common_satacmd()
     extra_params+=" -device ${idedevice}${satadev:+,bus=ata.0},drive=${__disk_id}"
     extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
     extra_params+="${media:+,media=${media}}"
-    initcli+=" root=/dev/${rootdev}"
 }
 
 __common_diskcmd()
@@ -590,22 +603,21 @@ __common_diskcmd()
     local fixup="$1"
     local rootfs="$2"
     local media
-    local hddev
+    local rootdev
 
     if [[ "${rootfs}" == *iso ]]; then
 	media="cdrom"
-	hddev="sr0"
+	rootdev="/dev/sr0"
     else
-	hddev="sda"
+	rootdev="/dev/sda"
     fi
 
     case "${fixup}" in
     "ata")
 	# standard ata/sata drive provided by platform
-	initcli+=" root=/dev/${hddev}"
-	# "rootwait" may be needed for PCMCIA drives and does not hurt
+	# rootwait may be needed for PCMCIA drives and does not hurt
 	# otherwise.
-	initcli+=" rootwait"
+	__set_rootdev "${rootdev}" 1
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
     "ide")
@@ -614,9 +626,9 @@ __common_diskcmd()
 	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
 	# With CONFIG_IDE, the device is /dev/hda for both hdd and cdrom.
 	if ! grep -q "CONFIG_ATA=y" .config; then
-	    hddev="hda"
+	    rootdev="/dev/hda"
 	fi
-	initcli+=" root=/dev/${hddev}"
+	__set_rootdev "${rootdev}"
 	extra_params+=" -drive file=${rootfs},format=raw,if=ide${media:+,media=${media}}"
 	;;
     mmc*|sd*|"sdhci")
@@ -626,7 +638,7 @@ __common_diskcmd()
 	__common_flashcmd "${fixup}" "${rootfs}"
 	;;
     "nvme")
-	initcli+=" root=/dev/nvme0n1 rootwait"
+	__set_rootdev "/dev/nvme0n1" 1
 	__pcibridge_new_port
 	extra_params+=" -device nvme,serial=foo,drive=${__disk_id}${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
@@ -813,6 +825,9 @@ __common_fixups()
 	__common_fixup "${fixup}" "${rootfs}"
     done
 
+    # Specify root file system and rootwait on command line if requested
+    initcli+="${__rootdev+ root=${__rootdev}}${__rootwait+" rootwait"}"
+
     # trim leading whitespaces, if any
     initcli="${initcli##*( )}"
     extra_params="${extra_params##*( )}"
@@ -857,14 +872,15 @@ common_diskcmd()
     initcli=""
     __have_usb_param=0
     __pcibridge_init
+    __init_disk
 
     for fixup in ${fixups}; do
 	__common_diskcmd "${fixup}" "${rootfs}"
     done
     diskcmd="${extra_params}"
-    if [ -z "${initcli}" ]; then
-	initcli="root=/dev/sda"
-    fi
+    __set_rootdev "/dev/sda"
+
+    initcli+=" root=${__rootdev}${__rootwait+" rootwait"}"
 }
 
 dokill()
