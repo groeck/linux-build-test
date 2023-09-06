@@ -205,6 +205,18 @@ __load_usb_xhci()
     fi
 }
 
+__init_disk()
+{
+    __disk_index=0
+    __disk_id="d0"
+}
+
+__next_disk()
+{
+    __disk_index=$((__disk_index + 1))
+    __disk_id="d${__disk_index}"
+}
+
 __common_scsicmd()
 {
     local fixup="$1"
@@ -270,8 +282,8 @@ __common_scsicmd()
 
     __pcibridge_new_port
     extra_params+=" ${device:+-device ${device},id=scsi}${__pcibus_ref}"
-    extra_params+=" ${device:+-device ${sdevice},bus=scsi.0,drive=d0${wwn:+,wwn=${wwn}}}"
-    extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=d0}"
+    extra_params+=" ${device:+-device ${sdevice},bus=scsi.0,drive=${__disk_id}${wwn:+,wwn=${wwn}}}"
+    extra_params+=" -drive file=${rootfs},format=raw,if=${iface:-none}${device:+,id=${__disk_id}}"
     extra_params+="${media:+,media=${media}}"
 }
 
@@ -290,74 +302,74 @@ __common_usbcmd()
     "usb-ohci")
 	__pcibridge_new_port
 	extra_params+=" -device pci-ohci,id=ohci${__pcibus_ref}"
-	extra_params+=" -device usb-storage,bus=ohci.0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=ohci.0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "usb-ehci")
 	__pcibridge_new_port
 	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
-	extra_params+=" -device usb-storage,bus=ehci.0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=ehci.0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "usb-xhci")
 	__load_usb_xhci
-	extra_params+=" -device usb-storage,bus=xhci.0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=xhci.0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "usb")
-	extra_params+=" -device usb-storage,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     usb[0-9])
 	# Same as "usb", but with explicit bus number
 	# The above must not be in quotes to enable pattern matching
-	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${fixup#usb}"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,drive=${__disk_id},bus=usb-bus.${fixup#usb}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     usb[0-9].[0-9])
 	# Same as "usb", but with explicit bus and port number
 	# The above must not be in quotes to enable pattern matching
 	bus="${fixup#usb}"
-	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${bus%.*},port=${bus#*.}"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,drive=${__disk_id},bus=usb-bus.${bus%.*},port=${bus#*.}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "usb-hub")
 	extra_params+=" -device usb-hub,bus=usb-bus.0,port=2"
-	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     usb-hub[0-9])
 	# Same as "usb-hub", but with explicit bus number
 	# The above must not be in quotes to enable pattern matching
 	extra_params+=" -device usb-hub,bus=usb-bus.${fixup#usb-hub},port=2"
-	extra_params+=" -device usb-storage,bus=usb-bus.${fixup#usb-hub},port=2.1,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=usb-bus.${fixup#usb-hub},port=2.1,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     usb-hub[0-9].[0-9])
 	# Same as "usb-hub", but with explicit bus and port number
 	# The above must not be in quotes to enable pattern matching
 	bus="${fixup#usb-hub}"
 	extra_params+=" -device usb-hub,bus=usb-bus.${bus%.*},port=${bus#*.}"
-	extra_params+=" -device usb-storage,bus=usb-bus.${bus%.*},port=${bus#*.}.1,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device usb-storage,bus=usb-bus.${bus%.*},port=${bus#*.}.1,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "usb-uas-ehci")
 	__pcibridge_new_port
 	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
 	extra_params+=" -device usb-uas,bus=ehci.0,id=uas"
-	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     "usb-uas-xhci")
 	__load_usb_xhci
 	extra_params+=" -device usb-uas,bus=xhci.0,id=uas"
-	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     "usb-uas")
 	extra_params+=" -device usb-uas,id=uas"
-	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     *)
 	;;
@@ -374,22 +386,22 @@ __common_virtcmd()
     case "${fixup}" in
     "virtio-blk-ccw")
 	# s390 only
-	extra_params+=" -device virtio-blk-ccw,devno=fe.0.0001,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device virtio-blk-ccw,devno=fe.0.0001,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "virtio-blk")
-	extra_params+=" -device virtio-blk-device,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device virtio-blk-device,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "virtio-pci")
 	__pcibridge_new_port
-	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus_ref}"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device virtio-blk-pci,drive=${__disk_id}${__pcibus_ref}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "virtio-pci-old")
 	__pcibridge_new_port
-	extra_params+=" -device virtio-blk-pci,disable-modern=on,drive=d0${__pcibus_ref}"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+	extra_params+=" -device virtio-blk-pci,disable-modern=on,drive=${__disk_id}${__pcibus_ref}"
+	extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
 	;;
     "virtio")
 	extra_params+=" -drive file=${rootfs},if=virtio,format=raw"
@@ -509,8 +521,8 @@ __common_mmccmd()
 	;;
     mmc*)
 	local devindex=${fixup#mmc}
-	extra_params+=" -device sd-card,drive=d0"
-	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+	extra_params+=" -device sd-card,drive=${__disk_id}"
+	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=${__disk_id}"
 	if [[ -n "${devindex}" ]]; then
 	    rootdev="/dev/mmcblk${devindex}"
 	fi
@@ -567,8 +579,8 @@ __common_satacmd()
 	;;
     esac
     extra_params+="${satadev:+ -device ${satadev},id=ata}"
-    extra_params+=" -device ${idedevice}${satadev:+,bus=ata.0},drive=d0"
-    extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
+    extra_params+=" -device ${idedevice}${satadev:+,bus=ata.0},drive=${__disk_id}"
+    extra_params+=" -drive file=${rootfs},if=none,id=${__disk_id},format=raw"
     extra_params+="${media:+,media=${media}}"
     initcli+=" root=/dev/${rootdev}"
 }
@@ -616,8 +628,8 @@ __common_diskcmd()
     "nvme")
 	initcli+=" root=/dev/nvme0n1 rootwait"
 	__pcibridge_new_port
-	extra_params+=" -device nvme,serial=foo,drive=d0${__pcibus_ref}"
-	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
+	extra_params+=" -device nvme,serial=foo,drive=${__disk_id}${__pcibus_ref}"
+	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     "sata-sii3112"|"sata-cmd646"|"sata")
 	__common_satacmd "${fixup}" "${rootfs}"
@@ -634,6 +646,8 @@ __common_diskcmd()
     *)
 	;;
     esac
+
+    __next_disk
 }
 
 __common_netcmd()
@@ -775,6 +789,7 @@ __common_fixups()
     local fixup
 
     __init_usb_xhci
+    __init_disk
 
     initcli="panic=-1 ${config_initcli}"
     extra_params="-snapshot"
