@@ -759,11 +759,6 @@ __common_fixup()
 	# behind this PCI bridge.
 	__pcibridge_new_bridge
 	;;
-    "sdhci")
-	# instantiate sdhci-pci (may be needed as pre-requisite for mmc)
-	__pcibridge_new_port
-	extra_params+=" -device sdhci-pci${__pcibus_ref}"
-	;;
     sdhci-mmc*|mmc*|sd*|"nvme"|\
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
@@ -883,16 +878,7 @@ common_diskcmd()
     __init_disk
 
     for fixup in ${fixups}; do
-	case "${fixup}" in
-	"sdhci")
-	    # instantiate sdhci-pci (may be needed as pre-requisite for mmc)
-	    __pcibridge_new_port
-	    extra_params+=" -device sdhci-pci${__pcibus_ref}"
-	    ;;
-	*)
-	    __common_diskcmd "${fixup}" "${rootfs}"
-	    ;;
-	esac
+	__common_diskcmd "${fixup}" "${rootfs}"
     done
     diskcmd="${extra_params}"
     __set_rootdev "/dev/sda"
