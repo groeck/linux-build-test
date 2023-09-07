@@ -244,8 +244,8 @@ __set_rootdev()
     fi
 
     if [[ "${__run_fstest}" -ne 0 ]]; then
-	if echo "${dev}" | grep -q "nvme"; then
-	    # nvme partition name is "p<index>"
+	if echo "${dev}" | grep -q -e "nvme" -e "mmcblk"; then
+	    # nvme and mmc partition name is "p<index>"
 	    dev="${dev}p"
 	fi
 	__rootdev="${dev}1"
@@ -559,10 +559,12 @@ __common_mmccmd()
     local fsize="$(stat --format="%s" "${rootfs}")"
     local bits="$(__bits_set ${fsize})"
 
-    if [[ "${bits}" -ne 1 ]]; then
-	# ssd/mmc file system size must be an exponent of 2
+    if [[ "${bits}" -ne 1 && "${__run_fstest}" -ne 1 ]]; then
+	# ssd/mmc drive size must be an exponent of 2
 	# Create temporary file with the appropriate size if the root
 	# file system does not meet the criteria.
+	# This is only needed if we are not running file system tests;
+	# in that case the generated partition image can be used directly.
 	local tmpfile="$(__mktemp /tmp/flash.XXXXX)"
 	local highest="$(__highest_bit_set "${fsize}")"
 	local flashsize
