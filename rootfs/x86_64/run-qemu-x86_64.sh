@@ -31,6 +31,8 @@ patch_defconfig()
     echo "CONFIG_XFS_FS=y" >> ${defconfig}
     echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
     echo "CONFIG_MINIX_FS=y" >> ${defconfig}
+    echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
+    echo "CONFIG_HFSPLUS_FS=y" >> ${defconfig}
 
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
@@ -134,6 +136,12 @@ checkstate ${retcode}
 runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb:fstest,nilfs2 SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
+if [[ "${runall}" -ne 0 ]]; then
+    # unstable / crashes in mainline
+    runkernel defconfig smp4:net,ne2k_pci:mem1G:usb:fstest,ntfs3 SandyBridge q35 rootfs.squashfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -238,7 +246,7 @@ checkstate ${retcode}
 runkernel defconfig nosmp:net,e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata:fstest,hfsplus Opteron_G4 q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:net,pcnet:efi32:mem2G:ata Haswell-noTSX-IBRS q35 rootfs.ext2
