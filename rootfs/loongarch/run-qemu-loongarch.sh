@@ -120,7 +120,7 @@ checkstate ${retcode}
 runkernel defconfig virt rootfs.btrfs "${nodebug}::efi:scsi[FUSION]:net,default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net,default:fstest,xfs"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig virt rootfs.squashfs "${nodebug}::efi:sdhci-mmc:net,default"
