@@ -24,10 +24,13 @@ patch_defconfig()
 {
     local defconfig=$1
 
-    # Enable f2fs and erofs
+    # Enable various file systems
     echo "CONFIG_F2FS_FS=y" >> ${defconfig}
     echo "CONFIG_EROFS_FS=y" >> ${defconfig}
     echo "CONFIG_EROFS_FS_ZIP=y" >> ${defconfig}
+    echo "CONFIG_XFS_FS=y" >> ${defconfig}
+    echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
+    echo "CONFIG_MINIX_FS=y" >> ${defconfig}
 
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
@@ -119,7 +122,7 @@ fi
 
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
-runkernel defconfig smp:net,e1000:mem256:ata Broadwell-noTSX q35 rootfs.ext2
+runkernel defconfig smp:net,e1000:mem256:ata:fstest,xfs Broadwell-noTSX q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
@@ -128,7 +131,7 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,i82801:efi:mem512:nvme IvyBridge q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb SandyBridge q35 rootfs.squashfs
+runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb:fstest,nilfs2 SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
@@ -228,7 +231,7 @@ checkstate ${retcode}
 runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci-mmc Skylake-Client-IBRS q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig preempt:smp6:net,i82550:mem512 KnightsMill q35 rootfs.cpio
+runkernel defconfig preempt:smp6:net,i82550:mem512:ata:fstest,minix KnightsMill q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
