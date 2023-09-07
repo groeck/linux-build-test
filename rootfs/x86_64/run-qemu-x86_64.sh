@@ -138,7 +138,7 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 if [[ "${runall}" -ne 0 ]]; then
     # unstable / crashes in mainline
-    runkernel defconfig smp4:net,ne2k_pci:mem1G:usb:fstest,ntfs3 SandyBridge q35 rootfs.squashfs
+    runkernel defconfig smp4:net,ne2k_pci:mem1G:usb:fstest,ntfs SandyBridge q35 rootfs.squashfs
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
@@ -246,7 +246,7 @@ checkstate ${retcode}
 runkernel defconfig nosmp:net,e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata:fstest,hfsplus Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata:fstest,hfs+ Opteron_G4 q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:net,pcnet:efi32:mem2G:ata Haswell-noTSX-IBRS q35 rootfs.ext2
