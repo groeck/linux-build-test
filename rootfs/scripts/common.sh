@@ -658,9 +658,9 @@ __common_diskcmd()
 	__common_flashcmd "${fixup}" "${rootfs}"
 	;;
     "nvme")
-	__set_rootdev "/dev/nvme0n1" 1
+	__set_rootdev "/dev/nvme${__disk_index}n1" 1
 	__pcibridge_new_port
-	extra_params+=" -device nvme,serial=foo,drive=${__disk_id}${__pcibus_ref}"
+	extra_params+=" -device nvme,serial=foo${__disk_id},drive=${__disk_id}${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     "sata-sii3112"|"sata-cmd646"|"sata")
