@@ -210,9 +210,19 @@ __load_usb_xhci()
 
 __init_disk()
 {
+    local fixups="$1"
+
     __disk_index=0
+    __partition_offset=17	# Needed to get partitions to align (reason unknown)
     __disk_id="d0"
     unset __primary_diskcmd
+    unset __rootfsname
+
+    if echo "${fixups}" | grep -q "fstest,"; then
+        __run_fstest=1
+    else
+        __run_fstest=0
+    fi
 }
 
 __next_disk()
@@ -236,12 +246,50 @@ __devname()
 
 __set_rootdev()
 {
-    if [[ -z "${__rootdev}" ]]; then
-	__rootdev="$1"
-	__rootwait="$2"
-    elif [[ -z "${__fstest_dev}" ]]; then
-	__fstest_dev="$1"
+    local dev="$1"
+
+    if [[ -n "${__rootdev}" ]]; then
+	return
     fi
+
+    if [[ "${__run_fstest}" -ne 0 ]]; then
+	if echo "${dev}" | grep -q "nvme"; then
+	    # nvme partition name is "p<index>"
+	    dev="${dev}p"
+	fi
+	__rootdev="${dev}1"
+	__fstest_dev="${dev}2"
+    else
+	__rootdev="${dev}"
+    fi
+    __rootwait="$2"
+}
+
+__gendisk()
+{
+    local fspath="$1"
+    local fssize="$(stat -c '%s' "${fspath}")"
+    local oneM="$((1024 * 1024))"
+    local parttype="${fspath##*.}"
+
+    # First time around create disk image and add a partition to it.
+    # Make disk large enough that two file system copies are guaranteed
+    # to fit. Use MiB units to avoid alignment complaints by parted.
+
+    if [[ "${__disk_index}" -eq 0 ]]; then
+	__rootfsname="$(__mktemp /tmp/rootfs.XXXXX)"
+	truncate -s 256M "${__rootfsname}"
+	parted -s "${__rootfsname}" mklabel gpt
+    fi
+
+    fssize="$(((fssize + oneM - 1) / oneM))"
+    local fsend="$((__partition_offset + fssize))"
+
+    parted -s "${__rootfsname}" unit MiB mkpart "${parttype}" "${__partition_offset}" "${fsend}"
+
+    dd if="${fspath}" of="${__rootfsname}" bs=1M seek="${__partition_offset}" conv=notrunc status=none
+
+    __partition_offset="$((__partition_offset + fssize))"
 }
 
 __common_scsicmd()
@@ -629,6 +677,13 @@ __common_diskcmd()
 	media="cdrom"
 	rootdev="/dev/sr0"
     else
+	if [[ "${__run_fstest}" -ne 0 ]]; then
+	    __gendisk "${rootfs}"
+	    if [[ "${__disk_index}" -ne 0 ]]; then
+		return 0
+	    fi
+	    rootfs="${__rootfsname}"
+	fi
 	rootdev="$(__devname sd)"
     fi
 
@@ -660,7 +715,7 @@ __common_diskcmd()
     "nvme")
 	__set_rootdev "/dev/nvme${__disk_index}n1" 1
 	__pcibridge_new_port
-	extra_params+=" -device nvme,serial=foo${__disk_id},drive=${__disk_id}${__pcibus_ref}"
+	extra_params+=" -device nvme,serial=foo,drive=${__disk_id}${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=${__disk_id}"
 	;;
     "sata-sii3112"|"sata-cmd646"|"sata")
@@ -849,7 +904,7 @@ __common_fixups()
     local fixup
 
     __init_usb_xhci
-    __init_disk
+    __init_disk "${fixups}"
     __init_rootdev
 
     initcli="panic=-1 ${config_initcli}"
@@ -923,7 +978,7 @@ common_diskcmd()
     initcli=""
     __have_usb_param=0
     __pcibridge_init
-    __init_disk
+    __init_disk "${fixups}"
     __init_rootdev
 
     for fixup in ${fixups}; do
