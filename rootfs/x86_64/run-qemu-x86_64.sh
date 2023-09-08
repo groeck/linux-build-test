@@ -25,15 +25,16 @@ patch_defconfig()
     local defconfig=$1
 
     # Enable various file systems
-    echo "CONFIG_F2FS_FS=y" >> ${defconfig}
     echo "CONFIG_EROFS_FS=y" >> ${defconfig}
     echo "CONFIG_EROFS_FS_ZIP=y" >> ${defconfig}
-    echo "CONFIG_XFS_FS=y" >> ${defconfig}
-    echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
-    echo "CONFIG_MINIX_FS=y" >> ${defconfig}
-    echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
+    echo "CONFIG_EXFAT_FS=y" >> ${defconfig}
+    echo "CONFIG_F2FS_FS=y" >> ${defconfig}
     echo "CONFIG_HFSPLUS_FS=y" >> ${defconfig}
     echo "CONFIG_HFS_FS=y" >> ${defconfig}
+    echo "CONFIG_MINIX_FS=y" >> ${defconfig}
+    echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
+    echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
+    echo "CONFIG_XFS_FS=y" >> ${defconfig}
 
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
@@ -123,13 +124,6 @@ else
     erofs="ext2"
 fi
 
-# ntfs3 is only supported in v5.15 and later
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
-    ntfstest=":fstest=ntfs"
-else
-    ntfstest=""
-fi
-
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
 runkernel defconfig smp:net=e1000:mem256:ata:fstest=xfs Broadwell-noTSX q35 rootfs.ext2
@@ -138,7 +132,7 @@ checkstate ${retcode}
 runkernel defconfig smp:net=e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:net=i82801:efi:mem512:nvme IvyBridge q35 rootfs.btrfs
+runkernel defconfig smp2:net=i82801:efi:mem512:nvme:fstest=exfat IvyBridge q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp4:net=ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
@@ -150,7 +144,7 @@ checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net=pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "smp2:tpm-tis:net=rtl8139:efi:mem4G:sdhci-mmc${ntfstest}" Skylake-Client q35 "rootfs.${erofs}"
+runkernel defconfig "smp2:tpm-tis:net=rtl8139:efi:mem4G:sdhci-mmc" Skylake-Client q35 "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
