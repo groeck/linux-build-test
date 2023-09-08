@@ -122,31 +122,31 @@ echo
 # Network tests:
 # - i82551 fails to instantiate
 
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net,e1000
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000
 retcode=$?
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net,pcnet
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net=pcnet
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net,pcnet:flash4,1,1
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net=pcnet:flash4,1,1
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net,i82550
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net,i82558a
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net=i82558a
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net,usb-ohci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net=usb-ohci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net,ne2k_pci
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net=ne2k_pci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net,rtl8139
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net,i82801
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net,pcnet:nvme
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net=pcnet:nvme
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net,virtio-net
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net=virtio-net
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net,tulip
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net,i82559er
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net=i82559er
 retcode=$((retcode + $?))
 # Image fails to boot with tests enabled
 # Network interfaces don't instantiate.

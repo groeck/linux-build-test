@@ -27,7 +27,7 @@ PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
-skip_414="arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net,default"
+skip_414="arm:versatilepb:versatile_defconfig:aeabi:pci:flash64:mem128:net=default"
 
 patch_defconfig()
 {
@@ -247,37 +247,37 @@ echo "Build reference: $(git describe --match 'v*')"
 echo
 
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128:net,default versatile-pb.dtb
+	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128:net=default versatile-pb.dtb
 retcode=$?
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128:net,default versatile-pb.dtb
+	rootfs-armv5.ext2 auto aeabi:pci::flash64:mem128:net=default versatile-pb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel versatile_defconfig versatilepb "" \
-	rootfs-armv5.cpio auto aeabi:pci::mem128:net,default versatile-pb.dtb
+	rootfs-armv5.cpio auto aeabi:pci::mem128:net=default versatile-pb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel versatile_defconfig versatileab "" \
-	rootfs-armv5.cpio auto ::mem128:net,default versatile-ab.dtb
+	rootfs-armv5.cpio auto ::mem128:net=default versatile-ab.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.cpio manual nonand::mem128:net,default imx25-pdk.dtb
+	rootfs-armv5.cpio manual nonand::mem128:net=default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::sd:mem128:net,default imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::sd:mem128:net=default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::usb0:mem128:net,default imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::usb0:mem128:net=default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel imx_v4_v5_defconfig imx25-pdk "" \
-	rootfs-armv5.ext2 manual nonand::usb1:mem128:net,default imx25-pdk.dtb
+	rootfs-armv5.ext2 manual nonand::usb1:mem128:net=default imx25-pdk.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -298,22 +298,22 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel realview_defconfig realview-pb-a8 "" \
-	rootfs-armv5.cpio auto realview_pb::mem512:net,default arm-realview-pba8.dtb
+	rootfs-armv5.cpio auto realview_pb::mem512:net=default arm-realview-pba8.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-pbx-a9 "" \
-	rootfs-armv5.cpio auto realview_pb::net,default arm-realview-pbx-a9.dtb
+	rootfs-armv5.cpio auto realview_pb::net=default arm-realview-pbx-a9.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb cortex-a8 \
-	rootfs-armv5.cpio manual realview_eb::mem512:net,default arm-realview-eb.dtb
+	rootfs-armv5.cpio manual realview_eb::mem512:net=default arm-realview-eb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel realview_defconfig realview-eb-mpcore "" \
-	rootfs-armv5.cpio manual realview_eb::mem512:net,default \
+	rootfs-armv5.cpio manual realview_eb::mem512:net=default \
 	arm-realview-eb-11mp-ctrevb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -326,64 +326,64 @@ checkstate ${retcode}
 
 runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.cramfs automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig borzoi "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig spitz "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.cramfs automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel pxa_defconfig terrier "" \
 	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net,usb
+	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -393,15 +393,15 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel integrator_defconfig integratorcp "" \
-	rootfs-armv5.cpio automatic ::mem128:net,default integratorcp.dtb
+	rootfs-armv5.cpio automatic ::mem128:net=default integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel integrator_defconfig integratorcp "" \
-	rootfs-armv5.ext2 automatic ::mem128:sd:net,default integratorcp.dtb
+	rootfs-armv5.ext2 automatic ::mem128:sd:net=default integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel integrator_defconfig integratorcp "" \
-	rootfs-armv5.cramfs automatic ::mem128:sd:net,default integratorcp.dtb
+	rootfs-armv5.cramfs automatic ::mem128:sd:net=default integratorcp.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 

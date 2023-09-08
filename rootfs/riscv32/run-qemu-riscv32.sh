@@ -99,33 +99,33 @@ echo "Build reference: $(git describe --match 'v*')"
 echo
 
 retcode=0
-runkernel virt "" rv32_defconfig "net,e1000" rootfs.cpio
+runkernel virt "" rv32_defconfig "net=e1000" rootfs.cpio
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig net,e1000e:virtio-blk rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig net=e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig net,i82801:virtio rootfs.ext2
+runkernel virt "" rv32_defconfig net=i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig net,i82550:virtio-pci rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig net=i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig tpm-tis-device:net,e1000-82544gc:sdhci-mmc rootfs.ext2
+runkernel virt "" rv32_defconfig tpm-tis-device:net=e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig net,usb-ohci:nvme rootfs.ext2
-retcode=$((retcode + $?))
-
-runkernel virt "" rv32_defconfig net,virtio-net-device:usb-ohci rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig net=usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
 
-runkernel virt "rv32,zbb=no" rv32_defconfig "net,pcnet:usb-ehci" rootfs.ext2
+runkernel virt "" rv32_defconfig net=virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig net,virtio-net-pci:usb-xhci rootfs.ext2
+
+runkernel virt "rv32,zbb=no" rv32_defconfig "net=pcnet:usb-ehci" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig net,i82557a:usb-uas-ehci rootfs.ext2
+runkernel virt "" rv32_defconfig net=virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig net,i82558a:usb-uas-xhci rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig net=i82557a:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net,i82559a:scsi[53C810]" rootfs.ext2
+runkernel virt "" rv32_defconfig net=i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig "net,i82559er:pci-bridge:scsi[53C895A]" rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=i82559a:scsi[53C810]" rootfs.ext2
+retcode=$((retcode + $?))
+runkernel virt "" rv32_defconfig "net=i82559er:pci-bridge:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -136,23 +136,23 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel virt "rv32,zbb=no" rv32_defconfig "net,rtl8139:scsi[MEGASAS]" rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig "net=rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig "pci-bridge:net,i82562:scsi[MEGASAS2]" rootfs.ext2
+runkernel virt "" rv32_defconfig "pci-bridge:net=i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net,e1000:scsi[FUSION]" rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "" rv32_defconfig "net,i82557b:scsi[virtio]" rootfs.ext2
+runkernel virt "" rv32_defconfig "net=i82557b:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt "rv32,zbb=no" rv32_defconfig "net,i82557c:scsi[virtio-pci]" rootfs.ext2
+runkernel virt "rv32,zbb=no" rv32_defconfig "net=i82557c:scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # Unable to handle kernel paging request at virtual address c0c00000
     # in __memset(), called from free_initmem()
-    runkernel sifive_u "" rv32_defconfig "net,default" rootfs.cpio
+    runkernel sifive_u "" rv32_defconfig "net=default" rootfs.cpio
     retcode=$((${retcode} + $?))
-    runkernel sifive_u "" rv32_defconfig "sd:net,default" rootfs.ext2
+    runkernel sifive_u "" rv32_defconfig "sd:net=default" rootfs.ext2
     retcode=$((${retcode} + $?))
 fi
 

@@ -39,7 +39,7 @@ runkernel()
     # the pcnet driver does not clear its rx buffer ring
     # which causes random qemu hiccups.
     if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-        fixup="$(echo ${fixup} | sed -e 's/net,pcnet/net,rtl8139/')"
+        fixup="$(echo ${fixup} | sed -e 's/net=pcnet/net,rtl8139/')"
     fi
 
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
@@ -95,28 +95,28 @@ echo
 #	"WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988"
 
 retcode=0
-runkernel smp:net,e1000 rootfs.cpio.gz
+runkernel smp:net=e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net,e1000-82544gc:sdhci-mmc rootfs.ext2.gz
+runkernel smp:net=e1000-82544gc:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net,virtio-net:nvme rootfs.ext2.gz
+runkernel smp:net=virtio-net:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net,usb-ohci:sata-cmd646 rootfs.ext2.gz
+runkernel smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net,pcnet:scsi rootfs.ext2.gz
+runkernel smp:net=pcnet:scsi rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net,pcnet:scsi[53C895A]" rootfs.ext2.gz
+runkernel "smp:net=pcnet:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net,rtl8139:scsi[DC395]" rootfs.ext2.gz
+runkernel "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net,tulip:scsi[AM53C974]" rootfs.ext2.gz
+runkernel "smp:net=tulip:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -142,30 +142,30 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 
 # Run remaining tests with SMP disabled
-runkernel nosmp:net,e1000:usb-ohci rootfs.ext2.gz
+runkernel nosmp:net=e1000:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,virtio-net:usb-ehci rootfs.ext2.gz
+runkernel nosmp:net=virtio-net:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,pcnet:usb-xhci rootfs.ext2.gz
+runkernel nosmp:net=pcnet:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,usb-ohci:usb-uas-ehci rootfs.ext2.gz
+runkernel nosmp:net=usb-ohci:usb-uas-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,rtl8139:usb-uas-xhci rootfs.ext2.gz
+runkernel nosmp:net=rtl8139:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # duplicate some of the previous tests, with SMP disabled
-runkernel nosmp:net,e1000 rootfs.cpio.gz
+runkernel nosmp:net=e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,tulip:sdhci-mmc rootfs.ext2.gz
+runkernel nosmp:net=tulip:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net,e1000:nvme rootfs.ext2.gz
+runkernel nosmp:net=e1000:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 

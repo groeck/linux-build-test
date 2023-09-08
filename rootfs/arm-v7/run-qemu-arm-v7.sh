@@ -23,17 +23,17 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
-skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default \
+skip_414="arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default \
 	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128 \
-	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net,default \
-	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net,nic \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net,nic \
-	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net,nic"
+	arm:xilinx-zynq-a9:multi_v7_defconfig:usb0:mem128:net=default \
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net=default \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:mem256:net=nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:usb1:mem256:net=nic \
+	arm:mcimx7d-sabre:imx_v6_v7_defconfig:nodrm:sd:mem256:net=nic"
 skip_419="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
-	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net,default \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net,default"
+	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net=default \
+	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
@@ -165,7 +165,7 @@ runkernel()
 	;;
     esac
     if [[ "${nonet}" -ne 0 ]]; then
-	fixup="$(echo ${fixup} | sed -e 's/:\+net,nic//')"
+	fixup="$(echo ${fixup} | sed -e 's/:\+net=nic//')"
     fi
 
     if ! dosetup -F "${fixup}" -c "${defconfig}${fixup%::*}" "${rootfs}" "${defconfig}"; then
@@ -256,71 +256,71 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
-# Ethernet needs double net,nic (double '-nic user') to work.
+# Ethernet needs double net=nic (double '-nic user') to work.
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.cpio manual nodrm::mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
+	rootfs-armv7a.cpio manual nodrm::mem256:net=nic:net=nic imx6ul-14x14-evk.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net=nic:net=nic imx6ul-14x14-evk.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::usb0:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::usb0:mem256:net=nic:net=nic imx6ul-14x14-evk.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \
-	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic:net,nic imx6ul-14x14-evk.dtb
+	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net=nic:net=nic imx6ul-14x14-evk.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.cpio manual nodrm::mem256:net,nic imx7d-sdb.dtb
+	rootfs-armv7a.cpio manual nodrm::mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net,nic imx7d-sdb.dtb
+	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net,nic imx7d-sdb.dtb
+	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # vexpress tests generate a warning during reboot if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.cpio auto nolocktests::mem128:net,default \
+	rootfs-armv5.cpio auto nolocktests::mem128:net=default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net,default \
-	vexpress-v2p-ca9.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net,default \
+	rootfs-armv5.ext2 auto nolocktests::sd:mem128:net=default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a9 "" \
-	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128:net,default \
+	rootfs-armv5.ext2 auto nolocktests::flash64:mem128:net=default \
+	vexpress-v2p-ca9.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig vexpress-a9 "" \
+	rootfs-armv5.ext2 auto nolocktests::virtio-blk:mem128:net=default \
 	vexpress-v2p-ca9.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
-	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net,default \
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net=default \
 	vexpress-v2p-ca15-tc1.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 # Local qemu v2.7+ has minimal support for vexpress-a15-a7
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net,default \
+	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net=default \
 	vexpress-v2p-ca15_a7.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.cpio manual ::mem256:net,default imx6dl-sabrelite.dtb
+	rootfs-armv5.cpio manual ::mem256:net=default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -330,7 +330,7 @@ if [ ${runall} -eq 1 ]; then
     # size which isn't worth it. Maybe we can figure out how to attach
     # a different flash at some point.
     runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.sqf manual ::mtd2:mem256:net,default imx6dl-sabrelite.dtb
+	rootfs-armv5.sqf manual ::mtd2:mem256:net=default imx6dl-sabrelite.dtb
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
@@ -352,32 +352,32 @@ if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
 fi
 
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net,default" imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net=default" imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb0:mem256:net,default imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual ::usb0:mem256:net=default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb1:mem256:net,default imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual ::usb1:mem256:net=default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.cpio auto ::mem128:net,default zynq-zc702.dtb
+	rootfs-armv5.cpio auto ::mem128:net=default zynq-zc702.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::usb0:mem128:net,default zynq-zc702.dtb
+	rootfs-armv5.ext2 auto ::usb0:mem128:net=default zynq-zc702.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc702.dtb
+	rootfs-armv5.ext2 auto ::sd:mem128:net=default zynq-zc702.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig xilinx-zynq-a9 "" \
-	rootfs-armv5.ext2 auto ::sd:mem128:net,default zynq-zc706.dtb
+	rootfs-armv5.ext2 auto ::sd:mem128:net=default zynq-zc706.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 # zynq-zed.dtb expects PHY address 0. The xilinx-zynq-a9 machine
@@ -392,29 +392,29 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.cpio manual ::mem512:net,default sun4i-a10-cubieboard.dtb
+	rootfs-armv5.cpio manual ::mem512:net=default sun4i-a10-cubieboard.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::usb:mem512:net,default sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::usb:mem512:net=default sun4i-a10-cubieboard.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
-	rootfs-armv5.ext2 manual ::sata:mem512:net,default sun4i-a10-cubieboard.dtb
+	rootfs-armv5.ext2 manual ::sata:mem512:net=default sun4i-a10-cubieboard.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig raspi2b "" \
-	rootfs-armv7a.cpio manual "::net,usb" bcm2836-rpi-2-b.dtb
+	rootfs-armv7a.cpio manual "::net=usb" bcm2836-rpi-2-b.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig raspi2b "" \
-	rootfs-armv7a.ext2 manual "::sd:net,usb" bcm2836-rpi-2-b.dtb
+	rootfs-armv7a.ext2 manual "::sd:net=usb" bcm2836-rpi-2-b.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig virt "" \
-	rootfs-armv7a.ext2 auto "::virtio-blk:mem512:net,virtio-net-device"
+	rootfs-armv7a.ext2 auto "::virtio-blk:mem512:net=virtio-net-device"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -428,19 +428,19 @@ if [ ${runall} -eq 1 ]; then
 fi
 
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.cpio automatic "::net,nic" sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.cpio automatic "::net=nic" sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::sd:net,nic sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::sd:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::usb0:net,nic sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::usb0:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::usb1:net,nic sun8i-h3-orangepi-pc.dtb
+	rootfs-armv7a.ext2 automatic ::usb1:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -501,7 +501,7 @@ if [ ${runall} -eq 1 ]; then
     # various backtraces in crypto/testmgr.c due to DMA timeouts
     # memory allocation/free problem in (failed) thermal zone initialization
     runkernel sunxi_defconfig bpim2u "" \
-	rootfs-armv7a.cpio automatic "::net,nic" sun8i-r40-bananapi-m2-ultra.dtb
+	rootfs-armv7a.cpio automatic "::net=nic" sun8i-r40-bananapi-m2-ultra.dtb
     checkstate ${retcode}
     # sd card association is not fixed (randomly instantiated as mmc0, mmc1,
     # or mmc2)
@@ -525,7 +525,7 @@ if [ ${runall} -eq 1 ]; then
     # See qemu patch 7ea47af390 ("tests/avocado: Make the test_arm_bpim2u_gmac
     # test more reliable") for details. That is hackish, but it works.
     runkernel sunxi_defconfig bpim2u "" \
-	rootfs-armv7a.ext2 automatic "::sd,b300:net,nic" sun8i-r40-bananapi-m2-ultra.dtb
+	rootfs-armv7a.ext2 automatic "::sd,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
     checkstate ${retcode}
 fi
 

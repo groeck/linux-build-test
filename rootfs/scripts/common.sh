@@ -754,7 +754,7 @@ __common_fscmd()
 __common_netcmd()
 {
     local fixup="$1"
-    local params=(${fixup//,/ })
+    local params=(${fixup//=/ })
     local netdev="${params[1]}"
 
     __do_network_test=1

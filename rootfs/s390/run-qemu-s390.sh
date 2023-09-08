@@ -30,10 +30,10 @@ fi
 
 PATH=${PATH_S390}:${PATH}
 
-# net,igb only works starting with 5.10
-skip_414="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
-skip_419="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
-skip_54="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net,igb:rootfs"
+# net=igb only works starting with 5.10
+skip_414="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
+skip_419="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
+skip_54="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
 
 patch_defconfig()
 {
@@ -103,28 +103,28 @@ fi
 
 # locktests takes way too long for this architecture.
 
-runkernel defconfig "nolocktests:smp2:net,default" rootfs.cpio
+runkernel defconfig "nolocktests:smp2:net=default" rootfs.cpio
 retcode=$?
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net,virtio-net-pci rootfs.ext2
+runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net=virtio-net-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,default rootfs.ext2
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net,igb rootfs.ext2
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=igb rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:virtio-pci:net,virtio-net-pci rootfs.ext2
+runkernel defconfig nolocktests:virtio-pci:net=virtio-net-pci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:scsi[virtio-pci]:net,usb-xhci rootfs.ext2
+runkernel defconfig nolocktests:scsi[virtio-pci]:net=usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-xhci:net,e1000e "rootfs.${erofs}"
+runkernel defconfig nolocktests:usb-xhci:net=e1000e "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-uas-xhci:net,usb-xhci rootfs.ext2
+runkernel defconfig nolocktests:usb-uas-xhci:net=usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}

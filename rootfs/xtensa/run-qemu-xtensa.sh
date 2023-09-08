@@ -131,17 +131,17 @@ echo "Build reference: $(git describe --match 'v*')"
 echo
 
 retcode=0
-runkernel generic_kc705_defconfig lx60 dc232b lx60 nolocktests:mem128:net,default rootfs-dc232b.cpio
+runkernel generic_kc705_defconfig lx60 dc232b lx60 nolocktests:mem128:net=default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig lx60 dc232b lx200 nolocktests:mem128:flash16:net,default rootfs-dc232b.squashfs
+runkernel generic_kc705_defconfig lx60 dc232b lx200 nolocktests:mem128:flash16:net=default rootfs-dc232b.squashfs
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:net,default rootfs-dc232b.cpio
+runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:net=default rootfs-dc232b.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:flash128:net,default rootfs-dc232b.ext2
+runkernel generic_kc705_defconfig kc705 dc232b kc705 nolocktests:mem1G:flash128:net=default rootfs-dc232b.ext2
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig ml605 dc233c ml605 nolocktests:mem128:net,default rootfs-dc233c.cpio
+runkernel generic_kc705_defconfig ml605 dc233c ml605 nolocktests:mem128:net=default rootfs-dc233c.cpio
 retcode=$((retcode + $?))
-runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:net,default rootfs-dc233c.cpio
+runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:net=default rootfs-dc233c.cpio
 retcode=$((retcode + $?))
 
 if [[ ${runall} -eq 1 ]]; then
@@ -151,10 +151,10 @@ if [[ ${runall} -eq 1 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:flash128:net,default rootfs-dc233c.ext2
+runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:flash128:net=default rootfs-dc233c.ext2
 retcode=$((retcode + $?))
 
-runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256:net,default rootfs-nommu.cpio
+runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256:net=default rootfs-nommu.cpio
 retcode=$((retcode + $?))
 
 exit ${retcode}

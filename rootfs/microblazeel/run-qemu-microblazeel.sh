@@ -64,10 +64,10 @@ echo
 
 retcode=0
 runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
-		"nolocktests:net,default" ttyUL0 rootfs.cpio
+		"nolocktests:net=default" ttyUL0 rootfs.cpio
 retcode=$((retcode + $?))
 runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
-		"nolocktests:flash16:net,default" ttyUL0 rootfs.ext2
+		"nolocktests:flash16:net=default" ttyUL0 rootfs.ext2
 retcode=$((retcode + $?))
 runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 \
 		"nolocktests" ttyS0 rootfs.cpio

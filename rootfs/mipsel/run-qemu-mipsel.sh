@@ -89,45 +89,45 @@ echo
 # Most images fail to instantiate CD ROM because there is an insufficient
 # amount of DMA memory.
 
-runkernel 24Kf malta_defconfig nocd:smp:net,e1000 rootfs.cpio.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=e1000 rootfs.cpio.gz
 retcode=$?
-runkernel 24Kf malta_defconfig nocd:smp:net,i82801:flash,4,1,1 rootfs.squashfs
+runkernel 24Kf malta_defconfig nocd:smp:net=i82801:flash,4,1,1 rootfs.squashfs
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nocd:smp:net,i82550:ide rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=i82550:ide rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 runkernel 24Kf malta_defconfig nocd:smp:nvme rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel 24Kf malta_defconfig nocd:smp:net,i82801:usb-xhci rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=i82801:usb-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nocd:smp:net,i82550:usb-ehci rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=i82550:usb-ehci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24Kc malta_defconfig nocd:smp:net,ne2k_pci:usb-uas-xhci rootfs-mipselr1.ext2.gz
+runkernel 24Kc malta_defconfig nocd:smp:net=ne2k_pci:usb-uas-xhci rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24KEc malta_defconfig nocd:smp:net,pcnet:sdhci-mmc rootfs-mipselr1.ext2.gz
+runkernel 24KEc malta_defconfig nocd:smp:net=pcnet:sdhci-mmc rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 34Kf malta_defconfig nocd:smp:net,rtl8139:scsi[53C810] rootfs-mipselr1.ext2.gz
+runkernel 34Kf malta_defconfig nocd:smp:net=rtl8139:scsi[53C810] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 74Kf malta_defconfig nocd:smp:net,tulip:scsi[53C895A] rootfs-mipselr1.ext2.gz
+runkernel 74Kf malta_defconfig nocd:smp:net=tulip:scsi[53C895A] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel M14Kc malta_defconfig nocd:smp:net,virtio-net:scsi[DC395] rootfs-mipselr1.ext2.gz
+runkernel M14Kc malta_defconfig nocd:smp:net=virtio-net:scsi[DC395] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nocd:smp:net,i82558a:scsi[AM53C974] rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=i82558a:scsi[AM53C974] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nocd:smp:net,i82562:scsi[MEGASAS] rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nocd:smp:net=i82562:scsi[MEGASAS] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 runkernel 24Kf malta_defconfig nocd:smp:scsi[MEGASAS2] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 runkernel 24Kf malta_defconfig nocd:smp:scsi[FUSION] rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel mips32r6-generic malta_qemu_32r6_defconfig nocd:smp:net,pcnet:ide rootfs-mipselr6.ext2.gz
+runkernel mips32r6-generic malta_qemu_32r6_defconfig nocd:smp:net=pcnet:ide rootfs-mipselr6.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel 24Kf malta_defconfig nosmp:net,pcnet rootfs.cpio.gz
+runkernel 24Kf malta_defconfig nosmp:net=pcnet rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel 24Kf malta_defconfig nosmp:ide:net,rtl8139 rootfs-mipselr1.ext2.gz
+runkernel 24Kf malta_defconfig nosmp:ide:net=rtl8139 rootfs-mipselr1.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

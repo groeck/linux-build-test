@@ -100,30 +100,30 @@ if [[ ${linux_version_code} -lt $(kernel_version 6 4) && "${runall}" -eq 0 ]]; t
     nodebug+=":nolocktests"
 fi
 
-runkernel defconfig virt rootfs.cpio "${nodebug}::efi:net,default"
+runkernel defconfig virt rootfs.cpio "${nodebug}::efi:net=default"
 retcode=$?
 checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
     # This does not work, at least not with qemu v8.0/v8.1 and Linux v6.4/v6.5.
     # Qemu for loongarch is not built with tpm support enabled,
     # and enabling it causes a boot hang.
-    runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net,default"
+    runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net=default"
     retcode=$?
     checkstate ${retcode}
 fi
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:nvme:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:nvme:net=default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:usb-xhci:net,default"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:usb-xhci:net=default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.btrfs "${nodebug}::efi:scsi[FUSION]:net,default"
+runkernel defconfig virt rootfs.btrfs "${nodebug}::efi:scsi[FUSION]:net=default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net,default:fstest=xfs"
+runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:scsi[MEGASAS]:net=default:fstest=xfs"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig virt rootfs.squashfs "${nodebug}::efi:sdhci-mmc:net,default"
+runkernel defconfig virt rootfs.squashfs "${nodebug}::efi:sdhci-mmc:net=default"
 retcode=$((retcode + $?))
 
 exit ${retcode}

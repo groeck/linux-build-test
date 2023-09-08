@@ -106,40 +106,40 @@ echo
 #	likely because r2d does not support i/o ports and does not set
 #	sh_io_port_base.
 retcode=0
-runkernel rts7751r2dplus_defconfig "net,rtl8139" rootfs.cpio.gz
+runkernel rts7751r2dplus_defconfig "net=rtl8139" rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig flash16,2304K,3:net,usb-ohci rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig flash16,2304K,3:net=usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig ata:net,virtio-net rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig ata:net=virtio-net rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig sdhci-mmc:net,i82801 rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig sdhci-mmc:net=i82801 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig nvme:net,tulip rootfs.ext2.gz
-retcode=$((retcode + $?))
-
-runkernel rts7751r2dplus_defconfig usb:net,i82550 rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-hub:net,rtl8139 rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig nvme:net=tulip rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel rts7751r2dplus_defconfig usb-ohci:net,i82557a rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb:net=i82550 rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-ehci:net,i82562 rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-xhci:net,rtl8139 rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-uas-ehci:net,rtl8139 rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig usb-uas-xhci:net,rtl8139 rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb-hub:net=rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel rts7751r2dplus_defconfig "scsi[53C810]:net,rtl8139" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig usb-ohci:net=i82557a rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-ehci:net=i82562 rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-xhci:net=rtl8139 rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-uas-ehci:net=rtl8139 rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel rts7751r2dplus_defconfig usb-uas-xhci:net=rtl8139 rootfs.ext2.gz
+retcode=$((retcode + $?))
+
+runkernel rts7751r2dplus_defconfig "scsi[53C810]:net=rtl8139" rootfs.ext2.gz
 retcode=$((${retcode} + $?))
-runkernel rts7751r2dplus_defconfig "scsi[53C895A]:net,rtl8139" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[53C895A]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig "scsi[DC395]:net,rtl8139" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[DC395]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel rts7751r2dplus_defconfig "scsi[AM53C974]:net,rtl8139" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[AM53C974]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
@@ -150,7 +150,7 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel rts7751r2dplus_defconfig "scsi[FUSION]:net,rtl8139" rootfs.ext2.gz
+runkernel rts7751r2dplus_defconfig "scsi[FUSION]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

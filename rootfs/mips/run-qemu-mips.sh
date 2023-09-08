@@ -87,42 +87,42 @@ echo
 
 # Disable CD support to avoid DMA memory allocation errors
 
-runkernel malta_defconfig nocd:smp:net,e1000 rootfs.cpio.gz
+runkernel malta_defconfig nocd:smp:net=e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,pcnet:flash,4,1,1 rootfs.squashfs
+runkernel malta_defconfig nocd:smp:net=pcnet:flash,4,1,1 rootfs.squashfs
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,pcnet:ide rootfs.ext2.gz
-retcode=$((retcode + $?))
-
-runkernel malta_defconfig nocd:smp:net,i82558b:nvme rootfs.ext2.gz
+runkernel malta_defconfig nocd:smp:net=pcnet:ide rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:smp:net,e1000:usb-xhci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,e1000-82545em:usb-uas-xhci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,i82801:usb-ehci rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,ne2k_pci:sdhci-mmc rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,pcnet:scsi[53C810] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,rtl8139:scsi[53C895A] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,tulip:scsi[DC395] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,virtio-net:scsi[AM53C974] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,i82550:scsi[MEGASAS] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,i82558a:scsi[MEGASAS2] rootfs.ext2.gz
-retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net,i82562:scsi[FUSION] rootfs.ext2.gz
+runkernel malta_defconfig nocd:smp:net=i82558b:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:nosmp:net,e1000 rootfs.cpio.gz
+runkernel malta_defconfig nocd:smp:net=e1000:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:nosmp:ide:net,pcnet rootfs.ext2.gz
+runkernel malta_defconfig nocd:smp:net=e1000-82545em:usb-uas-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=i82801:usb-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=ne2k_pci:sdhci-mmc rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=pcnet:scsi[53C810] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=rtl8139:scsi[53C895A] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=tulip:scsi[DC395] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=virtio-net:scsi[AM53C974] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=i82550:scsi[MEGASAS] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=i82558a:scsi[MEGASAS2] rootfs.ext2.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=i82562:scsi[FUSION] rootfs.ext2.gz
+retcode=$((retcode + $?))
+
+runkernel malta_defconfig nocd:nosmp:net=e1000 rootfs.cpio.gz
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:nosmp:ide:net=pcnet rootfs.ext2.gz
 retcode=$((retcode + $?))
 
 exit ${retcode}

@@ -109,11 +109,11 @@ echo
 retcode=0
 runkernel mcf5208evb m5208 m5208evb_defconfig "noextras" rootfs-5208.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.cpio
+runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.cpio
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.ext2
+runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.ext2
 retcode=$((retcode + $?))
-runkernel q800 m68040 mac_defconfig "nofs:net,default" rootfs-68040.cramfs
+runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.cramfs
 retcode=$((retcode + $?))
 
 exit ${retcode}

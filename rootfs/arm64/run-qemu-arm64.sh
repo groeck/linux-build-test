@@ -138,51 +138,51 @@ fi
 
 # Failing network tests: i82551, usb-net
 
-runkernel virt defconfig smp:net,e1000:mem512 rootfs.cpio
+runkernel virt defconfig smp:net=e1000:mem512 rootfs.cpio
 retcode=$?
-runkernel virt defconfig smp2:tpm-tis-device:net,e1000e:efi:mem512:usb-xhci rootfs.ext2
+runkernel virt defconfig smp2:tpm-tis-device:net=e1000e:efi:mem512:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,i82801:mem512:usb-ehci rootfs.ext2
+runkernel virt defconfig smp2:net=i82801:mem512:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,i82550:mem512:usb-ohci rootfs.ext2
+runkernel virt defconfig smp2:net=i82550:mem512:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs
+runkernel virt defconfig smp4:net=ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp6:net,pcnet:mem512:virtio rootfs.ext2
+runkernel virt defconfig smp6:net=pcnet:mem512:virtio rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp8:net,rtl8139:mem512:virtio-pci rootfs.ext2
+runkernel virt defconfig smp8:net=rtl8139:mem512:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp:net,tulip:efi:mem512:virtio-blk rootfs.ext2
+runkernel virt defconfig smp:net=tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net,virtio-net:mem512:nvme rootfs.btrfs
+runkernel virt defconfig smp2:net=virtio-net:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net,e1000:mem512:sdhci-mmc "rootfs.${erofs}"
+runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.${erofs}"
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net,i82557a:mem512:scsi[DC395]" "rootfs.${f2fs}"
+runkernel virt defconfig "smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.${f2fs}"
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net,i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
+runkernel virt defconfig "smp8:net=i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net,i82558b:mem512:scsi[MEGASAS]" rootfs.ext2
+runkernel virt defconfig "smp2:net=i82558b:mem512:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:net,i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs
+runkernel virt defconfig "smp4:net=i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net,e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2
+runkernel virt defconfig "smp6:net=e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net,e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs
+runkernel virt defconfig "smp8:net=e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp:net,pcnet:mem512:scsi[FUSION]" rootfs.ext2
+runkernel virt defconfig "smp:net=pcnet:mem512:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net,usb-ohci:mem512:scsi[virtio]" rootfs.ext2
+runkernel virt defconfig "smp2:net=usb-ohci:mem512:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
 
-runkernel xlnx-versal-virt defconfig smp:net,default:mem512 rootfs.cpio
+runkernel xlnx-versal-virt defconfig smp:net=default:mem512 rootfs.cpio
 retcode=$((retcode + $?))
-runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:virtio-blk" rootfs.ext2
+runkernel xlnx-versal-virt defconfig "smp4:net=default:mem512:virtio-blk" rootfs.ext2
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # unreliable; the drive sometimes instantiates as mmcblk1 instead of
     # mmcblk0, causing spurious failures.
-    runkernel xlnx-versal-virt defconfig "smp4:net,default:mem512:sd0" rootfs.ext2
+    runkernel xlnx-versal-virt defconfig "smp4:net=default:mem512:sd0" rootfs.ext2
     retcode=$((retcode + $?))
 fi
 
@@ -208,9 +208,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3b defconfig smp:net,usb:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp:net=usb:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel raspi3b defconfig smp4:net,usb:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp4:net=usb:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio
