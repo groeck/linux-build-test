@@ -30,6 +30,15 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # File system support
+    # Notes:
+    # - Trying to boot from erofs, f2fs fails
+    # - minix, nilfs file system tests fail
+    enable_config "${defconfig}" CONFIG_EXFAT_FS
+    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
+    enable_config "${defconfig}" CONFIG_HFS_FS
+    enable_config "${defconfig}" CONFIG_XFS_FS
+
     # 64 bit build
     disable_config "${defconfig}" CONFIG_32BIT
     disable_config "${defconfig}" CONFIG_CPU_MIPS32_R1
@@ -71,7 +80,7 @@ runkernel()
     if [[ "${rootfs}" == *.cpio* ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
@@ -110,47 +119,47 @@ retcode=0
 
 # Disable CD support to avoid DMA memory allocation errors
 
-runkernel malta_defconfig nocd:smp:net=e1000 rootfs-n32.cpio.gz
+runkernel malta_defconfig nocd:smp:net=e1000 rootfs-n32.cpio
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net=e1000:flash4,1,1 rootfs-n64.squashfs
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=e1000-82544gc:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net=e1000-82544gc:ide rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=i82801:sdhci-mmc rootfs-n64.ext2.gz
-retcode=$((retcode + $?))
-
-runkernel malta_defconfig nocd:smp:net=pcnet:nvme rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net=i82801:sdhci-mmc:fstest=hfs rootfs-n64.ext2
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:smp:net=ne2k_pci:usb-xhci rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net=pcnet:nvme:fstest=hfs+ rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=pcnet:usb-ehci rootfs-n32.ext2.gz
+
+runkernel malta_defconfig nocd:smp:net=ne2k_pci:usb-xhci rootfs-n32.btrfs
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=rtl8139:usb-uas-xhci rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net=pcnet:usb-ehci rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=tulip:scsi[53C810] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net=rtl8139:usb-uas-xhci rootfs-n64.ext2
+retcode=$((retcode + $?))
+runkernel malta_defconfig nocd:smp:net=tulip:scsi[53C810]:fstest=xfs rootfs-n32.ext2
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
     # sym0: interrupted SCRIPT address not found
-    runkernel malta_defconfig nocd:smp:scsi[53C895A] rootfs-n32.ext2.gz
+    runkernel malta_defconfig nocd:smp:scsi[53C895A] rootfs-n32.ext2
     retcode=$((retcode + $?))
 fi
 
-runkernel malta_defconfig nocd:smp:net=virtio-net:scsi[DC395] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net=virtio-net:scsi[DC395] rootfs-n64.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974]:fstest=exfat rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:pci-bridge:net=e1000:scsi[MEGASAS] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:pci-bridge:net=e1000:scsi[MEGASAS] rootfs-n64.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:pci-bridge:net=rtl8139:scsi[MEGASAS2] rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:smp:pci-bridge:net=rtl8139:scsi[MEGASAS2] rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=ne2k_pci:scsi[FUSION] rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:smp:net=ne2k_pci:scsi[FUSION] rootfs-n64.btrfs
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:nosmp:net=pcnet:ide rootfs-n32.ext2.gz
+runkernel malta_defconfig nocd:nosmp:net=pcnet:ide rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:nosmp:pci-bridge:net=tulip:sdhci-mmc rootfs-n64.ext2.gz
+runkernel malta_defconfig nocd:nosmp:pci-bridge:net=tulip:sdhci-mmc rootfs-n64.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
