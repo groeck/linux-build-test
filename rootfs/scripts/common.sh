@@ -216,7 +216,7 @@ __init_disk()
     __partition_offset=1
     unset __rootfsname
 
-    if echo "${fixups}" | grep -q "fstest,"; then
+    if echo "${fixups}" | grep -q "fstest="; then
         __run_fstest=1
     else
         __run_fstest=0
@@ -728,14 +728,14 @@ __common_diskcmd()
 }
 
 # Set up secondary file system.
-# Format is "fstest,<file system type>".
+# Format is "fstest=<file system type>".
 # A file named filesystem.<file system type> is expected to exist in the
 # filesystems/ directory. The primary disk must be specified first in the
 # list of fixups.
 __common_fscmd()
 {
     local fixup=$1
-    local params=(${fixup//,/ })
+    local params=(${fixup//=/ })
     local fstype="${params[1]}"
     local fspath="$(setup_filesystem "filesystem.${fstype}")"
 
@@ -848,7 +848,7 @@ __common_fixup()
     "ide"|"ata"|sata*|usb*|scsi*|virtio*|flash*|mtd*)
 	__common_diskcmd "${fixup}" "${rootfs}"
 	;;
-    fstest,*)
+    fstest=*)
 	# Instantiate disk to run file system tests
 	__common_fscmd "${fixup}"
 	;;

@@ -125,14 +125,14 @@ fi
 
 # ntfs3 is only supported in v5.15 and later
 if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
-    ntfstest=":fstest,ntfs"
+    ntfstest=":fstest=ntfs"
 else
     ntfstest=""
 fi
 
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
-runkernel defconfig smp:net,e1000:mem256:ata:fstest,xfs Broadwell-noTSX q35 rootfs.ext2
+runkernel defconfig smp:net,e1000:mem256:ata:fstest=xfs Broadwell-noTSX q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net,e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
@@ -141,7 +141,7 @@ checkstate ${retcode}
 runkernel defconfig smp2:net,i82801:efi:mem512:nvme IvyBridge q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb:fstest,nilfs2 SandyBridge q35 rootfs.squashfs
+runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
@@ -157,7 +157,7 @@ checkstate ${retcode}
 # Repeat 'tulip' boot for all three variants (efi, efi32, non-efi)
 # to catch potential efi related issues. Use the opportunity to also
 # test different CPUs, and sneak in a file system test.
-runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395]:fstest,hfs Conroe q35 rootfs.ext2
+runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395]:fstest=hfs Conroe q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
@@ -241,14 +241,14 @@ checkstate ${retcode}
 runkernel defconfig preempt:smp2:net,i82558b:efi32:mem1G:sdhci-mmc Skylake-Client-IBRS q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig preempt:smp6:net,i82550:mem512:ata:fstest,minix KnightsMill q35 rootfs.ext2
+runkernel defconfig preempt:smp6:net,i82550:mem512:ata:fstest=minix KnightsMill q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel defconfig nosmp:net,e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata:fstest,hfs+ Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:net,ne2k_pci:efi:mem512:ata:fstest=hfs+ Opteron_G4 q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:net,pcnet:efi32:mem2G:ata Haswell-noTSX-IBRS q35 rootfs.ext2
