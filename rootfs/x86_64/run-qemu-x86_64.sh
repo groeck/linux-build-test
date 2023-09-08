@@ -33,6 +33,7 @@ patch_defconfig()
     echo "CONFIG_MINIX_FS=y" >> ${defconfig}
     echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
     echo "CONFIG_HFSPLUS_FS=y" >> ${defconfig}
+    echo "CONFIG_HFS_FS=y" >> ${defconfig}
 
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
@@ -115,11 +116,18 @@ else
 	f2fs="ext2"
 fi
 
-# erofs is not supported in older kernels
+# erofs is only supported in v5.4 and later
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
     erofs="erofs"
 else
     erofs="ext2"
+fi
+
+# ntfs3 is only supported in v5.15 and later
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+    ntfstest=":fstest,ntfs"
+else
+    ntfstest=""
 fi
 
 # runkernel defconfig kvm64 q35
@@ -136,26 +144,20 @@ checkstate ${retcode}
 runkernel defconfig smp4:net,ne2k_pci:efi32:mem1G:usb:fstest,nilfs2 SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-if [[ "${runall}" -ne 0 ]]; then
-    # unstable / crashes in mainline
-    runkernel defconfig smp4:net,ne2k_pci:mem1G:usb:fstest,ntfs SandyBridge q35 rootfs.squashfs
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-fi
 runkernel defconfig smp8:net,ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net,pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci-mmc Skylake-Client q35 "rootfs.${erofs}"
+runkernel defconfig "smp2:tpm-tis:net,rtl8139:efi:mem4G:sdhci-mmc${ntfstest}" Skylake-Client q35 "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # Repeat 'tulip' boot for all three variants (efi, efi32, non-efi)
 # to catch potential efi related issues. Use the opportunity to also
-# test different CPUs.
-runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395] Conroe q35 rootfs.ext2
+# test different CPUs, and sneak in a file system test.
+runkernel defconfig smp4:net,tulip:efi32:mem256:scsi[DC395]:fstest,hfs Conroe q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net,tulip:efi:mem256:scsi[DC395] Denverton q35 rootfs.ext2
