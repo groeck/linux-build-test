@@ -520,7 +520,7 @@ __common_flashcmd()
     fi
     local devindex="${plist[3]}"
 
-    dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
+    truncate -s "${flashsize}M" "${tmpfile}"
     dd if="${rootfs}" of="${tmpfile}" ${seek} conv=notrunc status=none
     extra_params+=" -drive file=${tmpfile},format=raw,if=${flashif}"
     if [[ -n "${devindex}" ]]; then
@@ -576,7 +576,7 @@ __common_mmccmd()
 	fi
 
 	# adjust file system size to next exponent of 2
-	dd if=/dev/zero of="${tmpfile}" bs=1M count="${flashsize}" status=none
+	truncate -s "${flashsize}M" "${tmpfile}"
 	dd if="${rootfs}" of="${tmpfile}" ${seek} conv=notrunc status=none
 
 	rootfs="${tmpfile}"
