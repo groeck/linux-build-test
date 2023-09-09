@@ -44,6 +44,17 @@ patch_defconfig()
 	esac
     done
 
+    # Enable various file systems
+    # Note: erofs and f2fs only boot from an entire disk,
+    # and thus can not be used to run file system tests.
+    enable_config ${defconfig} CONFIG_EROFS_FS
+    enable_config ${defconfig} CONFIG_F2FS_FS
+    enable_config ${defconfig} CONFIG_HFS_FS
+    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+    enable_config ${defconfig} CONFIG_MINIX_FS
+    enable_config ${defconfig} CONFIG_NILFS2_FS
+    enable_config ${defconfig} CONFIG_XFS_FS
+
     enable_config "${defconfig}" CONFIG_BINFMT_MISC CONFIG_64BIT
     enable_config "${defconfig}" CONFIG_MIPS32_O32 CONFIG_MIPS32_N32
 
@@ -69,10 +80,10 @@ runkernel()
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
-    elif [[ "${rootfs%.gz}" == *iso ]]; then
+    elif [[ "${rootfs}" == *iso ]]; then
 	build+=":cd"
     else
-	build+=":hd"
+	build+=":${rootfs##*.}"
     fi
 
     if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
@@ -122,13 +133,13 @@ echo
 # Network tests:
 # - i82551 fails to instantiate
 
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000:fstest=xfs
 retcode=$?
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net=pcnet
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net=pcnet:flash4,1,1
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550:fstest=nilfs2
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net=i82558a
 retcode=$((retcode + $?))
@@ -138,11 +149,11 @@ runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net=n
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801:fstest=hfs
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:net=pcnet:nvme
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs r1:smp:net=pcnet:nvme:fstest=hfs+
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:scsi[DC395]:net=virtio-net
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.btrfs r1:smp:scsi[DC395]:net=virtio-net:fstest=minix
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip
 retcode=$((retcode + $?))
@@ -152,7 +163,17 @@ retcode=$((retcode + $?))
 # Network interfaces don't instantiate.
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.erofs notests:nonet:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.f2fs notests:nonet:smp:ide
+retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.ext2 notests:nonet:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.erofs notests:nonet:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.f2fs notests:nonet:smp:ide
+retcode=$((retcode + $?))
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.btrfs notests:nonet:smp:ide:fstest=xfs
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.iso notests:nonet:smp:ide
 retcode=$((retcode + $?))
