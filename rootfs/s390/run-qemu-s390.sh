@@ -40,10 +40,14 @@ patch_defconfig()
     local defconfig=$1
     local fixup=$2
 
-    # Enable f2fs after lockdep issues have been fixed
-    # enable_config ${defconfig} CONFIG_F2FS_FS
-    # Enable erofs
     enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
+    enable_config ${defconfig} CONFIG_F2FS_FS
+    enable_config ${defconfig} CONFIG_EXFAT_FS
+    enable_config ${defconfig} CONFIG_HFS_FS
+    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+    enable_config ${defconfig} CONFIG_MINIX_FS
+    enable_config ${defconfig} CONFIG_NILFS2_FS
+    enable_config ${defconfig} CONFIG_XFS_FS
 
     enable_config ${defconfig} CONFIG_PCI
 
@@ -61,7 +65,7 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     if ! match_params "${_fixup}@${fixup}"; then
@@ -106,25 +110,25 @@ fi
 runkernel defconfig "nolocktests:smp2:net=default" rootfs.cpio
 retcode=$?
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net=virtio-net-pci rootfs.ext2
+runkernel defconfig nolocktests:smp2:virtio-blk-ccw:net=virtio-net-pci rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=default rootfs.ext2
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=default:fstest=hfs+ rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=igb rootfs.ext2
+runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=igb:fstest=exfat rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:virtio-pci:net=virtio-net-pci rootfs.ext2
+runkernel defconfig nolocktests:virtio-pci:net=virtio-net-pci:fstest=nilfs2 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:scsi[virtio-pci]:net=usb-xhci rootfs.ext2
+runkernel defconfig nolocktests:scsi[virtio-pci]:net=usb-xhci:fstest=hfs rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:usb-xhci:net=e1000e "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-uas-xhci:net=usb-xhci rootfs.ext2
+runkernel defconfig nolocktests:usb-uas-xhci:net=usb-xhci:fstest=xfs rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
