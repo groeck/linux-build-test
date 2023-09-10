@@ -1368,7 +1368,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_USB_LINK_LAYER_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
-	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING CONFIG
+	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
 	    # takes too long
 	    # enable_config "${fragment}" CONFIG_TORTURE_TEST CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
 	    # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y
