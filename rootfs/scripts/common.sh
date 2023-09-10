@@ -1064,7 +1064,7 @@ setup_rootfs()
     echo "${destfile}"
 }
 
-destfile()
+fscachepath()
 {
     local fname="$(basename $1)"
     echo "${__fscachedir}/${fname%.gz}"
