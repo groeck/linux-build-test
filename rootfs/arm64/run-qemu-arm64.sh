@@ -121,14 +121,6 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
-# f2fs has known lockdep issues which the maintainers don't seem
-# to care about.
-if [[ "${runall}" -ne 0 ]]; then
-	f2fs="f2fs"
-else
-	f2fs="ext2"
-fi
-
 # erofs is not supported in older kernels
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
     erofs="erofs"
@@ -158,7 +150,7 @@ runkernel virt defconfig smp2:net=virtio-net:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.${erofs}"
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.${f2fs}"
+runkernel virt defconfig "smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.f2fs"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp8:net=i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
