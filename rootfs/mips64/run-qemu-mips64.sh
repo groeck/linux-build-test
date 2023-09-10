@@ -117,6 +117,20 @@ echo
 
 retcode=0
 
+# exfat only works with v5.10 and later
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    exfat=":fstest=exfat"
+else
+    exfat=""
+fi
+
+# btrfs only works with v6.1 and later and otherwise fails to run init
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+    btrfs="btrfs"
+else
+    btrfs="ext2"
+fi
+
 # Disable CD support to avoid DMA memory allocation errors
 
 runkernel malta_defconfig nocd:smp:net=e1000 rootfs-n32.cpio
@@ -131,7 +145,7 @@ retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net=pcnet:nvme:fstest=hfs+ rootfs-n32.ext2
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:smp:net=ne2k_pci:usb-xhci rootfs-n32.btrfs
+runkernel malta_defconfig nocd:smp:net=ne2k_pci:usb-xhci rootfs-n32.${btrfs}
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net=pcnet:usb-ehci rootfs-n32.ext2
 retcode=$((retcode + $?))
@@ -148,13 +162,13 @@ fi
 
 runkernel malta_defconfig nocd:smp:net=virtio-net:scsi[DC395] rootfs-n64.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974]:fstest=exfat rootfs-n32.ext2
+runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974]${exfat} rootfs-n32.ext2
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:pci-bridge:net=e1000:scsi[MEGASAS] rootfs-n64.ext2
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:pci-bridge:net=rtl8139:scsi[MEGASAS2] rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=ne2k_pci:scsi[FUSION] rootfs-n64.btrfs
+runkernel malta_defconfig nocd:smp:net=ne2k_pci:scsi[FUSION] rootfs-n64.${btrfs}
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:nosmp:net=pcnet:ide rootfs-n32.ext2
