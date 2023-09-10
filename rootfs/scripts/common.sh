@@ -1048,6 +1048,8 @@ setup_rootfs()
     if [[ "${rootfs}" == *.gz ]]; then
 	gunzip -f "${destfile}.gz"
 	rootfs="${rootfs%.gz}"
+	# Make it sparse
+	fallocate -d "${destfile}"
     fi
 
     if [[ -e "${rootfspath}.md5" ]]; then
@@ -1062,7 +1064,7 @@ setup_rootfs()
     echo "${destfile}"
 }
 
-fscachepath()
+destfile()
 {
     local fname="$(basename $1)"
     echo "${__fscachedir}/${fname%.gz}"
@@ -1104,6 +1106,8 @@ setup_filesystem()
     if [[ "${fsfile}" == *.gz ]]; then
 	gunzip -f "${destfile}.gz"
 	fsfile="${fsfile%.gz}"
+	# Make it sparse
+	fallocate -d "${destfile}"
     fi
 
     if [[ -e "${fspath}.md5" ]]; then
