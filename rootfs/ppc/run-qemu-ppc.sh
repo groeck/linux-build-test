@@ -35,6 +35,15 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # minix fails to mount
+    enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
+    enable_config ${defconfig} CONFIG_F2FS_FS
+    enable_config ${defconfig} CONFIG_EXFAT_FS
+    enable_config ${defconfig} CONFIG_HFS_FS
+    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+    enable_config ${defconfig} CONFIG_NILFS2_FS
+    enable_config ${defconfig} CONFIG_XFS_FS
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	"e500")
@@ -149,14 +158,14 @@ runkernel mpc85xx_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/po
 retcode=$((${retcode} + $?))
 runkernel mpc85xx_defconfig "::scsi[53C895A]:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "::sata-sii3112:net=rtl8139" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "::sata-sii3112:net=rtl8139:fstest=hfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig ::sdhci-mmc:net=usb-ohci mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig ::sdhci-mmc:net=usb-ohci:fstest=hfs+ mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
     # NVME interrupts (or more generally PCI interrupts) are not received by host OS
-    runkernel mpc85xx_defconfig ::nvme mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    runkernel mpc85xx_defconfig ::nvme:fstest=xfs mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
     # timeout, no error message
     runkernel mpc85xx_smp_defconfig ::scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
@@ -164,11 +173,11 @@ if [[ ${runall} -ne 0 ]]; then
 fi
 runkernel mpc85xx_smp_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "::scsi[DC395]:net=i82550" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::scsi[DC395]:net=i82550:fstest=xfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "::scsi[53C895A]:net=usb-ohci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::scsi[53C895A]:net=usb-ohci:fstest=nilfs2" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "::sata-sii3112:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::sata-sii3112:net=ne2k_pci:fstest=exfat" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 
 runkernel 44x/bamboo_defconfig "::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
