@@ -109,14 +109,6 @@ echo
 
 retcode=0
 
-# f2fs has known lockdep issues which the maintainers don't seem
-# to care about.
-if [[ "${runall}" -ne 0 ]]; then
-	f2fs="f2fs"
-else
-	f2fs="ext2"
-fi
-
 # erofs is only supported in v5.4 and later
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
     erofs="erofs"
@@ -138,7 +130,7 @@ checkstate ${retcode}
 runkernel defconfig smp4:net=ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp8:net=ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.${f2fs}"
+runkernel defconfig smp8:net=ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.f2fs"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net=pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
