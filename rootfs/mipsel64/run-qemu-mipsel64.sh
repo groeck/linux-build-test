@@ -130,6 +130,21 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
+# erofs is only supported in v5.4 and later
+if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+    erofs="erofs"
+else
+    erofs="ext2"
+fi
+
+# With malta_defconfig, btrfs only works with v6.1 and later and otherwise
+# fails to run init
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+    btrfs="btrfs"
+else
+    btrfs="ext2"
+fi
+
 # Network tests:
 # - i82551 fails to instantiate
 
@@ -147,15 +162,15 @@ runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net=u
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net=ne2k_pci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139:fstest=hfs+
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801:fstest=hfs
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs r1:smp:net=pcnet:nvme:fstest=hfs+
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.${btrfs} r1:smp:net=pcnet:nvme
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.btrfs r1:smp:scsi[DC395]:net=virtio-net:fstest=minix
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.${btrfs} r1:smp:scsi[DC395]:net=virtio-net
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip:fstest=minix
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net=i82559er
 retcode=$((retcode + $?))
@@ -163,13 +178,13 @@ retcode=$((retcode + $?))
 # Network interfaces don't instantiate.
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.erofs notests:nonet:smp:ide
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.${erofs} notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.erofs notests:nonet:smp:ide
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.${erofs} notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
