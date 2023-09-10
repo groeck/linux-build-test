@@ -71,3 +71,7 @@ fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
 
 fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
 	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
+
+# Plugins need gcc 14.1, 13.3, or 12.4 to work.
+# See https://gcc.gnu.org/r14-3331 for details.
+fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
