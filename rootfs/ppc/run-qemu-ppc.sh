@@ -276,7 +276,7 @@ runkernel corenet32_smp_defconfig e500::net=eTSEC:sdhci-mmc ppce500 e500mc ttyS0
 retcode=$((retcode + $?))
 # requires qemu v8.0+ (Freescale eSDHC controller enabled)
 runkernel corenet32_smp_defconfig e500::net=e1000:mmc ppce500 e500mc ttyS0 \
-	rootfs.ext2 arch/powerpc/boot/uImage
+	rootfs.cramfs arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
 if [[ ${runall} -ne 0 ]]; then
     # Fails to mount flash (mtdblock0)
@@ -288,7 +288,7 @@ runkernel corenet32_smp_defconfig e500::net=tulip:scsi[53C895A] ppce500 e500mc t
 	rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
 runkernel corenet32_smp_defconfig e500::net=i82562:sata-sii3112 ppce500 e500mc ttyS0 \
-	rootfs.ext2 arch/powerpc/boot/uImage
+	rootfs.f2fs arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
 
 exit ${retcode}
