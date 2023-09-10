@@ -25,14 +25,17 @@ patch_defconfig()
     local fixup
 
     # Common root file system needs to have TMPFS enabled.
-    echo "CONFIG_TMPFS=y" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_TMPFS
     # We won't test btrfs. Drop it to reduce image size.
-    echo "CONFIG_BTRFS_FS=n" >> ${defconfig}
+    disable_config ${defconfig} CONFIG_BTRFS_FS
     # enable ethernet interface
-    echo "CONFIG_NET_VENDOR_SUN=y" >> ${defconfig}
-    echo "CONFIG_HAPPYMEAL=y" >> ${defconfig}
-    # We don't currently test IPv6 so drop it to reduce image size
-    echo "CONFIG_IPV6=n" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_NET_VENDOR_SUN
+    enable_config ${defconfig} CONFIG_HAPPYMEAL
+    # We don't currently test the following so drop to reduce image size
+    disable_config ${defconfig} CONFIG_IPV6 CONFIG_WIRELESS
+    disable_config ${defconfig} CONFIG_HWMON CONFIG_NETWORK_FILESYSTEMS CONFIG_KGDB
+    disable_config ${defconfig} CONFIG_UTS_NS CONFIG_IPC_NS
+    disable_config ${defconfig} CONFIG_PID_NS CONFIG_NET_NS
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
