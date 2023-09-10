@@ -39,6 +39,7 @@ patch_defconfig()
     enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
     enable_config ${defconfig} CONFIG_F2FS_FS
     enable_config ${defconfig} CONFIG_EXFAT_FS
+    enable_config ${defconfig} CONFIG_GFS2_FS
     enable_config ${defconfig} CONFIG_HFS_FS
     enable_config ${defconfig} CONFIG_HFSPLUS_FS
     enable_config ${defconfig} CONFIG_NILFS2_FS
@@ -182,7 +183,7 @@ retcode=$((${retcode} + $?))
 
 runkernel 44x/bamboo_defconfig "::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "::scsi[AM53C974]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
+runkernel 44x/bamboo_defconfig "::scsi[AM53C974]:net=e1000:fstest=gfs2" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp::net=tulip" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
