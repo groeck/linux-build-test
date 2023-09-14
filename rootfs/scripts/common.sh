@@ -1246,6 +1246,7 @@ __setup_fragment()
     local nolockup=0
     local nofs=0
     local nolocktests=0
+    local nolockdep=0
     local nonvme=0
     local noscsi=0
     local notests="${__testbuild}"
@@ -1281,6 +1282,10 @@ __setup_fragment()
 	nodebugtimers) nodebugtimers=1 ;;
 	nocd) nocd=1 ;;
 	nofs) nofs=1 ;;
+	nolockdep)
+	    nolockdep=1
+	    nolocktests=1
+	    ;;
 	nolocktests) nolocktests=1 ;;
 	nolockup) nolockup=1 ;;
 	nonvme) nonvme=1 ;;
@@ -1308,8 +1313,13 @@ __setup_fragment()
 	# debug options
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
-	enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH CONFIG_DEBUG_LOCK_ALLOC
-	enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
+
+	if [[ "${nolockdep}" -eq 0 ]]; then
+	    enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_LOCK_ALLOC
+	    enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH
+	fi
+
+	enable_config "${fragment}" CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 	if [[ "${nodebugobj}" -eq 0 ]]; then
