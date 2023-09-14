@@ -65,6 +65,25 @@ patch_defconfig()
     enable_config ${defconfig} CONFIG_ATA CONFIG_BLK_DEV_SD
     # USB
     enable_config ${defconfig} CONFIG_USB CONFIG_USB_STORAGE CONFIG_USB_OHCI_HCD
+
+    for fixup in ${fixups}; do
+	case "${fixup}" in
+	fstest)
+	    enable_config ${defconfig} CONFIG_EROFS_FS
+	    enable_config ${defconfig} CONFIG_EXFAT_FS
+	    enable_config ${defconfig} CONFIG_F2FS_FS
+	    enable_config ${defconfig} CONFIG_GFS2_FS
+	    enable_config ${defconfig} CONFIG_HFS_FS
+	    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+	    enable_config ${defconfig} CONFIG_JFS_FS
+	    enable_config ${defconfig} CONFIG_MINIX_FS
+	    enable_config ${defconfig} CONFIG_NILFS2_FS
+	    enable_config ${defconfig} CONFIG_XFS_FS
+	    ;;
+	*)
+	    ;;
+	esac
+    done
 }
 
 runkernel()
@@ -182,6 +201,50 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
+if [ ${runall} -eq 1 ]; then
+    # run all file system tests
+    # As of v6.4/v6.5/v6.6-rc1, the Ethernet interface driver on ast2500
+    # triggers a lockdep warning. This is due to commit 1baf2e50e48f
+    # ("drivers/net/ftgmac100: fix DHCP potential failure with systemd")
+    # which enables the rtnl lock in a worker which may be canceled from
+    # code which holds the rtnl lock, potentially causing a deadlock.
+    # Activate not-my-problem field and disable lockdep debugging to avoid
+    # warning noise.
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.btrfs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.f2fs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.erofs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=exfat aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=gfs2 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=hfs aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=hfs+ aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=jfs aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=minix aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=nilfs2 aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+    runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=xfs aspeed-ast2600-evb.dtb
+    retcode=$((${retcode} + $?))
+fi
+
 runkernel aspeed_g4_defconfig quanta-q71l-bmc "" \
 	rootfs-armv5.cpio automatic "::net=nic" aspeed-bmc-quanta-q71l.dtb
 retcode=$((${retcode} + $?))
@@ -294,8 +357,6 @@ runkernel aspeed_g5_defconfig fuji-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# Note: f2fs generates lockdep splats. Only run with lockdep tests
-# disabled.
 runkernel aspeed_g5_defconfig fuji-bmc "" \
 	rootfs-armv5.f2fs automatic notests::mem1G:mtd128,0,8,1:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
