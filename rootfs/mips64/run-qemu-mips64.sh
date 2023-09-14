@@ -9,6 +9,7 @@ shift $((OPTIND - 1))
 
 config=$1
 variant=$2
+fs=$3
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-mips64}
 
@@ -30,15 +31,6 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
-    # File system support
-    # Notes:
-    # - Trying to boot from erofs, f2fs fails
-    # - minix, nilfs file system tests fail
-    enable_config "${defconfig}" CONFIG_EXFAT_FS
-    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
-    enable_config "${defconfig}" CONFIG_HFS_FS
-    enable_config "${defconfig}" CONFIG_XFS_FS
-
     # 64 bit build
     disable_config "${defconfig}" CONFIG_32BIT
     disable_config "${defconfig}" CONFIG_CPU_MIPS32_R1
@@ -57,13 +49,35 @@ patch_defconfig()
     enable_config "${defconfig}" CONFIG_MTD_PHYSMAP CONFIG_MTD_PHYSMAP_OF
 
     for fixup in ${fixups}; do
-	if [[ "${fixup}" == "smp" ]]; then
+        case "${fixup}" in
+	"ps4")
+	    # Some file systems only work with 4k page size
+	    disable_config "${defconfig}" CONFIG_PAGE_SIZE_16KB
+	    enable_config "${defconfig}" CONFIG_PAGE_SIZE_4KB
+	    ;;
+	"fstest")
+	    # File system support
+	    enable_config "${defconfig}" CONFIG_F2FS_FS
+	    enable_config "${defconfig}" CONFIG_EXFAT_FS
+	    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
+	    enable_config "${defconfig}" CONFIG_HFS_FS
+	    enable_config "${defconfig}" CONFIG_JFS_FS
+	    enable_config "${defconfig}" CONFIG_NILFS2_FS
+	    enable_config "${defconfig}" CONFIG_XFS_FS
+
+	    enable_config "${defconfig}" CONFIG_EROFS_FS
+	    enable_config "${defconfig}" CONFIG_GFS2_FS
+	    enable_config "${defconfig}" CONFIG_MINIX_FS
+	    ;;
+	"smp")
 	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP
 	    enable_config "${defconfig}" CONFIG_SCHED_SMT
-	elif [[ "${fixup}" == "nosmp" ]]; then
+	    ;;
+	"nosmp")
 	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP
 	    disable_config "${defconfig}" CONFIG_SCHED_SMT
-	fi
+	    ;;
+	esac
     done
 }
 
@@ -83,7 +97,7 @@ runkernel()
 	build+=":${rootfs##*.}"
     fi
 
-    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
+    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}" "${fs}@${rootfs}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
@@ -117,20 +131,6 @@ echo
 
 retcode=0
 
-# exfat only works with v5.10 and later
-if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    exfat=":fstest=exfat"
-else
-    exfat=""
-fi
-
-# btrfs only works with v6.1 and later and otherwise fails to run init
-if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
-    btrfs="btrfs"
-else
-    btrfs="ext2"
-fi
-
 # Disable CD support to avoid DMA memory allocation errors
 
 runkernel malta_defconfig nocd:smp:net=e1000 rootfs-n32.cpio
@@ -139,10 +139,10 @@ runkernel malta_defconfig nocd:smp:net=e1000:flash4,1,1 rootfs-n64.squashfs
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net=e1000-82544gc:ide rootfs-n32.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=i82801:sdhci-mmc:fstest=hfs rootfs-n64.ext2
+runkernel malta_defconfig nocd:smp:net=i82801:sdhci-mmc rootfs-n64.ext2
 retcode=$((retcode + $?))
 
-runkernel malta_defconfig nocd:smp:net=pcnet:nvme:fstest=hfs+ rootfs-n32.ext2
+runkernel malta_defconfig nocd:smp:net=pcnet:nvme rootfs-n32.ext2
 retcode=$((retcode + $?))
 
 runkernel malta_defconfig nocd:smp:net=ne2k_pci:usb-xhci rootfs-n32.${btrfs}
@@ -151,8 +151,41 @@ runkernel malta_defconfig nocd:smp:net=pcnet:usb-ehci rootfs-n32.ext2
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:net=rtl8139:usb-uas-xhci rootfs-n64.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=tulip:scsi[53C810]:fstest=xfs rootfs-n32.ext2
+runkernel malta_defconfig nocd:smp:net=tulip:scsi[53C810] rootfs-n32.ext2
 retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Run all file system tests, even those known to fail
+    runkernel malta_defconfig fstest:ps4:nocd:smp:net=e1000:ide rootfs-n32.btrfs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:ps4:nocd:smp:net=e1000:ide rootfs-n32.erofs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:ps4:nocd:smp:net=e1000:ide rootfs-n32.f2fs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide rootfs-n32.btrfs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide rootfs-n32.erofs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide rootfs-n32.f2fs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=exfat rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=hfs rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=hfs+ rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=gfs2 rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=jfs rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=minix rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=nilfs2 rootfs-n32.ext2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig fstest:nocd:smp:net=e1000:ide:fstest=xfs rootfs-n32.ext2
+    retcode=$((retcode + $?))
+
+fi
 
 if [[ ${runall} -ne 0 ]]; then
     # sym0: interrupted SCRIPT address not found
