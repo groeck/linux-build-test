@@ -29,31 +29,40 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
-	r1)
+	"ps4")
+	    # Some file systems only work with 4k page size
+	    disable_config "${defconfig}" CONFIG_PAGE_SIZE_16KB
+	    enable_config "${defconfig}" CONFIG_PAGE_SIZE_4KB
+	    ;;
+	"fstest")
+	    # File system support
+	    enable_config "${defconfig}" CONFIG_F2FS_FS
+	    enable_config ${defconfig} CONFIG_EROFS_FS
+	    enable_config ${defconfig} CONFIG_EXFAT_FS
+	    enable_config ${defconfig} CONFIG_F2FS_FS
+	    enable_config ${defconfig} CONFIG_GFS2_FS
+	    enable_config ${defconfig} CONFIG_HFS_FS
+	    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+	    enable_config ${defconfig} CONFIG_JFS_FS
+	    enable_config ${defconfig} CONFIG_MINIX_FS
+	    enable_config ${defconfig} CONFIG_NILFS2_FS
+	    enable_config ${defconfig} CONFIG_XFS_FS
+	    ;;
+	"r1")
 	    enable_config "${defconfig}" CONFIG_CPU_MIPS64_R1
 	    ;;
-	r2)
+	"r2")
 	    enable_config "${defconfig}" CONFIG_CPU_MIPS64_R2
 	    ;;
-	nosmp)
+	"nosmp")
 	    disable_config "${defconfig}" CONFIG_MIPS_MT_SMP CONFIG_SCHED_SMT
 	    ;;
-	smp)
+	"smp")
 	    enable_config "${defconfig}" CONFIG_MIPS_MT_SMP CONFIG_SCHED_SMT
 	    ;;
 	esac
     done
 
-    # Enable various file systems
-    # Note: erofs and f2fs only boot from an entire disk,
-    # and thus can not be used to run file system tests.
-    enable_config ${defconfig} CONFIG_EROFS_FS
-    enable_config ${defconfig} CONFIG_F2FS_FS
-    enable_config ${defconfig} CONFIG_HFS_FS
-    enable_config ${defconfig} CONFIG_HFSPLUS_FS
-    enable_config ${defconfig} CONFIG_MINIX_FS
-    enable_config ${defconfig} CONFIG_NILFS2_FS
-    enable_config ${defconfig} CONFIG_XFS_FS
 
     enable_config "${defconfig}" CONFIG_BINFMT_MISC CONFIG_64BIT
     enable_config "${defconfig}" CONFIG_MIPS32_O32 CONFIG_MIPS32_N32
@@ -148,13 +157,45 @@ fi
 # Network tests:
 # - i82551 fails to instantiate
 
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000:fstest=xfs
+if [[ ${runall} -ne 0 ]]; then
+    # Run all file system tests, even those known to fail
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs fstest:ps4:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.erofs fstest:ps4:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.f2fs fstest:ps4:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs fstest:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.erofs fstest:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.f2fs fstest:r1:smp:ide:net=e1000
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=exfat
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=gfs2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=hfs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=hfs+
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=jfs
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=minix
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=nilfs2
+    retcode=$((retcode + $?))
+    runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=xfs
+    retcode=$((retcode + $?))
+fi
+
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000
 retcode=$?
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net=pcnet
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net=pcnet:flash4,1,1
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550:fstest=nilfs2
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net=i82558a
 retcode=$((retcode + $?))
@@ -162,15 +203,15 @@ runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net=u
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net=ne2k_pci
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139:fstest=hfs+
+runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801:fstest=hfs
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.${btrfs} r1:smp:net=pcnet:nvme
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.${btrfs} r1:smp:scsi[DC395]:net=virtio-net
 retcode=$((retcode + $?))
-runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip:fstest=minix
+runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip
 retcode=$((retcode + $?))
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net=i82559er
 retcode=$((retcode + $?))
@@ -188,7 +229,7 @@ runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.${erofs} notests:nonet:s
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.btrfs notests:nonet:smp:ide:fstest=xfs
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.btrfs notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.iso notests:nonet:smp:ide
 retcode=$((retcode + $?))
