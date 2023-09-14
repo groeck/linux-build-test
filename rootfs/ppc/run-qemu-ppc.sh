@@ -12,6 +12,7 @@ shift $((OPTIND - 1))
 machine=$1
 variant=$2
 config=$3
+_rootfs=$4
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-ppc}
 
@@ -45,8 +46,12 @@ patch_defconfig()
 	    enable_config ${defconfig} CONFIG_GFS2_FS
 	    enable_config ${defconfig} CONFIG_HFS_FS
 	    enable_config ${defconfig} CONFIG_HFSPLUS_FS
+	    enable_config ${defconfig} CONFIG_JFS_FS
 	    enable_config ${defconfig} CONFIG_NILFS2_FS
 	    enable_config ${defconfig} CONFIG_XFS_FS
+	    # enable for testing
+	    enable_config ${defconfig} CONFIG_F2FS_FS
+	    enable_config ${defconfig} CONFIG_MINIX_FS
 	    ;;
 	"e500")
 	    enable_config ${defconfig} CONFIG_PPC_QEMU_E500
@@ -89,7 +94,7 @@ runkernel()
 
     local pbuild="ppc:${rbuild}"
 
-    if ! match_params "${machine}@${mach}" "${variant}@${fixup}" "${config}@${defconfig}"; then
+    if ! match_params "${machine}@${mach}" "${variant}@${fixup}" "${config}@${defconfig}" "${_rootfs}@${rootfs}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -156,35 +161,68 @@ echo
 # net=sungem does not instantiate
 # net=usb-uhci does not instantiate
 retcode=0
-runkernel mpc85xx_defconfig "fstest::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "fstest::scsi[53C895A]:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "::scsi[53C895A]:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig "fstest::sata-sii3112:net=rtl8139:fstest=hfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig "::sata-sii3112:net=rtl8139" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_defconfig fstest::sdhci-mmc:net=usb-ohci:fstest=hfs+ mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_defconfig ::sdhci-mmc:net=usb-ohci mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
     # NVME interrupts (or more generally PCI interrupts) are not received by host OS
-    runkernel mpc85xx_defconfig fstest::nvme:fstest=xfs mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
-    retcode=$((${retcode} + $?))
-    # timeout, no error message
-    runkernel mpc85xx_smp_defconfig fstest::scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    runkernel mpc85xx_defconfig "::nvme" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
 fi
-runkernel mpc85xx_smp_defconfig "fstest::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
+
+if [[ ${runall} -ne 0 ]]; then
+    # Run all file system tests, even those known to fail
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000" mpc8544ds "" ttyS0 rootfs.f2fs arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000" mpc8544ds "" ttyS0 rootfs.erofs arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=exfat" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=hfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=hfs+" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=gfs2" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=jfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=minix" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=nilfs2" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+    runkernel mpc85xx_smp_defconfig "fstest::sdhci-mmc:net=e1000:fstest=xfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+fi
+
+if [[ ${runall} -ne 0 ]]; then
+    # timeout, no error message
+    runkernel mpc85xx_smp_defconfig ::scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+    retcode=$((${retcode} + $?))
+fi
+
+runkernel mpc85xx_smp_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "fstest::scsi[DC395]:net=i82550:fstest=xfs" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::scsi[DC395]:net=i82550" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "fstest::scsi[53C895A]:net=usb-ohci:fstest=nilfs2" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::scsi[53C895A]:net=usb-ohci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
-runkernel mpc85xx_smp_defconfig "fstest::sata-sii3112:net=ne2k_pci:fstest=exfat" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
+runkernel mpc85xx_smp_defconfig "::sata-sii3112:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 
 runkernel 44x/bamboo_defconfig "fstest::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "fstest::scsi[AM53C974]:net=e1000:fstest=gfs2" bamboo "" ttyS0 rootfs.ext2 vmlinux
+runkernel 44x/bamboo_defconfig "fstest::scsi[AM53C974]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp::net=tulip" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
