@@ -21,11 +21,21 @@ patch_defconfig()
 {
     local defconfig=$1
 
+    # Starting with v5.6, we need to have DMA_BCM2835 built into the
     enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
 
-    # Enable f2fs and erofs
-    enable_config ${defconfig} CONFIG_F2FS_FS
-    enable_config ${defconfig} CONFIG_EROFS_FS CONFIG_EROFS_FS_ZIP
+    # File system support
+    enable_config "${defconfig}" CONFIG_EXFAT_FS
+    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
+    enable_config "${defconfig}" CONFIG_HFS_FS
+    enable_config "${defconfig}" CONFIG_JFS_FS
+    enable_config "${defconfig}" CONFIG_NILFS2_FS
+    enable_config "${defconfig}" CONFIG_XFS_FS
+
+    enable_config "${defconfig}" CONFIG_EROFS_FS
+    enable_config "${defconfig}" CONFIG_F2FS_FS
+    enable_config "${defconfig}" CONFIG_GFS2_FS
+    enable_config "${defconfig}" CONFIG_MINIX_FS
 
     # Starting with v5.14, CONFIG_USB_XHCI_PCI_RENESAS=m is enabled.
     # This results in CONFIG_USB_XHCI_PCI=m, which in turn causes some
@@ -131,6 +141,33 @@ fi
 
 # kown net test failures:
 #	i82551, usb-net= i82557a, i82557b
+
+# file system tests
+if [[ ${runall} -ne 0 ]]; then
+    # Run all file system tests, even those known to fail
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme "rootfs.btrfs"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme "rootfs.erofs"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme "rootfs.f2fs"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=exfat "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=gfs2 "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=hfs "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=hfs+ "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=jfs "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=minix "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=nilfs2 "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=xfs "rootfs.ext2"
+    retcode=$((retcode + $?))
+fi
 
 runkernel virt defconfig smp:net=e1000:mem512 rootfs.cpio
 retcode=$?
