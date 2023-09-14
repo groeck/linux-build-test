@@ -32,6 +32,7 @@ patch_defconfig()
     echo "CONFIG_GFS2_FS=y" >> ${defconfig}
     echo "CONFIG_HFSPLUS_FS=y" >> ${defconfig}
     echo "CONFIG_HFS_FS=y" >> ${defconfig}
+    echo "CONFIG_JFS_FS=y" >> ${defconfig}
     echo "CONFIG_MINIX_FS=y" >> ${defconfig}
     echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
     echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
@@ -176,7 +177,7 @@ checkstate ${retcode}
 runkernel defconfig smp4:net=i82559c:efi32:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp4:net=i82559c:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
+runkernel defconfig smp4:net=i82559c:mem256:scsi[MEGASAS2]:fstest=jfs Opteron_G5 q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp4:net=i82559c:mem256:scsi[MEGASAS2] Opteron_G5 pc rootfs.ext2
