@@ -202,7 +202,7 @@ fi
 
 runkernel malta_defconfig nocd:smp:net=virtio-net:scsi[DC395] rootfs-n64.ext2
 retcode=$((retcode + $?))
-runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974]${exfat} rootfs-n32.ext2
+runkernel malta_defconfig nocd:smp:net=i82562:scsi[AM53C974] rootfs-n32.ext2
 retcode=$((retcode + $?))
 runkernel malta_defconfig nocd:smp:pci-bridge:net=e1000:scsi[MEGASAS] rootfs-n64.ext2
 retcode=$((retcode + $?))
