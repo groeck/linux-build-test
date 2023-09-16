@@ -27,6 +27,9 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    enable_config "${defconfig}" CONFIG_F2FS_FS
+    enable_config ${defconfig} CONFIG_EROFS_FS
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	"ps4")
@@ -36,8 +39,6 @@ patch_defconfig()
 	    ;;
 	"fstest")
 	    # File system support
-	    enable_config "${defconfig}" CONFIG_F2FS_FS
-	    enable_config ${defconfig} CONFIG_EROFS_FS
 	    enable_config ${defconfig} CONFIG_EXFAT_FS
 	    enable_config ${defconfig} CONFIG_F2FS_FS
 	    enable_config ${defconfig} CONFIG_GFS2_FS
