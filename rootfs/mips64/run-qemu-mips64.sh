@@ -131,6 +131,13 @@ echo
 
 retcode=0
 
+# btrfs only works with v6.1 and later; earlier kernels need 4k page size
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+    btrfs="btrfs"
+else
+    btrfs="ext2"
+fi
+
 # Disable CD support to avoid DMA memory allocation errors
 
 runkernel malta_defconfig nocd:smp:net=e1000 rootfs-n32.cpio
