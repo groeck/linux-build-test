@@ -1365,7 +1365,8 @@ __setup_fragment()
 	# clock unit tests seem to introduce noise warning tracebacks
 	# enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST CONFIG_STACKINIT_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
+	# Results in lots of "ASoC: Parent card not yet available" log messages
+	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
 	# other
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
