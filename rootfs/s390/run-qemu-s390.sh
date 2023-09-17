@@ -105,6 +105,12 @@ else
     erofs="ext2"
 fi
 
+# exfat is not supported in v5.4 and older
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    exfat=":fstest=exfat"
+else
+    exfat=""
+fi
 # locktests takes way too long for this architecture.
 
 runkernel defconfig "nolocktests:smp2:net=default" rootfs.cpio
@@ -116,7 +122,7 @@ checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=default:fstest=hfs+ rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=igb:fstest=exfat rootfs.ext2
+runkernel defconfig "nolocktests:smp2:scsi[virtio-ccw]:net=igb${exfat}" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:virtio-pci:net=virtio-net-pci:fstest=nilfs2 rootfs.ext2
