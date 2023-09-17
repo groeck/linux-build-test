@@ -22,17 +22,16 @@ patch_defconfig()
     local defconfig=$1
 
     # File system support
-    enable_config "${defconfig}" CONFIG_EXFAT_FS
-    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
-    enable_config "${defconfig}" CONFIG_HFS_FS
-    enable_config "${defconfig}" CONFIG_JFS_FS
-    enable_config "${defconfig}" CONFIG_NILFS2_FS
-    enable_config "${defconfig}" CONFIG_XFS_FS
-
     enable_config "${defconfig}" CONFIG_EROFS_FS
+    enable_config "${defconfig}" CONFIG_EXFAT_FS
     enable_config "${defconfig}" CONFIG_F2FS_FS
     enable_config "${defconfig}" CONFIG_GFS2_FS
+    enable_config "${defconfig}" CONFIG_HFS_FS
+    enable_config "${defconfig}" CONFIG_HFSPLUS_FS
+    enable_config "${defconfig}" CONFIG_JFS_FS
     enable_config "${defconfig}" CONFIG_MINIX_FS
+    enable_config "${defconfig}" CONFIG_NILFS2_FS
+    enable_config "${defconfig}" CONFIG_XFS_FS
 
     # Starting with v5.6, we need to have DMA_BCM2835 built into the
     # kernel because MMC code using may otherwise fail with -EPROBE_DEFER.
@@ -130,7 +129,14 @@ runkernel()
 echo "Build reference: $(git describe --match 'v*')"
 echo
 
-# erofs is not supported in older kernels
+# exfat is not supported in v5.4 and older
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    exfat=":fstest=exfat"
+else
+    exfat=""
+fi
+
+# erofs is not supported in v4.19 and older
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
     erofs="erofs"
 else
@@ -149,13 +155,13 @@ runkernel virt defconfig smp2:net=i82550:mem512:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:net=ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp6:net=pcnet:mem512:virtio rootfs.ext2
+runkernel virt defconfig smp6:net=pcnet:mem512:virtio:fstest=minix rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp8:net=rtl8139:mem512:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp:net=tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig smp2:net=virtio-net:mem512:nvme rootfs.btrfs
+runkernel virt defconfig "smp2:net=virtio-net:mem512:nvme${exfat}" rootfs.btrfs
 retcode=$((retcode + $?))
 runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.${erofs}"
 retcode=$((retcode + $?))
@@ -163,15 +169,15 @@ runkernel virt defconfig "smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.f2fs"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp8:net=i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net=i82558b:mem512:scsi[MEGASAS]" rootfs.ext2
+runkernel virt defconfig "smp2:net=i82558b:mem512:scsi[MEGASAS]:fstest=hfs" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp4:net=i82559er:mem512:scsi[MEGASAS2]" rootfs.btrfs
+runkernel virt defconfig "smp4:net=i82559er:mem512:scsi[MEGASAS2]:fstest=hfs+" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp6:net=e1000-82544gc:mem512:scsi[53C810]" rootfs.ext2
+runkernel virt defconfig "smp6:net=e1000-82544gc:mem512:scsi[53C810]:fstest=jfs" rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp8:net=e1000-82545em:mem512:scsi[53C895A]" rootfs.btrfs
+runkernel virt defconfig "smp8:net=e1000-82545em:mem512:scsi[53C895A]:fstest=nilfs2" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp:net=pcnet:mem512:scsi[FUSION]" rootfs.ext2
+runkernel virt defconfig "smp:net=pcnet:mem512:scsi[FUSION]:fstest=xfs" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:net=usb-ohci:mem512:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
