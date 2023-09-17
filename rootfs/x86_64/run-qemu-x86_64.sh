@@ -111,11 +111,25 @@ echo
 
 retcode=0
 
+# exfat is not supported in v5.4 and older
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    exfat=":fstest=exfat"
+else
+    exfat=""
+fi
+
 # erofs is only supported in v5.4 and later
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
     erofs="erofs"
 else
     erofs="ext2"
+fi
+
+# gfs2 needs v5.15 or later
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+    gfs2=":fstest=gfs2"
+else
+    gfs2=""
 fi
 
 # runkernel defconfig kvm64 q35
@@ -126,7 +140,7 @@ checkstate ${retcode}
 runkernel defconfig smp:net=e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp2:net=i82801:efi:mem512:nvme:fstest=exfat IvyBridge q35 rootfs.btrfs
+runkernel defconfig "smp2:net=i82801:efi:mem512:nvme${exfat}" IvyBridge q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp4:net=ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
@@ -223,7 +237,7 @@ checkstate ${retcode}
 runkernel defconfig preempt:smp4:net=ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig preempt:smp8:net=i82557a:mem4G:nvme:fstest=gfs2 Icelake-Server q35 rootfs.btrfs
+runkernel defconfig "preempt:smp8:net=i82557a:mem4G:nvme${gfs2}" Icelake-Server q35 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig preempt:smp2:net=i82558b:efi32:mem1G:sdhci-mmc Skylake-Client-IBRS q35 rootfs.ext2
