@@ -39,7 +39,7 @@ runkernel()
     # the pcnet driver does not clear its rx buffer ring
     # which causes random qemu hiccups.
     if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-        fixup="$(echo ${fixup} | sed -e 's/net=pcnet/net,rtl8139/')"
+        fixup="$(echo ${fixup} | sed -e 's/net=pcnet/net=rtl8139/')"
     fi
 
     local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
