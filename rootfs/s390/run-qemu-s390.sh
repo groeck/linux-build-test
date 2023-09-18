@@ -30,11 +30,6 @@ fi
 
 PATH=${PATH_S390}:${PATH}
 
-# net=igb only works starting with 5.10
-skip_414="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
-skip_419="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
-skip_54="s390:defconfig:nolocktests:smp2:scsi[virtio-ccw]:net=igb:rootfs"
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -111,6 +106,14 @@ if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
 else
     exfat=""
 fi
+
+# net=igb only works starting with 5.10
+if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    igbnet="igb"
+else
+    igbnet="default"
+fi
+
 # locktests takes way too long for this architecture.
 
 runkernel defconfig "nolocktests:smp2:net=default" rootfs.cpio
@@ -122,7 +125,7 @@ checkstate ${retcode}
 runkernel defconfig nolocktests:smp2:scsi[virtio-ccw]:net=default:fstest=hfs+ rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "nolocktests:smp2:scsi[virtio-ccw]:net=igb${exfat}" rootfs.ext2
+runkernel defconfig "nolocktests:smp2:scsi[virtio-ccw]:net=${igbnet}${exfat}" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:virtio-pci:net=virtio-net-pci:fstest=nilfs2 rootfs.ext2
