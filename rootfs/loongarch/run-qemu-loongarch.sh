@@ -92,7 +92,7 @@ echo "Build reference: $(git describe --match 'v*')"
 echo
 
 nodebug=""
-if [[ ${linux_version_code} -lt $(kernel_version 6 4) && "${runall}" -eq 0 ]]; then
+if [[ ${linux_version_code} -le $(kernel_version 6 1) && "${runall}" -eq 0 ]]; then
     # nodebug to reduce boot time
     nodebug="nodebug"
     # lock tests result in traceback, sometimes hang with endless
