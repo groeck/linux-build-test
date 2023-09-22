@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-QEMU="${QEMU:-${QEMU_BIN}/qemu-system-loongarch64}"
+QEMU="${QEMU:-${QEMU_V81_BIN}/qemu-system-loongarch64}"
 
 # loongarch needs gcc 13.x+ when using binutils 2.40.
 PATH_LOONGARCH="/opt/kernel/${DEFAULT_CC13}/loongarch64-linux-gnu/bin"
@@ -82,7 +82,7 @@ runkernel()
       ${QEMU} -M ${mach} -cpu la464 -kernel arch/loongarch/boot/vmlinuz.efi \
 	-smp 2 -no-reboot -m 4G \
 	${extra_params} \
-	--append "${initcli} console=ttyS0,115200" \
+	--append "${initcli} console=ttyS0,115200 earlycon=uart8250,mmio,0x1fe001e0,115200n8" \
 	-nographic -serial stdio -monitor none
 
     return $?
