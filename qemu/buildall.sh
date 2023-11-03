@@ -101,43 +101,29 @@ dobuild_common()
 {
     dobuild $1 $2 \
 	"--disable-user --disable-gnutls --disable-docs \
-	--disable-nettle --disable-gcrypt --disable-hax \
+	--disable-nettle --disable-gcrypt \
 	--disable-xen --disable-xen-pci-passthrough \
-	--disable-libssh $3"
+	--disable-libssh --disable-png $3"
     checkexit $?
 }
 
-if [ -z "$1" -o "$1" = "v4.2" ]; then
-    dobuild_common v4.2.1-local v4.2 "--disable-vnc-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v7.1" ]; then
-    dobuild_common v7.1.0-local v7.1 "--disable-png"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
 if [ -z "$1" -o "$1" = "v7.2" ]; then
-    dobuild_common v7.2.5-local v7.2 "--disable-png"
+    dobuild_common v7.2.5-local v7.2 "--disable-hax"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v8.0" ]; then
-    dobuild_common v8.0.4-local v8.0 "--disable-png --disable-strip --extra-cflags=-g"
+    dobuild_common v8.0.4-local v8.0 "--disable-hax --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v8.1" ]; then
-    dobuild_common v8.1.1-local v8.1 "--disable-png --disable-strip --extra-cflags=-g"
-#    dobuild_common v8.1.0-local v8.1-debug \
+    dobuild_common v8.1.2-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
+#    dobuild_common v8.1.2-local v8.1-debug \
 #	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
@@ -145,7 +131,7 @@ if [ -z "$1" -o "$1" = "v8.1" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "master" ]; then
-    dobuild_common master-local master "--disable-png --disable-strip"
+    dobuild_common master-local master "--disable-strip"
     # While it would be desirable to have debugging enabled in general,
     # it slows down the system too much. Generate separate master-debug
     # specifically for to have images with debugging enabled available
