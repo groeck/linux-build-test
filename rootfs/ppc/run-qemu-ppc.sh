@@ -220,9 +220,9 @@ retcode=$((${retcode} + $?))
 runkernel mpc85xx_smp_defconfig "::sata-sii3112:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
 
-runkernel 44x/bamboo_defconfig "fstest::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
+runkernel 44x/bamboo_defconfig "::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
-runkernel 44x/bamboo_defconfig "fstest::scsi[AM53C974]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
+runkernel 44x/bamboo_defconfig "::scsi[AM53C974]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
 runkernel 44x/bamboo_defconfig "smp::net=tulip" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
