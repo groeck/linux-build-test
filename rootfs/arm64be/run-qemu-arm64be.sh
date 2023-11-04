@@ -31,6 +31,7 @@ patch_defconfig()
     enable_config "${defconfig}" CONFIG_JFS_FS
     enable_config "${defconfig}" CONFIG_NILFS2_FS
     enable_config "${defconfig}" CONFIG_XFS_FS
+    enable_config "${defconfig}" CONFIG_BCACHEFS_FS
 
     enable_config "${defconfig}" CONFIG_EROFS_FS
     enable_config "${defconfig}" CONFIG_F2FS_FS
@@ -166,6 +167,8 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=nilfs2 "rootfs.ext2"
     retcode=$((retcode + $?))
     runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=xfs "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=bcachefs "rootfs.ext2"
     retcode=$((retcode + $?))
 fi
 
