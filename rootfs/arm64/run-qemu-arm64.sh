@@ -32,6 +32,7 @@ patch_defconfig()
     enable_config "${defconfig}" CONFIG_MINIX_FS
     enable_config "${defconfig}" CONFIG_NILFS2_FS
     enable_config "${defconfig}" CONFIG_XFS_FS
+    enable_config "${defconfig}" CONFIG_BCACHEFS_FS
 
     # Starting with v5.6, we need to have DMA_BCM2835 built into the
     # kernel because MMC code using may otherwise fail with -EPROBE_DEFER.
@@ -213,6 +214,8 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=nilfs2 "rootfs.ext2"
     retcode=$((retcode + $?))
     runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=xfs "rootfs.ext2"
+    retcode=$((retcode + $?))
+    runkernel virt defconfig smp4:net=e1000:mem512:nvme:fstest=bcachefs "rootfs.ext2"
     retcode=$((retcode + $?))
 fi
 
