@@ -378,7 +378,7 @@ dumplog()
     sed -i -e "s/${basedir}//" "${log}"
 
     # Empty lines are irrelevant / don't add value.
-    sed -i -e '/^$/d' "${log}"
+    sed -i -e '/^[ 	]*$/d' "${log}"
 
     echo "--------------"
     echo "Error log:"
