@@ -73,7 +73,7 @@ fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
 	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
 
 # We don't want to be in the business of arguing about frame sizes
-fixup_x86_64=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=4096/")
+fixup_x86_64=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
 
 # Plugins need gcc 14.1, 13.3, or 12.4 to work.
 # See https://gcc.gnu.org/r14-3331 for details.
