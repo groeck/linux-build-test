@@ -10,6 +10,9 @@ CV12="12.2.0-2.39"
 CV123="12.3.0-2.40"
 CV13="13.1.0-2.40"
 
+# gcc version to use for building perf
+GCC_PERF="gcc-11"
+
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
@@ -414,20 +417,12 @@ do
 
 	# perf build is special. Use host compiler and build based on defconfig.
 	if [[ "${cmd[$i]}" = "tools/perf" ]]; then
-	    case ${rel} in
-	    v4.14)
-		# perf in v4.14 doesn't build with gcc-10 and later
-		GCC="gcc-9";;
-	    *)
-		GCC="gcc-10";;
-	    esac
-
-	    if ! make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC}" defconfig >/dev/null 2>${LOG}; then
+	    if ! make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC_PERF}" defconfig >/dev/null 2>${LOG}; then
 		echo "failed (config)"
 		dumplog 100 "${LOG}"
 		continue
 	    fi
-	    make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC}" NO_LIBTRACEEVENT=1 NO_BPF_SKEL=1 "${cmd[$i]}" >/dev/null 2>${LOG}
+	    make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC_PERF}" NO_LIBTRACEEVENT=1 NO_BPF_SKEL=1 "${cmd[$i]}" >/dev/null 2>${LOG}
 	    rv=$?
 	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
