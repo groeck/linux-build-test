@@ -1368,6 +1368,7 @@ __setup_fragment()
 	# Results in lots of "ASoC: Parent card not yet available" log messages
 	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
 	# other
+	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
