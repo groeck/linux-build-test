@@ -252,9 +252,9 @@ if [[ ${runall} -ne 0 ]]; then
     retcode=$((retcode + $?))
 fi
 
-runkernel raspi3b defconfig smp:net=usb:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
-runkernel raspi3b defconfig smp4:net=usb:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+runkernel raspi3b defconfig smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio
