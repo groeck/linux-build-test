@@ -7,9 +7,11 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-_fixup=$1
+_machine=$1
+_fixup=$2
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
+# QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
+QEMU=${QEMU:-${QEMU_V82_BIN}/qemu-system-hppa}
 
 PREFIX=hppa-linux-
 ARCH=parisc
@@ -30,9 +32,10 @@ patch_defconfig()
 
 runkernel()
 {
-    local defconfig="generic-32bit_defconfig"
-    local fixup=$1
-    local rootfs=$2
+    local machine=$1
+    local config=$2
+    local fixup=$3
+    local rootfs=$4
     local waitlist=("reboot: Restarting system" "Boot successful" "SeaBIOS wants SYSTEM RESET")
 
     # pcnet tests need v5.4 or later kernels. On older kernels,
@@ -42,8 +45,8 @@ runkernel()
         fixup="$(echo ${fixup} | sed -e 's/net=pcnet/net=rtl8139/')"
     fi
 
-    local build="${ARCH}:${defconfig}${fixup:+:${fixup}}"
-    local cache="${defconfig}:${fixup//smp*/smp}"
+    local build="${ARCH}:${machine}${fixup:+:${fixup}}"
+    local cache="${config}:${fixup//smp*/smp}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
 	build+=":initrd"
@@ -51,14 +54,14 @@ runkernel()
 	build+=":rootfs"
     fi
 
-    if ! match_params "${_fixup}@${fixup}"; then
+    if ! match_params "${_machine}@${machine}" "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
 
     echo -n "Building ${build} ... "
 
-    if ! dosetup -c "${cache}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${cache}" -F "${fixup}" "${rootfs}" "${config}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
@@ -66,7 +69,7 @@ runkernel()
     fi
 
     execute automatic waitlist[@] \
-      ${QEMU} -kernel vmlinux -no-reboot \
+      ${QEMU} -M ${machine} -kernel vmlinux -no-reboot \
 	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 ${extracli}" \
 	-nographic -monitor null
@@ -95,77 +98,101 @@ echo
 #	"WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988"
 
 retcode=0
-runkernel smp:net=e1000 rootfs.cpio.gz
+runkernel B160L generic-32bit_defconfig smp:net=e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net=e1000-82544gc:sdhci-mmc rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig smp:net=e1000-82544gc:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net=virtio-net:nvme rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig smp:net=virtio-net:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel smp:net=pcnet:scsi rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig smp:net=pcnet:scsi rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net=pcnet:scsi[53C895A]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "smp:net=pcnet:scsi[53C895A]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel "smp:net=tulip:scsi[AM53C974]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "smp:net=tulip:scsi[AM53C974]" rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Random crashes in sym_evaluate_dp(), called from sym_compute_residual()
-    # (NULL pointer access). The probem is seen during shutdown. This is a
+    # (NULL pointer access). The problem is seen during shutdown. This is a
     # kernel bug, obviously, likely caused by timing differences. It is
     # possible if not likely that an interrupt is seen after the controller
     # was presumably disabled.
-    runkernel "smp:scsi[53C810]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "smp:scsi[53C810]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
     # panic: arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map.
-    runkernel "smp:scsi[MEGASAS]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel "smp:scsi[MEGASAS2]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "smp:scsi[MEGASAS2]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel "smp:scsi[FUSION]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 
+# e1000 and e1000-82544gc don't work for C3700
+# ne2k_pci hangs with spinlock recursion
+runkernel C3700 generic-64bit_defconfig smp:net=pcnet rootfs.cpio.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig smp:net=virtio-net:nvme rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig smp:net=i82801:usb-uas-ehci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig smp:net=tulip:usb-xhci rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig smp:net=usb-xhci:sdhci-mmc rootfs.ext2.gz
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
 # Run remaining tests with SMP disabled
-runkernel nosmp:net=e1000:usb-ohci rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=e1000:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=virtio-net:usb-ehci rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=virtio-net:usb-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=pcnet:usb-xhci rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=pcnet:usb-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=usb-ohci:usb-uas-ehci rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=usb-ohci:usb-uas-ehci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=rtl8139:usb-uas-xhci rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=rtl8139:usb-uas-xhci rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 # duplicate some of the previous tests, with SMP disabled
-runkernel nosmp:net=e1000 rootfs.cpio.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=e1000 rootfs.cpio.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=tulip:sdhci-mmc rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=tulip:sdhci-mmc rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel nosmp:net=e1000:nvme rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig nosmp:net=e1000:nvme rootfs.ext2.gz
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
