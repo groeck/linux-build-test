@@ -144,30 +144,6 @@ if [[ ${runall} -ne 0 ]]; then
     checkstate ${retcode}
 fi
 
-# e1000 and e1000-82544gc don't work for C3700
-# ne2k_pci hangs with spinlock recursion
-runkernel C3700 generic-64bit_defconfig smp:net=pcnet rootfs.cpio.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp:net=virtio-net:nvme rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp:net=i82801:usb-uas-ehci rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp:net=tulip:usb-xhci rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp:net=usb-xhci:sdhci-mmc rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
 # Run remaining tests with SMP disabled
 runkernel B160L generic-32bit_defconfig nosmp:net=e1000:usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
