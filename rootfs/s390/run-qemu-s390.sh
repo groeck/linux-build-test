@@ -16,7 +16,7 @@ else
     cpu="qemu"
 fi
 
-QEMU=${QEMU:-${QEMU_V81_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_V82_BIN}/qemu-system-s390x}
 
 PREFIX=s390-linux-
 ARCH=s390
@@ -138,6 +138,9 @@ runkernel defconfig nolocktests:usb-xhci:net=e1000e "rootfs.${erofs}"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:usb-uas-xhci:net=usb-xhci:fstest=xfs rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel defconfig nolocktests:nvme:net=default rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
