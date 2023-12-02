@@ -1880,7 +1880,7 @@ dowait()
 
 	if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
 	    # Empty lines are irrelevant / don't add value.
-	    sed -i -e '/^[ \t]*$/d' "${logfile}"
+	    sed -i '/^[[:space:]]*$/d' "${logfile}"
 	    echo "------------"
 	    echo "qemu log:"
 	    head -5000 ${logfile}
