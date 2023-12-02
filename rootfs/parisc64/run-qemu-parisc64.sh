@@ -99,7 +99,7 @@ checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig smp::net=virtio-net:nvme rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp::net=usb-ohci:sata-cmd646 rootfs.ext2
+runkernel C3700 generic-64bit_defconfig smp::net=tulip:sata-cmd646 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig smp::net=i82801:usb-uas-ehci rootfs.ext2
@@ -123,7 +123,19 @@ checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig smp::net=pcnet:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig smp::net=usb-ohci:usb-uas-ehci rootfs.ext2
+
+if [[ ${runall} -ne 0 ]]; then
+    # Unstable, may result in hung task crash in usb_start_wait_urb/usb_kill_urb
+    # during shutdown, possibly/likely due to net=usb-ohci problems
+    runkernel C3700 generic-64bit_defconfig smp::net=usb-ohci:sata-cmd646 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig smp::net=usb-ohci:usb-uas-ehci rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
+
+runkernel C3700 generic-64bit_defconfig smp::net=tulip:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig smp::net=rtl8139:usb-uas-xhci rootfs.ext2
