@@ -115,15 +115,23 @@ if [ -z "$1" -o "$1" = "v7.2" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v8.0" ]; then
-    dobuild_common v8.0.4-local v8.0 "--disable-hax --disable-strip --extra-cflags=-g"
+    # Do not update to v8.0.5 - it fails fail borzoi ssd drive access
+    dobuild_common v8.0.4-local v8.0 "--disable-hax"
     if [ -n "$2" ]; then
 	shift
     fi
 fi
 
 if [ -z "$1" -o "$1" = "v8.1" ]; then
-    dobuild_common v8.1.2-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
-#    dobuild_common v8.1.2-local v8.1-debug \
+    dobuild_common v8.1.3-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
+    if [ -n "$2" ]; then
+	shift
+    fi
+fi
+
+if [ -z "$1" -o "$1" = "v8.2" ]; then
+    dobuild_common v8.2.0-local v8.2 "--disable-strip --extra-cflags=-g"
+#    dobuild_common v8.2.0-local v8.2-debug \
 #	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
