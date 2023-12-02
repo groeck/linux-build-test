@@ -35,19 +35,3 @@ git merge v2.4.0-rc3
 	--disable-xen-pci-passthrough
 
 make install
-
------------
-
-qemu for blackfin
-
-The blackfin port is not working (yet), or command line parameters
-are unknown.
-
-git remote add blackfin git@github.com:vapier/qemu.git
-git fetch blackfin
-git checkout -b blackfin blackfin/bfin
-[ or git checkout blackfin; git pull/merge blackfin/bfin]
-
-./configure --prefix=/opt/buildbot/qemu/bfin --disable-user --target-list bfin-softmmu --disable-werror
-make install
-(cd /opt/buildbot/bin; ln -s ../qemu/bfin/bin/qemu-system-bfin .)
