@@ -1181,6 +1181,17 @@ enable_config_cond()
     done
 }
 
+__domake()
+{
+    local CROSS32=""
+
+    if [ "${PREFIX32}" != "" ]; then
+        CROSS32="CROSS32_COMPILE=${PREFIX32}"
+    fi
+    make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${CROSS32} $* >/dev/null </dev/null
+    return $?
+}
+
 __setup_config()
 {
     local defconfig="$1"
@@ -1211,7 +1222,12 @@ __setup_config()
 	cp ${__progdir}/${defconfig} arch/${arch}/configs
     fi
 
-    if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${defconfig} >/dev/null 2>&1 </dev/null; then
+    CROSS32=""
+    if [ "${PREFIX32}" != "" ]; then
+        CROSS32="CROSS32_COMPILE=${PREFIX32}"
+    fi
+
+    if ! __domake ${defconfig} 2>/dev/null; then
 	return 2
     fi
 
@@ -1227,7 +1243,7 @@ __setup_config()
 
     if [ -n "${fixup}${fragment}" ]; then
 	target="olddefconfig"
-	if ! make ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${target} >/dev/null 2>&1 </dev/null; then
+	if ! __domake ${target} 2>/dev/null; then
 	    return 1
 	fi
     fi
@@ -1615,7 +1631,7 @@ dosetup()
     rootfs="$(setup_rootfs ${rootfs})"
     __common_fixups "${fixups}" "${rootfs}"
 
-    make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${EXTRAS} </dev/null >/dev/null 2>${logfile}
+    __domake ${EXTRAS} 2>${logfile}
     rv=$?
     if [ ${rv} -ne 0 ]
     then
