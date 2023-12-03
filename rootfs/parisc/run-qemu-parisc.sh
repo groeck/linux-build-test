@@ -46,13 +46,14 @@ runkernel()
     fi
 
     local build="${ARCH}:${machine}${fixup:+:${fixup}}"
-    local cache="${config}:${fixup//smp*/smp}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
+
+    build="${build//+(:)/:}"
 
     if ! match_params "${_machine}@${machine}" "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
@@ -61,7 +62,7 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    if ! dosetup -c "${cache}" -F "${fixup}" "${rootfs}" "${config}"; then
+    if ! dosetup -c "${config}${fixup%::*}" -F "${fixup}" "${rootfs}" "${config}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
@@ -98,28 +99,28 @@ echo
 #	"WARNING: CPU: 0 PID: 1 at drivers/parisc/dino.c:608 0x10120988"
 
 retcode=0
-runkernel B160L generic-32bit_defconfig smp:net=e1000 rootfs.cpio.gz
+runkernel B160L generic-32bit_defconfig ::net=e1000 rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig smp:net=e1000-82544gc:sdhci-mmc rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig ::net=e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig smp:net=virtio-net:nvme rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig ::net=virtio-net:nvme rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig smp:net=usb-ohci:sata-cmd646 rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig smp:net=pcnet:scsi rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig ::net=pcnet:scsi rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig "smp:net=pcnet:scsi[53C895A]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "::net=pcnet:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig "smp:net=rtl8139:scsi[DC395]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig "smp:net=tulip:scsi[AM53C974]" rootfs.ext2.gz
+runkernel B160L generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -129,46 +130,36 @@ if [[ ${runall} -ne 0 ]]; then
     # kernel bug, obviously, likely caused by timing differences. It is
     # possible if not likely that an interrupt is seen after the controller
     # was presumably disabled.
-    runkernel B160L generic-32bit_defconfig "smp:scsi[53C810]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "::scsi[53C810]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
     # panic: arch/parisc/kernel/pci-dma.c: pcxl_alloc_range() Too many pages to map.
-    runkernel B160L generic-32bit_defconfig "smp:scsi[MEGASAS]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "::scsi[MEGASAS]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel B160L generic-32bit_defconfig "smp:scsi[MEGASAS2]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "::scsi[MEGASAS2]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel B160L generic-32bit_defconfig "smp:scsi[FUSION]" rootfs.ext2.gz
+    runkernel B160L generic-32bit_defconfig "::scsi[FUSION]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 
-# Run remaining tests with SMP disabled
-runkernel B160L generic-32bit_defconfig nosmp:net=e1000:usb-ohci rootfs.ext2.gz
+# Run remaining tests with C3700 platform using the 32-bit configuration
+# Note: e1000 doesn't work with C3700
+runkernel C3700 generic-32bit_defconfig ::net=tulip:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=virtio-net:usb-ehci rootfs.ext2.gz
+runkernel C3700 generic-32bit_defconfig ::net=virtio-net:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=pcnet:usb-xhci rootfs.ext2.gz
+runkernel C3700 generic-32bit_defconfig ::net=pcnet:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=usb-ohci:usb-uas-ehci rootfs.ext2.gz
+runkernel C3700 generic-32bit_defconfig ::net=usb-ohci:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=rtl8139:usb-uas-xhci rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
-# duplicate some of the previous tests, with SMP disabled
-runkernel B160L generic-32bit_defconfig nosmp:net=e1000 rootfs.cpio.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=tulip:sdhci-mmc rootfs.ext2.gz
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig nosmp:net=e1000:nvme rootfs.ext2.gz
+runkernel C3700 generic-32bit_defconfig ::net=rtl8139:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
