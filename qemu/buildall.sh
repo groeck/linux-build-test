@@ -115,8 +115,7 @@ if [ -z "$1" -o "$1" = "v7.2" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v8.0" ]; then
-    # Do not update to v8.0.5 - it fails fail borzoi ssd drive access
-    dobuild_common v8.0.4-local v8.0 "--disable-hax"
+    dobuild_common v8.0.5-local v8.0 "--disable-hax"
     if [ -n "$2" ]; then
 	shift
     fi
