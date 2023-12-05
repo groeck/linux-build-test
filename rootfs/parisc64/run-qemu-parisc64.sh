@@ -108,9 +108,6 @@ checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig ::net=usb-xhci:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -122,6 +119,11 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
+    # May experience "Spurious irq, sreg=00", followed by "Aborting command"
+    # and hung task crash.
+    runkernel C3700 generic-64bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
     # Unstable, may result in hung task crash in usb_start_wait_urb/usb_kill_urb
     # during shutdown, possibly/likely due to net=usb-ohci problems
     runkernel C3700 generic-64bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.ext2
