@@ -192,8 +192,8 @@ __pcibridge_new_port()
     fi
 }
 
-# Use the following functions to ensure that usb-xhci is loaded exactly once
-# if needed.
+# Use the following functions to ensure that usb controllers are loaded
+# exactly once if needed.
 __init_usb_xhci()
 {
     __have_xhci=0
@@ -206,6 +206,41 @@ __load_usb_xhci()
 	extra_params+=" -device qemu-xhci,id=xhci${__pcibus_ref}"
 	__have_xhci=1
     fi
+}
+
+__init_usb_ohci()
+{
+    __have_ohci=0
+}
+
+__load_usb_ohci()
+{
+    if [[ ${__have_ohci} -eq 0 ]]; then
+	__pcibridge_new_port
+	extra_params+=" -device pci-ohci,id=ohci${__pcibus_ref}"
+	__have_ohci=1
+    fi
+}
+
+__init_usb_ehci()
+{
+    __have_ehci=0
+}
+
+__load_usb_ehci()
+{
+    if [[ ${__have_ehci} -eq 0 ]]; then
+	__pcibridge_new_port
+	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
+	__have_ehci=1
+    fi
+}
+
+__init_usb()
+{
+    __init_usb_ehci
+    __init_usb_ohci
+    __init_usb_xhci
 }
 
 __init_disk()
@@ -366,14 +401,12 @@ __common_usbcmd()
 
     case "${fixup}" in
     "usb-ohci")
-	__pcibridge_new_port
-	extra_params+=" -device pci-ohci,id=ohci${__pcibus_ref}"
+	__load_usb_ohci
 	extra_params+=" -device usb-storage,bus=ohci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-ehci")
-	__pcibridge_new_port
-	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
+	__load_usb_ehci
 	extra_params+=" -device usb-storage,bus=ehci.0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
@@ -420,8 +453,7 @@ __common_usbcmd()
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-uas-ehci")
-	__pcibridge_new_port
-	extra_params+=" -device usb-ehci,id=ehci${__pcibus_ref}"
+	__load_usb_ehci
 	extra_params+=" -device usb-uas,bus=ehci.0,id=uas"
 	extra_params+=" -device scsi-hd,bus=uas.0,scsi-id=0,lun=0,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,format=raw,id=d0"
@@ -779,9 +811,8 @@ __common_netcmd()
 	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
 	    ;;
 	"usb-ohci")
-	    __pcibridge_new_port
-	    extra_params+=" -device pci-ohci,id=ohci_net${__pcibus_ref}"
-	    extra_params+=" -device usb-net,bus=ohci_net.0,netdev=net0 -netdev user,id=net0"
+	    __load_usb_ohci
+	    extra_params+=" -device usb-net,bus=ohci.0,netdev=net0 -netdev user,id=net0"
 	    ;;
 	"usb-uhci")
 	    __pcibridge_new_port
@@ -893,7 +924,7 @@ __common_fixups()
     local rootfs="$2"
     local fixup
 
-    __init_usb_xhci
+    __init_usb
     __init_disk "${fixups}"
     __init_rootdev
 
@@ -1880,6 +1911,9 @@ dowait()
 
 	if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
 	    # Empty lines are irrelevant / don't add value.
+	    # First replace sequences of <cr> with a single <newline>
+	    sed -i 's/\r\+/\n/g'  "${logfile}"
+	    # Now remove empty lines
 	    sed -i '/^[[:space:]]*$/d' "${logfile}"
 	    echo "------------"
 	    echo "qemu log:"
