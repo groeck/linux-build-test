@@ -93,37 +93,66 @@ echo
 # e1000, e1000-82544gc: fail to enable interface
 
 retcode=0
-runkernel C3700 generic-64bit_defconfig ::net=pcnet rootfs.cpio
+runkernel C3700 generic-64bit_defconfig ::smp:net=pcnet rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=virtio-net:nvme rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp2:net=virtio-net:nvme rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=tulip:sata-cmd646 rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp4:net=tulip:sata-cmd646 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=i82801:usb-uas-ehci rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp6:net=i82801:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext2
+runkernel C3700 generic-64bit_defconfig "::smp4:net=rtl8139:scsi[DC395]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=usb-xhci:sdhci-mmc rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp2:net=usb-xhci:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=virtio-net:usb-ehci rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp2:net=virtio-net:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=pcnet:usb-xhci rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp4:net=pcnet:usb-xhci rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig "::smp6:net=pcnet:scsi[53C895A]" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig "::smp6:net=pcnet:scsi[53C810]" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[AM53C974]" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+runkernel C3700 generic-64bit_defconfig ::smp2:net=usb-ohci:sata-cmd646 rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig ::smp4:net=usb-xhci:usb-uas-ehci rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-64bit_defconfig ::smp4:net=usb-xhci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
-    # May experience "Spurious irq, sreg=00", followed by "Aborting command"
-    # and hung task crash.
-    runkernel C3700 generic-64bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.ext2
+    # scsi host1: scsi scan: INQUIRY result too short (5), using 36
+    # followed by
+    # megaraid_sas 0000:00:04.0: Unknown command completed!
+    # and hung task crash
+    runkernel C3700 generic-64bit_defconfig "::smp:net=pcnet:scsi[MEGASAS]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=usb-ohci:scsi[MEGASAS2]" rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    # complete silence; no log message from kernel boot
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[FUSION]" rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+
     # Unstable, may result in hung task crash in usb_start_wait_urb/usb_kill_urb
     # during shutdown, possibly/likely due to net=usb-ohci problems
     runkernel C3700 generic-64bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.ext2
@@ -132,12 +161,16 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel C3700 generic-64bit_defconfig ::net=usb-ohci:usb-uas-ehci rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
+    # NETDEV WATCHDOG: eth0 (cdc_ether): transmit queue 0 timed out 8444 ms
+    runkernel C3700 generic-64bit_defconfig ::smp4:net=usb-ohci:usb-ohci rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 
-runkernel C3700 generic-64bit_defconfig ::net=tulip:usb-uas-ehci rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp6:net=tulip:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-64bit_defconfig ::net=rtl8139:usb-uas-xhci rootfs.ext2
+runkernel C3700 generic-64bit_defconfig ::smp4:net=rtl8139:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
