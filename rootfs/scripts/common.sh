@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Set the following variable to true to skip DC395/AM53C97 build tests
-__skip_dc395=0
-
 shopt -s extglob
 
 ulimit -c unlimited
@@ -1590,18 +1587,6 @@ dosetup()
 
     local rootfs=$1
     local defconfig=$2
-
-    # Hack: Tests involving DC395 and AM53C974 are just not stable.
-    # Skip for now unless runall is set.
-    if [[ "${__skip_dc395}" -ne 0 && \
-		"${runall}" -eq 0 && ( \
-		"${fixup}" = *DC395* || "${fixup}" = *AM53C974* || \
-		"${fixups}" = *DC395* || "${fixups}" = *AM53C974* \
-		) ]]; then
-	echo "skipped"
-	__dosetup_rc=2
-	return 2
-    fi
 
     # If nobuild is set, don't build image, just set up the root file
     # system as needed. Assumes that the image was built already in
