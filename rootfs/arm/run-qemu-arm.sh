@@ -19,9 +19,16 @@ ARCH=arm
 PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
-# integratorcp does not boot in v5.4.y when using gcc 10.3/11.x/12.x
-PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
-# PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
+if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
+    # integratorcp crashes early with v5.4.y when using gcc 10+.
+    # The problem is fixed in v5.10+ with commit d25e37d89dd2
+    # ("tracepoint: Optimize using static_call()") and presumably static
+    # call related context patches. Not worth to try backporting to older
+    # kernel branches.
+    PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
+else
+    PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
+fi
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
 PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
@@ -224,7 +231,7 @@ runkernel()
     "realview-eb-mpcore" | "realview-eb" | \
     "versatileab" | "versatilepb" | \
     "integratorcp")
-	initcli+=" console=ttyAMA0,115200 earlycon"
+	initcli+=" console=ttyAMA0,115200 earlycon=pl011,0x16000000"
 	;;
     *)
 	;;
