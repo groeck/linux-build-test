@@ -11,10 +11,10 @@ machine=$1
 variant=$2
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sparc}
-PREFIX=sparc64-linux-
+PREFIX=sparc-linux-
 ARCH=sparc32
 
-PATH_SPARC=/opt/kernel/sparc64/gcc-6.5.0/bin
+PATH_SPARC=/opt/kernel/${DEFAULT_CC}/sparc-linux/bin
 
 PATH=${PATH_SPARC}:${PATH}
 
