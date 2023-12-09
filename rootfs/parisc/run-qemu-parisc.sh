@@ -26,6 +26,9 @@ patch_defconfig()
     # ATA
     enable_config ${defconfig} CONFIG_ATA CONFIG_PATA_CMD64X
 
+    # file systems
+    echo "CONFIG_F2FS_FS=y" >> ${defconfig}
+
     # Disable for now until warning messages have been fixed
     disable_config "${defconfig}" CONFIG_PROVE_LOCKING CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_LOCK_ALLOC CONFIG_DEBUG_WW_MUTEX_SLOWPATH
 }
@@ -105,22 +108,22 @@ checkstate ${retcode}
 runkernel B160L generic-32bit_defconfig ::net=e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig ::net=virtio-net:nvme rootfs.ext2
+runkernel B160L generic-32bit_defconfig ::net=virtio-net:nvme rootfs.ext4
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.ext2
+runkernel B160L generic-32bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig ::net=pcnet:scsi rootfs.ext2
+runkernel B160L generic-32bit_defconfig ::net=pcnet:scsi rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel B160L generic-32bit_defconfig "::net=pcnet:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext2
+runkernel B160L generic-32bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext4
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel B160L generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.ext2
+runkernel B160L generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -147,19 +150,19 @@ fi
 
 # Run remaining tests with C3700 platform using the 32-bit configuration
 # Note: e1000 doesn't work with C3700
-runkernel C3700 generic-32bit_defconfig ::net=tulip:usb-ohci rootfs.ext2
+runkernel C3700 generic-32bit_defconfig ::net=tulip:usb-ohci rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel C3700 generic-32bit_defconfig ::net=virtio-net:usb-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-32bit_defconfig ::net=pcnet:usb-xhci rootfs.ext2
+runkernel C3700 generic-32bit_defconfig ::net=pcnet:usb-xhci rootfs.ext4
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-32bit_defconfig ::net=usb-ohci:usb-uas-ehci rootfs.ext2
+runkernel C3700 generic-32bit_defconfig ::net=usb-ohci:usb-uas-ehci rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel C3700 generic-32bit_defconfig ::net=rtl8139:usb-uas-xhci rootfs.ext2
+runkernel C3700 generic-32bit_defconfig ::net=rtl8139:usb-uas-xhci rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
