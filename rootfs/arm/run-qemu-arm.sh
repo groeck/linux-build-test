@@ -19,16 +19,17 @@ ARCH=arm
 PREFIX_A="arm-linux-gnueabi-"
 PREFIX_M3="arm-linux-"
 
-if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-    # integratorcp crashes early with v5.4.y when using gcc 10+.
-    # The problem is fixed in v5.10+ with commit d25e37d89dd2
-    # ("tracepoint: Optimize using static_call()") and presumably static
-    # call related context patches. Not worth to try backporting to older
-    # kernel branches.
-    PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
-else
-    PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
-fi
+# integratorcp may crash in kmalloc_trace() when using gcc 10+.
+# This is seen in v5.4.y. The problem was fixed in v5.10+ with commit
+# d25e37d89dd2 ("tracepoint: Optimize using static_call()"), but is
+# seen again with the mainline kernel (v6.7-rc) and gcc-11.4.
+# Call trace is
+#  kmalloc_trace from of_syscon_register+0x58/0x2bc
+#  of_syscon_register from device_node_get_regmap+0x84/0x94
+#  device_node_get_regmap from intcp_init_early+0xc/0x40
+#  intcp_init_early from start_kernel+0x58/0x604
+#  start_kernel from 0x0
+PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
 PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
