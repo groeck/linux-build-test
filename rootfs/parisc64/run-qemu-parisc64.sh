@@ -138,6 +138,33 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.ext4
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.btrfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.f2fs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.ext4
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.btrfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.f2fs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
+
+if [[ ${runall} -ne 0 ]]; then
     # scsi host1: scsi scan: INQUIRY result too short (5), using 36
     # followed by
     # megaraid_sas 0000:00:04.0: Unknown command completed!
