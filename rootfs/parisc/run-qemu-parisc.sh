@@ -150,6 +150,12 @@ fi
 
 # Run remaining tests with C3700 platform using the 32-bit configuration
 # Note: e1000 doesn't work with C3700
+runkernel C3700 generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.btrfs
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel C3700 generic-32bit_defconfig "::net=tulip:scsi[DC395]" rootfs.f2fs
+retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel C3700 generic-32bit_defconfig ::net=tulip:usb-ohci rootfs.f2fs
 retcode=$((retcode + $?))
 checkstate ${retcode}
