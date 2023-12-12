@@ -836,9 +836,12 @@ __common_netcmd()
 __start_tpm()
 {
     __stop_tpm
-    /opt/buildbot/bin/swtpm socket --tpmstate dir="${__swtpmdir}" \
+    if ! /opt/buildbot/bin/swtpm socket --tpmstate dir="${__swtpmdir}" \
 		--ctrl type=unixio,path="${__swtpmsock}" --tpm2 \
-		-d --pid file="${__swtpmpidfile}"
+		-d --pid file="${__swtpmpidfile}"; then
+	echo "Failed to start swtpm on ${__swtpmsock}"
+	return 1
+    fi
     sleep 1
     # Abort if swtpm failed to start
     if [[ ! -s "${__swtpmpidfile}" ]]; then
