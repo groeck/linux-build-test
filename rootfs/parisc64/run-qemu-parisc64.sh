@@ -138,28 +138,31 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.ext2
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[53C895A]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.ext4
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[53C895A]" rootfs.ext4
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.btrfs
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[53C895A]" rootfs.btrfs
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[AM53C974]" rootfs.f2fs
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[AM53C974]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.ext2
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[AM53C974]" rootfs.ext4
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.ext4
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[AM53C974]" rootfs.btrfs
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.btrfs
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[DC395]" rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel C3700 generic-64bit_defconfig "::smp2:net=tulip:scsi[DC395]" rootfs.f2fs
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[DC395]" rootfs.ext4
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[DC395]" rootfs.btrfs
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
