@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_V81_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -388,7 +388,21 @@ checkstate ${retcode}
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
-checkstate ${retcode}
+if [ ${runall} -eq 1 ]; then
+    # As of v6.7-rc,
+    #     { .compatible = "tcg,tpm-tis-i2c", },
+    # is still missing from drivers/char/tpm/tpm_tis_i2c.c. It looks like it
+    # got stuck in buerocracy. See upstream exchange at
+    # https://yhbt.net/lore/all/20220928043957.2636877-2-joel@jms.id.au/T/
+    # Also see openbmc commit 86d097a7e5540 ("tpm: tis-i2c: Add more compatible
+    # strings").
+    runkernel aspeed_g5_defconfig tacoma-bmc "" \
+	rootfs-armv5.cpio automatic \
+	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.1,address=0x2e:net=nic \
+	aspeed-bmc-opp-tacoma.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mmc:net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
@@ -398,12 +412,6 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# Not supported by upstream kernel as of v6.5 (missing bindings)
-# Requires qemu v8.1
-# runkernel aspeed_g5_defconfig rainier-bmc "" \
-# 	rootfs-armv5.cpio automatic \
-# 	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.12,address=0x2e:net=nic \
-# 	aspeed-bmc-ibm-rainier.dtb
 runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
