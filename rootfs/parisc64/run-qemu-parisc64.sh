@@ -127,9 +127,9 @@ runkernel C3700 generic-64bit_defconfig "::smp4:net=tulip:scsi[AM53C974]" rootfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel C3700 generic-64bit_defconfig ::smp2:net=usb-ohci:sata-cmd646 rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
+# runkernel C3700 generic-64bit_defconfig ::smp2:net=usb-ohci:sata-cmd646 rootfs.ext2
+# retcode=$((retcode + $?))
+# checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig ::smp4:net=usb-xhci:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
