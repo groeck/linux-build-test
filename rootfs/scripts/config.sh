@@ -9,7 +9,7 @@ QEMU_V81_BIN=${QEMU_INSTALL}/v8.1/bin
 QEMU_V82_BIN=${QEMU_INSTALL}/v8.2/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
-QEMU_BIN=${QEMU_V80_BIN}
+QEMU_BIN=${QEMU_V81_BIN}
 
 # default compiler
 DEFAULT_CC="gcc-11.4.0-2.40-nolibc"
