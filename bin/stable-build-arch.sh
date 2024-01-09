@@ -19,9 +19,7 @@ PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 # ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
-# Assembler errors with gcc 8.4.0, 8.5.0 (v4.14.y, v4.19.y)
-# on v4.4.y (at least), in kernel/fork.c:
-# "unrecognized emulation mode: big-endian" with gcc 10.2.0
+# Assembler errors with gcc 8.4.0, 8.5.0 (v4.19.y)
 # internal compiler error with gcc 11.1.0, 11.3.0, 11.4.0, 12.2.0
 # PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
@@ -83,7 +81,7 @@ configcmd="olddefconfig"
 
 # Older releases don't like gcc 6+
 case ${rel} in
-v4.14|v4.19)
+v4.19)
 	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
 	;;
 *)
@@ -167,7 +165,7 @@ case ${ARCH} in
     hexagon)
 	cmd=(${cmd_hexagon[*]})
 	case ${rel} in
-	v4.14|v4.19|v5.4)
+	v4.19|v5.4)
 	    PREFIX="hexagon-linux-"
 	    PATH=${PATH_HEXAGON}:${PATH}
 	    ;;
@@ -236,7 +234,7 @@ case ${ARCH} in
 	PREFIX="hppa64-linux-"
 	PREFIX32="hppa-linux-"
 	case ${rel} in
-	v4.14|v4.19|v5.4|v5.10)
+	v4.19|v5.4|v5.10)
 	    ARCH=parisc
 	    ;;
 	v5.15|v6.1)
@@ -300,7 +298,7 @@ case ${ARCH} in
     um)
 	cmd=(${cmd_um[*]})
 	case ${rel} in
-	v4.14|v4.19)
+	v4.19)
 		# doesn't build with 8.2.0 ("virtual memory exhausted")
 		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
 		PREFIX="${PREFIX_X86}"
