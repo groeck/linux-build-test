@@ -154,16 +154,6 @@ runkernel()
 	return 0
     fi
 
-    case "${mach}" in
-    "orangepi-pc")
-	# Network tests need v4.19 or later
-	if [[ ${linux_version_code} -lt $(kernel_version 4 19) ]]; then
-	    nonet=1
-        fi
-	;;
-    *)
-	;;
-    esac
     if [[ "${nonet}" -ne 0 ]]; then
 	fixup="$(echo ${fixup} | sed -e 's/:\+net=nic//')"
     fi
