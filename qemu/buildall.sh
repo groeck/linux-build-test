@@ -122,7 +122,7 @@ if [ -z "$1" -o "$1" = "v8.0" ]; then
 fi
 
 if [ -z "$1" -o "$1" = "v8.1" ]; then
-    dobuild_common v8.1.3-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
+    dobuild_common v8.1.4-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
     if [ -n "$2" ]; then
 	shift
     fi
