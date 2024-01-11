@@ -48,7 +48,7 @@ cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/per
 cmd_xtensa=(defconfig allmodconfig allnoconfig tinyconfig)
 cmd_um=(defconfig)
 
-# build to skip
+# builds to skip
 
 skip_414="x86_64:tools/perf i386:tools/perf parisc64:allnoconfig"
 skip_419="x86_64:tools/perf i386:tools/perf riscv32:allmodconfig riscv:allmodconfig powerpc:ppc32_allmodconfig openrisc:allmodconfig parisc64:allnoconfig"
@@ -73,9 +73,19 @@ fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
 fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
 	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
 
-# We don't want to be in the business of arguing about frame sizes
-fixup_x86_64=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
-
 # Plugins need gcc 14.1, 13.3, or 12.4 to work.
 # See https://gcc.gnu.org/r14-3331 for details.
 fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
+
+# Skip CONFIG_WERROR. Needed due to enforced -Wmissing-prototypes in v6.8+
+
+fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+
+fixup_openrisc=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+
+fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+
+fixup_sparc64=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+
+# We don't ever want to be in the business of arguing about frame sizes
+fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
