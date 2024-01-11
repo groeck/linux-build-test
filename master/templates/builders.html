@@ -213,13 +213,13 @@
 	    var fail = getResults_{{rel_var}} (/fail: \d+/);
 	    var box = "success";
 	    var build = "successful";
-	    if ((total == 0 && qemu_total == 0) || total == skipped) {
+	    if ((total == 0 && qemu_total == 0) || (total > 0 && total == skipped)) {
 		box = "skipped";
 		build = "skipped";
 	    } else if (passed == 0 && qemu_passed == 0) {
 		box = "failure";
 		build = "failed";
-	    } else if (fail > 0 || qemu_fail > 0) {
+	    } else if (total == 0 || qemu_total == 0 || fail > 0 || qemu_fail > 0) {
 		box = "warnings";
 		build = "warnings";
 	    }
