@@ -36,6 +36,11 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # Thanks to enforced -Wmissing-prototypes in v6.8+
+    disable_config ${defconfig} CONFIG_WERROR
+    disable_config ${defconfig} CONFIG_PPC_WERROR
+    enable_config ${defconfig} CONFIG_PPC_DISABLE_WERROR
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	"fstest")
