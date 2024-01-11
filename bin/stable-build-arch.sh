@@ -326,6 +326,10 @@ if [[ -n "${!tmp}" ]]; then
     fixup+=("${!tmp}")
 fi
 
+if [[ -n "${fixup_common}" ]]; then
+    fixup+=("${fixup_common}")
+fi
+
 if [[ "${CCMD}" = "clang" ]]; then
     compiler_version="$(clang --version | head -n 1)"
     assembler_version=""
