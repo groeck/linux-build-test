@@ -107,42 +107,44 @@ dobuild_common()
     checkexit $?
 }
 
-if [ -z "$1" -o "$1" = "v7.2" ]; then
-    dobuild_common v7.2.5-local v7.2 "--disable-hax"
-    if [ -n "$2" ]; then
-	shift
-    fi
+build_one()
+{
+    case "$1" in
+    "v7.2")
+	dobuild_common v7.2.5-local v7.2 "--disable-hax"
+	;;
+    "v8.0")
+	dobuild_common v8.0.5-local v8.0 "--disable-hax"
+	;;
+    "v8.1")
+	dobuild_common v8.1.4-local v8.1 "--disable-hax"
+	;;
+    "v8.2")
+	dobuild_common v8.2.0-local v8.2 "--disable-strip --extra-cflags=-g"
+	# dobuild_common v8.2.0-local v8.2-debug \
+	#	"--enable-debug --disable-strip --extra-cflags=-g"
+	;;
+    "master")
+	dobuild_common master-local master "--disable-strip --extra-cflags=-g"
+	# While it would be desirable to have debugging enabled in general,
+	# it slows down the system too much. Generate separate master-debug
+	# to have images with debugging enabled available if needed.
+	dobuild_common master-local master-debug \
+		"--enable-debug --disable-strip --extra-cflags=-g"
+	;;
+    *)
+	echo "$0: unknown release: $1"
+	exit 1
+	;;
+    esac
+}
+
+if [[ -z "$*" ]]; then
+    builds="v7.2 v8.0 v8.1 v8.2 master"
+else
+    builds="$*"
 fi
 
-if [ -z "$1" -o "$1" = "v8.0" ]; then
-    dobuild_common v8.0.5-local v8.0 "--disable-hax"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v8.1" ]; then
-    dobuild_common v8.1.4-local v8.1 "--disable-hax --disable-strip --extra-cflags=-g"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "v8.2" ]; then
-    dobuild_common v8.2.0-local v8.2 "--disable-strip --extra-cflags=-g"
-#    dobuild_common v8.2.0-local v8.2-debug \
-#	"--disable-vnc-png --enable-debug --disable-strip --extra-cflags=-g"
-    if [ -n "$2" ]; then
-	shift
-    fi
-fi
-
-if [ -z "$1" -o "$1" = "master" ]; then
-    dobuild_common master-local master "--disable-strip"
-    # While it would be desirable to have debugging enabled in general,
-    # it slows down the system too much. Generate separate master-debug
-    # specifically for to have images with debugging enabled available
-    # if needed.
-    dobuild_common master-local master-debug \
-	"--disable-png --enable-debug --disable-strip --extra-cflags=-g"
-fi
+for build in ${builds}; do
+    build_one "${build}"
+done
