@@ -126,6 +126,8 @@ build_one()
 	;;
     "master")
 	dobuild_common master-local master "--disable-strip --extra-cflags=-g"
+	;;
+    "master-debug")
 	# While it would be desirable to have debugging enabled in general,
 	# it slows down the system too much. Generate separate master-debug
 	# to have images with debugging enabled available if needed.
@@ -140,7 +142,7 @@ build_one()
 }
 
 if [[ -z "$*" ]]; then
-    builds="v7.2 v8.0 v8.1 v8.2 master"
+    builds="v7.2 v8.0 v8.1 v8.2 master master-debug"
 else
     builds="$*"
 fi
