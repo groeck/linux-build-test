@@ -166,20 +166,14 @@ runkernel()
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
+    "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
     bletchley-bmc*)
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
-	extra_params+=" -nodefaults"
 	;;
     "fuji-bmc")
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e783000,115200n8"
-	extra_params+=" -nodefaults"
-	;;
-    "qcom-dc-scm-v1-bmc" | "ast2600-evb")
-	initcli+=" console=ttyS4,115200"
-	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
-	extra_params+=" -nodefaults"
 	;;
     *)
 	;;
