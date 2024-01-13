@@ -487,36 +487,32 @@ runkernel multi_v7_defconfig kudo-bmc "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # various backtraces in crypto/testmgr.c due to DMA timeouts
-    # memory allocation/free problem in (failed) thermal zone initialization
-    runkernel sunxi_defconfig bpim2u "" \
+runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.cpio automatic "::net=nic" sun8i-r40-bananapi-m2-ultra.dtb
-    checkstate ${retcode}
-    # sd card association is not fixed (randomly instantiated as mmc0, mmc1,
-    # or mmc2)
-    # The following change in sun8i-r40-bananapi-m2-ultra.dts appears to fix
-    # the problem.
-    # diff --git a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
-    # index 28197bbcb1d5..475183ab9bf5 100644
-    # --- a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
-    # +++ b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
-    # @@ -54,6 +54,9 @@ / {
-    #         aliases {
-    #                 ethernet0 = &gmac;
-    #                 serial0 = &uart0;
-    # +               mmc0 = &mmc0;
-    # +               mmc1 = &mmc1;
-    # +               mmc2 = &mmc2;
-    #         };
-    # No idea if that would be acceptable in the upstream kernel. Also see mmc
-    # comments for sabrelite above for more details.
-    # Alternatively, we can specify the block device number (b300) as root device.
-    # See qemu patch 7ea47af390 ("tests/avocado: Make the test_arm_bpim2u_gmac
-    # test more reliable") for details. That is hackish, but it works.
-    runkernel sunxi_defconfig bpim2u "" \
+checkstate ${retcode}
+# sd card association is not fixed (randomly instantiated as mmc0, mmc1,
+# or mmc2)
+# The following change in sun8i-r40-bananapi-m2-ultra.dts appears to fix
+# the problem.
+# diff --git a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+# index 28197bbcb1d5..475183ab9bf5 100644
+# --- a/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+# +++ b/arch/arm/boot/dts/sun8i-r40-bananapi-m2-ultra.dts
+# @@ -54,6 +54,9 @@ / {
+#         aliases {
+#                 ethernet0 = &gmac;
+#                 serial0 = &uart0;
+# +               mmc0 = &mmc0;
+# +               mmc1 = &mmc1;
+# +               mmc2 = &mmc2;
+#         };
+# No idea if that would be acceptable in the upstream kernel. Also see mmc
+# comments for sabrelite above for more details.
+# Alternatively, we can specify the block device number (b300) as root device.
+# See qemu patch 7ea47af390 ("tests/avocado: Make the test_arm_bpim2u_gmac
+# test more reliable") for details. That is hackish, but it works.
+runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::sd,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
-    checkstate ${retcode}
-fi
+checkstate ${retcode}
 
 exit ${retcode}
