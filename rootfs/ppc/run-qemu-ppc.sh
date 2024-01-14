@@ -26,7 +26,6 @@ ARCH=powerpc
 
 PATH=${PATH_PPC}:${PATH}
 
-skip_414="ppce500:corenet32_smp_defconfig:e500:net=eTSEC:sdhci-mmc:ext2"
 skip_419="ppce500:corenet32_smp_defconfig:e500:net=eTSEC:sdhci-mmc:ext2"
 skip_54="ppce500:corenet32_smp_defconfig:e500:net=eTSEC:sdhci-mmc:ext2"
 
