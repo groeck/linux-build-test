@@ -24,7 +24,6 @@ PATH_PPC="/opt/kernel/${DEFAULT_CC}/powerpc64-linux/bin"
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
-skip_414="ppce500:corenet64_smp_defconfig:e5500:net=eTSEC:sdhci-mmc:rootfs"
 skip_419="ppce500:corenet64_smp_defconfig:e5500:net=eTSEC:sdhci-mmc:rootfs"
 skip_54="ppce500:corenet64_smp_defconfig:e5500:net=eTSEC:sdhci-mmc:rootfs"
 
