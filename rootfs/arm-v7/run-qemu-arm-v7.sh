@@ -514,5 +514,13 @@ checkstate ${retcode}
 runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::sd,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
 checkstate ${retcode}
+# The following tests require out-of-tree code to enable support for USB and SATA ports
+# for the bpim2u (Allwinner H40) qemu emulation.
+runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.ext2 automatic "::sata:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
+checkstate ${retcode}
+runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.ext2 automatic "::usb:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
+checkstate ${retcode}
 
 exit ${retcode}
