@@ -12,7 +12,6 @@ PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
 
-skip_414="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_419="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_54="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_510="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
