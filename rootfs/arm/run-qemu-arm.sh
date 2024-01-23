@@ -82,10 +82,6 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
-	nochecksum)
-	    # broken on an385 starting with v6.8
-	    disable_config "${defconfig}" CONFIG_CHECKSUM_KUNIT
-	    ;;
 	nofdt)
 	    disable_config "${defconfig}" CONFIG_MACH_PXA27X_DT CONFIG_MACH_PXA3XX_DT
 	    ;;
@@ -426,15 +422,8 @@ runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet:nocd:nofs:
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# starting with v6.8-rc1:
-# Unhandled exception: IPSR = 00000006 LR = fffffff1
-# CPU: 0 PID: 164 Comm: kunit_try_catch Tainted: G                 N 6.8.0-rc1 #1
-# Hardware name: Generic DT based system
-# PC is at __csum_ipv6_magic+0x8/0xb4
-# LR is at test_csum_ipv6_magic+0x3d/0xa4
-# Disable CONFIG_CHECKSUM_KUNIT to work around it.
 runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
-	rootfs-arm-m3.cpio manual "nochecksum::" mps2-an385.dtb
+	rootfs-arm-m3.cpio manual "" mps2-an385.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
