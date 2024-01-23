@@ -88,6 +88,7 @@ __testbuild=0	# test build, do not run tests
 ___testbuild=0	# test build, run tests but abort after first failure
 _log_abort=0	# abort after warnings / backtraces
 _log_always=0	# log always
+_log_all=0	# log everything, not just part of the log
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -122,10 +123,11 @@ parse_args()
 	__testbuild=0
 	__log_abort=0
 	__log_always=0
+	__log_all=0
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dlnr:tTvW opt; do
+	while getopts ae:dlLnr:tTvW opt; do
 	case ${opt} in
 	a)	runall=1;;
 	d)	dodebug=$((dodebug + 1));;
@@ -142,6 +144,7 @@ parse_args()
 	v)	verbose=1;;
 	W)	__log_abort=1;;
 	l)	__log_always=1;;
+	L)	__log_all=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
 	done
@@ -1650,15 +1653,17 @@ dosetup()
     rootfs="$(setup_rootfs ${rootfs})"
     __common_fixups "${fixups}" "${rootfs}"
 
-    __domake ${EXTRAS} 2>${logfile}
-    rv=$?
-    if [ ${rv} -ne 0 ]
-    then
+    if ! __domake ${EXTRAS} 2>${logfile}; then
+	rv=1
 	__cached_reason="failed"
 	echo "failed"
 	echo "------------"
 	echo "Error log:"
-	head -1000 ${logfile}
+	if [[ "${__log_all}" -ne 0 ]]; then
+	    cat ${logfile}
+	else
+	    head -1000 ${logfile}
+	fi
 	echo "------------"
     fi
 
@@ -1905,7 +1910,11 @@ dowait()
 	    sed -i '/^[[:space:]]*$/d' "${logfile}"
 	    echo "------------"
 	    echo "qemu log:"
-	    head -5000 ${logfile}
+	    if [[ "${__log_all}" -ne 0 ]]; then
+		cat ${logfile}
+	    else
+		head -5000 ${logfile}
+	    fi
 	    echo "------------"
 	fi
 	if [[ ${dolog} -ne 0 && ${__log_abort} -ne 0 ]]; then
