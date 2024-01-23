@@ -101,59 +101,81 @@ echo
 retcode=0
 runkernel virt "" rv32_defconfig "net=e1000" rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig net=e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig net=i82801:virtio rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig net=i82550:virtio-pci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig tpm-tis-device:net=e1000-82544gc:sdhci-mmc rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig net=usb-ohci:nvme rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel virt "" rv32_defconfig net=virtio-net-device:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel virt "rv32,zbb=no" rv32_defconfig "net=pcnet:usb-ehci" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig net=virtio-net-pci:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig net=i82557a:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig net=i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=i82559a:scsi[53C810]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig "net=i82559er:pci-bridge:scsi[53C895A]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Does not instantiate
     runkernel virt "rv32,zbb=no" rv32_defconfig "scsi[AM53C974]" rootfs.ext2
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel virt "" rv32_defconfig "scsi[DC395]" rootfs.ext2
     retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 
 runkernel virt "rv32,zbb=no" rv32_defconfig "net=rtl8139:scsi[MEGASAS]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig "pci-bridge:net=i82562:scsi[MEGASAS2]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=e1000:scsi[FUSION]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "" rv32_defconfig "net=i82557b:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel virt "rv32,zbb=no" rv32_defconfig "net=i82557c:scsi[virtio-pci]" rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Unable to handle kernel paging request at virtual address c0c00000
     # in __memset(), called from free_initmem()
     runkernel sifive_u "" rv32_defconfig "net=default" rootfs.cpio
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel sifive_u "" rv32_defconfig "sd:net=default" rootfs.ext2
-    retcode=$((${retcode} + $?))
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 
 exit ${retcode}
