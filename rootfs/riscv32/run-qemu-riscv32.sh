@@ -44,7 +44,7 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local fixup=$4
+    local fixup="nofs::$4"
     local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="riscv32:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
@@ -52,7 +52,7 @@ runkernel()
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     if ! match_params "${_mach}@${mach}" "${_fixup}@${fixup}"; then
@@ -60,13 +60,15 @@ runkernel()
 	return 0
     fi
 
+    build="${build//+(:)/:}"
+
     echo -n "Building ${build} ... "
 
     if ! checkskip "${build}" ; then
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}${fixup%::*}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
