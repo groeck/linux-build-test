@@ -623,13 +623,18 @@ __common_mmccmd()
     fi
 
     case "${fixup}" in
-    mmc*)
+    mmc,*)
+	# mmc followed by root device name
+	extra_params+=" -device sd-card,drive=d0"
+	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
+	rootdev="${fixup#mmc,}"
+	;;
+    mmc|mmc[0-9])
+	# mmc optionally followed by mmc device index
 	local devindex=${fixup#mmc}
 	extra_params+=" -device sd-card,drive=d0"
 	extra_params+=" -drive file=${rootfs},format=raw,if=none,id=d0"
-	if [[ -n "${devindex}" ]]; then
-	    rootdev="/dev/mmcblk${devindex}"
-	fi
+	rootdev="/dev/mmcblk${devindex:-0}"
 	;;
     "sd")	# similar to mmc, but does not need sd-card; uses if=sd
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
