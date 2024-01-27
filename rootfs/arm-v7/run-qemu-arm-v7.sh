@@ -325,18 +325,13 @@ fi
 # On top of that, there is commit 2a43322ca7f3 ("ARM: dts: imx6qdl-sabre:
 # Add mmc aliases") after v6.1. This changes the alias back from mmc3 to
 # mmc1, just to make things even more complicated.
-
-sabrelite_mmc="mmc1"
-if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    # devicetree file moved in v6.5.
-    dtsifile="$(find arch/arm/boot/dts -name imx6qdl-sabrelite.dtsi)"
-    if ! grep -q mmc1 "${dtsifile}"; then
-	sabrelite_mmc="mmc3"
-    fi
-fi
+# We could try to determine the actual mmc device, but it turns out
+# that Linux also supports providing raw device references. Use "b300"
+# as root device becasue that is known to work everywhere.
+# Also see bpim2u below, which has the same problem.
 
 runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual "::${sabrelite_mmc}:mem256:net=default" imx6dl-sabrelite.dtb
+	rootfs-armv5.ext2 manual "::mmc,b300:mem256:net=default" imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig sabrelite "" \
