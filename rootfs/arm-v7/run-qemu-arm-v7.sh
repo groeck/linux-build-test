@@ -271,6 +271,46 @@ runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
+runkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.cpio manual nodrm::mem256:net=default imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+if [ ${runall} -eq 1 ]; then
+    # Flash size is 2 MB. Latest root file system is larger than that,
+    # so we can't really support that unless reducing root file system
+    # size which isn't worth it. Maybe we can figure out how to attach
+    # a different flash at some point.
+    runkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.sqf manual nodrm::mtd2:mem256:net=default imx6dl-sabrelite.dtb
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
+
+# For sabrelite, the instatiated mmc device index is linux kernel release
+# specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
+# setting slot index via device tree alias") for reason and details.
+# On top of that, there is commit 2a43322ca7f3 ("ARM: dts: imx6qdl-sabre:
+# Add mmc aliases") after v6.1. This changes the alias back from mmc3 to
+# mmc1, just to make things even more complicated.
+# We could try to determine the actual mmc device, but it turns out
+# that Linux also supports providing raw device references. Use "b300"
+# as root device becasue that is known to work everywhere.
+# Also see bpim2u below, which has the same problem.
+
+runkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual "nodrm::mmc,b300:mem256:net=default" imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual nodrm::usb0:mem256:net=default imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel imx_v6_v7_defconfig sabrelite "" \
+	rootfs-armv5.ext2 manual nodrm::usb1:mem256:net=default imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
 # vexpress tests generate a warning during reboot if CONFIG_PROVE_RCU is enabled
 runkernel multi_v7_defconfig vexpress-a9 "" \
 	rootfs-armv5.cpio auto nolocktests::mem128:net=default \
@@ -300,46 +340,6 @@ checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15-a7 "" \
 	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net=default \
 	vexpress-v2p-ca15_a7.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
-runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.cpio manual ::mem256:net=default imx6dl-sabrelite.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # Flash size is 2 MB. Latest root file system is larger than that,
-    # so we can't really support that unless reducing root file system
-    # size which isn't worth it. Maybe we can figure out how to attach
-    # a different flash at some point.
-    runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.sqf manual ::mtd2:mem256:net=default imx6dl-sabrelite.dtb
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-fi
-
-# For sabrelite, the instatiated mmc device index is linux kernel release
-# specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
-# setting slot index via device tree alias") for reason and details.
-# On top of that, there is commit 2a43322ca7f3 ("ARM: dts: imx6qdl-sabre:
-# Add mmc aliases") after v6.1. This changes the alias back from mmc3 to
-# mmc1, just to make things even more complicated.
-# We could try to determine the actual mmc device, but it turns out
-# that Linux also supports providing raw device references. Use "b300"
-# as root device becasue that is known to work everywhere.
-# Also see bpim2u below, which has the same problem.
-
-runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual "::mmc,b300:mem256:net=default" imx6dl-sabrelite.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb0:mem256:net=default imx6dl-sabrelite.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig sabrelite "" \
-	rootfs-armv5.ext2 manual ::usb1:mem256:net=default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
