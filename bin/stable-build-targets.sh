@@ -80,8 +80,6 @@ fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
 
 fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
-fixup_openrisc=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
-
 fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
 fixup_sparc64=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
