@@ -117,11 +117,11 @@ build_one()
 	dobuild_common v8.0.5-local v8.0 "--disable-hax"
 	;;
     "v8.1")
-	dobuild_common v8.1.4-local v8.1 "--disable-hax"
+	dobuild_common v8.1.5-local v8.1 "--disable-hax"
 	;;
     "v8.2")
-	dobuild_common v8.2.0-local v8.2 "--disable-strip --extra-cflags=-g"
-	# dobuild_common v8.2.0-local v8.2-debug \
+	dobuild_common v8.2.1-local v8.2 "--disable-strip --extra-cflags=-g"
+	# dobuild_common v8.2.1-local v8.2-debug \
 	#	"--enable-debug --disable-strip --extra-cflags=-g"
 	;;
     "master")
