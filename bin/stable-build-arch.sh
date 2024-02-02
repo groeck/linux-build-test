@@ -47,7 +47,8 @@ PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
 
-PATH_LLVM=/opt/kernel/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-16.04/bin
+# PATH_LLVM=/opt/kernel/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-16.04/bin
+PATH_LLVM=/opt/kernel/clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04/bin
 
 PREFIX_ARC="arc-elf-"
 PREFIX_ARCV2="arc-elf-"
