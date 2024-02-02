@@ -17,7 +17,7 @@ fi
 
 git fetch --all
 
-for a in $(git branch -r | grep origin | grep -v HEAD | grep -v linux-2.6 | cut -f2 -d'/')
+for a in $(git branch -r | grep "origin/linux-[4-9]" | cut -f2 -d'/')
 do
 	echo -n "$a: "
 	git push local origin/$a:$a
