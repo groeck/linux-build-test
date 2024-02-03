@@ -15,6 +15,8 @@ passed_qemu = re.compile('Building (\S+):(\S+) \.+ running [\.R]+ passed$')
 failed_qemu = re.compile('Building (\S+):(\S+) .*?failed.*$')
 skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped$')
 
+kunit_result = re.compile('# ([^:]+): pass:(\d+) fail:(\d+) skip:(\d+) total:\d+$')
+
 def lastStep(step):
     allSteps = step.build.getStatus().getSteps()
     last = allSteps[-1]
@@ -136,7 +138,7 @@ class StableBuildCommand(RefShellCommand):
         text = RefShellCommand.getText2(self, cmd, results)
 	# if results == SKIPPED:
 	#     return text
-	text.append("<br>");
+	text.append("<br>")
 	text.append("total: " + str(self.counter.numTotal))
         if self.counter.numPassed > 0:
             text.append("pass: " + str(self.counter.numPassed))
@@ -171,8 +173,12 @@ class AnalyzeQemuBuildLog(LogLineObserver):
         self.numPassed = 0
         self.numFailed = 0
         self.numSkipped = 0
+        self.numKunitPassed = 0
+        self.numKunitFailed = 0
+        self.numKunitSkipped = 0
         self.tracebacks = False
         self.failed = []
+        self.kunit_failed = []
     def outLineReceived(self, line):
 	# Look for:
 	# Building <arch>:<config> .+ running .+ passed
@@ -202,7 +208,14 @@ class AnalyzeQemuBuildLog(LogLineObserver):
 	elif line.find('show_stack') != -1:
 	    self.tracebacks = True
 	elif line.find('(try booting with the "irqpoll" option)') != -1:
-	    self.tracebacks = True
+            self.tracebacks = True
+        kunit = kunit_result.match(line)
+        if kunit and kunit.group(1) != 'Totals':
+            self.numKunitPassed += int(kunit.group(2))
+            self.numKunitFailed += int(kunit.group(3))
+            self.numKunitSkipped += int(kunit.group(4))
+            if int(kunit.group(3)) > 0:
+                self.kunit_failed.append(kunit.group(1))
 
 class QemuBuildCommand(RefShellCommand):
     name = "qemubuildcommand"
@@ -232,6 +245,14 @@ class QemuBuildCommand(RefShellCommand):
             # for elem in self.counter.failed:
 	    #     text.append(str(elem[0][0]) + ":" + str(elem[0][1]) + " ")
 	    # text.append("] -->")
+        if self.counter.numKunitFailed or self.counter.numKunitPassed or self.counter.numKunitSkipped:
+            text.append("kunit: ")
+            if self.counter.numKunitPassed:
+                text.append("pass: " + str(self.counter.numKunitPassed))
+            if self.counter.numKunitSkipped:
+                text.append("skipped: " + str(self.counter.numKunitSkipped))
+            if self.counter.numKunitFailed:
+                text.append("fail: " + str(self.counter.numKunitFailed))
         return text
 
     def getText2(self, cmd, results):
@@ -241,7 +262,7 @@ class QemuBuildCommand(RefShellCommand):
         text = RefShellCommand.getText2(self, cmd, results)
 	# if results == SKIPPED:
 	#     return text
-	text.append("<br>");
+	text.append("<br>")
 	text.append("total: " + str(self.counter.numTotal))
         if self.counter.numPassed > 0:
             text.append("pass: " + str(self.counter.numPassed))
@@ -249,10 +270,23 @@ class QemuBuildCommand(RefShellCommand):
             text.append("skipped: " + str(self.counter.numSkipped))
         if self.counter.numFailed > 0:
             text.append("fail: " + str(self.counter.numFailed))
-	    text.append("<!-- ")
+	    text.append("<!-- fail ")
             for elem in self.counter.failed:
 	        text.append(str(elem[0][0]) + ":" + str(elem[0][1]) + " ")
-	    text.append("-->")
+	    text.append("fail -->")
+        if self.counter.numKunitFailed or self.counter.numKunitPassed or self.counter.numKunitSkipped:
+            text.append("<br>")
+            text.append("kunit: ")
+            if self.counter.numKunitPassed:
+                text.append("pass: " + str(self.counter.numKunitPassed))
+            if self.counter.numKunitSkipped:
+                text.append("skipped: " + str(self.counter.numKunitSkipped))
+            if self.counter.numKunitFailed:
+                text.append("fail: " + str(self.counter.numKunitFailed))
+                text.append("<!-- kunit ")
+                for elem in self.counter.kunit_failed:
+                    text.append(str(elem) + " ")
+                text.append("kunit -->")
         return text
 
     def maybeGetText2(self, cmd, results):
