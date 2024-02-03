@@ -100,8 +100,8 @@
 			       "exception interrupted"] -%}
 	{% continue -%}
       {% endif -%}
-      {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
-      {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
+      {% set fbuilds = b.build_text|regex_replace('.*<!-- fail +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' +fail -->.*', '') -%}
       {% if fbuilds != '' and fbuilds != b.build_text -%}
 	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
 	{% set fbuilds = fbuilds|split(' ') -%}
@@ -140,7 +140,30 @@
       {% if not 'total' in b.build_text -%}
         {% continue -%}
       {% endif -%}
-      {% set summary = b.build_text|regex_replace('.*total', 'total') -%}
+      {% set summary = b.build_text|regex_replace('kunit:.*', '') -%}
+      {% set summary = summary|regex_replace('.*total', 'total') -%}
+      {% set summary = summary|regex_replace('<!--.*', '') -%}
+      {% if exists -%}, {% endif -%}
+	"{{ summary }}"
+      {% do exists.append("1") -%}
+    {% endfor -%}
+  {% endfor -%} ];
+
+  {% set exists = [] -%}
+
+  var qemuKunitBuildText_{{rel_var}} = [
+  {% for arch in qemu_arches -%}
+    {% set bname = "qemu-" ~ arch ~ "-" ~ rel -%}
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
+			     "exception interrupted"] -%}
+	{% continue -%}
+      {% endif -%}
+      {% if not 'kunit:' in b.build_text -%}
+        {% continue -%}
+      {% endif -%}
+      {% set summary = b.build_text|regex_replace('.*kunit:', '') -%}
+      {% set summary = summary|regex_replace('.*pass', 'pass') -%}
       {% set summary = summary|regex_replace('<!--.*', '') -%}
       {% if exists -%}, {% endif -%}
 	"{{ summary }}"
@@ -161,8 +184,8 @@
       {% if not 'total' in b.build_text -%}
         {% continue -%}
       {% endif -%}
-      {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
-      {% set fbuilds = fbuilds|regex_replace(' +-->.*', '') -%}
+      {% set fbuilds = b.build_text|regex_replace('.*<!-- fail +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' +fail -->.*', '') -%}
       {% if fbuilds != '' and fbuilds != b.build_text -%}
 	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
 	{% set fbuilds = fbuilds|replace('qemu_', '') -%}
@@ -187,6 +210,19 @@
     return num;
   }
 
+  function qemuGetKunitResults_{{rel_var}} (match_string)
+  {
+    var num = 0;
+    // document.write('{{rel_var}} Kunit length ' + qemuKunitBuildText_{{rel_var}}.length + ' match: ' + match_string)
+    for (var i=0; i < qemuKunitBuildText_{{rel_var}}.length; i++)
+    {
+        var elem = qemuKunitBuildText_{{rel_var}}[i];
+        num += getResult(elem, match_string);
+    }
+    // document.write('--> ' + num + '<br>')
+    return num;
+  }
+
 {% endfor -%}
 </script>
 
@@ -207,6 +243,8 @@
 	    var qemu_passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
 	    var qemu_skipped = qemuGetResults_{{rel_var}} (/skipped: \d+/);
 	    var qemu_fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
+	    var qemu_kunit_passed = qemuGetKunitResults_{{rel_var}} (/pass: \d+/);
+	    var qemu_kunit_fail = qemuGetKunitResults_{{rel_var}} (/fail: \d+/);
 	    var total = getResults_{{rel_var}} (/total: \d+/);
 	    var passed = getResults_{{rel_var}} (/pass: \d+/);
 	    var skipped = getResults_{{rel_var}} (/skipped: \d+/);
@@ -246,6 +284,11 @@
 			document.write('<br>' + qemuBuildFailures_{{rel_var}}[f] + '\n');
 		}
 		document.write('\n');
+	}
+	if (qemu_kunit_passed > 0 || qemu_kunit_fail > 0) {
+	    document.write("<br>Kunit test results:<br>");
+            document.write(' pass: ' + qemu_kunit_passed +
+			' fail: ' + qemu_kunit_fail);
 	}
         document.write('</td>\n');
 	</script>
@@ -404,6 +447,8 @@
 	    var passed = qemuGetResults_{{rel_var}} (/pass: \d+/);
 	    var skipped = qemuGetResults_{{rel_var}} (/skipped: \d+/);
 	    var fail = qemuGetResults_{{rel_var}} (/fail: \d+/);
+	    var kunit_passed = qemuGetKunitResults_{{rel_var}} (/pass: \d+/);
+	    var kunit_fail = qemuGetKunitResults_{{rel_var}} (/fail: \d+/);
 	    var box = "success";
 	    var build = "successful";
 	    if (total == 0 || total == skipped) {
@@ -422,12 +467,17 @@
         document.write('total: ' + total +
 			' pass: ' + passed +
 			' fail: ' + fail);
+	document.write('<br>');
 	if (qemuBuildFailures_{{rel_var}}.length > 0) {
-		document.write('<br>Failed tests:<br>\n');
+		document.write('Failed tests:<br>\n');
 		for (var f=0; f < qemuBuildFailures_{{rel_var}}.length; f++) {
 			document.write(qemuBuildFailures_{{rel_var}}[f] + '<br>\n');
 		}
-		document.write('\n<br>');
+	}
+	if (kunit_passed > 0 || kunit_fail > 0) {
+	    document.write("Kunit tests:<br>");
+            document.write(' pass: ' + kunit_passed +
+			' fail: ' + kunit_fail);
 	}
         document.write('</td>\n');
 	</script>
