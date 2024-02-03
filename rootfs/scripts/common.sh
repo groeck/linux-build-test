@@ -1403,6 +1403,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
+	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
+	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, but last time I checked
+	# this was not present in all affected kernel branches.
+	# enable_config "${fragment} CONFIG_MEMCPY_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_TIME_UNIT_TEST CONFIG_HASH_UNIT_TEST
 	enable_config "${fragment}" CONFIG_CPUMASK_KUNIT_TEST CONFIG_BITFIELD_KUNIT
 	enable_config "${fragment}" CONFIG_HASH_KUNIT_TEST CONFIG_HASHTABLE_KUNIT_TEST
@@ -1412,9 +1416,7 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_MPTCP_KUNIT_TEST CONFIG_NET_HANDSHAKE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_FORMAT_KUNIT_TEST CONFIG_IIO_RESCALE_KUNIT_TEST
-	# regmap unit tests may be executed under spinlock, but allocate memory.
-	# This results in a traceback (mips, arm-aspeed, and others)
-	# enable_config "${fragment}" CONFIG_REGMAP_KUNIT
+	enable_config "${fragment}" CONFIG_REGMAP_KUNIT
 	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST CONFIG_CHECKSUM_KUNIT
 	# clock unit tests seem to introduce noise warning tracebacks
@@ -1432,6 +1434,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RCU_EQS_DEBUG CONFIG_STATIC_KEYS_SELFTEST
 	enable_config "${fragment}" CONFIG_STRING_SELFTEST CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
 	enable_config "${fragment}" CONFIG_ATOMIC64_SELFTEST CONFIG_CRC32_SELFTEST
+	# generates warning backtraces on purpose 
+	# enable_config "${fragment}" CONFIG_OF_UNITTEST
 	# takes too long
 	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
 	enable_config "${fragment}" CONFIG_TEST_SORT CONFIG_TEST_SYSCTL CONFIG_TEST_UUID
@@ -1875,6 +1879,10 @@ dowait()
 	dolog=1
     fi
     if grep -q "BUG: KFENCE:" ${logfile}; then
+	dolog=1
+    fi
+    # Try to catch failing kunit tests
+    if grep -q -e '# Totals: pass:[0-9]* fail:[1-9][0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
 	dolog=1
     fi
 
