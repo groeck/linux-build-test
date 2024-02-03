@@ -213,13 +213,11 @@
   function qemuGetKunitResults_{{rel_var}} (match_string)
   {
     var num = 0;
-    // document.write('{{rel_var}} Kunit length ' + qemuKunitBuildText_{{rel_var}}.length + ' match: ' + match_string)
     for (var i=0; i < qemuKunitBuildText_{{rel_var}}.length; i++)
     {
         var elem = qemuKunitBuildText_{{rel_var}}[i];
         num += getResult(elem, match_string);
     }
-    // document.write('--> ' + num + '<br>')
     return num;
   }
 
