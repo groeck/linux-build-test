@@ -87,7 +87,7 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local waitlist=("Boot successful" "Rebooting")
-    local build="mips64:${defconfig}"
+    local build="mips64:${QEMU_MACH}:${defconfig}"
     local cache="${defconfig}${fixup//smp*/smp}"
 
     build+=":${fixup}"
