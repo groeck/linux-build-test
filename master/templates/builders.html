@@ -100,8 +100,8 @@
 			       "exception interrupted"] -%}
 	{% continue -%}
       {% endif -%}
-      {% set fbuilds = b.build_text|regex_replace('.*<!-- fail +', '') -%}
-      {% set fbuilds = fbuilds|regex_replace(' +fail -->.*', '') -%}
+      {% set fbuilds = b.build_text|regex_replace('.*<!-- +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' + -->.*', '') -%}
       {% if fbuilds != '' and fbuilds != b.build_text -%}
 	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
 	{% set fbuilds = fbuilds|split(' ') -%}
@@ -199,6 +199,35 @@
     {% endfor -%}
   {% endfor -%} ];
 
+  {% set exists = [] -%}
+
+  var qemuKunitFailures_{{rel_var}} = [
+  {% for arch in qemu_arches -%}
+    {% set bname = "qemu-" ~ arch ~ "-" ~ rel -%}
+    {% for b in builders if b.name == bname and b.build_url and b.build_css_class -%}
+      {% if b.build_text in ["exception buildcommand",
+			       "exception interrupted"] -%}
+	{% continue -%}
+      {% endif -%}
+      {% if not 'kunit:' in b.build_text -%}
+        {% continue -%}
+      {% endif -%}
+      {% set fbuilds = b.build_text|regex_replace('.*kunit: +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace('.*<!-- kunit +', '') -%}
+      {% set fbuilds = fbuilds|regex_replace(' +kunit -->.*', '') -%}
+      {% if fbuilds != '' and fbuilds != b.build_text -%}
+	{% set fbuilds = fbuilds|regex_replace(' +', ' ') -%}
+	{% set fbuilds = fbuilds|replace('qemu_', '') -%}
+	{% set fbuilds = fbuilds|split('#') -%}
+	{% for fbuild in fbuilds -%}
+	  {% if exists -%}, {% endif -%}
+		"{{ fbuild }}"
+          {% do exists.append("1") -%}
+	{% endfor -%}
+      {% endif -%}
+    {% endfor -%}
+  {% endfor -%} ];
+
   function qemuGetResults_{{rel_var}} (match_string)
   {
     var num = 0;
@@ -287,6 +316,13 @@
 	    document.write("<br>Kunit test results:<br>");
             document.write(' pass: ' + qemu_kunit_passed +
 			' fail: ' + qemu_kunit_fail);
+	}
+	if (qemuKunitFailures_{{rel_var}}.length > 0) {
+		document.write('<br>Failed unit tests:\n');
+		for (var f=0; f < qemuKunitFailures_{{rel_var}}.length; f++) {
+			document.write('<br>' + qemuKunitFailures_{{rel_var}}[f] + '\n');
+		}
+		document.write('\n');
 	}
         document.write('</td>\n');
 	</script>
