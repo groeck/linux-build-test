@@ -48,7 +48,7 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local waitlist=("Boot successful" "Rebooting")
-    local build="${ARCH}:${defconfig}:${fixup}"
+    local build="${ARCH}:${QEMU_MACH}:${defconfig}:${fixup}"
     local cache="${defconfig}${fixup//smp*/smp}"
 
     if [[ "${rootfs}" == *.cpio* ]]; then
