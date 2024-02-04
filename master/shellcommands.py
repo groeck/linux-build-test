@@ -11,6 +11,7 @@ passed = re.compile('Building (\S+):(\S+) \.\.\. passed$')
 failed = re.compile('Building (\S+):(\S+) \.\.\. failed$')
 skipped = re.compile('Building (\S+):(\S+) \.\.\. failed \(\S+\)')
 
+current_qemu = re.compile('Building ([^:\s]+):([^:\s]+):(\S+) \.+ running [\.R]+')
 passed_qemu = re.compile('Building (\S+):(\S+) \.+ running [\.R]+ passed$')
 failed_qemu = re.compile('Building (\S+):(\S+) .*?failed.*$')
 skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped$')
@@ -177,12 +178,16 @@ class AnalyzeQemuBuildLog(LogLineObserver):
         self.numKunitFailed = 0
         self.numKunitSkipped = 0
         self.tracebacks = False
+        self.current = None
         self.failed = []
         self.kunit_failed = []
     def outLineReceived(self, line):
 	# Look for:
 	# Building <arch>:<config> .+ running .+ passed
 	# Building <arch>:<config> .* failed.*
+	current = current_qemu.match(line)
+	if current:
+            self.current = [current.group(1).replace('#','_'), current.group(2).replace('#','_')]
         if passed_qemu.match(line) or failed_qemu.match(line) or skipped_qemu.match(line):
             self.numTotal += 1
 	    if passed_qemu.match(line):
@@ -214,8 +219,10 @@ class AnalyzeQemuBuildLog(LogLineObserver):
             self.numKunitPassed += int(kunit.group(2))
             self.numKunitFailed += int(kunit.group(3))
             self.numKunitSkipped += int(kunit.group(4))
-            if int(kunit.group(3)) > 0:
-                self.kunit_failed.append(kunit.group(1))
+            if self.current and int(kunit.group(3)) > 0:
+                new = self.current + [kunit.group(1).replace('#','_')]
+                if new not in self.kunit_failed:
+                    self.kunit_failed.append(new)
 
 class QemuBuildCommand(RefShellCommand):
     name = "qemubuildcommand"
@@ -284,9 +291,11 @@ class QemuBuildCommand(RefShellCommand):
             if self.counter.numKunitFailed:
                 text.append("fail: " + str(self.counter.numKunitFailed))
                 text.append("<!-- kunit ")
+                elems = []
                 for elem in self.counter.kunit_failed:
-                    text.append(str(elem) + " ")
-                text.append("kunit -->")
+                    elems.append(':'.join(elem))
+                text.append('#'.join(elems))
+                text.append(" kunit -->")
         return text
 
     def maybeGetText2(self, cmd, results):
