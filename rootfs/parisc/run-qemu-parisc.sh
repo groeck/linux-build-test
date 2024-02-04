@@ -76,7 +76,7 @@ runkernel()
       ${QEMU} -M ${machine} -kernel vmlinux -no-reboot \
 	${extra_params} \
 	-append "${initcli} console=ttyS0,115200 ${extracli}" \
-	-nographic -monitor null
+	-nographic -monitor null -serial stdio
 
     return $?
 }
