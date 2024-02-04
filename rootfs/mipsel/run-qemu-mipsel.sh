@@ -46,7 +46,7 @@ runkernel()
     local fixup="$3"
     local rootfs=$4
     local waitlist=("Boot successful" "Rebooting")
-    local build="mipsel:${cpu}:${defconfig}:${fixup}"
+    local build="mipsel:${QEMU_MACH}:${cpu}:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup//smp*/smp}"
 
     if [[ "${rootfs%.gz}" == *cpio ]]; then
