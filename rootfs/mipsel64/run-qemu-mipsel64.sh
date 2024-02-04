@@ -82,7 +82,7 @@ runkernel()
     local rootfs=$3
     local fixup=$4
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local build="mipsel64:${defconfig}:${fixup}"
+    local build="mipsel64:${mach}:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup//smp*/smp}"
     local wait="automatic"
     local mem
