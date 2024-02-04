@@ -39,7 +39,7 @@ runkernel()
     local rootfs=$3
     local fixup=$4
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
-    local build="loongarch:${defconfig}:${fixup}"
+    local build="loongarch:${mach}:${defconfig}:${fixup}"
     local buildconfig="${defconfig}:${fixup%::*}"
     local wait="automatic"
     local mem
