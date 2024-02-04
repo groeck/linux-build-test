@@ -29,7 +29,7 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local waitlist=("Boot successful" "Rebooting" "Restarting system")
-    local build="${ARCH}:${defconfig}"
+    local build="${ARCH}:clipper:${defconfig}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
