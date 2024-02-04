@@ -305,6 +305,7 @@
         document.write('total: ' + qemu_total +
 			' pass: ' + qemu_passed +
 			' fail: ' + qemu_fail);
+	/*
 	if (qemuBuildFailures_{{rel_var}}.length > 0) {
 		document.write('<br>Failed tests:\n');
 		for (var f=0; f < qemuBuildFailures_{{rel_var}}.length; f++) {
@@ -312,8 +313,9 @@
 		}
 		document.write('\n');
 	}
+	*/
 	if (qemu_kunit_passed > 0 || qemu_kunit_fail > 0) {
-	    document.write("<br>Kunit test results:<br>");
+	    document.write("<br>Unit test results:<br>");
             document.write(' pass: ' + qemu_kunit_passed +
 			' fail: ' + qemu_kunit_fail);
 	/*
@@ -511,7 +513,7 @@
 		}
 	}
 	if (kunit_passed > 0 || kunit_fail > 0) {
-	    document.write("Kunit tests:<br>");
+	    document.write("Unit tests:<br>");
             document.write(' pass: ' + kunit_passed +
 			' fail: ' + kunit_fail);
 	    if (qemuKunitFailures_{{rel_var}}.length > 0) {
