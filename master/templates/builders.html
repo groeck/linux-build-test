@@ -450,7 +450,7 @@
       {% if b.build_url and b.build_css_class -%}
       <script type='text/javascript'>
             var myclass = '{{ b.build_css_class }}';
-            var elem = '{{ b.build_text }}';
+            var elem = '{{ b.build_text }}'.replace(/kunit:.*/,'');
 	    var fail = getResult (elem, /fail: \d+/);
 	    if ( '{{ b.build_css_class }}' == 'warnings' && fail == 0) {
               myclass = 'runtime-warnings';
