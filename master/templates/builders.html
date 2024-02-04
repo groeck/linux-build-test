@@ -316,13 +316,15 @@
 	    document.write("<br>Kunit test results:<br>");
             document.write(' pass: ' + qemu_kunit_passed +
 			' fail: ' + qemu_kunit_fail);
-	}
-	if (qemuKunitFailures_{{rel_var}}.length > 0) {
-		document.write('<br>Failed unit tests:\n');
+	/*
+	    if (qemuKunitFailures_{{rel_var}}.length > 0) {
+		document.write('\n<br>Failed unit tests:\n');
 		for (var f=0; f < qemuKunitFailures_{{rel_var}}.length; f++) {
 			document.write('<br>' + qemuKunitFailures_{{rel_var}}[f] + '\n');
 		}
-		document.write('\n');
+	    }
+	*/
+	    document.write('\n');
 	}
         document.write('</td>\n');
 	</script>
@@ -512,6 +514,12 @@
 	    document.write("Kunit tests:<br>");
             document.write(' pass: ' + kunit_passed +
 			' fail: ' + kunit_fail);
+	    if (qemuKunitFailures_{{rel_var}}.length > 0) {
+		document.write('\n<br>Failed unit tests:\n');
+		for (var f=0; f < qemuKunitFailures_{{rel_var}}.length; f++) {
+			document.write('<br>' + qemuKunitFailures_{{rel_var}}[f] + '\n');
+		}
+	    }
 	}
         document.write('</td>\n');
 	</script>
