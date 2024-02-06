@@ -395,6 +395,12 @@ div.BuildWaterfall {
 	border-color: #C29D46;
 }
 
+.kunit-failures {
+	color: #000;
+	background-color: #fd3;
+	border-color: #C29D46;
+}
+
 .skipped {
 	color: #000;
 	background: #AADDEE;

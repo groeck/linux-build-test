@@ -450,9 +450,16 @@
       <script type='text/javascript'>
             var myclass = '{{ b.build_css_class }}';
             var elem = '{{ b.build_text }}';
-            elem = elem.replace(/kunit:.*/,'');
+	    var kelem = elem.match('kunit:.*');
+	    if (kelem) {
+	        var kfail = getResult (kelem, /fail: \d+/);
+	        if (myclass == 'success' && kfail > 0) {
+	          myclass = 'kunit-failures';
+	        }
+                elem = elem.replace(/kunit:.*/,'');
+	    }
 	    var fail = getResult (elem, /fail: \d+/);
-	    if ( '{{ b.build_css_class }}' == 'warnings' && fail == 0) {
+	    if (myclass == 'warnings' && fail == 0) {
               myclass = 'runtime-warnings';
 	    }
 	    document.write('<td class="LastBuild box ' + myclass + '">\n');
