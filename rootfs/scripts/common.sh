@@ -4,10 +4,10 @@ shopt -s extglob
 
 ulimit -c unlimited
 
-# limit file size to 1GB to prevent log file sizes from getting out of control.
+# limit file size to 2GB to prevent log file sizes from getting out of control.
 # Note that the limit needs to be a bit larger than 1GB to accommodate 1GB
 # flashes, and some arm64 builds need inexplicably more space when linking.
-ulimit -f $((1500 * 1024))
+ulimit -f $((2000 * 1024))
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
@@ -1427,20 +1427,51 @@ __setup_fragment()
 	# other
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-	enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_DEBUG_LOCKING_API_SELFTESTS
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
-	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST CONFIG_GLOB_SELFTEST
+	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST
 	enable_config "${fragment}" CONFIG_PCI_EPF_TEST CONFIG_PCI_ENDPOINT_TEST
 	enable_config "${fragment}" CONFIG_RCU_EQS_DEBUG CONFIG_STATIC_KEYS_SELFTEST
-	enable_config "${fragment}" CONFIG_STRING_SELFTEST CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
-	enable_config "${fragment}" CONFIG_ATOMIC64_SELFTEST CONFIG_CRC32_SELFTEST
-	# generates warning backtraces on purpose 
+	# generates warning backtraces on purpose
 	# enable_config "${fragment}" CONFIG_OF_UNITTEST
 	# takes too long
 	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
-	enable_config "${fragment}" CONFIG_TEST_SORT CONFIG_TEST_SYSCTL CONFIG_TEST_UUID
+	enable_config "${fragment}" CONFIG_TEST_SORT
 	enable_config "${fragment}" CONFIG_USB_TEST CONFIG_USB_EHSET_TEST_FIXTURE
 	enable_config "${fragment}" CONFIG_USB_LINK_LAYER_TEST
+
+	enable_config "${fragment}" CONFIG_DM_KUNIT_TEST CONFIG_DRIVER_PE_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_USB4_KUNIT_TEST CONFIG_BINFMT_ELF_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_FAT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_TEST_LIST_SORT TEST_SORT
+	enable_config "${fragment}" CONFIG_PERCPU_TEST
+	enable_config "${fragment}" CONFIG_TEST_KSTRTOX
+	enable_config "${fragment}" CONFIG_TEST_BPF
+	enable_config "${fragment}" CONFIG_TEST_BLACKHOLE_DEV
+	enable_config "${fragment}" CONFIG_MMC_SDHCI_OF_ASPEED_TEST
+	enable_config "${fragment}" CONFIG_TEST_IOV_ITER
+	enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
+
+	# non-standard output, can not parse
+	# enable_config "${fragment}" CONFIG_TEST_PRINTF CONFIG_TEST_SCANF CONFIG_TEST_UUID
+	# enable_config "${fragment}" CONFIG_TEST_HEXDUMP CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
+	# enable_config "${fragment}" CONFIG_TEST_XARRAY
+	# enable_config "${fragment}" CONFIG_STRING_SELFTEST
+	# enable_config "${fragment}" CONFIG_TEST_SYSCTL
+	# enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_TEST_MIN_HEAP
+	# enable_config "${fragment}" CONFIG_DEBUG_LOCKING_API_SELFTESTS
+	# enable_config "${fragment}" CONFIG_ATOMIC64_SELFTEST
+	# enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
+	# enable_config "${fragment}" CONFIG_GLOB_SELFTEST
+	#
+	# runs too long (> 2 minutes) or hangs, and non-standard output
+	# enable_config "${fragment}" CONFIG_REED_SOLOMON_TEST
+	#
+	# hangs without output
+	# enable_config "${fragment}" CONFIG_TEST_MAPLE_TREE
+	#
+	# hangs with soft lockup (arm, microblaze)
+	# and/or reports RCU stalls (mips)
+	# enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
@@ -1449,8 +1480,6 @@ __setup_fragment()
 	    # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y
 	    # enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
 	fi
-
-	enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
     fi
 
     if [[ "${nonet}" -eq 0 ]]; then
