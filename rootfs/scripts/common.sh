@@ -1729,6 +1729,38 @@ dosetup()
     return ${rv}
 }
 
+# Combine all kunit test results into a single log line
+kunit_summary()
+{
+    declare results="$(grep -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' "$1" | sed -e 's/^\[.*\] # Totals: //')"
+    local pass=0
+    local fail=0
+    local skip=0
+    local total=0
+
+    for result in ${results[@]}; do
+	# Drop trailing '\r'
+	result="${result%$'\r'}"
+	for r in ${result}; do
+	    case $r in
+	    pass:[0-9]*)
+		pass="$((pass + ${r//pass:}))"
+		;;
+	    fail:[0-9]*)
+		fail="$((fail + ${r//fail:}))"
+		;;
+	    skip:[0-9]*)
+		skip="$((skip + ${r//skip:}))"
+		;;
+	    total:[0-9]*)
+		total="$((total + ${r//total:}))"
+		;;
+	    esac
+	done
+    done
+    echo " # Totals: pass:${pass} fail:${fail} skip:${skip} total:${total}"
+}
+
 dowait()
 {
     local pid=$1
@@ -1979,7 +2011,7 @@ dowait()
 	    echo "------------"
 	elif grep -q -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
 	    echo "Kunit tests:"
-	    grep -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile} | sed -e 's/^\[.*]//'
+	    kunit_summary "${logfile}"
 	fi
 	if [[ ${dolog} -ne 0 && ${__log_abort} -ne 0 ]]; then
 	    retcode=1
