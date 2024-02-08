@@ -1758,7 +1758,7 @@ kunit_summary()
 	    esac
 	done
     done
-    echo " # Totals: pass:${pass} fail:${fail} skip:${skip} total:${total}"
+    echo "# Totals: pass:${pass} fail:${fail} skip:${skip} total:${total}"
 }
 
 dowait()
