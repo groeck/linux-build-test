@@ -1403,38 +1403,25 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
-	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
-	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, but last time I checked
-	# this was not present in all affected kernel branches.
-	# enable_config "${fragment} CONFIG_MEMCPY_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_TIME_UNIT_TEST CONFIG_HASH_UNIT_TEST
 	enable_config "${fragment}" CONFIG_CPUMASK_KUNIT_TEST CONFIG_BITFIELD_KUNIT
 	enable_config "${fragment}" CONFIG_HASH_KUNIT_TEST CONFIG_HASHTABLE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_OVERFLOW_KUNIT_TEST CONFIG_STRSCPY_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_KUNIT_DEBUGFS
-	# RTC library unit tests hang in many qemu emulations
-	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_MPTCP_KUNIT_TEST CONFIG_NET_HANDSHAKE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_FORMAT_KUNIT_TEST CONFIG_IIO_RESCALE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_REGMAP_KUNIT
 	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST CONFIG_CHECKSUM_KUNIT
-	# clock unit tests seem to introduce noise warning tracebacks
-	# enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST CONFIG_STACKINIT_KUNIT_TEST
-	# Results in lots of "ASoC: Parent card not yet available" log messages
-	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
-	# other
+
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
+	# Oddity: We have to disable the following option to enable the tests
 	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
 	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST
 	enable_config "${fragment}" CONFIG_PCI_EPF_TEST CONFIG_PCI_ENDPOINT_TEST
 	enable_config "${fragment}" CONFIG_RCU_EQS_DEBUG CONFIG_STATIC_KEYS_SELFTEST
-	# generates warning backtraces on purpose
-	# enable_config "${fragment}" CONFIG_OF_UNITTEST
-	# takes too long
-	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
 	enable_config "${fragment}" CONFIG_TEST_SORT
 	enable_config "${fragment}" CONFIG_USB_TEST CONFIG_USB_EHSET_TEST_FIXTURE
 	enable_config "${fragment}" CONFIG_USB_LINK_LAYER_TEST
@@ -1449,7 +1436,16 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_TEST_BLACKHOLE_DEV
 	enable_config "${fragment}" CONFIG_MMC_SDHCI_OF_ASPEED_TEST
 	enable_config "${fragment}" CONFIG_TEST_IOV_ITER
-	enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
+
+	enable_config "${fragment}" CONFIG_CROS_KUNIT_EC_PROTO_TEST
+	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
+
+	# Would be built as module; need to enable board by board if desired
+	# together with base configuration (CONFIG_DRM=y, CONFIG_SND_HDA=y, ...)
+	# enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
+	# enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST CONFIG_DRM_VC4_KUNIT_TEST
+	# enable_config "${fragment}" CONFIG_SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
+	# enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST CONFIG_CFG80211_KUNIT_TEST
 
 	# non-standard output, can not parse
 	# enable_config "${fragment}" CONFIG_TEST_PRINTF CONFIG_TEST_SCANF CONFIG_TEST_UUID
@@ -1463,6 +1459,17 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
 	# enable_config "${fragment}" CONFIG_GLOB_SELFTEST
 	#
+	# RTC library unit tests hang in many qemu emulations
+	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
+	#
+	# Results in lots of "ASoC: Parent card not yet available" log messages
+	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
+	#
+	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
+	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, but last time I checked
+	# this was not present in all affected kernel branches.
+	# enable_config "${fragment} CONFIG_MEMCPY_KUNIT_TEST
+	#
 	# runs too long (> 2 minutes) or hangs, and non-standard output
 	# enable_config "${fragment}" CONFIG_REED_SOLOMON_TEST
 	#
@@ -1472,6 +1479,18 @@ __setup_fragment()
 	# hangs with soft lockup (arm, microblaze)
 	# and/or reports RCU stalls (mips)
 	# enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
+	#
+	# generates warning backtraces on purpose
+	# enable_config "${fragment}" CONFIG_OF_UNITTEST
+	#
+	# takes too long
+	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
+	#
+	# clock unit tests seem to introduce noise warning tracebacks
+	# enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_KUNIT_TEST
+	#
+	# triggers tracebacks, runs forever
+	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
@@ -1958,6 +1977,9 @@ dowait()
 		head -5000 ${logfile}
 	    fi
 	    echo "------------"
+	elif grep -q -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
+	    echo "Kunit tests:"
+	    grep -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile} | sed -e 's/^\[.*]//'
 	fi
 	if [[ ${dolog} -ne 0 && ${__log_abort} -ne 0 ]]; then
 	    retcode=1
