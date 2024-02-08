@@ -91,10 +91,10 @@ class AnalyzeBuildLog(LogLineObserver):
         self.numSkipped = 0
         self.failed = []
     def outLineReceived(self, line):
-	# Look for:
-	# Building <arch>:<config> ... passed
-	# Building <arch>:<config> ... failed
-	# Building <arch:<config> ... failed (config) - skipping
+        # Look for:
+        # Building <arch>:<config> ... passed
+        # Building <arch>:<config> ... failed
+        # Building <arch:<config> ... failed (config) - skipping
         if line.startswith("Building "):
             self.numTotal += 1
 	    if passed.match(line):
@@ -182,11 +182,14 @@ class AnalyzeQemuBuildLog(LogLineObserver):
         self.failed = []
         self.kunit_failed = []
     def outLineReceived(self, line):
-	# Look for:
-	# Building <arch>:<config> .+ running .+ passed
-	# Building <arch>:<config> .* failed.*
-	current = current_qemu.match(line)
-	if current:
+        # Look for:
+        # Building <arch>:<machine>:<config> .+ running .+ passed
+        # Building <arch>:<machine>:<config> .* failed.*
+        # save architecture and machine in self.current for later use
+        # Make sure that '#" is not in the architecture or machine name
+        # because that is used as separator later on.
+        current = current_qemu.match(line)
+        if current:
             self.current = [current.group(1).replace('#','_'), current.group(2).replace('#','_')]
         if passed_qemu.match(line) or failed_qemu.match(line) or skipped_qemu.match(line):
             self.numTotal += 1
@@ -215,11 +218,13 @@ class AnalyzeQemuBuildLog(LogLineObserver):
 	elif line.find('(try booting with the "irqpoll" option)') != -1:
             self.tracebacks = True
         kunit = kunit_result.match(line)
-        if kunit and kunit.group(1) != 'Totals':
-            self.numKunitPassed += int(kunit.group(2))
-            self.numKunitFailed += int(kunit.group(3))
-            self.numKunitSkipped += int(kunit.group(4))
-            if self.current and int(kunit.group(3)) > 0:
+        if kunit:
+            # count totals but add individual test results to output
+            if kunit.group(1) == 'Totals':
+                self.numKunitPassed += int(kunit.group(2))
+                self.numKunitFailed += int(kunit.group(3))
+                self.numKunitSkipped += int(kunit.group(4))
+            elif self.current and int(kunit.group(3)) > 0:
                 new = self.current + [kunit.group(1).replace('#','_')]
                 if new not in self.kunit_failed:
                     self.kunit_failed.append(new)
