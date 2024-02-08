@@ -287,6 +287,10 @@
 		box = "warnings";
 		build = "warnings";
 	    }
+	    if (box == "success" && qemu_kunit_fail > 0) {
+		box = "kunit-failures";
+		build = "warnings";
+	    }
 	document.write('<td class="LastBuild box ' + box + '">\n');
 	document.write("Build results:<br>");
 	total = total - skipped;
