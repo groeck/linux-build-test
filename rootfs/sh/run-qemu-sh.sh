@@ -74,7 +74,7 @@ runkernel()
 
     # 'nofs' is needed to avoid enabling btrfs, which in turn enables raid6,
     # which sometimes hangs in emulation, depending on code alignment.
-    if ! dosetup -c "${defconfig}" -F "${fixup}:nofs:notests:nodebug" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}:nofs:nodebug" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
