@@ -94,7 +94,8 @@ runkernel()
 	return 0
     fi
 
-    # Do not use -F: If we do, sheb will fail to run in ToT Linux
+    # Do not use -F: If we do, sheb will fail to run (abort immediately
+    # with no log output) in ToT Linux
     if ! dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"; then
 	return 1
     fi
