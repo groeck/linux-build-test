@@ -36,7 +36,7 @@ runkernel()
 
     echo -n "Building ${ARCH}:${defconfig} ... "
 
-    fixup="notests:nolockup"
+    fixup="nolockup"
     if [[ ${linux_version_code} -lt $(kernel_version 5 0) ]]; then
 	# We don't run network tests, so don't enable them
 	fixup+=":nonet"
