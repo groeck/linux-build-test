@@ -65,7 +65,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}" -F "${fixup}:nodebug:notests:nofs" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}:nodebug:nofs" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
