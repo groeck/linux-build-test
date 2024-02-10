@@ -43,35 +43,6 @@ patch_defconfig()
     # Build a big endian image
     echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
     echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
-
-    # DEVTMPFS
-    echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
-    echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
-
-    # BLK_DEV_INITRD
-    echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
-
-    # NVME support
-    echo "CONFIG_BLK_DEV_NVME=y" >> ${defconfig}
-
-    # USB support
-    echo "CONFIG_USB=y" >> ${defconfig}
-    echo "CONFIG_USB_XHCI_HCD=y" >> ${defconfig}
-    echo "CONFIG_USB_STORAGE=y" >> ${defconfig}
-    echo "CONFIG_USB_UAS=y" >> ${defconfig}
-
-    # MMC/SDHCI support
-    echo "CONFIG_MMC=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI=y" >> ${defconfig}
-    echo "CONFIG_MMC_SDHCI_PCI=y" >> ${defconfig}
-
-    # SCSI controller drivers
-    echo "CONFIG_SCSI_DC395x=y" >> ${defconfig}
-    echo "CONFIG_SCSI_AM53C974=y" >> ${defconfig}
-    echo "CONFIG_MEGARAID_SAS=y" >> ${defconfig}
-    echo "CONFIG_SCSI_SYM53C8XX_2=y" >> ${defconfig}
-    echo "CONFIG_FUSION=y" >> ${defconfig}
-    echo "CONFIG_FUSION_SAS=y" >> ${defconfig}
 }
 
 runkernel()
@@ -82,10 +53,10 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
     local build="${DISPARCH}:${defconfig}"
 
-    if [[ "${rootfs%.gz}" == *cpio ]]; then
+    if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
-	build+=":${fixup}:rootfs"
+	build+=":${rootfs##*.}"
     fi
 
     echo -n "Building ${build} ... "
@@ -94,21 +65,14 @@ runkernel()
 	return 0
     fi
 
-    # Do not use -F: If we do, sheb will fail to run (abort immediately
-    # with no log output) in ToT Linux
-    if ! dosetup -c "${defconfig}" -f fixup "${rootfs}" "${defconfig}"; then
-	return 1
-    fi
-
-    rootfs="$(rootfsname ${rootfs})"
-    if ! common_diskcmd "${fixup}" "${rootfs}"; then
+    if ! dosetup -c "${defconfig}" -F "${fixup}:nodebug:notests:nofs" "${rootfs}" "${defconfig}"; then
 	return 1
     fi
 
     execute automatic waitlist[@] \
       ${QEMU} -M r2d -kernel ./arch/sh/boot/zImage \
 	-snapshot \
-	${diskcmd} \
+	${extra_params} \
 	-append "${initcli} console=ttySC1,115200 noiotrap" \
 	-serial null -serial stdio -monitor null -nographic \
 	-no-reboot
