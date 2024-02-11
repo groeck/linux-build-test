@@ -1398,6 +1398,8 @@ __setup_fragment()
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
 	# kunit
+	# We do not want to run _all_ tests, much less building them as modules
+	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
 	enable_config "${fragment}" CONFIG_KUNIT CONFIG_KUNIT_TEST CONFIG_PM_QOS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
