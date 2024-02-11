@@ -36,6 +36,7 @@ patch_defconfig()
     echo "CONFIG_MINIX_FS=y" >> ${defconfig}
     echo "CONFIG_NILFS2_FS=y" >> ${defconfig}
     echo "CONFIG_NTFS3_FS=y" >> ${defconfig}
+    echo "CONFIG_NTFS3_LZX_XPRESS=y" >> ${defconfig}
     echo "CONFIG_XFS_FS=y" >> ${defconfig}
 
     # Enable TPM testing
