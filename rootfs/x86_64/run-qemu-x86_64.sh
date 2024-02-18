@@ -133,6 +133,15 @@ else
     gfs2=""
 fi
 
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+    if [[ ${runall} -ne 0 ]]; then
+	runkernel defconfig "smp2:net=e1000:mem512:ata:fstest=ntfs" IvyBridge q35 rootfs.ext2
+	retcode=$((retcode + $?))
+	checkstate ${retcode}
+    fi
+fi
+
+checkstate ${retcode}
 # runkernel defconfig kvm64 q35
 # retcode=$((retcode + $?))
 runkernel defconfig smp:net=e1000:mem256:ata:fstest=xfs Broadwell-noTSX q35 rootfs.ext2
