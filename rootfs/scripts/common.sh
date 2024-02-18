@@ -1291,8 +1291,9 @@ __setup_config()
 
 __setup_fragment()
 {
-    local fragment="$1"
-    local fixups="${2//:/ }"
+    local defconfig="$1"
+    local fragment="$2"
+    local fixups="${3//:/ }"
     local fixup
     local nocd=0
     local nodebug=0
@@ -1442,10 +1443,30 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_CROS_KUNIT_EC_PROTO_TEST
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
 
+	# If DRM is enabled for a given configuration, build it into the kernel
+	# and enable unit tests on it. Do the same for its various sub-tests.
+	#
+	# Note: Unusable. The tests result in several warning backtraces
+	# in drm code. At least some of them are intentional, making the
+	# test all but unusable due to WARNING noise.
+	# The TTM tests result in list corruptions, ultimately causing
+	# the system to hang/crash.
+#	if grep -F -q "CONFIG_DRM=" "${defconfig}"; then
+#	    enable_config "${fragment}" CONFIG_DRM
+#	    enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
+#	    enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
+#	    if grep -F -q "CONFIG_DRM_XE=" "${defconfig}"; then
+#		enable_config "${fragment}" CONFIG_DRM_XE
+#		enable_config "${fragment}" CONFIG_DRM_XE_KUNIT_TEST
+#	    fi
+#	    if grep -F -q "CONFIG_DRM_VC4=" "${defconfig}"; then
+#		enable_config "${fragment}" CONFIG_DRM_VC4
+#		enable_config "${fragment}" CONFIG_DRM_VC4_KUNIT_TEST
+#	    fi
+#	fi
+
+	# Needs to be enabled together with base configuration (CONFIG_SND_HDA=y, ...)
 	# Would be built as module; need to enable board by board if desired
-	# together with base configuration (CONFIG_DRM=y, CONFIG_SND_HDA=y, ...)
-	# enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
-	# enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST CONFIG_DRM_VC4_KUNIT_TEST
 	# enable_config "${fragment}" CONFIG_SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
 	# enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST CONFIG_CFG80211_KUNIT_TEST
 
@@ -1690,7 +1711,7 @@ dosetup()
 
     if [ -n "${fixups}" ]; then
 	fragment="$(__mktemp /tmp/fragment.XXXXX)"
-	__setup_fragment "${fragment}" "${fixups}"
+	__setup_fragment "${defconfig}" "${fragment}" "${fixups}"
     fi
 
     __setup_config "${defconfig}" "${fragment}" "${fixup:-${fixups}}"
