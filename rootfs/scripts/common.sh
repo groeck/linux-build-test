@@ -1448,22 +1448,25 @@ __setup_fragment()
 	#
 	# Note: Unusable. The tests result in several warning backtraces
 	# in drm code. At least some of them are intentional, making the
-	# test all but unusable due to WARNING noise.
-	# The TTM tests result in list corruptions, ultimately causing
-	# the system to hang/crash.
-#	if grep -F -q "CONFIG_DRM=" "${defconfig}"; then
-#	    enable_config "${fragment}" CONFIG_DRM
-#	    enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
-#	    enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
-#	    if grep -F -q "CONFIG_DRM_XE=" "${defconfig}"; then
-#		enable_config "${fragment}" CONFIG_DRM_XE
-#		enable_config "${fragment}" CONFIG_DRM_XE_KUNIT_TEST
-#	    fi
-#	    if grep -F -q "CONFIG_DRM_VC4=" "${defconfig}"; then
-#		enable_config "${fragment}" CONFIG_DRM_VC4
-#		enable_config "${fragment}" CONFIG_DRM_VC4_KUNIT_TEST
-#	    fi
-#	fi
+	# tests all but unusable due to WARNING noise.
+	# The (failing) TTM tests result in list corruptions, ultimately
+	# causing the system to hang/crash. It appears that cleanup after
+	# failures is lacking or incomplete.
+	if [[ false || "${runall}" -ne 0 ]]; then
+	    if grep -F -q "CONFIG_DRM=" "${defconfig}"; then
+		enable_config "${fragment}" CONFIG_DRM
+		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
+		enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
+		if grep -F -q "CONFIG_DRM_XE=" "${defconfig}"; then
+		    enable_config "${fragment}" CONFIG_DRM_XE
+		    enable_config "${fragment}" CONFIG_DRM_XE_KUNIT_TEST
+		fi
+		if grep -F -q "CONFIG_DRM_VC4=" "${defconfig}"; then
+		    enable_config "${fragment}" CONFIG_DRM_VC4
+		    enable_config "${fragment}" CONFIG_DRM_VC4_KUNIT_TEST
+		fi
+	    fi
+	fi
 
 	# Needs to be enabled together with base configuration (CONFIG_SND_HDA=y, ...)
 	# Would be built as module; need to enable board by board if desired
