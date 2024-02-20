@@ -39,6 +39,8 @@ patch_defconfig()
     echo "CONFIG_NTFS3_LZX_XPRESS=y" >> ${defconfig}
     echo "CONFIG_XFS_FS=y" >> ${defconfig}
 
+    enable_config ${defconfig} CONFIG_BCACHEFS_FS
+
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
     echo "CONFIG_TCG_TIS=y" >> ${defconfig}
