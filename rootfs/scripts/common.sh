@@ -1365,6 +1365,16 @@ __setup_fragment()
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER_FALLBACK
 
+    # With CONFIG_DEBUG_SHIRQ enabled, the irq core issues a dummy interrupt
+    # to the driver when an interrupt is released using free_irq(). This
+    # results in an extra call into the affected interrupt handlers.
+    # If/when this happens as part of usb_hcd_pci_shutdown(),
+    # the usb interface is already disabled the hardware and does not
+    # handle the interrupt. It appears that this may cause random USB
+    # errors when shutting down the system. Disable it to see if that
+    # solves the problem or if there is some other issue lurking.
+    disable_config "${fragment}" CONFIG_DEBUG_SHIRQ
+
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
@@ -1443,6 +1453,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_CROS_KUNIT_EC_PROTO_TEST
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
 
+	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
+	enable_config "${fragment}" CONFIG_NET_TEST
+
 	# If DRM is enabled for a given configuration, build it into the kernel
 	# and enable unit tests on it. Do the same for its various sub-tests.
 	#
@@ -1452,7 +1465,12 @@ __setup_fragment()
 	# The (failing) TTM tests result in list corruptions, ultimately
 	# causing the system to hang/crash. It appears that cleanup after
 	# failures is lacking or incomplete.
-	if [[ false || "${runall}" -ne 0 ]]; then
+	if false; then
+	    # This doesn't work: "${defconfig}" does not include
+	    # the directory, and .config is not yet initialized.
+	    # We'll have to call __setup_config() without fragment
+	    # prior to executing this code and then check .config
+	    # instead of ${defconfig}.
 	    if grep -F -q "CONFIG_DRM=" "${defconfig}"; then
 		enable_config "${fragment}" CONFIG_DRM
 		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
@@ -1517,6 +1535,8 @@ __setup_fragment()
 	#
 	# triggers tracebacks, runs forever
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
+	# triggers DEBUG_LOCKS_WARN_ON traceback
+	# enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
