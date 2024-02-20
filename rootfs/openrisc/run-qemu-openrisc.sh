@@ -34,7 +34,7 @@ runkernel()
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local fixup
 
-    echo -n "Building ${ARCH}:${defconfig} ... "
+    echo -n "Building ${ARCH}:or1200:${defconfig} ... "
 
     fixup="nolockup"
     if [[ ${linux_version_code} -lt $(kernel_version 5 0) ]]; then
