@@ -76,6 +76,7 @@ patch_defconfig()
 	    enable_config ${defconfig} CONFIG_MINIX_FS
 	    enable_config ${defconfig} CONFIG_NILFS2_FS
 	    enable_config ${defconfig} CONFIG_XFS_FS
+	    enable_config ${defconfig} CONFIG_BCACHEFS_FS
 	    ;;
 	*)
 	    ;;
