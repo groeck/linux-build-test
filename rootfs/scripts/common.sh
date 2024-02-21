@@ -1289,11 +1289,22 @@ __setup_config()
     return 0
 }
 
+is_enabled()
+{
+    grep -q -e "^$1=[m|y]\$" ".config"
+    return $?
+}
+
+is_available()
+{
+    grep -q -e "^$1=[m|y]\$" -e "^# $1 is not set$" ".config"
+    return $?
+}
+
 __setup_fragment()
 {
-    local defconfig="$1"
-    local fragment="$2"
-    local fixups="${3//:/ }"
+    local fragment="$1"
+    local fixups="${2//:/ }"
     local fixup
     local nocd=0
     local nodebug=0
@@ -1416,7 +1427,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_TIME_UNIT_TEST CONFIG_HASH_UNIT_TEST
+	enable_config "${fragment}" CONFIG_HASH_UNIT_TEST
 	enable_config "${fragment}" CONFIG_CPUMASK_KUNIT_TEST CONFIG_BITFIELD_KUNIT
 	enable_config "${fragment}" CONFIG_HASH_KUNIT_TEST CONFIG_HASHTABLE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_OVERFLOW_KUNIT_TEST CONFIG_STRSCPY_KUNIT_TEST
@@ -1455,6 +1466,33 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
 	enable_config "${fragment}" CONFIG_NET_TEST
+	if is_enabled CONFIG_CFG80211; then
+	    enable_config "${fragment}" CONFIG_CFG80211
+	    enable_config "${fragment}" CONFIG_CFG80211_KUNIT_TEST
+	fi
+
+	if is_enabled CONFIG_MAC80211; then
+	    enable_config CONFIG_MAC80211
+	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
+	fi
+
+	enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_STRCAT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SIPHASH_KUNIT_TEST
+
+	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
+	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, so only configure
+	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled.
+	#
+	# In practice this doesn't work because CONFIG_MEMCPY_SLOW_KUNIT_TEST
+	# is only visible in .config if CONFIG_MEMCPY_KUNIT_TEST is already
+	# enabled. So CONFIG_MEMCPY_KUNIT_TEST will always end up being
+	# disabled. Keep the code for the time being; maybe we can find
+	# a better solution.
+	if is_available CONFIG_MEMCPY_SLOW_KUNIT_TEST; then
+	    enable_config "${fragment}" CONFIG_MEMCPY_KUNIT_TEST
+	    disable_config "${fragment}" CONFIG_MEMCPY_SLOW_KUNIT_TEST
+	fi
 
 	# If DRM is enabled for a given configuration, build it into the kernel
 	# and enable unit tests on it. Do the same for its various sub-tests.
@@ -1466,20 +1504,15 @@ __setup_fragment()
 	# causing the system to hang/crash. It appears that cleanup after
 	# failures is lacking or incomplete.
 	if false; then
-	    # This doesn't work: "${defconfig}" does not include
-	    # the directory, and .config is not yet initialized.
-	    # We'll have to call __setup_config() without fragment
-	    # prior to executing this code and then check .config
-	    # instead of ${defconfig}.
-	    if grep -F -q "CONFIG_DRM=" "${defconfig}"; then
+	    if is_enabled CONFIG_DRM; then
 		enable_config "${fragment}" CONFIG_DRM
 		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
 		enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
-		if grep -F -q "CONFIG_DRM_XE=" "${defconfig}"; then
+		if is_enabled CONFIG_DRM_XE; then
 		    enable_config "${fragment}" CONFIG_DRM_XE
 		    enable_config "${fragment}" CONFIG_DRM_XE_KUNIT_TEST
 		fi
-		if grep -F -q "CONFIG_DRM_VC4=" "${defconfig}"; then
+		if is_enabled CONFIG_DRM_VC4; then
 		    enable_config "${fragment}" CONFIG_DRM_VC4
 		    enable_config "${fragment}" CONFIG_DRM_VC4_KUNIT_TEST
 		fi
@@ -1509,19 +1542,16 @@ __setup_fragment()
 	# Results in lots of "ASoC: Parent card not yet available" log messages
 	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
 	#
-	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
-	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, but last time I checked
-	# this was not present in all affected kernel branches.
-	# enable_config "${fragment} CONFIG_MEMCPY_KUNIT_TEST
-	#
 	# runs too long (> 2 minutes) or hangs, and non-standard output
 	# enable_config "${fragment}" CONFIG_REED_SOLOMON_TEST
 	#
 	# hangs without output
 	# enable_config "${fragment}" CONFIG_TEST_MAPLE_TREE
 	#
-	# hangs with soft lockup (arm, microblaze)
-	# and/or reports RCU stalls (mips)
+	# hangs with soft lockup (arm, microblaze) and/or reports RCU stalls
+	# (mips). Even if not hanging or stalling, it takes a long time to run
+	# for little gain: All it does is to test time64_to_tm() with a large
+	# number of input values.
 	# enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
 	#
 	# generates warning backtraces on purpose
@@ -1733,8 +1763,10 @@ dosetup()
     doclean ${ARCH}
 
     if [ -n "${fixups}" ]; then
+	# dummy call to initialize .config
+	__setup_config "${defconfig}" "" "${fixup:-${fixups}}"
 	fragment="$(__mktemp /tmp/fragment.XXXXX)"
-	__setup_fragment "${defconfig}" "${fragment}" "${fixups}"
+	__setup_fragment "${fragment}" "${fixups}"
     fi
 
     __setup_config "${defconfig}" "${fragment}" "${fixup:-${fixups}}"
