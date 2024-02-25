@@ -129,7 +129,7 @@ parse_args()
 	extracli=""
 	while getopts ae:dlLnr:tTvW opt; do
 	case ${opt} in
-	a)	runall=1;;
+	a)	runall="$((runall + 1))";;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
@@ -1465,7 +1465,11 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
-	enable_config "${fragment}" CONFIG_NET_TEST
+	if is_enabled CONFIG_MMU; then
+	    # Crashes on an385 (nommu).
+	    # Don't bother testing on nommu systems in general.
+	    enable_config "${fragment}" CONFIG_NET_TEST
+	fi
 	if is_enabled CONFIG_CFG80211; then
 	    enable_config "${fragment}" CONFIG_CFG80211
 	    enable_config "${fragment}" CONFIG_CFG80211_KUNIT_TEST
@@ -1480,16 +1484,21 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STRCAT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SIPHASH_KUNIT_TEST
 
-	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds.
+	if is_enabled CONFIG_SND_HDA; then
+	    enable_config "${fragment}" CONFIG_SND_HDA
+	    enable_config "${fragment}" CONFIG_SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
+	    # Results in lots of "ASoC: Parent card not yet available" log messages
+	    # enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
+	fi
+
+	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds to run.
 	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, so only configure
-	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled.
-	#
-	# In practice this doesn't work because CONFIG_MEMCPY_SLOW_KUNIT_TEST
-	# is only visible in .config if CONFIG_MEMCPY_KUNIT_TEST is already
-	# enabled. So CONFIG_MEMCPY_KUNIT_TEST will always end up being
-	# disabled. Keep the code for the time being; maybe we can find
-	# a better solution.
-	if is_available CONFIG_MEMCPY_SLOW_KUNIT_TEST; then
+	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled. Unfortunately
+	# there is no easy way to check if CONFIG_MEMCPY_SLOW_KUNIT_TEST
+	# is available because it is only visible in .config if
+	# CONFIG_MEMCPY_KUNIT_TEST is already enabled. Enable the test with
+	# runall to get optional results.
+	if [[ "${runall}" -ge 1 ]]; then
 	    enable_config "${fragment}" CONFIG_MEMCPY_KUNIT_TEST
 	    disable_config "${fragment}" CONFIG_MEMCPY_SLOW_KUNIT_TEST
 	fi
@@ -1503,7 +1512,7 @@ __setup_fragment()
 	# The (failing) TTM tests result in list corruptions, ultimately
 	# causing the system to hang/crash. It appears that cleanup after
 	# failures is lacking or incomplete.
-	if false; then
+	if [[ "${runall}" -ge 2 ]]; then
 	    if is_enabled CONFIG_DRM; then
 		enable_config "${fragment}" CONFIG_DRM
 		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
@@ -1519,11 +1528,6 @@ __setup_fragment()
 	    fi
 	fi
 
-	# Needs to be enabled together with base configuration (CONFIG_SND_HDA=y, ...)
-	# Would be built as module; need to enable board by board if desired
-	# enable_config "${fragment}" CONFIG_SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
-	# enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST CONFIG_CFG80211_KUNIT_TEST
-
 	# non-standard output, can not parse
 	# enable_config "${fragment}" CONFIG_TEST_PRINTF CONFIG_TEST_SCANF CONFIG_TEST_UUID
 	# enable_config "${fragment}" CONFIG_TEST_HEXDUMP CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
@@ -1538,9 +1542,6 @@ __setup_fragment()
 	#
 	# RTC library unit tests hang in many qemu emulations
 	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
-	#
-	# Results in lots of "ASoC: Parent card not yet available" log messages
-	# enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
 	#
 	# runs too long (> 2 minutes) or hangs, and non-standard output
 	# enable_config "${fragment}" CONFIG_REED_SOLOMON_TEST
@@ -1560,8 +1561,13 @@ __setup_fragment()
 	# takes too long
 	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
 	#
-	# clock unit tests seem to introduce noise warning tracebacks
-	# enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_KUNIT_TEST
+	# clock unit tests introduce trigger warning tracebacks.
+	# enable with runall for testing.
+	#
+	if [[ "${runall}" -ge 1 ]]; then
+	    enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	    enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_FD_KUNIT_TEST
+	fi
 	#
 	# triggers tracebacks, runs forever
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
