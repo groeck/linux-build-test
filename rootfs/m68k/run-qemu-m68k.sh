@@ -8,11 +8,7 @@ shift $((OPTIND - 1))
 
 machine=$1
 
-if [[ ${linux_version_code} -lt $(kernel_version 4 15) ]]; then
-    QEMU=${QEMU:-${QEMU_V42_BIN}/qemu-system-m68k}
-else
-    QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
-fi
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 
 PREFIX=m68k-linux-
 ARCH=m68k
