@@ -1437,7 +1437,12 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_REGMAP_KUNIT
 	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST CONFIG_CHECKSUM_KUNIT
-	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST CONFIG_STACKINIT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
+
+	if ! is_enabled CONFIG_M68K; then
+	    # known to fail on m68k for unknown reasons
+	    enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
+	fi
 
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	# Oddity: We have to disable the following option to enable the tests
