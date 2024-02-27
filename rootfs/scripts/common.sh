@@ -1821,7 +1821,7 @@ dosetup()
 # Combine all kunit test results into a single log line
 kunit_summary()
 {
-    declare results="$(grep -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' "$1" | sed -e 's/^\[.*\] # Totals: //')"
+    declare results="$(grep -a -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' "$1" | sed -e 's/^\[.*\] # Totals: //')"
     local pass=0
     local fail=0
     local skip=0
@@ -1895,16 +1895,16 @@ dowait()
 	# some kernels _do_ crash on reboot (eg sparc64, openrisc)
 
 	if [ "${manual}" = "manual" ]; then
-	    if grep -q "${waitlist[0]}" ${logfile}; then
+	    if grep -a -q "${waitlist[0]}" ${logfile}; then
 		dokill ${pid}
 		break
 	    fi
 	fi
 
-	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
+	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
 	    # x86 has the habit of crashing in restart once in a while.
 	    # Try to ignore it.
-	    if ! grep -q -e "^machine restart" ${logfile}; then
+	    if ! grep -a -q -e "^machine restart" ${logfile}; then
 		msg="failed (crashed)"
 		retcode=1
 	    fi
@@ -1940,21 +1940,21 @@ dowait()
     # Sometimes qemu exits immediately after a crash and the above code
     # does not catch it. Catch it here, with exceptions as noted.
     if [[ ${retcode} -eq 0 ]]; then
-	if grep -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
+	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
 	    if [[ "${ARCH}" == "xtensa" ]]; then
 		# xtensa images may crash during reboot; reason unknown.
 		# It may be because its reboot handler jumps directly to
 		# the reset address but doesn't really reset the CPU,
 		# leaving some exception handling still enabled.
-		if ! grep -q "reboot: Restarting system" ${logfile}; then
+		if ! grep -a -q "reboot: Restarting system" ${logfile}; then
 		    msg="failed (crashed)"
 		    retcode=1
 		fi
-		if ! grep -q "Unrecoverable error in exception handler" ${logfile}; then
+		if ! grep -a -q "Unrecoverable error in exception handler" ${logfile}; then
 		    msg="failed (crashed)"
 		    retcode=1
 		fi
-	    elif ! grep -q -e "^machine restart\|MACHINE RESTART" ${logfile}; then
+	    elif ! grep -a -q -e "^machine restart\|MACHINE RESTART" ${logfile}; then
 		# x86 has the habit of crashing in restart once in a while,
 		# and openrisc crashes all the time.
 		# Try to ignore it.
@@ -1966,7 +1966,7 @@ dowait()
 
     # Look for missing root file system
     if [[ ${retcode} -eq 0 ]]; then
-	if grep -q "Cannot open root device" ${logfile}; then
+	if grep -a -q "Cannot open root device" ${logfile}; then
 	    msg="failed (no root file system)"
 	    retcode=1
 	fi
@@ -1976,7 +1976,7 @@ dowait()
 	# Expect the log message to be at the end of the log;
 	# we don't want to overwrite the reason if something else
 	# happened after we started waiting for the root file system.
-	if tail ${logfile} | grep -q "Waiting for root device"; then
+	if tail ${logfile} | grep -a -q "Waiting for root device"; then
 	    msg="failed (no root file system)"
 	    retcode=1
 	fi
@@ -1984,7 +1984,7 @@ dowait()
 
     # Look for network test failures
     if [[ ${retcode} -eq 0 && "${__do_network_test}" -ne 0 ]]; then
-	if ! grep -q "Network interface test passed" ${logfile}; then
+	if ! grep -a -q "Network interface test passed" ${logfile}; then
 	    msg="failed (network)"
 	    retcode=1
 	fi
@@ -1992,7 +1992,7 @@ dowait()
 
     # Look for TPM test failures
     if [[ ${retcode} -eq 0 && "${__do_tpm_test}" -ne 0 ]]; then
-	if ! grep -q "TPM selftest passed" ${logfile}; then
+	if ! grep -a -q "TPM selftest passed" ${logfile}; then
 	    msg="failed (tpm)"
 	    retcode=1
 	fi
@@ -2000,7 +2000,7 @@ dowait()
 
     # Look for file system test failures
     if [[ ${retcode} -eq 0 ]]; then
-	if grep -q "File system test failed" ${logfile}; then
+	if grep -a -q "File system test failed" ${logfile}; then
 	    msg="failed (file system)"
 	    retcode=1
 	fi
@@ -2009,15 +2009,15 @@ dowait()
     if [ ${retcode} -eq 0 ]; then
 	for i in $(seq 0 $((${entries} - 1)))
 	do
-	    if ! grep -q -E "${waitlist[$i]}" ${logfile}; then
+	    if ! grep -a -q -E "${waitlist[$i]}" ${logfile}; then
 		# The first entry is not always found; this can happen
 		# if qemu executes the reset before it is displayed.
 		# Look for alternate.
 	        if [[ $i -eq 0 ]]; then
-		    if grep -q "Requesting system reboot" ${logfile}; then
+		    if grep -a -q "Requesting system reboot" ${logfile}; then
 			continue
 		    fi
-		    if grep -q "Rebooting" ${logfile}; then
+		    if grep -a -q "Rebooting" ${logfile}; then
 			continue
 		    fi
 		fi
@@ -2029,29 +2029,29 @@ dowait()
     fi
 
     dolog=$((retcode + __log_always))
-    if grep -q "cannot create duplicate filename" ${logfile}; then
+    if grep -a -q "cannot create duplicate filename" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "\[ cut here \]" ${logfile}; then
+    if grep -a -q "\[ cut here \]" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "\[ end trace [0-9a-f]* \]" ${logfile}; then
+    if grep -a -q "\[ end trace [0-9a-f]* \]" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "dump_stack" ${logfile}; then
+    if grep -a -q "dump_stack" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "stack backtrace" ${logfile}; then
+    if grep -a -q "stack backtrace" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "Call Trace" ${logfile}; then
+    if grep -a -q "Call Trace" ${logfile}; then
 	dolog=1
     fi
-    if grep -q "BUG: KFENCE:" ${logfile}; then
+    if grep -a -q "BUG: KFENCE:" ${logfile}; then
 	dolog=1
     fi
     # Try to catch failing kunit tests
-    if grep -q -e '# Totals: pass:[0-9]* fail:[1-9][0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
+    if grep -a -q -e '# Totals: pass:[0-9]* fail:[1-9][0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
 	dolog=1
     fi
 
@@ -2098,7 +2098,7 @@ dowait()
 		head -5000 ${logfile}
 	    fi
 	    echo "------------"
-	elif grep -q -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
+	elif grep -a -q -e '# Totals: pass:[0-9]* fail:[0-9]* skip:[0-9]* total:[0-9]*' ${logfile}; then
 	    echo "Kunit tests:"
 	    kunit_summary "${logfile}"
 	fi
