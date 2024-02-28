@@ -1289,6 +1289,13 @@ __setup_config()
     return 0
 }
 
+is_supported()
+{
+    local option="${1#CONFIG_}"
+    git grep -F -q "config ${option}"
+    return $?
+}
+
 is_enabled()
 {
     grep -q -e "^$1=[m|y]\$" ".config"
@@ -1440,7 +1447,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
-	if is_enabled CONFIG_ARM_THUMB; then
+	if is_enabled CONFIG_ARM_THUMB && [[ "${runall}" -lt 2 ]]; then
 	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARM_THUMB
 	    disable_config "${fragment}" CONFIG_CHECKSUM_MISALIGNED_KUNIT
 	fi
@@ -1473,8 +1480,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
-	if ! is_enabled CONFIG_ARM_THUMB && ! is_enabled CONFIG_NIOS2; then
-	    # Crashes in gso tests on an385 (nommu) and nios2.
+	if [[ "${runall}" -ge 2 ]] || \
+		( ! is_enabled CONFIG_ARM_THUMB && ! is_enabled CONFIG_NIOS2 && \
+		  ! is_enabled CONFIG_PARISC ); then
+	    # Crashes in gso tests on an385 (thumb), nios2, and parisc.
 	    enable_config "${fragment}" CONFIG_NET_TEST
 	fi
 	if is_enabled CONFIG_CFG80211; then
@@ -1491,21 +1500,27 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STRCAT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SIPHASH_KUNIT_TEST
 
+	enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_FD_KUNIT_TEST
+
+	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
+
 	if is_enabled CONFIG_SND_HDA; then
 	    enable_config "${fragment}" CONFIG_SND_HDA
 	    enable_config "${fragment}" CONFIG_SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
-	    # Results in lots of "ASoC: Parent card not yet available" log messages
-	    # enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST SND_SOC_UTILS_KUNIT_TEST
+	fi
+	if is_enabled CONFIG_SND_SOC; then
+	    enable_config "${fragment}" CONFIG_SND_SOC
+	    enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_BUILD
+	    enable_config "${fragment}" CONFIG_SND_SOC_TOPOLOGY_KUNIT_TEST
+	    enable_config "${fragment}" CONFIG_SND_SOC_UTILS_KUNIT_TEST
 	fi
 
 	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds to run.
 	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, so only configure
-	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled. Unfortunately
-	# there is no easy way to check if CONFIG_MEMCPY_SLOW_KUNIT_TEST
-	# is available because it is only visible in .config if
-	# CONFIG_MEMCPY_KUNIT_TEST is already enabled. Enable the test with
-	# runall to get optional results.
-	if [[ "${runall}" -ge 1 ]]; then
+	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled.
+	if is_supported CONFIG_MEMCPY_SLOW_KUNIT_TEST; then
 	    enable_config "${fragment}" CONFIG_MEMCPY_KUNIT_TEST
 	    disable_config "${fragment}" CONFIG_MEMCPY_SLOW_KUNIT_TEST
 	fi
@@ -1513,17 +1528,20 @@ __setup_fragment()
 	# If DRM is enabled for a given configuration, build it into the kernel
 	# and enable unit tests on it. Do the same for its various sub-tests.
 	#
-	# Note: Unusable. The tests result in several warning backtraces
-	# in drm code. At least some of them are intentional, making the
-	# tests all but unusable due to WARNING noise.
-	# The (failing) TTM tests result in list corruptions, ultimately
-	# causing the system to hang/crash. It appears that cleanup after
-	# failures is lacking or incomplete.
+	# The tests result in lots of warning backtraces in drm code. At least
+	# some of them are intentional, making the tests all but unusable due
+	# to WARNING noise.
+	# Note that TTM is a single-use functionality (see linux-next commit
+	# commit de1b1b78516d ("drm/ttm/tests: depend on UML || COMPILE_TEST")
+	# but is not protected against multi-use. Running TTM unit tests
+	# (CONFIG_DRM_TTM_KUNIT_TEST) is therefore not possible on real
+	# hardware or even in qemu, and must never be enabled.
 	if [[ "${runall}" -ge 2 ]]; then
 	    if is_enabled CONFIG_DRM; then
 		enable_config "${fragment}" CONFIG_DRM
 		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
-		enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
+		# see above
+		# enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
 		if is_enabled CONFIG_DRM_XE; then
 		    enable_config "${fragment}" CONFIG_DRM_XE
 		    enable_config "${fragment}" CONFIG_DRM_XE_KUNIT_TEST
@@ -1562,24 +1580,19 @@ __setup_fragment()
 	# number of input values.
 	# enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
 	#
-	# generates warning backtraces on purpose
+	# non-standard output
 	# enable_config "${fragment}" CONFIG_OF_UNITTEST
 	#
 	# takes too long
 	# enable_config "${fragment}" CONFIG_TEST_RHASHTABLE
 	#
-	# clock unit tests introduce trigger warning tracebacks.
-	# enable with runall for testing.
-	#
-	if [[ "${runall}" -ge 1 ]]; then
-	    enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
-	    enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_FD_KUNIT_TEST
-	fi
-	#
-	# triggers tracebacks, runs forever
+	# triggers tracebacks, runs for a long time
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
-	# triggers DEBUG_LOCKS_WARN_ON traceback
-	# enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
+
+	if [[ "${runall}" -ge 1 ]]; then
+	    # triggers DEBUG_LOCKS_WARN_ON traceback
+	    enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
+	fi
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
