@@ -44,7 +44,8 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    dosetup -f fixup "${rootfs}" "${defconfig}"
+    # Run unit tests and enable debugging, but nothing else
+    dosetup -F nofs:noscsi:nonvme:nousb:nocd:novirt "${rootfs}" "${defconfig}"
     retcode=$?
     if [ ${retcode} -ne 0 ]
     then
