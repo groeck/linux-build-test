@@ -1436,13 +1436,16 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_IIO_FORMAT_KUNIT_TEST CONFIG_IIO_RESCALE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_REGMAP_KUNIT
 	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST CONFIG_CHECKSUM_KUNIT
+	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
 
-	if ! is_enabled CONFIG_M68K; then
-	    # known to fail on m68k for unknown reasons
-	    enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
+	if is_enabled CONFIG_ARM_THUMB; then
+	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARM_THUMB
+	    disable_config "${fragment}" CONFIG_CHECKSUM_MISALIGNED_KUNIT
 	fi
+
+	enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	# Oddity: We have to disable the following option to enable the tests
@@ -1470,9 +1473,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
-	if is_enabled CONFIG_MMU; then
-	    # Crashes on an385 (nommu).
-	    # Don't bother testing on nommu systems in general.
+	if ! is_enabled CONFIG_ARM_THUMB && ! is_enabled CONFIG_NIOS2; then
+	    # Crashes in gso tests on an385 (nommu) and nios2.
 	    enable_config "${fragment}" CONFIG_NET_TEST
 	fi
 	if is_enabled CONFIG_CFG80211; then
