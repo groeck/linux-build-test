@@ -44,8 +44,9 @@ runkernel()
 
     echo -n "Building ${pbuild} ... "
 
-    # Run unit tests and enable debugging, but nothing else
-    dosetup -F nofs:noscsi:nonvme:nousb:nocd:novirt "${rootfs}" "${defconfig}"
+    # Run unit tests and enable some debugging, but nothing else
+    # Note that lockdep is known to trigger backtraces.
+    dosetup -F nolockdep:nofs:noscsi:nonvme:nousb:nocd:novirt "${rootfs}" "${defconfig}"
     retcode=$?
     if [ ${retcode} -ne 0 ]
     then
