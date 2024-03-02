@@ -1446,10 +1446,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
 
-	enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
-	if is_enabled CONFIG_ARM_THUMB && [[ "${runall}" -lt 2 ]]; then
+	if ! is_enabled CONFIG_ARM_THUMB || [[ "${runall}" -ge 2 ]]; then
 	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARM_THUMB
-	    disable_config "${fragment}" CONFIG_CHECKSUM_MISALIGNED_KUNIT
+	    enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
 	fi
 
 	enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
@@ -1496,12 +1495,22 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
-	enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
+	if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+	    # slub unit tests fail in v5.15.y and older kernels.
+	    enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
+	fi
+
 	enable_config "${fragment}" CONFIG_STRCAT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SIPHASH_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST CONFIG_CLK_FD_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
+	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]]; then
+	    # clock gate unit tests fail on some systems in v6.6 and older
+	    # kernels. See upstream commit 75357829cc8e ("clk: Fix clk gate
+	    # kunit test on big-endian CPUs").
+	    enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST
+	fi
 
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
