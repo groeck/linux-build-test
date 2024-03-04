@@ -57,32 +57,31 @@ skip_515="x86_64:tools/perf i386:tools/perf"
 
 # fixups
 
-fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
-	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
+# Skip CONFIG_WERROR. Needed due to enforced -Wmissing-prototypes in v6.8+
+fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
-fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
-	"s/CONFIG_SECTION_MISMATCH_WARN_ONLY is not set/CONFIG_SECTION_MISMATCH_WARN_ONLY=y/"
-	"s/CONFIG_LD_NO_RELAX=n/CONFIG_LD_NO_RELAX=y/")
-
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
-
-fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
-	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
 
 # Plugins need gcc 14.1, 13.3, or 12.4 to work.
 # See https://gcc.gnu.org/r14-3331 for details.
 fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
 
-# Skip CONFIG_WERROR. Needed due to enforced -Wmissing-prototypes in v6.8+
+fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
+	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
 
-fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
+	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
 
 fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
 fixup_sparc64=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
+
+fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
+	"s/CONFIG_SECTION_MISMATCH_WARN_ONLY is not set/CONFIG_SECTION_MISMATCH_WARN_ONLY=y/"
+	"s/CONFIG_LD_NO_RELAX=n/CONFIG_LD_NO_RELAX=y/")
 
 # We don't ever want to be in the business of arguing about frame sizes
 fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
