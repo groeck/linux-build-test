@@ -1513,7 +1513,15 @@ __setup_fragment()
 	fi
 
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
+
+	if ( ! is_enabled CONFIG_ARM && ! is_enabled CONFIG_ARM64 && \
+		! is_enabled CONFIG_LOONGARCH ) || [[ "${runall}" -ge 1 ]]; then
+	    # hardware breakpoint tests are known to be broken on arm/arm64. See
+	    # https://lore.kernel.org/lkml/Ytl9L0Zn1PVuL1cB@FVFF77S0Q05N.cambridge.arm.com/
+	    # for details.
+	    # The loongarch failure is due to its qemu emulation.
+	    enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
+	fi
 
 	if is_enabled CONFIG_SND_HDA; then
 	    enable_config "${fragment}" CONFIG_SND_HDA
