@@ -936,7 +936,7 @@ __common_fixups()
     __init_disk "${fixups}"
     __init_rootdev
 
-    initcli="panic=-1 ${config_initcli}"
+    initcli="panic=-1 kunit.stats_enabled=2 ${config_initcli}"
     extra_params="-snapshot"
     __have_usb_param=0
     __do_network_test=0
