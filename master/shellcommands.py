@@ -16,7 +16,7 @@ passed_qemu = re.compile('Building (\S+):(\S+) \.+ running [\.R]+ passed$')
 failed_qemu = re.compile('Building (\S+):(\S+) .*?failed.*$')
 skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped$')
 
-kunit_result = re.compile('(?:\[ *\d+\.\d+\] +)?# ([^:]+): pass:(\d+) fail:(\d+) skip:(\d+) total:\d+$')
+kunit_result = re.compile('(?:\[ *\d+\.\d+\](?:\[ *T\d+\])? +)?# ([^:]+): pass:(\d+) fail:(\d+) skip:(\d+) total:\d+$')
 
 def lastStep(step):
     allSteps = step.build.getStatus().getSteps()
