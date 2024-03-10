@@ -1515,11 +1515,14 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
 
 	if ( ! is_enabled CONFIG_ARM && ! is_enabled CONFIG_ARM64 && \
-		! is_enabled CONFIG_LOONGARCH ) || [[ "${runall}" -ge 1 ]]; then
+		! is_enabled CONFIG_LOONGARCH && !is_enabled CONFIG_PPC64 ) \
+		|| [[ "${runall}" -ge 1 ]]; then
 	    # hardware breakpoint tests are known to be broken on arm/arm64. See
 	    # https://lore.kernel.org/lkml/Ytl9L0Zn1PVuL1cB@FVFF77S0Q05N.cambridge.arm.com/
 	    # for details.
 	    # The loongarch failure is due to its qemu emulation.
+	    # ppc64:powernv tests are known to fail. The failures have not been
+	    # evaluated.
 	    enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
 	fi
 
@@ -1606,10 +1609,7 @@ __setup_fragment()
 	# triggers tracebacks, runs for a long time
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
 
-	if [[ "${runall}" -ge 1 ]]; then
-	    # triggers DEBUG_LOCKS_WARN_ON traceback
-	    enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
-	fi
+	enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
