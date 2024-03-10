@@ -38,7 +38,10 @@ cmd_powerpc=(defconfig allmodconfig ppc32_allmodconfig allnoconfig tinyconfig \
 	maple_defconfig ppc6xx_defconfig mpc83xx_defconfig \
 	tqm8xx_defconfig \
 	85xx/tqm8548_defconfig 83xx/mpc834x_itx_defconfig)
-cmd_riscv=(defconfig allnoconfig tinyconfig allmodconfig)
+cmd_riscv32=(defconfig allnoconfig tinyconfig allmodconfig \
+	nommu_virt_defconfig)
+cmd_riscv64=(defconfig allnoconfig tinyconfig allmodconfig nommu_k210_sdcard_defconfig \
+	nommu_virt_defconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
 cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig \
 	shx3_defconfig se7619_defconfig)

@@ -255,16 +255,17 @@ case ${ARCH} in
 	PATH=${PATH_PPC}:${PATH}
 	# EXTRA_CMD="KALLSYMS_EXTRA_PASS=1"
 	;;
-    riscv)
-	cmd=(${cmd_riscv[*]})
-	PREFIX="riscv64-linux-"
-	PATH=${PATH_RISCV64}:${PATH}
-	;;
     riscv32)
 	ARCH=riscv
-	cmd=(${cmd_riscv[*]})
+	cmd=(${cmd_riscv32[*]})
 	PREFIX="riscv32-linux-"
 	PATH=${PATH_RISCV32}:${PATH}
+	;;
+    riscv64)
+	ARCH=riscv
+	cmd=(${cmd_riscv64[*]})
+	PREFIX="riscv64-linux-"
+	PATH=${PATH_RISCV64}:${PATH}
 	;;
     sparc32)
 	cmd=(${cmd_sparc32[*]})
