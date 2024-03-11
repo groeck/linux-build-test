@@ -1308,6 +1308,14 @@ is_available()
     return $?
 }
 
+is_testing()
+{
+    if [[ "$(git rev-parse --abbrev-ref HEAD)" = "testing" ]]; then
+	return 0
+    fi
+    return 1
+}
+
 __setup_fragment()
 {
     local fragment="$1"
@@ -1609,7 +1617,9 @@ __setup_fragment()
 	# triggers tracebacks, runs for a long time
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
 
-	enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
+	if is_testing || [[ "${runall}" -ge 1 ]]; then
+	    enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
+	fi
 
 	if [[ "${nolocktests}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
