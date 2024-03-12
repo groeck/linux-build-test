@@ -118,6 +118,8 @@ checkstate()
 parse_args()
 {
 	nobuild=0
+	bugverbose=0
+	nobugverbose=0
 	dodebug=0
 	runall=0
 	__testbuild=0
@@ -127,9 +129,11 @@ parse_args()
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts ae:dlLnr:tTvW opt; do
+	while getopts abBe:dlLnr:tTvW opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
+	b)	bugverbose=1;;
+	B)	nobugverbose=1;;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	n)	nobuild=1;;
@@ -1432,6 +1436,12 @@ __setup_fragment()
 	fi
     fi
 
+    if [[ "${bugverbose}" -eq 1 ]]; then
+	enable_config "${fragment}" CONFIG_DEBUG_BUGVERBOSE
+    elif [[ "${nobugverbose}" -eq 1 ]]; then
+	disable_config "${fragment}" CONFIG_DEBUG_BUGVERBOSE
+    fi
+
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
 	# kunit
@@ -1510,6 +1520,9 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_STRCAT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SIPHASH_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_STRING_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_STRING_HELPERS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_FORTIFY_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
@@ -1523,7 +1536,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
 
 	if ( ! is_enabled CONFIG_ARM && ! is_enabled CONFIG_ARM64 && \
-		! is_enabled CONFIG_LOONGARCH && !is_enabled CONFIG_PPC64 ) \
+		! is_enabled CONFIG_LOONGARCH && ! is_enabled CONFIG_PPC64 ) \
 		|| [[ "${runall}" -ge 1 ]]; then
 	    # hardware breakpoint tests are known to be broken on arm/arm64. See
 	    # https://lore.kernel.org/lkml/Ytl9L0Zn1PVuL1cB@FVFF77S0Q05N.cambridge.arm.com/
@@ -1585,7 +1598,6 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_TEST_PRINTF CONFIG_TEST_SCANF CONFIG_TEST_UUID
 	# enable_config "${fragment}" CONFIG_TEST_HEXDUMP CONFIG_TEST_BITMAP CONFIG_TEST_FIRMWARE
 	# enable_config "${fragment}" CONFIG_TEST_XARRAY
-	# enable_config "${fragment}" CONFIG_STRING_SELFTEST
 	# enable_config "${fragment}" CONFIG_TEST_SYSCTL
 	# enable_config "${fragment}" CONFIG_CRC32_SELFTEST CONFIG_TEST_MIN_HEAP
 	# enable_config "${fragment}" CONFIG_DEBUG_LOCKING_API_SELFTESTS
