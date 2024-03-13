@@ -48,6 +48,7 @@ runkernel()
 
     execute manual waitlist[@] \
 	${QEMU} -cpu or1200 -M or1k-sim \
+	    ${initcli:+--append "${initcli}"} \
 	    -kernel vmlinux -nographic -serial stdio -monitor none
 
     return $?
