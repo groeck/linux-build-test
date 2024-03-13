@@ -1477,8 +1477,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
 
-	if ! is_enabled CONFIG_ARM_THUMB || [[ "${runall}" -ge 2 ]]; then
-	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARM_THUMB
+	if ! is_enabled CONFIG_ARCH_MPS2 || [[ "${runall}" -ge 2 ]]; then
+	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARCH_MPS2
 	    enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
 	fi
 
@@ -1511,9 +1511,9 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
 	if [[ "${runall}" -ge 2 ]] || \
-		( ! is_enabled CONFIG_ARM_THUMB && ! is_enabled CONFIG_NIOS2 && \
+		( ! is_enabled CONFIG_ARCH_MPS2 && ! is_enabled CONFIG_NIOS2 && \
 		  ! is_enabled CONFIG_PARISC ); then
-	    # Crashes in gso tests on an385 (thumb), nios2, and parisc.
+	    # Crashes in gso tests on an385, nios2, and parisc.
 	    enable_config "${fragment}" CONFIG_NET_TEST
 	fi
 	if is_enabled CONFIG_CFG80211; then
@@ -1577,7 +1577,8 @@ __setup_fragment()
 	# CONFIG_MEMCPY_KUNIT_TEST sometimes takes more than 45 seconds to run.
 	# CONFIG_MEMCPY_SLOW_KUNIT_TEST avoids this, so only configure
 	# CONFIG_MEMCPY_KUNIT_TEST if slow tests can be disabled.
-	if is_supported CONFIG_MEMCPY_SLOW_KUNIT_TEST; then
+	if is_supported CONFIG_MEMCPY_SLOW_KUNIT_TEST ||
+		[[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
 	    enable_config "${fragment}" CONFIG_MEMCPY_KUNIT_TEST
 	    disable_config "${fragment}" CONFIG_MEMCPY_SLOW_KUNIT_TEST
 	fi
@@ -1622,7 +1623,8 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_GLOB_SELFTEST
 
 	if is_testing || [[ "${runall}" -ge 2 ]]; then
-	    # RTC library unit tests hang in many qemu emulations
+	    # RTC library unit tests are slow but not marked as such
+	    # (as of v6.8).
 	    enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
 	fi
 
@@ -1635,9 +1637,10 @@ __setup_fragment()
 	#
 	# hangs with soft lockup (arm, microblaze) and/or reports RCU stalls
 	# (mips). Even if not hanging or stalling, it takes a long time to run
-	# for little gain: All it does is to test time64_to_tm() with a large
-	# number of input values.
-	# enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
+	# on older kernels.
+	if is_testing || [[ "${runall}" -ge 2 ]] || [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
+	    enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
+	fi
 	#
 	# non-standard output
 	# enable_config "${fragment}" CONFIG_OF_UNITTEST
