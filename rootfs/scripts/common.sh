@@ -120,6 +120,7 @@ parse_args()
 	nobuild=0
 	bugverbose=0
 	nobugverbose=0
+	nokallsyms=0
 	dodebug=0
 	runall=0
 	__testbuild=0
@@ -129,13 +130,14 @@ parse_args()
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts abBe:dlLnr:tTvW opt; do
+	while getopts abBde:KlLnr:tTvW opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
 	B)	nobugverbose=1;;
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
+	K)	nokallsyms=1;;
 	n)	nobuild=1;;
 	t)	__testbuild=1;___testbuild=1;__retries=0;;
 	T)	___testbuild=1;__retries=0;;
@@ -1386,8 +1388,19 @@ __setup_fragment()
 	esac
     done
 
-    # Always build with CONFIG_KALLSYMS enabled
-    enable_config "${fragment}" CONFIG_KALLSYMS
+    # Always build with CONFIG_KALLSYMS=y unless explicitly disabled
+    if [[ "${nokallsyms}" -eq 1 ]]; then
+	disable_config "${fragment}" CONFIG_KPROBES
+	disable_config "${fragment}" CONFIG_FUNCTION_TRACER
+	disable_config "${fragment}" CONFIG_STACK_TRACER
+	disable_config "${fragment}" CONFIG_FTRACE_SYSCALLS
+	disable_config "${fragment}" CONFIG_KALLSYMS
+	# lock debugging selects CONFIG_KALLSYMS
+	nolockdep=1
+	nolocktests=1
+    else
+	enable_config "${fragment}" CONFIG_KALLSYMS
+    fi
 
     # We do not use a userspace helper to download firmware.
     # Disable it to avoid long (60 second) timeouts with
@@ -1535,6 +1548,9 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
 
+	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_UAPI_TEST CONFIG_FIREWIRE_KUNIT_DEVICE_ATTRIBUTE_TEST
+	enable_config "${fragment}" CONFIG_FPGA_KUNIT_TESTS
+
 	if ( ! is_enabled CONFIG_ARM && ! is_enabled CONFIG_ARM64 && \
 		! is_enabled CONFIG_LOONGARCH && ! is_enabled CONFIG_PPC64 ) \
 		|| [[ "${runall}" -ge 1 ]]; then
@@ -1604,9 +1620,12 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_ATOMIC64_SELFTEST
 	# enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
 	# enable_config "${fragment}" CONFIG_GLOB_SELFTEST
-	#
-	# RTC library unit tests hang in many qemu emulations
-	# enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
+
+	if is_testing || [[ "${runall}" -ge 2 ]]; then
+	    # RTC library unit tests hang in many qemu emulations
+	    enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
+	fi
+
 	#
 	# runs too long (> 2 minutes) or hangs, and non-standard output
 	# enable_config "${fragment}" CONFIG_REED_SOLOMON_TEST
@@ -1638,7 +1657,9 @@ __setup_fragment()
 	    # takes too long
 	    # enable_config "${fragment}" CONFIG_TORTURE_TEST CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
 	    # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y
-	    # enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
+	    if ! is_enabled CONFIG_PREEMPT; then
+		enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
+	    fi
 	fi
     fi
 
