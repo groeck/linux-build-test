@@ -206,7 +206,7 @@ runkernel()
 	;;
     "mps2-an385")
 	extra_params+=" -bios ${progdir}/mps2-boot.axf"
-	initcli=""
+	initcli+=" earlycon"
 	kernel="vmlinux"
 	;;
     "akita" | "borzoi" | "spitz" | "terrier")
