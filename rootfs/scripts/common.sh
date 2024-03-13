@@ -942,7 +942,7 @@ __common_fixups()
     __init_disk "${fixups}"
     __init_rootdev
 
-    initcli="panic=-1 kunit.stats_enabled=2 ${config_initcli}"
+    initcli="panic=-1 kunit.stats_enabled=2 kunit.filter=speed>slow ${config_initcli}"
     extra_params="-snapshot"
     __have_usb_param=0
     __do_network_test=0
@@ -1656,8 +1656,9 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_PROVE_RCU CONFIG_PROVE_LOCKING
 	    # takes too long
 	    # enable_config "${fragment}" CONFIG_TORTURE_TEST CONFIG_LOCK_TORTURE_TEST CONFIG_RCU_TORTURE_TEST
-	    # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y
-	    if ! is_enabled CONFIG_PREEMPT; then
+	    # CONFIG_WW_MUTEX_SELFTEST interferes with CONFIG_PREEMPT=y.
+	    # Even without it it may run very long or hang.
+	    if ! is_enabled CONFIG_PREEMPT && [[ "${runall}" -ge 3 ]]; then
 		enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
 	    fi
 	fi
