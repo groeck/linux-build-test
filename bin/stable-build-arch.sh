@@ -308,8 +308,8 @@ if [[ -n "${!tmp}" ]]; then
     fixup+=("${!tmp}")
 fi
 
-if [[ -n "${fixup_common}" ]]; then
-    fixup+=("${fixup_common}")
+if [[ -n "${fixup_common[@]}" ]]; then
+    fixup+=("${fixup_common[@]}")
 fi
 
 if [[ "${CCMD}" = "clang" ]]; then
