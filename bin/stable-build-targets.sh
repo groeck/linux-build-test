@@ -68,18 +68,11 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
 
-# Plugins need gcc 14.1, 13.3, or 12.4 to work.
-# See https://gcc.gnu.org/r14-3331 for details.
-fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
-
 # Avoid build failures in v6.9+ due to duplicate 'END' defines
 fixup_mips=("/CONFIG_DRM_XE/d")
 
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
 	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
-
-fixup_s390=("s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
-	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/")
 
 fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
@@ -89,5 +82,16 @@ fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
 	"s/CONFIG_SECTION_MISMATCH_WARN_ONLY is not set/CONFIG_SECTION_MISMATCH_WARN_ONLY=y/"
 	"s/CONFIG_LD_NO_RELAX=n/CONFIG_LD_NO_RELAX=y/")
 
-# We don't ever want to be in the business of arguing about frame sizes
-fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
+# We don't ever want to be in the business of arguing about frame sizes,
+# so disable frame size warnings/errors completely.
+# Plugins need gcc 14.1, 13.3, or 12.4 to work on some architectures.
+# See https://gcc.gnu.org/r14-3331 for details affecting looongarch,
+# but other architectures are affected as well. Disable plugin support
+# entirely since it only has limited if any value for test builds.
+# Disable CONFIG_RANDSTRUCT because it results in random build failures
+# which are difficult to track down, for example on s390.
+fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/"
+	"s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/"
+	"s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
+	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/"
+	)
