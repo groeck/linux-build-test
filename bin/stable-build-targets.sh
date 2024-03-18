@@ -72,6 +72,9 @@ fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
 # See https://gcc.gnu.org/r14-3331 for details.
 fixup_loongarch=("s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/")
 
+# Avoid build failures in v6.9+ due to duplicate 'END' defines
+fixup_mips=("/CONFIG_DRM_XE/d")
+
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
 	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
 

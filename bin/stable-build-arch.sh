@@ -2,13 +2,13 @@
 
 basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/stable-build-targets.sh
+. ${basedir}/build-macros.sh
 
 # default compiler version
-CV9="9.4.0"
+CV8="8.5.0"
 CV="11.4.0-2.40"
-CV12="12.2.0-2.39"
-CV123="12.3.0-2.40"
-CV13="13.1.0-2.40"
+CV12="12.3.0-2.40"
+CV13="13.2.0-2.42"
 
 # gcc version to use for building perf
 GCC_PERF="gcc-11"
@@ -26,10 +26,8 @@ PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 PATH_HEXAGON=/opt/kernel/hexagon/bin
-# loongarch either needs 12.x.0-2.39 or 13.1-2.40.
-# 12.x.0-2.40 doesn't work due to compiler/assembler interdependencies.
-# 13.1.0-2.40 results in __write_overflow_field in drivers/infiniband/hw/irdma/uk.c.
-PATH_LOONGARCH=/opt/kernel/gcc-${CV12}-nolibc/loongarch64-linux-gnu/bin
+# loongarch needs 13.2+ to avoid 64-bit divide operations in drm code (6.9+)
+PATH_LOONGARCH=/opt/kernel/gcc-${CV13}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
@@ -47,7 +45,16 @@ PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
 
-# PATH_LLVM=/opt/kernel/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-16.04/bin
+if [[ ${linux_version_code} -ge $(kernel_version 6 8) ]]; then
+    # Avoid drm 64-bit divide build failures seen with gcc 12.x and older
+    # in v6.9+.
+    PATH_CSKY=/opt/kernel/gcc-${CV13}-nolibc/csky-linux/bin
+    PATH_MIPS=/opt/kernel/gcc-${CV13}-nolibc/mips64-linux/bin
+    PATH_OPENRISC=/opt/kernel/gcc-${CV13}-nolibc/or1k-linux/bin
+    PATH_PARISC=/opt/kernel/gcc-${CV13}-nolibc/hppa-linux/bin
+    PATH_XTENSA=/opt/kernel/gcc-${CV13}-nolibc/xtensa-linux/bin
+fi
+
 PATH_LLVM=/opt/kernel/clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04/bin
 
 PREFIX_ARC="arc-elf-"
@@ -62,13 +69,6 @@ LOG="/tmp/buildlog.stable-build-arch"
 
 trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGBUS SIGFPE SIGSEGV SIGALRM SIGTERM SIGPWR
 
-__cleanup()
-{
-    rv=$?
-    rm -rf ${BUILDDIR} ${LOG}
-    exit ${rv}
-}
-
 rel=$(git describe --match 'v*' | cut -f1 -d- | cut -f1,2 -d.)
 relx=$(echo ${rel} | sed -e 's/\.//' | sed -e 's/v//')
 branch=$(git branch | cut -f2 -d' ')
@@ -80,14 +80,10 @@ ulimit -f $((3500*1024))
 
 configcmd="olddefconfig"
 
-# Older releases don't like gcc 6+
-case ${rel} in
-v4.19)
-	PATH_S390=/opt/kernel/gcc-8.5.0-nolibc/s390-linux/bin
-	;;
-*)
-	;;
-esac
+if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
+    # Older releases don't like gcc 6+
+    PATH_S390=/opt/kernel/gcc-${CV8}-nolibc/s390-linux/bin
+fi
 
 maxload=$(($(nproc) * 3 / 2))
 
@@ -165,18 +161,15 @@ case ${ARCH} in
 	;;
     hexagon)
 	cmd=(${cmd_hexagon[*]})
-	case ${rel} in
-	v4.19|v5.4)
+	if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
 	    PREFIX="hexagon-linux-"
 	    PATH=${PATH_HEXAGON}:${PATH}
-	    ;;
-	*)
+	else
 	    PREFIX="hexagon-unknown-linux-gnu-"
 	    PATH=${PATH_LLVM}:${PATH}
 	    CCMD="clang"
 	    EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
-	    ;;
-	esac
+	fi
 	;;
     i386)
 	cmd=(${cmd_i386[*]})
@@ -234,18 +227,14 @@ case ${ARCH} in
 	cmd=(${cmd_parisc64[*]})
 	PREFIX="hppa64-linux-"
 	PREFIX32="hppa-linux-"
-	case ${rel} in
-	v4.19|v5.4|v5.10)
+	if [[ ${linux_version_code} -lt $(kernel_version 5 15) ]]; then
 	    ARCH=parisc
-	    ;;
-	v5.15|v6.1)
-	    ;;
-	*)
+	fi
+	if [[ ${linux_version_code} -gt $(kernel_version 6 4) ]]; then
 	    # parisc after v6.4 wants at least gcc v12.0
-	    PATH_PARISC=/opt/kernel/gcc-${CV123}-nolibc/hppa-linux/bin
-	    PATH_PARISC64=/opt/kernel/gcc-${CV123}-nolibc/hppa64-linux/bin
-	    ;;
-	esac
+	    PATH_PARISC=/opt/kernel/gcc-${CV12}-nolibc/hppa-linux/bin
+	    PATH_PARISC64=/opt/kernel/gcc-${CV12}-nolibc/hppa64-linux/bin
+	fi
 	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	;;
     powerpc)
@@ -299,16 +288,7 @@ case ${ARCH} in
 	;;
     um)
 	cmd=(${cmd_um[*]})
-	case ${rel} in
-	v4.19)
-		# doesn't build with 8.2.0 ("virtual memory exhausted")
-		PATH_X86=/opt/kernel/x86_64/gcc-6.3.0/usr/bin
-		PREFIX="${PREFIX_X86}"
-		;;
-	*)
-		PREFIX="${PREFIX_X86}"
-		;;
-	esac
+	PREFIX="${PREFIX_X86}"
 	PATH=${PATH_X86}:${PATH}
 	SUBARCH="x86_64"
 	;;
@@ -373,34 +353,6 @@ if [ ${#fixup[*]} -gt 0 ]; then
 fi
 
 rm -rf "${BUILDDIR}"
-
-dumplog()
-{
-    local maxsize="$1"
-    local log="$2"
-    local logsize="$(cat ${log} | wc -l)"
-
-    # strip off path name - it is irrelevant for the log
-    local basedir="$(pwd | sed -e 's/\//\\\//g')\/"
-    sed -i -e "s/${basedir}//" "${log}"
-
-    # Empty lines are irrelevant / don't add value.
-    sed -i -e '/^[ 	]*$/d' "${log}"
-
-    echo "--------------"
-    echo "Error log:"
-    if [[ ${logsize} -lt ${maxsize} ]]; then
-	cat "${log}"
-    else
-	local splitsize=$((maxsize / 3))
-	head "-${splitsize}" "${log}"
-	echo "..."
-	echo "[skipped]"
-	echo "..."
-	tail "-${splitsize}" "${log}"
-    fi
-    echo "--------------"
-}
 
 maxcmd=$(expr ${#cmd[*]} - 1)
 for i in $(seq 0 ${maxcmd})
