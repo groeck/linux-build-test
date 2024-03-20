@@ -1,9 +1,6 @@
 Repositories and packages
 -------------------------
 
-Use aarch64 with gcc 4.8.1 built with buildroot. gcc 4.8.3 works as well.
-Use qemu-2.0.0-local branch; we need patches applied on top of qemu 2.0.0.
-Note: qemu 2.1.0 is required for aarch64 (arm64).
 README in the qemu directory describes distribution.
 
 ----
@@ -135,48 +132,6 @@ make clean
 make INSTALL_PREFIX=/opt/buildbot install
 
 ---
-arc:
-
-get buildroot from http://buildroot.uclibc.org/download.html.
-
-configure for ARC little endian (big endian is broken, at least with 2013.05).
-
-Commands to run (assuming gcc 4.4.7):
-	make toolchain
-	cd output
-	mkdir arc
-	mv host arc/gcc-4.4.7
-	tar czf /tmp/x86_64-gcc-4.4.7-uclibc_arc-linux.tar.gz arc
-
-The result can be installed in /opt/kernel as usual.
-Path and prefix to use:
-	PATH=/opt/kernel/arc/gcc-4.4.7/usr/bin
-	CROSS_COMPILE=arc-buildroot-linux-uclibc-
-
-Building little endian arc 4.8.3 from 2014.11 works as well.
-
----
-openrisc:
-
-Kernel can be built with openrisc toolchain from kernel.org, but finding
-a matching toolchain to build a root file system may be difficult.
-
-In general, don't build kernel and root file system from different
-tool chains. The ABI has changed over time, so the result likely won't
-work unless you are really lucky. A hanging (silent) kernel or odd
-tracebacks are an indication of a kernel / user space ABI mismatch.
-
-A toolchain built using http://opencores.org/or1k/OpenRISC_GNU_tool_chain
-is seen to be working if both kernel and root file system are built with
-the same toolchain. Kernels at least up to 3.17-rc4 need a patch to be
-able to build it with the resulting toolchain. See
-rootfs/openrisc/run-qemu-openrisc.sh for details.
-
-Current approach here is to use the kernel toolchain for kernel test builds,
-and to use the new toolchain built from the opencores.org for qemu tests.
-This avoids having to patch the kernel for build tests to succeed.
-
----
 xtensa:
 
 Same as above; buildroot 2014.08-rc3 is recommended.
@@ -202,22 +157,6 @@ the qemu target. Note that you _must_ use the same toolchain for both
 kernel and rootfs builds.
 
 ---
-arm:
-
-[ tested with tip of buildroot tree as of 8/23/2014 ]
-buildroot, configure for arm little endian, cortex-A7
-EABI, VFPv4-D16 (defaults)
-gcc 4.8.x, glibc 2.19
-binutils 2.24
-4.4 kernel headers
-
-	make toolchain
-	cd output
-	mkdir arm
-	mv host arm/gcc-4.8.3
-	tar czf /tmp/x86_64-gcc-4.8.3-glibc_arm-linux.tar.gz arm
-
----
 Microblaze
 
 [ tested with tip of buildroot tree as of 8/23/2014 ]
@@ -229,16 +168,6 @@ Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
 	mkdir microblaze
 	mv host microblaze/gcc-4.9.1
 	tar czf /tmp/x86_64-gcc-4.9.1-glibc_microblaze-linux.tar.gz microblaze
-
----
-NIOS II
-
-Use kernel.org toolchain or toolchain built with buildroot.
-
----
-powerpc64
-
-Build gcc-6.5.0 using buildroot.
 
 ---
 qemu
