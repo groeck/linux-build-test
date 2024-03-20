@@ -7,7 +7,6 @@ parse_args "$@"
 shift $((OPTIND - 1))
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4eb}
-# PREFIX=sh4-linux-
 PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
@@ -18,15 +17,7 @@ skip_510="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_515="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 skip_61="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
 
-if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-    # boot tests hang with gcc 9.x and later (including 11.4.0)
-    # for kernels older than v5.10 when using recent binutils
-    # (2.37 or later).
-    # Use gcc 11.3.0 with binutils 2.32 instead.
-    PATH_SH=/opt/kernel/gcc-11.3.0-2.32-nolibc/sh4eb-linux/bin
-else
-    PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
-fi
+PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
 
 PATH=${PATH_SH}:${PATH}
 
