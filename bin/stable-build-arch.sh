@@ -5,10 +5,22 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/build-macros.sh
 
 # default compiler version
-CV8="8.5.0"
-CV="11.4.0-2.40"
+CV11="11.4.0-2.40"
 CV12="12.3.0-2.40"
 CV13="13.2.0-2.42"
+
+# See if we can build with gcc 13.x for recent kernel branches.
+# Branch specific findings:
+# - v5.10.y
+#   - parisc images don't build with gcc 13.x/binutils 2.42
+#
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+    CV="${CV13}"
+elif [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+    CV="${CV12}"
+else
+    CV="${CV11}"
+fi
 
 # gcc version to use for building perf
 GCC_PERF="gcc-11"
@@ -19,13 +31,14 @@ PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
-PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
-# loongarch needs 13.2+ to avoid 64-bit divide operations in drm code (6.9+)
-PATH_LOONGARCH=/opt/kernel/gcc-${CV13}-nolibc/loongarch64-linux-gnu/bin
+# h8300 support was dropped in gcc 12.x
+PATH_H8300=/opt/kernel/gcc-${CV11}-nolibc/h8300-linux/bin
+PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-PATH_NDS32=/opt/kernel/gcc-${CV}-nolibc/nds32le-linux/bin
+# nds32 fails to build with gcc 13.x / binutils 2.42 (5.15.y)
+PATH_NDS32=/opt/kernel/gcc-${CV11}-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
@@ -38,16 +51,6 @@ PATH_SH4=/opt/kernel/gcc-${CV}-nolibc/sh4-linux/bin
 PATH_SPARC=/opt/kernel/gcc-${CV}-nolibc/sparc64-linux/bin
 PATH_X86=/opt/kernel/gcc-${CV}-nolibc/x86_64-linux/bin
 PATH_XTENSA=/opt/kernel/gcc-${CV}-nolibc/xtensa-linux/bin
-
-if [[ ${linux_version_code} -ge $(kernel_version 6 8) ]]; then
-    # Avoid drm 64-bit divide build failures seen with gcc 12.x and older
-    # in v6.9+.
-    PATH_CSKY=/opt/kernel/gcc-${CV13}-nolibc/csky-linux/bin
-    PATH_MIPS=/opt/kernel/gcc-${CV13}-nolibc/mips64-linux/bin
-    PATH_OPENRISC=/opt/kernel/gcc-${CV13}-nolibc/or1k-linux/bin
-    PATH_PARISC=/opt/kernel/gcc-${CV13}-nolibc/hppa-linux/bin
-    PATH_XTENSA=/opt/kernel/gcc-${CV13}-nolibc/xtensa-linux/bin
-fi
 
 PATH_LLVM=/opt/kernel/llvm-16.0.6-x86_64/bin
 
@@ -73,11 +76,6 @@ branch=$(git branch | cut -f2 -d' ')
 ulimit -f $((3500*1024))
 
 configcmd="olddefconfig"
-
-if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-    # Older releases don't like gcc 6+
-    PATH_S390=/opt/kernel/gcc-${CV8}-nolibc/s390-linux/bin
-fi
 
 maxload=$(($(nproc) * 3 / 2))
 
@@ -148,6 +146,7 @@ case ${ARCH} in
 	PATH=${PATH_H8300}:${PATH}
 	;;
     hexagon)
+	cmd=(${cmd_hexagon[*]})
 	PATH=${PATH_LLVM}:${PATH}
 	CCMD="clang"
 	EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
