@@ -18,11 +18,6 @@ PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
-# ICE with gcc 9.2.0, gcc 9.3.0, gcc 10.3.0
-# Assembler errors with gcc 8.4.0, 8.5.0 (v4.19.y)
-# internal compiler error with gcc 11.1.0, 11.3.0, 11.4.0, 12.2.0
-# PATH_C6X=/opt/kernel/gcc-${CV}-nolibc/c6x-elf/bin
-PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
 # loongarch needs 13.2+ to avoid 64-bit divide operations in drm code (6.9+)
@@ -141,12 +136,6 @@ case ${ARCH} in
 	cmd=(${cmd_arm64[*]})
 	PREFIX="aarch64-linux-"
 	PATH=${PATH_ARM64}:${PATH}
-	;;
-    c6x)
-	cmd=(${cmd_c6x[*]})
-	PREFIX="c6x-elf-"
-	# PREFIX="tic6x-uclinux-"
-	PATH=${PATH_C6X}:${PATH}
 	;;
     csky)
 	cmd=(${cmd_csky[*]})

@@ -14,7 +14,6 @@ cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	integrator_defconfig sp7021_defconfig \
 	pxa910_defconfig clps711x_defconfig)
 cmd_arm64=(allnoconfig tinyconfig defconfig allmodconfig)
-cmd_c6x=(dsk6455_defconfig evmc6457_defconfig evmc6678_defconfig)
 cmd_csky=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-sim_defconfig)
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
