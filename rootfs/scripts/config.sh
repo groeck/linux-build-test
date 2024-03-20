@@ -14,6 +14,6 @@ QEMU_BIN=${QEMU_V81_BIN}
 # default compiler
 DEFAULT_CC="gcc-11.4.0-2.40-nolibc"
 DEFAULT_CC12="gcc-12.3.0-2.40-nolibc"
-DEFAULT_CC13="gcc-13.1.0-2.40-nolibc"
+DEFAULT_CC13="gcc-13.2.0-2.42-nolibc"
 
 config_initcli="slub_debug=FZPUA"
