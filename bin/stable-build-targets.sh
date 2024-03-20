@@ -59,7 +59,20 @@ skip_515="x86_64:tools/perf i386:tools/perf"
 
 # fixups
 
-# Skip CONFIG_WERROR. Needed due to enforced -Wmissing-prototypes in v6.8+
+# CONFIG_DRM_SUN4I is disabled on some architectures to avoid 64-bit build
+# failures.
+# Affects:
+# - openrisc
+# - parisc
+# - xtensa
+
+# CONFIG_WERROR is disabled on some architectures where builds are known to fail
+# if it is enabled.
+# Affects:
+# - alpha
+# - sh4
+# - sparc64
+
 fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
 fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
@@ -70,7 +83,10 @@ fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
 # Avoid build failures in v6.9+ due to duplicate 'END' defines
 fixup_mips=("/CONFIG_DRM_XE/d")
 
+fixup_openrisc=("/CONFIG_DRM_SUN4I=/")
+
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
+	"/CONFIG_DRM_SUN4I=/"
 	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
 
 fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
@@ -78,6 +94,7 @@ fixup_sh=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 fixup_sparc64=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
 fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
+	"/CONFIG_DRM_SUN4I=/"
 	"s/CONFIG_SECTION_MISMATCH_WARN_ONLY is not set/CONFIG_SECTION_MISMATCH_WARN_ONLY=y/"
 	"s/CONFIG_LD_NO_RELAX=n/CONFIG_LD_NO_RELAX=y/")
 
