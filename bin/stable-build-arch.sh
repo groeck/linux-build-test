@@ -25,7 +25,6 @@ PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_C6X=/opt/kernel/gcc-8.3.0-nolibc/c6x-elf/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_H8300=/opt/kernel/gcc-${CV}-nolibc/h8300-linux/bin
-PATH_HEXAGON=/opt/kernel/hexagon/bin
 # loongarch needs 13.2+ to avoid 64-bit divide operations in drm code (6.9+)
 PATH_LOONGARCH=/opt/kernel/gcc-${CV13}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
@@ -55,7 +54,7 @@ if [[ ${linux_version_code} -ge $(kernel_version 6 8) ]]; then
     PATH_XTENSA=/opt/kernel/gcc-${CV13}-nolibc/xtensa-linux/bin
 fi
 
-PATH_LLVM=/opt/kernel/clang+llvm-16.0.4-x86_64-linux-gnu-ubuntu-22.04/bin
+PATH_LLVM=/opt/kernel/llvm-16.0.6-x86_64/bin
 
 PREFIX_ARC="arc-elf-"
 PREFIX_ARCV2="arc-elf-"
@@ -160,16 +159,9 @@ case ${ARCH} in
 	PATH=${PATH_H8300}:${PATH}
 	;;
     hexagon)
-	cmd=(${cmd_hexagon[*]})
-	if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-	    PREFIX="hexagon-linux-"
-	    PATH=${PATH_HEXAGON}:${PATH}
-	else
-	    PREFIX="hexagon-unknown-linux-gnu-"
-	    PATH=${PATH_LLVM}:${PATH}
-	    CCMD="clang"
-	    EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
-	fi
+	PATH=${PATH_LLVM}:${PATH}
+	CCMD="clang"
+	EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
 	;;
     i386)
 	cmd=(${cmd_i386[*]})
