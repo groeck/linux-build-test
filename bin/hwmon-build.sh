@@ -6,9 +6,11 @@ ERR=/tmp/error.$$
 
 BRANCH=$(git branch | egrep "^\*" | cut -f2 -d' ')
 
-PATH_X86=/opt/kernel/gcc-11.2.0-nolibc/x86_64-linux/bin
-PATH_ARM=/opt/kernel/gcc-11.2.0-nolibc/arm-linux-gnueabi/bin
-PATH_PPC=/opt/kernel/powerpc64/gcc-6.5.0/bin
+CV="11.4.0-2.40-nolibc"
+
+PATH_X86=/opt/kernel/${CV}/x86_64-linux/bin
+PATH_ARM=/opt/kernel/${CV}/arm-linux-gnueabi/bin
+PATH_PPC=/opt/kernel/${CV}/powerpc64-linux/bin
 
 export PATH=${PATH_X86}:${PATH_ARM}:${PATH_PPC}:${PATH}
 
