@@ -7,7 +7,8 @@ ulimit -c unlimited
 # limit file size to 2GB to prevent log file sizes from getting out of control.
 # Note that the limit needs to be a bit larger than 1GB to accommodate 1GB
 # flashes, and some arm64 builds need inexplicably more space when linking.
-ulimit -f $((2000 * 1024))
+# Update 3/21/2024: loongarch on v6.8+ now needs more than 2GB for linking.
+ulimit -f $((3000 * 1024))
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
