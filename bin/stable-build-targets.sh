@@ -65,9 +65,6 @@ skip_515="x86_64:tools/perf i386:tools/perf"
 # - alpha
 # - sh4
 # - sparc64
-#
-# CONFIG_DRM_XE is disabled for mips due to "duplicate 'END' defines"
-# build failures.
 
 fixup_alpha=("s/CONFIG_WERROR=y/CONFIG_WERROR=n/")
 
@@ -75,8 +72,6 @@ fixup_arc=("s/CONFIG_BLK_DEV_INITRD=y/CONFIG_BLK_DEV_INITRD=n/"
 	"/CONFIG_INITRAMFS_SOURCE/d")
 
 fixup_csky=("s/CONFIG_FRAME_POINTER=y/CONFIG_FRAME_POINTER=n/")
-
-fixup_mips=("/CONFIG_DRM_XE/d")
 
 fixup_parisc=("s/# CONFIG_MLONGCALLS is not set/CONFIG_MLONGCALLS=y/"
 	"s/CONFIG_MLONGCALLS=n/CONFIG_MLONGCALLS=y/")
