@@ -11,12 +11,22 @@ CV13="13.2.0-2.42"
 
 # See if we can build with gcc 13.x for recent kernel branches.
 # Branch specific findings:
+# -v5.15.y
+#   - xtensa images fail to build with gcc 13.x due to missing
+#     __umulsidi3 symbol
 # - v5.10.y
 #   - parisc images don't build with gcc 13.x/binutils 2.42
+# - v5.4.y
+#   - ppc32:allmodconfig fails to build with gcc 12.x
 #
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+# Based on those findings,
+# - use gcc 13.x for v6.1.y and later
+# - use gcc 12.x for v5.15.y and v5.10.y
+# - use gcc 11.x for v4.19.y and v5.4.y
+#
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     CV="${CV13}"
-elif [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
+elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
     CV="${CV12}"
 else
     CV="${CV11}"
