@@ -13,7 +13,7 @@ PREFIX=microblazeel-linux-
 ARCH=microblaze
 
 # Images built with gcc 10.x/11.x fail to boot
-PATH_MICROBLAZE="/opt/kernel/gcc-9.4.0-nolibc/microblazeel-linux/bin"
+PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC9}/microblazeel-linux/bin"
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
