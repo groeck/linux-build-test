@@ -120,8 +120,11 @@ build_one()
 	dobuild_common v8.1.5-local v8.1 "--disable-hax"
 	;;
     "v8.2")
-	dobuild_common v8.2.2-local v8.2 "--disable-strip --extra-cflags=-g"
-	# dobuild_common v8.2.2-local v8.2-debug \
+	dobuild_common v8.2.2-local v8.2 ""
+	;;
+    "v9.0")
+	dobuild_common v9.0.0-local v9.0 "--disable-strip --extra-cflags=-g"
+	# dobuild_common v9.0.0-local v9.0-debug \
 	#	"--enable-debug --disable-strip --extra-cflags=-g"
 	;;
     "master")
@@ -142,7 +145,7 @@ build_one()
 }
 
 if [[ -z "$*" ]]; then
-    builds="v7.2 v8.0 v8.1 v8.2 master master-debug"
+    builds="v7.2 v8.0 v8.1 v8.2 v9.0 master master-debug"
 else
     builds="$*"
 fi
