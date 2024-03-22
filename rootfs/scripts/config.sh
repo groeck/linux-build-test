@@ -17,4 +17,4 @@ DEFAULT_CC9="gcc-9.4.0-nolibc"
 DEFAULT_CC12="gcc-12.3.0-2.40-nolibc"
 DEFAULT_CC13="gcc-13.2.0-2.42-nolibc"
 
-config_initcli="slub_debug=FZPUA"
+config_initcli="panic=-1"

@@ -943,7 +943,7 @@ __common_fixups()
     __init_disk "${fixups}"
     __init_rootdev
 
-    initcli="panic=-1 kunit.stats_enabled=2 kunit.filter=speed>slow ${config_initcli}"
+    initcli="${config_initcli} kunit.stats_enabled=2 kunit.filter=speed>slow"
     extra_params="-snapshot"
     __have_usb_param=0
     __do_network_test=0
@@ -973,59 +973,6 @@ __common_fixups()
     # trim leading whitespaces, if any
     initcli="${initcli##*( )}"
     extra_params="${extra_params##*( )}"
-}
-
-# Set globals diskcmd and initcli variables
-# using common fixup strings.
-# Supports:
-# - initrd / rootfs separation
-# - sdhci-mmc/sdhci-mmc[0-9]/mmc/mmc[0-9]/sd/sd[0-9]
-#   Difference:
-#   - sdhci-mmc instantiates sdhci and then sd card
-#   - mmc/mmc[0-9] instantiates sd-card
-#     mmc[0-9] uses mmcblk[0-9] as root device
-#   - sd/sd[0-9] uses if=sd
-#   sd[0-9] instantiates the drive at index [0-9].
-# - ata/sata/sata-cmd646
-#   Difference: sata instantiates ide-hd, ata doesn't.
-#   sata-cmd646 also instantiates cmd-646 (a PCI sata/ide controller)
-# - nvme
-# - ata/sata
-# - scsi
-# - usb, usb-xhci, usb-ehci
-#   Difference: usb-xhci enables usb and instantiates qemu-xhci
-# - usb-uas, usb-uas-xhci
-#   Difference: same as above.
-# - flash{size_in_MB}
-# - mtd{size_in_MB}
-#   Creates flash file with root file system at start
-common_diskcmd()
-{
-    local fixups="${1//:/ }"
-    local rootfs="$2"
-
-    if [[ "${rootfs}" == *cpio ]]; then
-	initcli="rdinit=/sbin/init"
-	diskcmd="-initrd ${rootfs}"
-	return 0
-    fi
-
-    extra_params=""
-    initcli=""
-    __have_usb_param=0
-    __pcibridge_init
-    __init_disk "${fixups}"
-    __init_rootdev
-
-    for fixup in ${fixups}; do
-	__common_diskcmd "${fixup}" "${rootfs}"
-    done
-    diskcmd="${extra_params}"
-    if [[ -z "${__rootdev}" ]]; then
-	__set_rootdev "/dev/sda"
-    fi
-
-    initcli+=" root=${__rootdev}${__rootwait+" rootwait"}"
 }
 
 dokill()
@@ -1421,6 +1368,7 @@ __setup_fragment()
 
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
+	enable_config "${fragment}" CONFIG_SLUB_DEBUG CONFIG_SLUB_DEBUG_ON
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
 
@@ -1448,6 +1396,8 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_DETECT_HUNG_TASK CONFIG_BOOTPARAM_HUNG_TASK_PANIC
 	    set_config "${fragment}" CONFIG_DEFAULT_HUNG_TASK_TIMEOUT 30
 	fi
+    else
+	disable_config "${fragment}" CONFIG_SLUB_DEBUG
     fi
 
     if [[ "${bugverbose}" -eq 1 ]]; then
@@ -1666,6 +1616,8 @@ __setup_fragment()
 		enable_config "${fragment}" CONFIG_WW_MUTEX_SELFTEST
 	    fi
 	fi
+    else
+	disable_config "${fragment}" CONFIG_KUNIT
     fi
 
     if [[ "${nonet}" -eq 0 ]]; then
