@@ -423,7 +423,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
-	rootfs-arm-m3.cpio manual "" mps2-an385.dtb
+	rootfs-arm-m3.cpio manual "nodebug:nousb:nonet:nocd:nofs:nonvme:noscsi:novirt" mps2-an385.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
