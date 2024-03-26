@@ -2,11 +2,9 @@
 # otherwise use the versioned target.
 
 QEMU_INSTALL=/opt/buildbot/qemu-install
-QEMU_V42_BIN=${QEMU_INSTALL}/v4.2/bin
-QEMU_V72_BIN=${QEMU_INSTALL}/v7.2/bin
-QEMU_V80_BIN=${QEMU_INSTALL}/v8.0/bin
 QEMU_V81_BIN=${QEMU_INSTALL}/v8.1/bin
 QEMU_V82_BIN=${QEMU_INSTALL}/v8.2/bin
+QEMU_V90_BIN=${QEMU_INSTALL}/v9.0/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
 QEMU_BIN=${QEMU_V81_BIN}
