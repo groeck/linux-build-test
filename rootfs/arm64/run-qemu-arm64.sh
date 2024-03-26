@@ -108,6 +108,12 @@ runkernel()
 	extra_params+=" -serial null"
 	waitflag="manual"
 	;;
+    "raspi4b")
+	QEMU="${QEMU_V90_BIN}/qemu-system-aarch64"
+	initcli+=" earlycon console=ttyS1,115200"
+	extra_params+=" -serial null"
+	waitflag="manual"
+	;;
     "xlnx-zcu102")
 	initcli+=" earlycon=cdns,mmio,0xFF000000,115200n8 console=ttyPS0"
 	waitflag="automatic"
@@ -256,6 +262,16 @@ runkernel raspi3b defconfig smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
 runkernel raspi3b defconfig smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
 retcode=$((retcode + $?))
+
+if [[ ${runall} -ne 0 ]]; then
+    # Crashes due to missing interrupt controller support,
+    # missing i2c controller support, missing clock controller support
+    # (gave up here).
+    runkernel raspi4b defconfig smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
+    retcode=$((retcode + $?))
+    runkernel raspi4b defconfig smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
+    retcode=$((retcode + $?))
+fi
 
 runkernel virt defconfig nosmp:mem512 rootfs.cpio
 retcode=$((retcode + $?))
