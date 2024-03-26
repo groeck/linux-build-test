@@ -1378,6 +1378,7 @@ __setup_fragment()
 	fi
 
 	enable_config "${fragment}" CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
+	enable_config "${fragment}" CONFIG_DEBUG_SG CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 	if [[ "${nodebugobj}" -eq 0 ]]; then
@@ -1409,7 +1410,10 @@ __setup_fragment()
     if [[ "${notests}" -eq 0 ]]; then
 	# selftests
 	# kunit
-	# We do not want to run _all_ tests, much less building them as modules
+	# We can not run all tests since some crash on some architectures/platforms.
+	# Unfortunately, CONFIG_KUNIT_ALL_TESTS is all or nothing, and individual
+	# tests can not be disabled if it is set. That means we have to explicitly
+	# disable it and manually select all applicable tests.
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
 	enable_config "${fragment}" CONFIG_KUNIT CONFIG_KUNIT_TEST CONFIG_PM_QOS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
