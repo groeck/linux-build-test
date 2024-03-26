@@ -1378,9 +1378,11 @@ __setup_fragment()
 	fi
 
 	enable_config "${fragment}" CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
-	enable_config "${fragment}" CONFIG_DEBUG_SG CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
+	enable_config "${fragment}" CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
+	enable_config "${fragment}" CONFIG_DEBUG_SG
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
+
 	if [[ "${nodebugobj}" -eq 0 ]]; then
 	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS CONFIG_DEBUG_OBJECTS_FREE
 	    enable_config "${fragment}" CONFIG_DEBUG_OBJECTS_WORK
@@ -1512,9 +1514,10 @@ __setup_fragment()
 	    # hardware breakpoint tests are known to be broken on arm/arm64. See
 	    # https://lore.kernel.org/lkml/Ytl9L0Zn1PVuL1cB@FVFF77S0Q05N.cambridge.arm.com/
 	    # for details.
-	    # The loongarch failure is due to its qemu emulation.
-	    # ppc64:powernv tests are known to fail. The failures have not been
-	    # evaluated.
+	    # Other failures:
+	    # - The loongarch failure is due to its qemu emulation.
+	    # - ppc64:powernv tests are known to fail. The failures have not been
+	    #   evaluated.
 	    enable_config "${fragment}" CONFIG_HW_BREAKPOINT_KUNIT_TEST
 	fi
 
