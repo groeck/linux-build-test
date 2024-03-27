@@ -1376,7 +1376,6 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_DEBUG_LOCKDEP CONFIG_DEBUG_LOCK_ALLOC
 	    enable_config "${fragment}" CONFIG_DEBUG_WW_MUTEX_SLOWPATH
 	fi
-
 	enable_config "${fragment}" CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
 	enable_config "${fragment}" CONFIG_DEBUG_SG
@@ -1440,6 +1439,7 @@ __setup_fragment()
 	fi
 
 	enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	# Oddity: We have to disable the following option to enable the tests
