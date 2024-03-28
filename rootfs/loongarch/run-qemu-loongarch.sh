@@ -28,6 +28,10 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
+    # pointless, waste of time to build
+    disable_config "${defconfig}" CONFIG_DRM_AMDGPU
+    disable_config "${defconfig}" CONFIG_DRM_RADEON
+
     # Needed for TPM tests
     enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
 }
