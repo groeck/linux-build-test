@@ -1378,7 +1378,12 @@ __setup_fragment()
 	fi
 	enable_config "${fragment}" CONFIG_DEBUG_ATOMIC_SLEEP CONFIG_DEBUG_LIST
 	enable_config "${fragment}" CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
-	enable_config "${fragment}" CONFIG_DEBUG_SG
+
+	# loongarch crashes if CONFIG_KFENCE is enabled
+	if is_testing || ! is_enabled CONFIG_LOONGARCH; then
+	    enable_config "${fragment}" CONFIG_DEBUG_SG
+	fi
+
 	enable_config "${fragment}" CONFIG_KFENCE
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 
