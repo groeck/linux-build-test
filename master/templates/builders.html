@@ -308,15 +308,13 @@
         document.write('total: ' + qemu_total +
 			' pass: ' + qemu_passed +
 			' fail: ' + qemu_fail);
-	/*
-	if (qemuBuildFailures_{{rel_var}}.length > 0) {
+	if (qemuBuildFailures_{{rel_var}}.length > 0 && '{{rel}}' != 'next') {
 		document.write('<br>Failed tests:\n');
 		for (var f=0; f < qemuBuildFailures_{{rel_var}}.length; f++) {
 			document.write('<br>' + qemuBuildFailures_{{rel_var}}[f] + '\n');
 		}
 		document.write('\n');
 	}
-	*/
 	if (qemu_kunit_passed > 0 || qemu_kunit_fail > 0) {
 	    document.write("<br>Unit test results:<br>");
             document.write(' pass: ' + qemu_kunit_passed +
