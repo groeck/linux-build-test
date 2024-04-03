@@ -1368,6 +1368,8 @@ __setup_fragment()
 
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
+	enable_config "${fragment}" CONFIG_SLAB_FREELIST_RANDOM CONFIG_SLAB_FREELIST_HARDENED
+
 	enable_config "${fragment}" CONFIG_SLUB_DEBUG CONFIG_SLUB_DEBUG_ON
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
