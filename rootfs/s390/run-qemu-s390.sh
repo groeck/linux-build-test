@@ -16,7 +16,7 @@ else
     cpu="qemu"
 fi
 
-QEMU=${QEMU:-${QEMU_V82_BIN}/qemu-system-s390x}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 
 PREFIX=s390-linux-
 ARCH=s390

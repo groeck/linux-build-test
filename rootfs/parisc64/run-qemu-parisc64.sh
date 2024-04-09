@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 _machine=$1
 _fixup=$2
 
-QEMU=${QEMU:-${QEMU_V82_BIN}/qemu-system-hppa}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-hppa}
 
 PREFIX=hppa64-linux-
 PREFIX32=hppa-linux-
