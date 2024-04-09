@@ -259,15 +259,15 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.cpio manual nodrm::mem256:net=nic imx7d-sdb.dtb
+	rootfs-armv7a.cpio manual nodrm::smp2:mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual nodrm::usb1:mem256:net=nic imx7d-sdb.dtb
+	rootfs-armv7a.ext2 manual nodrm::smp2:usb1:mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
-	rootfs-armv7a.ext2 manual nodrm::sd:mem256:net=nic imx7d-sdb.dtb
+	rootfs-armv7a.ext2 manual nodrm::smp2:sd:mem256:net=nic imx7d-sdb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
