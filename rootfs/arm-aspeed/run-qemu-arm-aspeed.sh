@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V81_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -380,16 +380,8 @@ checkstate ${retcode}
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
-if [ ${runall} -eq 1 ]; then
-    # As of v6.8-rc,
-    #     { .compatible = "tcg,tpm-tis-i2c", },
-    # is still missing from drivers/char/tpm/tpm_tis_i2c.c. It looks like it
-    # got stuck in buerocracy. See upstream exchange at
-    # https://yhbt.net/lore/all/20220928043957.2636877-2-joel@jms.id.au/T/
-    # Also see openbmc commit 86d097a7e5540 ("tpm: tis-i2c: Add more compatible
-    # strings") as well as
-    # https://lore.kernel.org/lkml/20240116181754.3905754-2-ninad@linux.ibm.com/
-    # The test passes with the above patch applied.
+if [[ ${linux_version_code} -ge $(kernel_version 6 9) ]]; then
+    # The necessary compatible "tcg,tpm-tis-i2c" is only available in v6.9+.
     runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic \
 	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.1,address=0x2e:net=nic \
