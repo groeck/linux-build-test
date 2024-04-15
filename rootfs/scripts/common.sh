@@ -1368,7 +1368,17 @@ __setup_fragment()
 
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
-	enable_config "${fragment}" CONFIG_SLAB_FREELIST_RANDOM CONFIG_SLAB_FREELIST_HARDENED
+	enable_config "${fragment}" CONFIG_SLAB_FREELIST_RANDOM
+
+	if [[ ${linux_version_code} -ne $(kernel_version 6 6) ]] || \
+		! is_enabled CONFIG_PARISC || is_enabled CONFIG_64BIT; then
+	    # Crashes in v6.6.y on 32-bit parisc tests. Older and newer
+	    # branches as well as 64-bit tests are ok.
+	    # According to bisect, commit 284f17ac13fe ("mm/slub: handle bulk
+	    # and single object freeing separately") fixes the problem in v6.8.
+	    # Not really worth tracking down details.
+	    enable_config "${fragment}" CONFIG_SLAB_FREELIST_HARDENED
+	fi
 
 	enable_config "${fragment}" CONFIG_SLUB_DEBUG CONFIG_SLUB_DEBUG_ON
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
