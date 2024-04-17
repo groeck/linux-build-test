@@ -61,10 +61,6 @@ patch_defconfig()
     enable_config_cond "${defconfig}" CONFIG_PCMCIA CONFIG_PATA_PCMCIA CONFIG_PCMCIA_PXA2XX
     # USB
     enable_config_cond "${defconfig}" CONFIG_USB CONFIG_USB_STORAGE CONFIG_USB_OHCI_HCD CONFIG_USB_OHCI_HCD_PXA27X
-    # NAND (spitz)
-    # Doesn't work as-is; it looks like NAND images need to be
-    # specially prepared.
-    # enable_config_cond "${defconfig}" CONFIG_MTD_RAW_NAND CONFIG_MTD_NAND_SHARPSL
 
     # Build cramfs into kernel if enabled
     enable_config_cond "${defconfig}" CONFIG_CRAMFS
@@ -209,9 +205,6 @@ runkernel()
 	initcli+=" earlycon"
 	kernel="vmlinux"
 	;;
-    "akita" | "borzoi" | "spitz" | "terrier")
-	initcli+=" console=ttyS0"
-	;;
     "collie")
 	initcli+=" console=ttySA1"
 	;;
@@ -321,75 +314,6 @@ checkstate ${retcode}
 runkernel realview_defconfig realview-eb-mpcore "" \
 	rootfs-armv5.cpio manual realview_eb::mem512:net=default \
 	arm-realview-eb-11mp-ctrevb.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-# disable most test options to avoid running out of memory
-runkernel pxa_defconfig akita "" \
-	rootfs-armv5.cpio automatic nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.cramfs automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig borzoi "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel pxa_defconfig spitz "" \
-	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig spitz "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig spitz "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig spitz "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.cpio automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::mmc:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.cramfs automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::ata:net=usb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel pxa_defconfig terrier "" \
-	rootfs-armv5.ext2 automatic \
-	nodebug:nocd:nofs:nonvme:noscsi:notests:novirt:nofdt::usb:net=usb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
