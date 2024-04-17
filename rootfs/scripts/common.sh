@@ -1561,17 +1561,19 @@ __setup_fragment()
 	# If DRM is enabled for a given configuration, build it into the kernel
 	# and enable unit tests on it. Do the same for its various sub-tests.
 	#
-	# The tests result in lots of warning backtraces in drm code. At least
-	# some of them are intentional, making the tests all but unusable due
-	# to WARNING noise.
+	# The tests result in warning backtraces in drm code. At least some of
+	# them are intentional (see below for details), making the tests all
+	# but unusable due to WARNING noise.
 	# Note that TTM is a single-use functionality (see linux-next commit
-	# commit de1b1b78516d ("drm/ttm/tests: depend on UML || COMPILE_TEST")
+	# de1b1b78516d ("drm/ttm/tests: depend on UML || COMPILE_TEST")
 	# but is not protected against multi-use. Running TTM unit tests
 	# (CONFIG_DRM_TTM_KUNIT_TEST) is therefore not possible on real
 	# hardware or even in qemu, and must never be enabled.
 	if [[ "${runall}" -ge 2 ]]; then
 	    if is_enabled CONFIG_DRM; then
 		enable_config "${fragment}" CONFIG_DRM
+		# Results in warning backtraces triggered by intentionally
+		# bad API calls in drm_rect_test.c.
 		enable_config "${fragment}" CONFIG_DRM_KUNIT_TEST
 		# see above
 		# enable_config "${fragment}" CONFIG_DRM_TTM_KUNIT_TEST
@@ -1599,7 +1601,7 @@ __setup_fragment()
 
 	if is_testing || [[ "${runall}" -ge 2 ]]; then
 	    # RTC library unit tests are slow but not marked as such
-	    # (as of v6.8).
+	    # (as of v6.8, v6.9-rc4).
 	    enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
 	fi
 
@@ -1613,7 +1615,8 @@ __setup_fragment()
 	# hangs with soft lockup (arm, microblaze) and/or reports RCU stalls
 	# (mips). Even if not hanging or stalling, it takes a long time to run
 	# on older kernels.
-	if is_testing || [[ "${runall}" -ge 2 ]] || [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
+	if is_testing || [[ "${runall}" -ge 2 ]] || \
+		[[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
 	    enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
 	fi
 	#
