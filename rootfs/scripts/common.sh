@@ -1362,9 +1362,18 @@ __setup_fragment()
     # If/when this happens as part of usb_hcd_pci_shutdown(),
     # the usb interface is already disabled the hardware and does not
     # handle the interrupt. It appears that this may cause random USB
-    # errors when shutting down the system. Disable it to see if that
-    # solves the problem or if there is some other issue lurking.
-    disable_config "${fragment}" CONFIG_DEBUG_SHIRQ
+    # errors when shutting down the system.
+    # Disabling CONFIG_DEBUG_SHIRQ does not really solve the problem.
+    # There is (at least) another problem where usb-ohci does not get
+    # or handle handle interrupts, resulting in interface timeouts
+    # and hung task resets. The underlying problem is that the qemu
+    # interrupts are level triggered. If Linux does not handle all
+    # interrupts, pending interrupts will never be cleared and Linux
+    # does not receive interrupts even if interrupts are pending
+    # It is unclear if the problem is caused by the qemu OHCI implementation
+    # or by the Linux kernel. For now it is worked around in qemu
+    # (v8.2 and later local branches).
+    # disable_config "${fragment}" CONFIG_DEBUG_SHIRQ
 
     if [[ "${nodebug}" -eq 0 ]]; then
 	# debug options
