@@ -1443,7 +1443,7 @@ __setup_fragment()
 	# tests can not be disabled if it is set. That means we have to explicitly
 	# disable it and manually select all applicable tests.
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
-	enable_config "${fragment}" CONFIG_KUNIT CONFIG_KUNIT_TEST CONFIG_PM_QOS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_KUNIT CONFIG_PM_QOS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
