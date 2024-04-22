@@ -1444,7 +1444,16 @@ __setup_fragment()
 	# disable it and manually select all applicable tests.
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
 	enable_config "${fragment}" CONFIG_KUNIT CONFIG_PM_QOS_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS CONFIG_SYSCTL_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
+
+	# As of v6.9-rc5, ext4 kunit tests pass but result in memory corruption.
+	# The problem was introduced in the v6.9 commit window. It looks like the
+	# fix may not be applied to v6.9, potentially corrupting test images in
+	# this release. Disable for now.
+	if is_testing || [[ "${runall}" -ge 2 ]]; then
+	    enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
+	fi
+
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
