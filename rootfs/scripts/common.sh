@@ -1444,6 +1444,9 @@ __setup_fragment()
 	# disable it and manually select all applicable tests.
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
 	enable_config "${fragment}" CONFIG_KUNIT CONFIG_PM_QOS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_KUNIT_TEST
+	# Explicitly disable KUNIT_FAULT_TEST to avoid BUG() messages
+	disable_config "${fragment}" CONFIG_KUNIT_FAULT_TEST
 	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
 
 	# As of v6.9-rc5, ext4 kunit tests pass but result in memory corruption.
