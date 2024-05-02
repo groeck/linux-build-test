@@ -29,7 +29,7 @@ PREFIX_M3="arm-linux-"
 #  device_node_get_regmap from intcp_init_early+0xc/0x40
 #  intcp_init_early from start_kernel+0x58/0x604
 #  start_kernel from 0x0
-PATH_ARM="/opt/kernel/gcc-9.4.0-nolibc/arm-linux-gnueabi/bin"
+PATH_ARM="/opt/kernel/${DEFAULT_CC9}/arm-linux-gnueabi/bin"
 # Cortex-M3 (thumb) needs binutils 2.28 or earlier
 PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
