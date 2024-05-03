@@ -278,28 +278,28 @@ checkstate ${retcode}
 #       virtio-net: ?
 #       i82551: ip: SIOCSIFFLAGS: No such file or directory
 #
-runkernel powernv_defconfig "::net=rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::net=rtl8139" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.cpio.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel powernv_defconfig "::smp2:nvme:net=i82559a" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::smp2:nvme:net=i82559a" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel powernv_defconfig "::usb-xhci:net=i82562" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::usb-xhci:net=i82562" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel powernv_defconfig "::scsi[MEGASAS]:net=i82557a" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::scsi[MEGASAS]:net=i82557a" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel powernv_defconfig "::smp2:sdhci-mmc:net=i82801" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::smp2:sdhci-mmc:net=i82801" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel powernv_defconfig "::mtd32:net=rtl8139" powernv POWER9 hvc0 \
+runkernel powernv_defconfig "::mtd32:net=rtl8139" powernv power10 hvc0 \
 	arch/powerpc/boot/zImage.epapr rootfs-el.ext2.gz manual
 retcode=$((retcode + $?))
 checkstate ${retcode}
