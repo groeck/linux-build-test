@@ -109,7 +109,6 @@ runkernel()
 	waitflag="manual"
 	;;
     "raspi4b")
-	QEMU="${QEMU_V90_BIN}/qemu-system-aarch64"
 	initcli+=" earlycon console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
