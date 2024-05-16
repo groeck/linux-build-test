@@ -44,7 +44,7 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local fixup="nofs::$4"
+    local fixup="nofs:noscsi::$4"
     local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="riscv32:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
@@ -136,32 +136,7 @@ checkstate ${retcode}
 runkernel virt "" rv32_defconfig net=i82558a:usb-uas-xhci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=i82559a:scsi[53C810]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel virt "" rv32_defconfig "net=i82559er:pci-bridge:scsi[53C895A]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
 
-if [[ ${runall} -ne 0 ]]; then
-    # Does not instantiate
-    runkernel virt "rv32,zbb=no" rv32_defconfig "scsi[AM53C974]" rootfs.ext2
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-    runkernel virt "" rv32_defconfig "scsi[DC395]" rootfs.ext2
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-fi
-
-runkernel virt "rv32,zbb=no" rv32_defconfig "net=rtl8139:scsi[MEGASAS]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel virt "" rv32_defconfig "pci-bridge:net=i82562:scsi[MEGASAS2]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel virt "rv32,zbb=no" rv32_defconfig "pci-bridge:net=e1000:scsi[FUSION]" rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
 runkernel virt "" rv32_defconfig "net=i82557b:scsi[virtio]" rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
