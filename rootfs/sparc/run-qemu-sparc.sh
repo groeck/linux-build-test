@@ -71,8 +71,8 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
-    # novirt:nousb:noscsi to reduce image size
-    if ! dosetup -c "${config}" -F "novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
+    # no*: options to reduce image size
+    if ! dosetup -c "${config}" -F "nonet:nonvme:novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
@@ -100,49 +100,49 @@ echo
 # Override CPU on systems which set TI-MicroSparc-I by default.
 # On those systems, the new root file system stalls when loading
 # run.sh with endless faults and no fault reason.
-runkernel sparc32_defconfig SPARCClassic "Fujitsu-MB86904" nodebugobj:nosmp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SPARCClassic "Fujitsu-MB86904" nosmp:scsi:net=default rootfs.ext2
 retcode=$?
 checkstate ${retcode}
-runkernel sparc32_defconfig SPARCbook "Fujitsu-MB86904" nodebugobj:nosmp:scsi:net=default rootfs.iso
+runkernel sparc32_defconfig SPARCbook "Fujitsu-MB86904" nosmp:scsi:net=default rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig LX "Fujitsu-MB86904" nodebugobj:nosmp:noapc:scsi:net=default rootfs.sqf
+runkernel sparc32_defconfig LX "Fujitsu-MB86904" nosmp:noapc:scsi:net=default rootfs.sqf
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-4 "" nodebugobj:nosmp:net=default rootfs.cpio
+runkernel sparc32_defconfig SS-4 "" nosmp:net=default rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-5 "" nodebugobj:nosmp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SS-5 "" nosmp:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-10 "" nodebugobj:nosmp:scsi:net=default rootfs.iso
+runkernel sparc32_defconfig SS-10 "" nosmp:scsi:net=default rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-20 "" nodebugobj:nosmp:scsi:net=default rootfs.sqf
+runkernel sparc32_defconfig SS-20 "" nosmp:scsi:net=default rootfs.sqf
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-600MP "" nodebugobj:nosmp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SS-600MP "" nosmp:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig Voyager "" nodebugobj:nosmp:noapc:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig Voyager "" nosmp:noapc:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-4 "" nodebug:smp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SS-4 "" smp:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-5 "" nodebug:smp:scsi:net=default rootfs.iso
+runkernel sparc32_defconfig SS-5 "" smp:scsi:net=default rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-10 "" nodebug:smp:scsi:net=default rootfs.sqf
+runkernel sparc32_defconfig SS-10 "" smp:scsi:net=default rootfs.sqf
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-20 "" nodebug:smp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SS-20 "" smp:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig SS-600MP "" nodebug:smp:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig SS-600MP "" smp:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel sparc32_defconfig Voyager "" nodebug:smp:noapc:scsi:net=default rootfs.ext2
+runkernel sparc32_defconfig Voyager "" smp:noapc:scsi:net=default rootfs.ext2
 retcode=$((retcode + $?))
 
 exit ${retcode}
