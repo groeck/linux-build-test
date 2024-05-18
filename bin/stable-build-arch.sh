@@ -220,15 +220,11 @@ case ${ARCH} in
 	if [[ ${linux_version_code} -lt $(kernel_version 5 15) ]]; then
 	    ARCH=parisc
 	fi
-	if [[ ${linux_version_code} -gt $(kernel_version 6 4) ]]; then
-	    # parisc after v6.4 wants at least gcc v12.0
-	    PATH_PARISC=/opt/kernel/gcc-${CV12}-nolibc/hppa-linux/bin
-	    PATH_PARISC64=/opt/kernel/gcc-${CV12}-nolibc/hppa64-linux/bin
-	fi
+	# Note: parisc after v6.4 wants at least gcc 12.x, so building with
+	# gcc 11.x to avoid build failures introduced later is not an option.
 	PATH=${PATH_PARISC64}:${PATH_PARISC}:${PATH}
 	;;
     powerpc)
-	    PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
 	cmd=(${cmd_powerpc[*]})
 	PREFIX="${PREFIX_PPC}"
 	PATH=${PATH_PPC}:${PATH}
