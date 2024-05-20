@@ -15,8 +15,6 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
 PREFIX=sh4-linux-
 ARCH=sh
-CONFIG=""
-EARLYCON=""
 
 errlog="/tmp/err-sh.log"
 
@@ -28,14 +26,14 @@ patch_defconfig()
 {
     local defconfig=$1
 
-    # Drop command line overwrite
-    sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
+    # Drop command line overwrites
+    disable_config ${defconfig} CONFIG_CMDLINE_OVERWRITE
+    disable_config ${defconfig} CONFIG_CMDLINE_EXTEND
+    # enable CMDLINE_FROM_BOOTLOADER instead if it exists (v6.10+)
+    enable_config ${defconfig} CONFIG_CMDLINE_FROM_BOOTLOADER
 
     # Enable MTD_BLOCK to be able to boot from flash
-    echo "CONFIG_MTD_BLOCK=y" >> ${defconfig}
-
-    # Conditionally enable earlyprintk
-    echo "${CONFIG}" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_MTD_BLOCK
 }
 
 runkernel()
@@ -65,7 +63,7 @@ runkernel()
 	return 1
     fi
 
-    initcli+=" console=ttySC1,115200 ${EARLYCON} noiotrap"
+    initcli+=" console=ttySC1,115200 noiotrap"
 
     if [[ ${dodebug} -eq 2 ]]; then
 	extra_params+=" -d int,mmu,in_asm,guest_errors,unimp,pcall -D ${errlog}"
