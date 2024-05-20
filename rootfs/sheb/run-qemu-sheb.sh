@@ -27,15 +27,18 @@ patch_defconfig()
 {
     local defconfig=$1
 
-    # Drop command line overwrite
-    sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
+    # Drop command line overwrites
+    disable_config ${defconfig} CONFIG_CMDLINE_OVERWRITE
+    disable_config ${defconfig} CONFIG_CMDLINE_EXTEND
+    # enable CMDLINE_FROM_BOOTLOADER instead if it exists (v6.10+)
+    enable_config ${defconfig} CONFIG_CMDLINE_FROM_BOOTLOADER
 
     # Enable MTD_BLOCK to be able to boot from flash
-    echo "CONFIG_MTD_BLOCK=y" >> ${defconfig}
+    enable_config ${defconfig} CONFIG_MTD_BLOCK
 
     # Build a big endian image
-    echo "CONFIG_CPU_LITTLE_ENDIAN=n" >> ${defconfig}
-    echo "CONFIG_CPU_BIG_ENDIAN=y" >> ${defconfig}
+    disable_config ${defconfig} CONFIG_CPU_LITTLE_ENDIAN
+    enable_config ${defconfig} CONFIG_CPU_BIG_ENDIAN
 }
 
 runkernel()
