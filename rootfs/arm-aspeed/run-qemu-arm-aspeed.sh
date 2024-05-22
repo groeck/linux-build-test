@@ -149,7 +149,7 @@ runkernel()
     # If a dtb file was specified but does not exist, skip the build.
     local dtbcmd=""
     if [[ -n "${dtb}" ]]; then
-	dtbfile="$(find arch/arm/boot/dts -name "${dtb}")"
+	dtbfile="$(find "${__qemu_builddir}/arch/arm/boot/dts" -name "${dtb}")"
 	if [[ -z "${dtbfile}" ]]; then
 	    echo "skipped (dtb)"
 	    return 0

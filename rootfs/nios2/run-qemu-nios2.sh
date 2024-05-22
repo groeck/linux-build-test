@@ -57,8 +57,8 @@ runkernel()
 	return 1
     fi
 
-    dts="arch/nios2/boot/dts/${dts}"
-    dtb=$(echo ${dts} | sed -e 's/\.dts/\.dtb/')
+    dts="${__qemu_builddir}/arch/nios2/boot/dts/${dts}"
+    dtb="${dts/.dts/.dtb}"
     dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
 
     execute manual waitlist[@] \

@@ -16,6 +16,8 @@ __basedir="${__progdir}/.."
 __swtpmdir=$(mktemp -d "/tmp/mytpmXXXXX")
 __swtpmsock="${__swtpmdir}/swtpm-sock"
 __swtpmpidfile="${__swtpmdir}/pid"
+__qemu_builddir="$(mktemp -d "/tmp/qemuXXXXX")"
+__config="${__qemu_builddir}/.config"
 
 . "${__basedir}/scripts/config.sh"
 
@@ -61,6 +63,9 @@ __cleanup()
     __stop_tpm
     if [[ -d "${__swtpmdir}" ]]; then
 	rm -rf "${__swtpmdir}"
+    fi
+    if [[ -d "${__qemu_builddir}" ]]; then
+	rm -rf "${__qemu_builddir}"
     fi
 
     exit ${rv}
@@ -734,7 +739,7 @@ __common_diskcmd()
 	# The actual configuration determines if the root file system
 	# is /dev/sda (CONFIG_ATA) or /dev/hda (CONFIG_IDE).
 	# With CONFIG_IDE, the device is /dev/hda for both hdd and cdrom.
-	if ! grep -q "CONFIG_ATA=y" .config; then
+	if ! grep -q "CONFIG_ATA=y" "${__config}"; then
 	    hddev="/dev/hda"
 	fi
 	__set_rootdev "${hddev}"
@@ -1005,6 +1010,7 @@ doclean()
 		make ARCH=${ARCH} mrproper >/dev/null 2>&1
 		rm -f .config
 	fi
+	rm -rf "${__qemu_builddir}"
 }
 
 rootfsname()
@@ -1181,7 +1187,7 @@ __domake()
     if [ "${PREFIX32}" != "" ]; then
         CROSS32="CROSS32_COMPILE=${PREFIX32}"
     fi
-    make -j${maxload} ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${CROSS32} $* >/dev/null </dev/null
+    make -j${maxload} O="${__qemu_builddir}" ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${CROSS32} $* >/dev/null </dev/null
     return $?
 }
 
@@ -1224,14 +1230,14 @@ __setup_config()
 	return 2
     fi
 
-    # the configuration is in .config
+    # the configuration is in "${__config}"
 
     if [ -n "${fragment}" ]; then
-	cat "${fragment}" >> .config
+	cat "${fragment}" >> "${__config}"
     fi
 
     if [ -n "${fixup}" ]; then
-	patch_defconfig .config "${fixup}"
+	patch_defconfig "${__config}" "${fixup}"
     fi
 
     if [ -n "${fixup}${fragment}" ]; then
@@ -1252,13 +1258,13 @@ is_supported()
 
 is_enabled()
 {
-    grep -q -e "^$1=[m|y]\$" ".config"
+    grep -q -e "^$1=[m|y]\$" "${__config}"
     return $?
 }
 
 is_available()
 {
-    grep -q -e "^$1=[m|y]\$" -e "^# $1 is not set$" ".config"
+    grep -q -e "^$1=[m|y]\$" -e "^# $1 is not set$" "${__config}"
     return $?
 }
 
@@ -1739,7 +1745,7 @@ __setup_fragment()
     fi
 
     if [[ "${preempt}" -eq 1 ]]; then
-	enable_config "${fragment}"  CONFIG_PREEMPT
+	enable_config "${fragment}" CONFIG_PREEMPT
     fi
 }
 
@@ -1852,6 +1858,8 @@ dosetup()
     __cached_reason=""
 
     doclean ${ARCH}
+
+    mkdir -p "${__qemu_builddir}"
 
     if [ -n "${fixups}" ]; then
 	# dummy call to initialize .config
@@ -2205,6 +2213,8 @@ execute()
 
     echo -n "running ..."
 
+    pushd "${__qemu_builddir}" >/dev/null
+
     if [[ ${dodebug} -ne 0 ]]; then
 	local x
 	local len="$(echo ${cmd} | wc | awk '{print $3}')"
@@ -2259,6 +2269,8 @@ execute()
 
 	retries=$((retries + 1))
     done
+
+    popd >/dev/null
 
     return ${retcode}
 }
