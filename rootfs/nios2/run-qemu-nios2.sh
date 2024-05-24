@@ -36,6 +36,7 @@ runkernel()
     local retcode
     local waitlist=("Restarting system" "Boot successful" "Machine restart")
     local pbuild="${ARCH}:${mach}:${defconfig}:${dts}"
+    local dtb
 
     if ! match_params "${machine}@${mach}" "${config}@${defconfig}"; then
 	echo "Skipping ${pbuild} ... "
@@ -57,14 +58,12 @@ runkernel()
 	return 1
     fi
 
-    dts="${__qemu_builddir}/arch/nios2/boot/dts/${dts}"
-    dtb="${dts/.dts/.dtb}"
-    dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
+    dtb="$(gendtb "arch/nios2/boot/dts/${dts}")"
 
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} \
 	-kernel vmlinux -no-reboot \
-	-dtb ${dtb} \
+	-dtb "${dtb}" \
 	--append "rdinit=/sbin/init ${initcli} earlycon=uart8250,mmio32,0x18001600 console=ttyS0,115200" \
 	-initrd "$(rootfsname ${rootfs})" \
 	-nographic -monitor none

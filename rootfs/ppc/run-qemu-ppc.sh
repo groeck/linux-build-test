@@ -83,6 +83,7 @@ runkernel()
     local rootfs=$6
     local kernel=$7
     local dts=$8
+    local dtb
     local dtbcmd=""
     local earlycon=""
     local waitlist=("Restarting" "Boot successful" "Rebooting")
@@ -121,10 +122,9 @@ runkernel()
 	cpu="-cpu ${cpu}"
     fi
 
-    if [ -n "${dts}" -a -e "${dts}" ]; then
-	local dtb="${dts/.dts/.dtb}"
+    dtb="$(gendtb "${dts}")"
+    if [ -n "${dtb}" ]; then
 	dtbcmd="-dtb ${dtb}"
-	dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
     fi
 
     # Needed for "FUSION" boot tests

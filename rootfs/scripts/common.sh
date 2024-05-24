@@ -100,6 +100,21 @@ _log_all=0	# log everything, not just part of the log
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
+gendtb()
+{
+    local dts="$1"
+    local dtb=""
+
+    if [ -n "${dts}" -a -e "${dts}" ]; then
+	dtb="${__qemu_builddir}/${dts/.dts/.dtb}"
+	if [[ ! -e "${dtb}" ]]; then
+            mkdir -p "$(dirname "${dtb}")"
+            dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
+	fi
+    fi
+    echo "${dtb}"
+}
+
 # Return kernel version based on parameters
 kernel_version()
 {

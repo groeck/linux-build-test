@@ -57,7 +57,6 @@ runkernel()
 {
     local defconfig=$1
     local dts="arch/xtensa/boot/dts/$2.dts"
-    local dtb
     local cpu=$3
     local mach=$4
     local fixup="${cpu}:${5}"
@@ -66,6 +65,7 @@ runkernel()
     local pbuild="${ARCH}:${cpu}:${mach}:${defconfig}"
     local earlycon
     local image
+    local dtb
     local dtbcmd
 
     if ! match_params "${machine}@${mach}" "${_cpu}@${cpu}" "${config}@${defconfig}"; then
@@ -92,13 +92,9 @@ runkernel()
 	return 1
     fi
 
-    if [ -e "${dts}" ]; then
-	dtb="${__qemu_builddir}/${dts/.dts/.dtb}"
+    dtb="$(gendtb "${dts}")"
+    if [[ -n "${dtb}" ]]; then
 	dtbcmd="-dtb ${dtb}"
-	if [ ! -e "${dtb}" ]; then
-	    mkdir -p "$(dirname "${dtb}")"
-	    dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
-	fi
     fi
 
     case "${mach}" in
