@@ -27,8 +27,9 @@ patch_defconfig()
     local defconfig=$1
 
     # Drop command line overwrites
-    disable_config ${defconfig} CONFIG_CMDLINE_OVERWRITE
-    disable_config ${defconfig} CONFIG_CMDLINE_EXTEND
+    # Note: We can not use disable_config here since the
+    # options must be completely removed.
+    sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
     # enable CMDLINE_FROM_BOOTLOADER instead if it exists (v6.10+)
     enable_config ${defconfig} CONFIG_CMDLINE_FROM_BOOTLOADER
 
