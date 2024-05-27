@@ -16,8 +16,8 @@ __basedir="${__progdir}/.."
 __swtpmdir=$(mktemp -d "/tmp/mytpmXXXXX")
 __swtpmsock="${__swtpmdir}/swtpm-sock"
 __swtpmpidfile="${__swtpmdir}/pid"
-__qemu_builddir="$(mktemp -d "/tmp/qemuXXXXX")"
-__config="${__qemu_builddir}/.config"
+__qemu_builddir_default="$(mktemp -d "/tmp/qemuXXXXX")"
+__qemu_builddir_static="/tmp/qemu_builddir"
 
 . "${__basedir}/scripts/config.sh"
 
@@ -51,6 +51,22 @@ __stop_tpm()
     rm -f "${__swtpmpidfile}"
 }
 
+__set_qemu_builddir()
+{
+    qemu_builddir="$1"
+    __config="${qemu_builddir}/.config"
+}
+
+__set_qemu_builddir_default()
+{
+    __set_qemu_builddir "${__qemu_builddir_default}"
+}
+
+__set_qemu_builddir_static()
+{
+    __set_qemu_builddir "${__qemu_builddir_static}"
+}
+
 __cleanup()
 {
     rv=$?
@@ -64,8 +80,8 @@ __cleanup()
     if [[ -d "${__swtpmdir}" ]]; then
 	rm -rf "${__swtpmdir}"
     fi
-    if [[ -d "${__qemu_builddir}" ]]; then
-	rm -rf "${__qemu_builddir}"
+    if [[ -d "${__qemu_builddir_default}" ]]; then
+	rm -rf "${__qemu_builddir_default}"
     fi
 
     exit ${rv}
@@ -106,7 +122,7 @@ gendtb()
     local dtb=""
 
     if [ -n "${dts}" -a -e "${dts}" ]; then
-	dtb="${__qemu_builddir}/${dts/.dts/.dtb}"
+	dtb="${qemu_builddir}/${dts/.dts/.dtb}"
 	if [[ ! -e "${dtb}" ]]; then
             mkdir -p "$(dirname "${dtb}")"
             dtc -I dts -O dtb ${dts} -o ${dtb} >/dev/null 2>&1
@@ -151,7 +167,10 @@ parse_args()
 	___testbuild=0
 	verbose=0
 	extracli=""
-	while getopts abBde:KlLnr:tTvW opt; do
+
+	__set_qemu_builddir_default
+
+	while getopts abBde:KlLnNr:tTvW opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
@@ -159,7 +178,8 @@ parse_args()
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	K)	nokallsyms=1;;
-	n)	nobuild=1;;
+	n)	__set_qemu_builddir_static; nobuild=1;;
+	N)	__set_qemu_builddir_static;;
 	t)	__testbuild=1;___testbuild=1;__retries=0;;
 	T)	___testbuild=1;__retries=0;;
 	r)	__retries=${OPTARG}
@@ -1025,7 +1045,9 @@ doclean()
 		make ARCH=${ARCH} mrproper >/dev/null 2>&1
 		rm -f .config
 	fi
-	rm -rf "${__qemu_builddir}"
+	if [[ -n "${qemu_builddir}" ]]; then
+	    rm -rf "${qemu_builddir}"
+	fi
 }
 
 rootfsname()
@@ -1202,7 +1224,7 @@ __domake()
     if [ "${PREFIX32}" != "" ]; then
         CROSS32="CROSS32_COMPILE=${PREFIX32}"
     fi
-    make -j${maxload} O="${__qemu_builddir}" ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${CROSS32} $* >/dev/null </dev/null
+    make -j${maxload} O="${qemu_builddir}" ARCH=${ARCH} CROSS_COMPILE=${PREFIX} ${CROSS32} $* >/dev/null </dev/null
     return $?
 }
 
@@ -1874,7 +1896,11 @@ dosetup()
 
     doclean ${ARCH}
 
-    mkdir -p "${__qemu_builddir}"
+    if [[ -z "${qemu_builddir}" ]]; then
+	__set_qemu_builddir_default
+    fi
+
+    mkdir -p "${qemu_builddir}"
 
     if [ -n "${fixups}" ]; then
 	# dummy call to initialize .config
@@ -2228,7 +2254,7 @@ execute()
 
     echo -n "running ..."
 
-    pushd "${__qemu_builddir}" >/dev/null
+    pushd "${qemu_builddir}" >/dev/null
 
     if [[ ${dodebug} -ne 0 ]]; then
 	local x
