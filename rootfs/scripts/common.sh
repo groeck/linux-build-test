@@ -1863,8 +1863,13 @@ dosetup()
 
     # If nobuild is set, don't build image, just set up the root file
     # system as needed. Assumes that the image was built already in
-    # a previous test run.
+    # a previous test run. Bail out if that is not the case.
     if [ ${nobuild:-0} -ne 0 ]; then
+	if [[ ! -d "${qemu_builddir}" ]]; then
+	    echo "failed (no build directory)"
+	    __dosetup_rc=1
+	    return 1
+	fi
 	rootfs="$(setup_rootfs ${rootfs})"
 	__common_fixups "${fixups}" "${rootfs}"
 	return 0
