@@ -57,7 +57,7 @@ runkernel()
 	return 1
     fi
 
-    initcli+=" console=${console},115200"
+    initcli+=" console=${console},115200 earlycon=uartlite0"
 
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} -m 256 \
