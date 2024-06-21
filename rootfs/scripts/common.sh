@@ -2264,6 +2264,7 @@ execute()
     if [[ ${dodebug} -ne 0 ]]; then
 	local x
 	local len="$(echo ${cmd} | wc | awk '{print $3}')"
+	local is_kernel_opt=0
 
 	echo
 	echo -n "${cmd}"
@@ -2271,8 +2272,17 @@ execute()
 	# At the same time, it lets us conveniently split command line output
 	# to multiple lines, which is quite useful to improve readability.
 	for x in "$@"; do
+	    # Override kernel location to include the build directory.
+	    if [[ "$x" == "-kernel" ]]; then
+	        is_kernel_opt=1
+	    elif [[ ${is_kernel_opt} -ne 0 ]]; then
+		x="${qemu_builddir}/$x"
+	        is_kernel_opt=0
+	    fi
+
 	    local n="$(echo $x | wc | awk '{print $2}')"
 	    local l="$(echo $x | wc | awk '{print $3}')"
+
 	    if [[ "$((len + l))" -ge 80 ]]; then
 	        echo " \\"; echo -n "    "
 		len=4
