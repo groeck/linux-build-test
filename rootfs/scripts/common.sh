@@ -116,6 +116,19 @@ _log_all=0	# log everything, not just part of the log
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
+# Find file in qemu build directory.
+# Return path _without_ qemu build directory itself.
+__findfile()
+{
+    local basedir="$1"
+    local filename="$2"
+    local pathname
+
+    pathname="$(cd "${qemu_builddir}"; find "${basedir}" -name "${filename}")"
+
+    echo "${pathname}"
+}
+
 gendtb()
 {
     local dts="$1"
@@ -2265,6 +2278,7 @@ execute()
 	local x
 	local len="$(echo ${cmd} | wc | awk '{print $3}')"
 	local is_kernel_opt=0
+	local is_dtb_opt=0
 
 	echo
 	echo -n "${cmd}"
@@ -2278,6 +2292,14 @@ execute()
 	    elif [[ ${is_kernel_opt} -ne 0 ]]; then
 		x="${qemu_builddir}/$x"
 	        is_kernel_opt=0
+	    fi
+
+	    # Override dtb file location to include the build directory.
+	    if [[ "$x" == "-dtb" ]]; then
+	        is_dtb_opt=1
+	    elif [[ ${is_dtb_opt} -ne 0 ]]; then
+		x="${qemu_builddir}/$x"
+	        is_dtb_opt=0
 	    fi
 
 	    local n="$(echo $x | wc | awk '{print $2}')"
