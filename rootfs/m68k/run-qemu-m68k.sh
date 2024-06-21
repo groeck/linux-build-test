@@ -93,6 +93,7 @@ runkernel()
       ${qemu} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
+	-audio none \
 	${diskcmd} \
 	-append "${initcli} console=ttyS0,115200"
 
