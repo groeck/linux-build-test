@@ -116,6 +116,26 @@ _log_all=0	# log everything, not just part of the log
 # maxload=$(($(nproc) * 3 / 2))
 maxload=$(nproc)
 
+# Display build reference. It assumes that the following
+# environment variables are set:
+# - PATH must include the path to gcc.
+# Parameters:
+# - C compiler (with prefix, must be in PATH)
+#   C compiler version will not be displayed if parameter is not provided
+# - QEMU command, full path
+build_reference()
+{
+    local qemu_version="$($2 --version | head -n 1 | sed -e "s/.*version //")"
+
+    echo "Build reference: $(git describe --match 'v*')"
+    if [[ -n "$1" ]]; then
+	local compiler_version="$($1 --version | head -n 1)"
+	echo "Compiler version: ${compiler_version}"
+    fi
+    echo "Qemu version: ${qemu_version}"
+    echo
+}
+
 # Find file in qemu build directory.
 # Return path _without_ qemu build directory itself.
 __findfile()
