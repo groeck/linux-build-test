@@ -16,8 +16,8 @@ PREFIX=hppa64-linux-
 PREFIX32=hppa-linux-
 ARCH=parisc64
 
-PATH_PARISC64="/opt/kernel/${DEFAULT_CC12}/hppa64-linux/bin"
-PATH_PARISC32="/opt/kernel/${DEFAULT_CC12}/hppa-linux/bin"
+PATH_PARISC64="/opt/kernel/${DEFAULT_CC13}/hppa64-linux/bin"
+PATH_PARISC32="/opt/kernel/${DEFAULT_CC13}/hppa-linux/bin"
 PATH=${PATH}:${PATH_PARISC64}:${PATH_PARISC32}
 
 patch_defconfig()
@@ -72,8 +72,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Network test notes:
 # i82550:
