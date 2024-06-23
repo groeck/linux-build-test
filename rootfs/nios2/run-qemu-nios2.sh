@@ -71,8 +71,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 runkernel 10m50-ghrd 10m50_defconfig 10m50_devboard.dts
 retcode=$?

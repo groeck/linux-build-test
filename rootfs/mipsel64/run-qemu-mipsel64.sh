@@ -138,8 +138,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # erofs is only supported in v5.4 and later
 if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then

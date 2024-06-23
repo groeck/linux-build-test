@@ -94,8 +94,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Override CPU on systems which set TI-MicroSparc-I by default.
 # On those systems, the new root file system stalls when loading

@@ -83,8 +83,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Most images fail to instantiate CD ROM because there is an insufficient
 # amount of DMA memory.

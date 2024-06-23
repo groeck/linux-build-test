@@ -130,8 +130,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Notes:
 #   pseries:ne2k_pci on pseries (big endian) results in

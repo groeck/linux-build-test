@@ -85,8 +85,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Network test notes:
 # - ne2k_pci gets an IP address, but fails to ping the host

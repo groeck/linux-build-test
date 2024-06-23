@@ -146,7 +146,6 @@ runkernel()
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
-    local QEMUCMD="${QEMU}"
     local PREFIX="${PREFIX_A}"
     if [[ "${cpu}" = "cortex-m3" ]]; then
 	PREFIX="${PREFIX_M3}"
@@ -230,7 +229,7 @@ runkernel()
     esac
 
     execute "${mode}" waitlist[@] \
-        ${QEMUCMD} -M ${mach} \
+        ${QEMU} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
 	    -kernel ${kernel} \
 	    -no-reboot \
@@ -242,8 +241,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 runkernel versatile_defconfig versatilepb "" \
 	rootfs-armv5.ext2 auto aeabi:pci::scsi:mem128:net=default versatile-pb.dtb

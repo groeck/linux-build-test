@@ -59,7 +59,6 @@ runkernel()
     local rootfs=$5
     local waitlist=("Rebooting" "Boot successful")
     local build="${ARCH}:${mach}:${cpu}:${defconfig}"
-    local qemu="${QEMU}"
     local diskcmd=""
 
     if [[ "${rootfs}" == *cpio ]]; then
@@ -90,7 +89,7 @@ runkernel()
     fi
 
     execute manual waitlist[@] \
-      ${qemu} -M ${mach} \
+      ${QEMU} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
 	-audio none \
@@ -100,8 +99,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 retcode=0
 runkernel mcf5208evb m5208 m5208evb_defconfig "noextras" rootfs-5208.cpio

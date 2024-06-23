@@ -122,7 +122,6 @@ runkernel()
     local waitlist=("Restarting" "Boot successful" "Rebooting")
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
-    local QEMUCMD="${QEMU}"
 
     local _boot
     if [[ "${rootfs}" == *cpio ]]; then
@@ -223,7 +222,7 @@ runkernel()
     esac
 
     execute "${mode}" waitlist[@] \
-        ${QEMUCMD} -M ${mach} \
+        ${QEMU} -M ${mach} \
 	    ${cpu:+-cpu ${cpu}} \
 	    -kernel ${kernel} \
 	    -no-reboot \
@@ -235,8 +234,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Ethernet needs double net=nic (double '-nic user') to work.
 runkernel imx_v6_v7_defconfig mcimx6ul-evk "" \

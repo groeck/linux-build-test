@@ -148,8 +148,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Multi-core boot for mpc8544ds has been broken at least since upstream
 # commit 56f1ba280719 ("powerpc/mpc85xx: refactor the PM operations"),

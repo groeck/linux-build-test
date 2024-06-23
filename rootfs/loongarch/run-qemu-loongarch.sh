@@ -92,8 +92,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 nodebug=""
 if [[ ${linux_version_code} -le $(kernel_version 6 1) && "${runall}" -eq 0 ]]; then

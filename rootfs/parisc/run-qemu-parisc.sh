@@ -80,8 +80,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # run initial set of tests with SMP enabled.
 # Multi-core boots take a long time to boot, so don't test with more

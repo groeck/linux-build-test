@@ -122,8 +122,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # f2fs has known lockdep issues which the maintainers don't seem
 # to care about.

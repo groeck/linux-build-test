@@ -132,8 +132,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # exfat is not supported in v5.4 and older
 if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then

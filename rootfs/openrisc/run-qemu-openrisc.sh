@@ -54,8 +54,7 @@ runkernel()
     return $?
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 runkernel or1ksim_defconfig
 retcode=$?

@@ -81,8 +81,7 @@ runkernel()
     return ${rv}
 }
 
-echo "Build reference: $(git describe --match 'v*')"
-echo
+build_reference "${PREFIX}gcc" "${QEMU}"
 
 # Network test notes:
 # - e1000, and variants crash with unaligned fixup in e1000_io_write
