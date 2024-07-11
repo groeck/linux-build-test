@@ -1543,7 +1543,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_KUNIT_DEBUGFS
 	enable_config "${fragment}" CONFIG_MPTCP_KUNIT_TEST CONFIG_NET_HANDSHAKE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_FORMAT_KUNIT_TEST CONFIG_IIO_RESCALE_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_REGMAP_KUNIT
+	enable_config "${fragment}" CONFIG_REGMAP_KUNIT CONFIG_REGMAP_BUILD
 	enable_config "${fragment}" CONFIG_INPUT_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
