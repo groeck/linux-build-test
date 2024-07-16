@@ -111,7 +111,7 @@ build_one()
 {
     case "$1" in
     "v7.2")
-	dobuild_common v7.2.10-local v7.2 "--disable-hax"
+	dobuild_common v7.2.13-local v7.2 "--disable-hax"
 	;;
     "v8.0")
 	dobuild_common v8.0.5-local v8.0 "--disable-hax"
@@ -120,11 +120,11 @@ build_one()
 	dobuild_common v8.1.5-local v8.1 "--disable-hax"
 	;;
     "v8.2")
-	dobuild_common v8.2.5-local v8.2 ""
+	dobuild_common v8.2.6-local v8.2 ""
 	;;
     "v9.0")
-	dobuild_common v9.0.1-local v9.0 "--disable-strip --extra-cflags=-g"
-	# dobuild_common v9.0.1-local v9.0-debug \
+	dobuild_common v9.0.2-local v9.0 "--disable-strip --extra-cflags=-g"
+	# dobuild_common v9.0.2-local v9.0-debug \
 	#	"--enable-debug --disable-strip --extra-cflags=-g"
 	;;
     "master")
