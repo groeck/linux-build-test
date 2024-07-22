@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 config=$1
 variant=$2
 
-QEMU="${QEMU:-${QEMU_BIN}/qemu-system-loongarch64}"
+QEMU="${QEMU:-${QEMU_MASTER_BIN}/qemu-system-loongarch64}"
 
 # loongarch needs gcc 13.x+ when using binutils 2.40.
 PATH_LOONGARCH="/opt/kernel/${DEFAULT_CC13}/loongarch64-linux-gnu/bin"
@@ -106,14 +106,10 @@ fi
 runkernel defconfig virt rootfs.cpio "${nodebug}::efi:net=default"
 retcode=$?
 checkstate ${retcode}
-if [[ ${runall} -ne 0 ]]; then
-    # This does not work, at least not with qemu v8.0/v8.1 and Linux v6.4/v6.5.
-    # Qemu for loongarch is not built with tpm support enabled,
-    # and enabling it causes a boot hang.
-    runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net=default"
-    retcode=$?
-    checkstate ${retcode}
-fi
+# tpm needs qemu v9.1+
+runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net=default"
+retcode=$?
+checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:nvme:net=default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
