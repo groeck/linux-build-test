@@ -1017,7 +1017,7 @@ __common_fixups()
     __init_rootdev
 
     initcli="${config_initcli} kunit.stats_enabled=2 kunit.filter=speed>slow"
-    extra_params="-snapshot"
+    extra_params="-snapshot -audio none"
     __have_usb_param=0
     __do_network_test=0
     __do_tpm_test=0
