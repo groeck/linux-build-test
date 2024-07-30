@@ -5,9 +5,9 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/build-macros.sh
 
 # default compiler version
-CV11="11.4.0-2.40"
-CV12="12.3.0-2.40"
-CV13="13.2.0-2.42"
+CV11="11.5.0-2.40"
+CV12="12.4.0-2.42"
+CV13="13.3.0-2.42"
 
 # See if we can build with gcc 13.x for recent kernel branches.
 # Branch specific findings:
