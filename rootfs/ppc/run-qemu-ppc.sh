@@ -167,18 +167,23 @@ build_reference "${PREFIX}gcc" "${QEMU}"
 retcode=0
 runkernel mpc85xx_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_defconfig "::scsi[53C895A]:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_defconfig "::sata-sii3112:net=rtl8139" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_defconfig ::sdhci-mmc:net=usb-ohci mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # nvme nvme0: I/O 23 QID 0 timeout, completion polled
     # NVME interrupts (or more generally PCI interrupts) are not received by host OS
     runkernel mpc85xx_defconfig "::nvme" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 if [[ ${runall} -ne 0 ]]; then
@@ -213,27 +218,37 @@ if [[ ${runall} -ne 0 ]]; then
     # timeout, no error message
     runkernel mpc85xx_smp_defconfig ::scsi[MEGASAS2] mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 runkernel mpc85xx_smp_defconfig "::net=e1000" mpc8544ds "" ttyS0 rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_smp_defconfig "::scsi[DC395]:net=i82550" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_smp_defconfig "::scsi[53C895A]:net=usb-ohci" mpc8544ds "" ttyS0 rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel mpc85xx_smp_defconfig "::sata-sii3112:net=ne2k_pci" mpc8544ds "" ttyS0 rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel 44x/bamboo_defconfig "::net=pcnet" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "::scsi[AM53C974]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "smp::net=tulip" bamboo "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "smp::scsi[DC395]:net=e1000" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "smp::scsi[AM53C974]:net=usb-ohci" bamboo "" ttyS0 rootfs.btrfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
     # megaraid_sas 0000:00:02.0: Command pool empty!
     # Unable to handle kernel paging request for data at address 0x00000000
@@ -242,79 +257,104 @@ if [[ ${runall} -ne 0 ]]; then
     # NIP [c024a5c8] megasas_issue_init_mfi+0x20/0x138
     runkernel 44x/bamboo_defconfig "smp::scsi[MEGASAS]" bamboo "" ttyS0 rootfs.ext2 vmlinux
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 runkernel 44x/bamboo_defconfig "smp::scsi[FUSION]:net=e1000" bamboo "" ttyS0 rootfs.btrfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "smp::sdhci-mmc:net=ne2k_pci" bamboo "" ttyS0 rootfs.cramfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/bamboo_defconfig "smp::nvme:net=pcnet" bamboo "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel 44x/canyonlands_defconfig "::net=tulip" \
 	sam460ex "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::usb:net=e1000" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::sdhci-mmc:net=e1000e" \
 	sam460ex "" ttyS0 rootfs.cramfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::nvme:net=ne2k_pci" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::scsi[53C895A]:net=usb-ohci" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::scsi[AM53C974]:net=rtl8139" \
 	sam460ex "" ttyS0 rootfs.btrfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::scsi[DC395]:net=i82559a" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel 44x/canyonlands_defconfig "::scsi[FUSION]:net=pcnet" \
 	sam460ex "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # megaraid_sas 0002:00:02.0: Command pool empty!
     # Unable to handle kernel paging request for data at address 0x00000000
     runkernel 44x/canyonlands_defconfig ::scsi[MEGASAS] sam460ex "" ttyS0 rootfs.ext2 vmlinux
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
     runkernel 44x/canyonlands_defconfig ::scsi[MEGASAS2] sam460ex "" ttyS0 rootfs.ext2 vmlinux
     retcode=$((${retcode} + $?))
+    checkstate ${retcode}
 fi
 
 # Machine "mac99,via=pmu" works but does not auto-reboot
 runkernel pmac32_defconfig zilog:smp::ide:net=e1000 mac99 G4 ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
-
+checkstate ${retcode}
 
 runkernel pmac32_defconfig zilog::ide:net=virtio-net-pci g3beige G3 ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::ide:net=default g3beige G3 ttyS0 rootfs.btrfs vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel pmac32_defconfig zilog::ide:net=default mac99 G4 ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::net=e1000 mac99 "" ttyS0 rootfs.cpio vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::ide:net=usb-ohci mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::usb:net=i82562 mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::sdhci-mmc:net=ne2k_pci mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::nvme:net=pcnet mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel pmac32_defconfig zilog::scsi[DC395]:net=tulip mac99 "" ttyS0 rootfs.ext2 vmlinux
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 
 runkernel corenet32_smp_defconfig e500::net=rtl8139 ppce500 e500mc ttyS0 \
 	rootfs.cpio arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel corenet32_smp_defconfig e500::net=virtio-net:nvme ppce500 e500mc ttyS0 \
 	rootfs.btrfs arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel corenet32_smp_defconfig e500::net=eTSEC:sdhci-mmc ppce500 e500mc ttyS0 \
 	rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
@@ -322,17 +362,21 @@ retcode=$((retcode + $?))
 runkernel corenet32_smp_defconfig e500::net=e1000:mmc ppce500 e500mc ttyS0 \
 	rootfs.cramfs arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
+checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
     # Fails to mount flash (mtdblock0)
     runkernel corenet32_smp_defconfig e500::net=e1000:flash64 ppce500 e500mc ttyS0 \
 	rootfs.ext2 arch/powerpc/boot/uImage
     retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 runkernel corenet32_smp_defconfig e500::net=tulip:scsi[53C895A] ppce500 e500mc ttyS0 \
 	rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel corenet32_smp_defconfig e500::net=i82562:sata-sii3112 ppce500 e500mc ttyS0 \
 	rootfs.ext2 arch/powerpc/boot/uImage
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 exit ${retcode}
