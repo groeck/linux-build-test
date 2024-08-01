@@ -176,6 +176,14 @@ kernel_version()
 # Current Linux kernel version
 linux_version_code="$(kernel_version $(git describe --match 'v*' | cut -f1 -d- | sed -e 's/\./ /g' | sed -e 's/v//'))"
 
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+    DEFAULT_CC="${DEFAULT_CC13}"
+elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
+    DEFAULT_CC="${DEFAULT_CC12}"
+else
+    DEFAULT_CC="${DEFAULT_CC11}"
+fi
+
 checkstate()
 {
     if [[ ${___testbuild} != 0 && $1 != 0 ]]; then
