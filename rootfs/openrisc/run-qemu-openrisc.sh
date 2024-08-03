@@ -26,6 +26,10 @@ patch_defconfig()
     # We need to support initramfs gzip compression
     sed -i -e '/CONFIG_RD_GZIP/d' ${defconfig}
     echo "CONFIG_RD_GZIP=y" >> ${defconfig}
+
+    # string kunit tests run slow on this architecture, causing random test
+    # failures. Avoid unnecessary random failure reports and disable it.
+    echo "CONFIG_STRING_KUNIT_TEST=n" >> ${defconfig}
 }
 
 runkernel()
