@@ -50,6 +50,10 @@ patch_defconfig()
 
     echo "CONFIG_CRAMFS=y" >> ${defconfig}
 
+    # TPM
+    echo "CONFIG_TCG_TPM=y" >> ${defconfig}
+    echo "CONFIG_TCG_TIS=y" >> ${defconfig}
+
     # MMC
     sed -i -e 's/CONFIG_MMC_BLOCK=m/CONFIG_MMC_BLOCK=y/' ${defconfig}
     # PCMCIA
@@ -227,7 +231,7 @@ runkernel()
 	    -kernel ${kernel} \
 	    -no-reboot \
 	    ${extra_params} \
-	    ${initcli:+--append "${initcli}"} \
+	    ${initcli:+--append "${initcli} ${extracli}"} \
 	    ${dtbcmd} \
 	    -nographic -monitor null -serial stdio
 
@@ -390,6 +394,11 @@ checkstate ${retcode}
 
 runkernel multi_v7_defconfig virt "" \
 	rootfs-armv7a.ext2 auto "::virtio-blk:mem512:net=virtio-net-device"
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+runkernel multi_v7_defconfig virt "" \
+	rootfs-armv5.ext2 auto "::tpm-tis-device:virtio-blk:mem512:net=virtio-net-device"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
