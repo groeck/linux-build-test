@@ -398,7 +398,7 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig virt "" \
-	rootfs-armv5.ext2 auto "::tpm-tis-device:virtio-blk:mem512:net=virtio-net-device"
+	rootfs-armv7a.ext2 auto "::tpm-tis-device:virtio-blk:mem512:net=virtio-net-device"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
