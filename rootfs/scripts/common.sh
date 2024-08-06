@@ -1541,6 +1541,21 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
 	fi
 
+	# New in v6.10
+	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
+	enable_config "${fragment}" CONFIG_ARM_SMMU_V3_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SND_SOC_CARD_KUNIT_TEST
+
+	# New in v6.11
+	enable_config "${fragment}" CONFIG_EXEC_KUNIT_TEST CONFIG_BINFMT_ELF_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
+	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_OHCI_SERDES_TEST
+
+	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
+	if [[ "${runall}" -ge 2 ]]; then
+	    enable_config "${fragment}" CONFIG_USERCOPY_KUNIT_TEST
+	fi
+
 	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
