@@ -1369,6 +1369,7 @@ __setup_fragment()
     local nolockdep=0
     local nonvme=0
     local noscsi=0
+    local nosecurity=0
     local notests="${__testbuild}"
     local nousb=0
     local novirt=0
@@ -1410,6 +1411,7 @@ __setup_fragment()
 	nolockup) nolockup=1 ;;
 	nonvme) nonvme=1 ;;
 	noscsi) noscsi=1 ;;
+	nosecurity) nosecurity=1 ;;
 	notests) notests=1 ;;
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
@@ -1460,6 +1462,22 @@ __setup_fragment()
     # disable_config "${fragment}" CONFIG_DEBUG_SHIRQ
 
     if [[ "${nodebug}" -eq 0 ]]; then
+	if [[ "${nosecurity}" -eq 0 ]]; then
+	    # security modules
+	    enable_config "${fragment}" CONFIG_SECURITY
+	    enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
+	    enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
+	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
+	    enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM
+	    enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM_EARLY
+	    enable_config "${fragment}" CONFIG_SECURITY_YAMA
+	    enable_config "${fragment}" CONFIG_SECURITY_LOADPIN
+	    enable_config "${fragment}" CONFIG_SECURITY_SAFESETID
+	    enable_config "${fragment}" CONFIG_BPF_LSM
+	    set_config "${fragment}" CONFIG_LSM "landlock,lockdown,yama,loadpin,safesetid,bpf"
+	fi
+
 	# debug options
 	enable_config "${fragment}" CONFIG_SLAB_FREELIST_RANDOM
 
@@ -1556,7 +1574,7 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_USERCOPY_KUNIT_TEST
 	fi
 
-	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_LIST_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RESOURCE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_CMDLINE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_HASH_UNIT_TEST
