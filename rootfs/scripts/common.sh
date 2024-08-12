@@ -1442,6 +1442,22 @@ __setup_fragment()
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER_FALLBACK
 
+    if [[ "${nosecurity}" -eq 0 ]]; then
+	# security modules
+	enable_config "${fragment}" CONFIG_SECURITY
+	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
+	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
+	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM
+	enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM_EARLY
+	enable_config "${fragment}" CONFIG_SECURITY_YAMA
+	enable_config "${fragment}" CONFIG_SECURITY_LOADPIN
+	enable_config "${fragment}" CONFIG_SECURITY_SAFESETID
+	enable_config "${fragment}" CONFIG_BPF_LSM
+	set_config "${fragment}" CONFIG_LSM "landlock,lockdown,yama,loadpin,safesetid,bpf"
+    fi
+
     # With CONFIG_DEBUG_SHIRQ enabled, the irq core issues a dummy interrupt
     # to the driver when an interrupt is released using free_irq(). This
     # results in an extra call into the affected interrupt handlers.
@@ -1462,22 +1478,6 @@ __setup_fragment()
     # disable_config "${fragment}" CONFIG_DEBUG_SHIRQ
 
     if [[ "${nodebug}" -eq 0 ]]; then
-	if [[ "${nosecurity}" -eq 0 ]]; then
-	    # security modules
-	    enable_config "${fragment}" CONFIG_SECURITY
-	    enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
-	    enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
-	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
-	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
-	    enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM
-	    enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM_EARLY
-	    enable_config "${fragment}" CONFIG_SECURITY_YAMA
-	    enable_config "${fragment}" CONFIG_SECURITY_LOADPIN
-	    enable_config "${fragment}" CONFIG_SECURITY_SAFESETID
-	    enable_config "${fragment}" CONFIG_BPF_LSM
-	    set_config "${fragment}" CONFIG_LSM "landlock,lockdown,yama,loadpin,safesetid,bpf"
-	fi
-
 	# debug options
 	enable_config "${fragment}" CONFIG_SLAB_FREELIST_RANDOM
 
