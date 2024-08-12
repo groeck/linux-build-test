@@ -44,7 +44,7 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local fixup="notests:nofs::$4"
+    local fixup="nosecurity:notests:nofs::$4"
     local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="riscv32:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
