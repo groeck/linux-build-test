@@ -58,7 +58,7 @@ runkernel()
       ${QEMU} -M clipper \
 	-kernel arch/alpha/boot/vmlinux -no-reboot \
 	${extra_params} \
-	-append "${initcli} console=ttyS0" \
+	-append "${initcli} console=ttyS0 earlycon=uart8250,io,0x3f8,115200n8" \
 	-m 128M -nographic -monitor null -serial stdio
 
     return $?
