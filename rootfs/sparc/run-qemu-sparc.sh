@@ -72,7 +72,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     # no*: options to reduce image size
-    if ! dosetup -c "${config}" -F "nonet:nonvme:novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${config}" -F "nosecurity:nonet:nonvme:novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
