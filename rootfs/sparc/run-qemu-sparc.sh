@@ -28,6 +28,8 @@ patch_defconfig()
     enable_config ${defconfig} CONFIG_TMPFS
     # We won't test btrfs. Drop it to reduce image size.
     disable_config ${defconfig} CONFIG_BTRFS_FS
+    # We do test squashfs, so enable it explicitly
+    enable_config ${defconfig} CONFIG_SQUASHFS
     # enable ethernet interface
     enable_config ${defconfig} CONFIG_NET_VENDOR_SUN
     enable_config ${defconfig} CONFIG_HAPPYMEAL
@@ -36,6 +38,8 @@ patch_defconfig()
     disable_config ${defconfig} CONFIG_HWMON CONFIG_NETWORK_FILESYSTEMS CONFIG_KGDB
     disable_config ${defconfig} CONFIG_UTS_NS CONFIG_IPC_NS
     disable_config ${defconfig} CONFIG_PID_NS CONFIG_NET_NS
+    # Try to optimize for size
+    enable_config ${defconfig} CONFIG_CC_OPTIMIZE_FOR_SIZE
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -72,7 +76,7 @@ runkernel()
     echo -n "Building ${build} ... "
 
     # no*: options to reduce image size
-    if ! dosetup -c "${config}" -F "nosecurity:nonet:nonvme:novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${config}" -F "nofs:nonet:nonvme:novirt:nousb:noscsi:${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
