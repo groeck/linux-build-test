@@ -1649,9 +1649,11 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STRING_HELPERS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FORTIFY_KUNIT_TEST
 
-	enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
 	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]]; then
+	    # Clock unit tests result in backtraces in v6.6.y and older.
+	    # Disable to avoid warning backtrace noise.
+	    enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	    enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
 	    # clock gate unit tests fail on some systems in v6.6 and older
 	    # kernels. See upstream commit 75357829cc8e ("clk: Fix clk gate
 	    # kunit test on big-endian CPUs").
