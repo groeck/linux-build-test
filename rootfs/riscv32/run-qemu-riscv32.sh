@@ -23,8 +23,8 @@ patch_defconfig()
     local fixups=${2//:/ }
     local fixup
 
-    echo "CONFIG_PCI_HOST_GENERIC=y" >> ${defconfig}
-    echo "CONFIG_CGROUP_FREEZER=n" >> ${defconfig}
+    enable_config "${defconfig}" CONFIG_PCI_HOST_GENERIC
+    disable_config "${defconfig}" CONFIG_CGROUP_FREEZER
 
     # Needed for TPM tests
     enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
@@ -32,9 +32,16 @@ patch_defconfig()
     # CONFIG_PREEMPT=y and some of the selftests are like cat and dog,
     # only worse.
     if grep -q "CONFIG_PREEMPT=y" "${defconfig}"; then
-	echo "CONFIG_LOCK_TORTURE_TEST=n" >> ${defconfig}
-	echo "CONFIG_RCU_TORTURE_TEST=n" >> ${defconfig}
+	disable_config "${defconfig}" CONFIG_LOCK_TORTURE_TEST
+	disable_config "${defconfig}" CONFIG_RCU_TORTURE_TEST
     fi
+
+    # Disable untested configurations to reduce image size
+    disable_config "${defconfig}" CONFIG_NETWORK_FILESYSTEMS
+    disable_config "${defconfig}" CONFIG_NAMESPACES
+
+    # Try to optimize for size
+    enable_config ${defconfig} CONFIG_CC_OPTIMIZE_FOR_SIZE
 }
 
 cached_config=""
@@ -44,7 +51,7 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local fixup="nosecurity:notests:nofs::$4"
+    local fixup="::$4"
     local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="riscv32:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
@@ -68,7 +75,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}${fixup%::*}" -F "${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}${fixup%::*}" -F "nofs:${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
