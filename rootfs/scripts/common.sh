@@ -1442,7 +1442,7 @@ __setup_fragment()
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER
     disable_config "${fragment}" CONFIG_FW_LOADER_USER_HELPER_FALLBACK
 
-    if [[ "${nosecurity}" -eq 0 ]]; then
+    if [[ "${nosecurity}" -eq 0 ]] && ! is_enabled CONFIG_SUPERH; then
 	# security modules
 	enable_config "${fragment}" CONFIG_SECURITY
 	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
