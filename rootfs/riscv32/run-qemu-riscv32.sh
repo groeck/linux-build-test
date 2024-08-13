@@ -51,7 +51,8 @@ runkernel()
     local mach=$1
     local cpu=$2
     local defconfig=$3
-    local fixup="::$4"
+    local fixup="$4"
+    local __fixup="::${fixup}"
     local rootfs=$5
     local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
     local build="riscv32:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
@@ -75,7 +76,7 @@ runkernel()
 	return 0
     fi
 
-    if ! dosetup -c "${defconfig}${fixup%::*}" -F "nofs:${fixup}" "${rootfs}" "${defconfig}"; then
+    if ! dosetup -c "${defconfig}${__fixup%::*}" -F "nofs:${fixup}" "${rootfs}" "${defconfig}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
 	fi
@@ -107,9 +108,13 @@ runkernel()
 build_reference "${PREFIX}gcc" "${QEMU}"
 
 retcode=0
-runkernel virt "" rv32_defconfig "net=e1000" rootfs.cpio
-retcode=$((retcode + $?))
-checkstate ${retcode}
+if [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
+    # Kernels older than v6.6 crash in free_initmem() if security tests
+    # are enabled and we are booting from initrd.
+    runkernel virt "" rv32_defconfig "net=e1000" rootfs.cpio
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 runkernel virt "rv32,zbb=no" rv32_defconfig net=e1000e:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
