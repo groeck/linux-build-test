@@ -162,7 +162,9 @@ runkernel()
     case ${mach} in
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
-    "supermicro-x11spi-bmc" | "rainier-bmc" | "quanta-q71l-bmc" | "fp5280g2-bmc" | \
+    "supermicro-x11spi-bmc" | "rainier-bmc" | \
+    "bonnell-bmc" | \
+    "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
     bletchley-bmc*)
 	initcli+=" console=ttyS4,115200"
@@ -412,6 +414,23 @@ if [ ${runall} -eq 1 ]; then
     # does not instantiate (SPI controller not supported by qemu)
     runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic notests::mtd128:net=nic aspeed-bmc-ibm-rainier.dtb
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
+
+# As of qemu v9.0/v9.1, bonnell-bmc is not supported by upstream qemu.
+# It is supported locally to be able to test tpm-tis without having to
+# manually instantiate the chip from within the root file system.
+runkernel aspeed_g5_defconfig bonnell-bmc "" \
+	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-bmc-ibm-bonnell.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+if [[ ${linux_version_code} -ge $(kernel_version 6 9) ]]; then
+    # The necessary compatible "tcg,tpm-tis-i2c" is only available in v6.9+.
+    runkernel aspeed_g5_defconfig bonnell-bmc "" \
+	rootfs-armv5.cpio automatic \
+	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.12,address=0x2e:net=nic \
+	aspeed-bmc-ibm-bonnell.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
