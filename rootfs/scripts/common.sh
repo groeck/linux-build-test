@@ -1446,7 +1446,12 @@ __setup_fragment()
 	# security modules
 	enable_config "${fragment}" CONFIG_SECURITY
 	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
-	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	# CONFIG_SECURITY_APPARMOR_KUNIT_TEST is broken on big endian systems.
+	# As of 8/14/24, patch is pending but not yet upstream.
+	# Don't bother testing on older kernels.
+	if ! is_enabled CONFIG_CPU_BIG_ENDIAN || [[ ${linux_version_code} -ge $(kernel_version 6 10) ]]; then
+	    enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
+	fi
 	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
 	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM
@@ -1558,6 +1563,9 @@ __setup_fragment()
 	if is_testing || [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
 	fi
+
+	# New in v6.9
+	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TESTS
 
 	# New in v6.10
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
