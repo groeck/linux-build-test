@@ -22,26 +22,30 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 
+# selftests sometimes hang (or used to hang) with soft CPU lockup.
+# notests="notests"
+notests=""
+
 skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
-	arm:ast2500-evb:aspeed_g5_defconfig:notests:sd:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net=nic"
+	arm:ast2500-evb:aspeed_g5_defconfig:${notests:+notests:}sd:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb:net=nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:sd2:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net=nic"
-skip_510="arm:ast2600-evb:aspeed_g5_defconfig:notests:usb:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net=nic"
-skip_515="arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:notests:mtd64,0,6,1:net=nic \
-	arm:g220a-bmc:aspeed_g5_defconfig:notests:mtd32,0,12,2:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:notests:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:notests:sd2:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:notests:mem1G:mtd128:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:notests:mem1G:mtd128,0,8,1:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:notests:usb:net=nic "
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
+skip_510="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
+skip_515="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic \
+	arm:g220a-bmc:aspeed_g5_defconfig:${notests:+notests:}mtd32,0,12,2:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128,0,8,1:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}usb:net=nic "
 
 patch_defconfig()
 {
@@ -268,152 +272,152 @@ runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-# selftests sometimes hang with soft CPU lockup
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-opp-witherspoon.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd32:net=nic aspeed-bmc-opp-witherspoon.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd32:net=nic aspeed-bmc-opp-witherspoon.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-inspur-fp5280g2.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-inspur-fp5280g2.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd64:net=nic aspeed-bmc-inspur-fp5280g2.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd64:net=nic aspeed-bmc-inspur-fp5280g2.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-ast2500-evb.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::sd:net=nic aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic ${notests}::sd:net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::mtd32:net=nic aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd32:net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Run the next test with armv7a root file system.
 # Both are expected to work.
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic notests::sd2:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic ${notests}::sd2:net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # The following tests require qemu 7.1+ and Linux v5.18+
 # Boot from 1st SPI controller (fmc)
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic notests::mtd64:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic ${notests}::mtd64:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 # Boot from 2nd SPI controller
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic notests::mtd64,0,6,1:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic ${notests}::mtd64,0,6,1:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic notests::sd2:net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::sd2:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Default memory size (2G) prevents SPI device instantiation,
 # so limit memory size to 1G
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mem1G:mtd128:net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mem1G:mtd128:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.f2fs automatic notests::mem1G:mtd128,0,8,1:net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.f2fs automatic ${notests}::mem1G:mtd128,0,8,1:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig romulus-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-opp-romulus.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig romulus-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd32:net=nic aspeed-bmc-opp-romulus.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd32:net=nic aspeed-bmc-opp-romulus.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd64:net=nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd64:net=nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Test booting from second SPI controller
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd32,0,12,2:net=nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd32,0,12,2:net=nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-opp-tacoma.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 if [[ ${linux_version_code} -ge $(kernel_version 6 9) ]]; then
     # The necessary compatible "tcg,tpm-tis-i2c" is only available in v6.9+.
     runkernel aspeed_g5_defconfig tacoma-bmc "" \
 	rootfs-armv5.cpio automatic \
-	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.1,address=0x2e:net=nic \
+	${notests}::tpm-tis-i2c,bus=aspeed.i2c.bus.1,address=0x2e:net=nic \
 	aspeed-bmc-opp-tacoma.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc:net=nic aspeed-bmc-opp-tacoma.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mmc:net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-bmc-opp-tacoma.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-ibm-rainier.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mmc:net=nic aspeed-bmc-ibm-rainier.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mmc:net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-bmc-ibm-rainier.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # does not instantiate (SPI controller not supported by qemu)
     runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd128:net=nic aspeed-bmc-ibm-rainier.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd128:net=nic aspeed-bmc-ibm-rainier.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
@@ -422,25 +426,33 @@ fi
 # It is supported locally to be able to test tpm-tis without having to
 # manually instantiate the chip from within the root file system.
 runkernel aspeed_g5_defconfig bonnell-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb:net=nic aspeed-bmc-ibm-bonnell.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-ibm-bonnell.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig bonnell-bmc "" \
+	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-ibm-bonnell.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig bonnell-bmc "" \
+	rootfs-armv5.ext2 automatic ${notests}::mmc:net=nic aspeed-bmc-ibm-bonnell.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 if [[ ${linux_version_code} -ge $(kernel_version 6 9) ]]; then
     # The necessary compatible "tcg,tpm-tis-i2c" is only available in v6.9+.
     runkernel aspeed_g5_defconfig bonnell-bmc "" \
 	rootfs-armv5.cpio automatic \
-	notests::tpm-tis-i2c,bus=aspeed.i2c.bus.12,address=0x2e:net=nic \
+	${notests}::tpm-tis-i2c,bus=aspeed.i2c.bus.12,address=0x2e:net=nic \
 	aspeed-bmc-ibm-bonnell.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 fi
 
 runkernel aspeed_g5_defconfig bletchley-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig bletchley-bmc "" \
-	rootfs-armv5.ext2 automatic notests::usb0:net=nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb0:net=nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # The default SPI chips used on this board are not supported by Linux as of
@@ -448,21 +460,21 @@ checkstate ${retcode}
 # 2G prevents SPI interface instantiation, so limit RAM size for SPI tests
 # to 1G.
 runkernel aspeed_g5_defconfig bletchley-bmc,fmc-model=mt25qu02g,spi-model=mt25qu02g "" \
-	rootfs-armv5.f2fs automatic notests::mem1G:mtd256:net=nic aspeed-bmc-facebook-bletchley.dtb
+	rootfs-armv5.f2fs automatic ${notests}::mem1G:mtd256:net=nic aspeed-bmc-facebook-bletchley.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.cpio automatic notests::net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd64:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd64:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Also test booting from second SPI controller
 runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic notests::mtd64,0,12,2:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mtd64,0,12,2:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
