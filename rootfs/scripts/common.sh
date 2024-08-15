@@ -1631,8 +1631,7 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_MEAN_AND_VARIANCE_UNIT_TEST
 	if [[ "${runall}" -ge 2 ]] || \
-		( ! is_enabled CONFIG_ARCH_MPS2 && ! is_enabled CONFIG_NIOS2 && \
-		  ! is_enabled CONFIG_PARISC ); then
+		( ! is_enabled CONFIG_ARCH_MPS2 && ! is_enabled CONFIG_PARISC ); then
 	    # Crashes in gso tests on an385, nios2, and parisc.
 	    enable_config "${fragment}" CONFIG_NET_TEST
 	fi
