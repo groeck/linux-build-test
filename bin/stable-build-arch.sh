@@ -5,8 +5,10 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/build-macros.sh
 
 # default compiler version
+CV11_4="11.4.0-2.40"
 CV11="11.5.0-2.40"
-CV12="12.4.0-2.42"
+CV12_242="12.4.0-2.42"
+CV12="12.4.0-2.40"
 CV13="13.3.0-2.42"
 
 # See if we can build with gcc 13.x for recent kernel branches.
@@ -41,8 +43,8 @@ PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
-# h8300 support was dropped in gcc 12.x
-PATH_H8300=/opt/kernel/gcc-${CV11}-nolibc/h8300-linux/bin
+# h8300 support was dropped in gcc 12.x and gcc 11.5
+PATH_H8300=/opt/kernel/gcc-${CV11_4}-nolibc/h8300-linux/bin
 PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
