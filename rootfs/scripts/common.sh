@@ -97,7 +97,11 @@ __mktemp()
     echo "${tmpfile}"
 }
 
-trap __cleanup EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP SIGABRT SIGBUS SIGFPE SIGSEGV SIGALRM SIGTERM SIGPWR
+signals="EXIT SIGHUP SIGINT SIGQUIT SIGILL SIGTRAP"
+signals+=" SIGABRT SIGBUS SIGFPE SIGSEGV SIGALRM SIGTERM SIGPWR"
+signals+=" SIGUSR1 SIGUSR2 SIGHUP"
+
+trap __cleanup ${signals}
 
 # Common variables used for waiting
 
