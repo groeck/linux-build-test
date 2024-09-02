@@ -1560,16 +1560,10 @@ __setup_fragment()
 	disable_config "${fragment}" CONFIG_KUNIT_FAULT_TEST
 	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
 
-	# As of v6.9-rc5, ext4 kunit tests pass but result in memory corruption.
-	# The problem was introduced in the v6.9 commit window. It looks like the
-	# fix may not be applied to v6.9, potentially corrupting test images in
-	# this release. Disable for now.
-	if is_testing || [[ "${runall}" -ge 2 ]]; then
-	    enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
-	fi
+	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
 
 	# New in v6.9
-	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TESTS
+	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
 
 	# New in v6.10
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
@@ -1720,7 +1714,7 @@ __setup_fragment()
 	# but is not protected against multi-use. Running TTM unit tests
 	# (CONFIG_DRM_TTM_KUNIT_TEST) is therefore not possible on real
 	# hardware or even in qemu, and must never be enabled.
-	if [[ "${runall}" -ge 2 ]]; then
+	if [[ "${runall}" -ge 3 ]]; then
 	    if is_enabled CONFIG_DRM; then
 		enable_config "${fragment}" CONFIG_DRM
 		# Results in warning backtraces triggered by intentionally
