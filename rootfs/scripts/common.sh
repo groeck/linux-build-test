@@ -1556,6 +1556,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
+	enable_config "${fragment}" CONFIG_VCAP_KUNIT_TEST
 
 	# New in v6.9
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
