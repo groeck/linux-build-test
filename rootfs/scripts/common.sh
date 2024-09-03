@@ -1561,7 +1561,16 @@ __setup_fragment()
 	# New in v6.9
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_GTS_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
+	# Fails if there is no devicetree file, making the test pointless (e.g. arm64)
+	# # of_dtb_root_node_found_by_path: EXPECTATION FAILED at drivers/of/of_test.c:18
+	# Expected np is not null, but is
+	# # of_dtb_root_node_found_by_path: pass:0 fail:1 skip:0 total:1
+	# not ok 1 of_dtb_root_node_found_by_path
+	# # of_dtb_root_node_populates_of_root: EXPECTATION FAILED at drivers/of/of_test.c:28
+	# Expected of_root is not null, but is
+	# # of_dtb_root_node_populates_of_root: pass:0 fail:1 skip:0 total:1
+	# not ok 2 of_dtb_root_node_populates_of_root
+	# enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
 
 	# New in v6.10
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
