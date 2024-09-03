@@ -1559,6 +1559,7 @@ __setup_fragment()
 
 	# New in v6.9
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_IIO_GTS_KUNIT_TEST
 
 	# New in v6.10
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
