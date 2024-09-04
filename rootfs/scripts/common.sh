@@ -1558,6 +1558,14 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
 	enable_config "${fragment}" CONFIG_VCAP_KUNIT_TEST
 
+	# damon
+	enable_config "${fragment}" CONFIG_DAMON CONFIG_DAMON_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_DAMON_SYSFS CONFIG_DAMON_SYSFS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_DAMON_VADDR CONFIG_DAMON_PADDR
+	enable_config "${fragment}" CONFIG_DAMON_VADDR_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_DAMON_DBGFS_DEPRECATED
+	enable_config "${fragment}" CONFIG_DAMON_DBGFS CONFIG_DAMON_DBGFS_KUNIT_TEST
+
 	# New in v6.9
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_GTS_KUNIT_TEST
