@@ -96,6 +96,7 @@ runkernel()
 {
     local defconfig=$1
     local mach=$2
+    local bmach="${mach%%,*}"	# basic machine, without machine options
     local cpu=$3
     local rootfs=$4
     local mode=$5
@@ -105,7 +106,7 @@ runkernel()
     local dtbfile=""
     local nonet=0
     local waitlist=("Restarting" "Boot successful" "Rebooting")
-    local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
+    local build="${ARCH}:${bmach}:${defconfig}${fixup:+:${fixup}}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
 
     local _boot
@@ -120,7 +121,7 @@ runkernel()
     pbuild="${pbuild//+(:)/:}"
     build="${build//+(:)/:}"
 
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${options}@${fixup}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
+    if ! match_params "${machine}@${bmach}" "${config}@${defconfig}" "${options}@${fixup}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -131,7 +132,7 @@ runkernel()
 	return 0
     fi
 
-    case "${mach}" in
+    case "${bmach}" in
     "ast2600-evb")
 	# Network tests need v5.11 or later
 	# Older kernels only instantiate the second Ethernet interface.
@@ -167,14 +168,14 @@ runkernel()
     rootfs="$(rootfsname ${rootfs})"
 
     kernel="arch/arm/boot/zImage"
-    case ${mach} in
+    case "${bmach}" in
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | \
     "bonnell-bmc" | \
     "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
-    bletchley-bmc*)
+    "bletchley-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
 	;;
