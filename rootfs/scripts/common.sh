@@ -1560,7 +1560,7 @@ __setup_fragment()
 
 	# damon
 	# limit to testing branch until problems are fixed in mainline kernel.
-	if is_testing || [[ "${runall}" -ge 2 ]]; then
+	if is_enabled CONFIG_MMU && ( is_testing || [[ "${runall}" -ge 2 ]] ); then
 	    enable_config "${fragment}" CONFIG_DAMON CONFIG_DAMON_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_SYSFS CONFIG_DAMON_SYSFS_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_VADDR CONFIG_DAMON_PADDR
