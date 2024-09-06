@@ -66,6 +66,7 @@ patch_defconfig()
     enable_config ${defconfig} CONFIG_ATA CONFIG_BLK_DEV_SD
     # USB
     enable_config ${defconfig} CONFIG_USB CONFIG_USB_STORAGE CONFIG_USB_OHCI_HCD
+    enable_config ${defconfig} CONFIG_USB_UHCI_HCD
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -342,7 +343,7 @@ runkernel aspeed_g5_defconfig fuji-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Default memory size (2G) prevents SPI device instantiation,
@@ -398,7 +399,7 @@ runkernel aspeed_g5_defconfig tacoma-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-opp-tacoma.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-opp-tacoma.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -430,7 +431,7 @@ runkernel aspeed_g5_defconfig bonnell-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig bonnell-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-bmc-ibm-bonnell.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-ibm-bonnell.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig bonnell-bmc "" \
