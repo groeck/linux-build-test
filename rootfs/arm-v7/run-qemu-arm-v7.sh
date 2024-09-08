@@ -513,8 +513,13 @@ checkstate ${retcode}
 runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::sata:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
 checkstate ${retcode}
+# EHCI
 runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::usb0:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
+checkstate ${retcode}
+# OHCI
+runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.ext2 automatic "::usb2:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
 checkstate ${retcode}
 
 runkernel sunxi_defconfig bpim2u "" \
