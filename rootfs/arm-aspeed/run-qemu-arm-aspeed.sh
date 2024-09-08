@@ -29,16 +29,13 @@ notests=""
 skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:${notests:+notests:}sd:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb2:net=nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb2:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_510="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb2:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_515="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
@@ -307,8 +304,14 @@ runkernel aspeed_g5_defconfig ast2500-evb "" \
 	rootfs-armv5.ext2 automatic ${notests}::mtd32:net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+# EHCI
 runkernel aspeed_g5_defconfig ast2500-evb "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb:net=nic aspeed-ast2500-evb.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-ast2500-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+# UHCI
+runkernel aspeed_g5_defconfig ast2500-evb "" \
+	rootfs-armv5.ext2 automatic ${notests}::usb2:net=nic aspeed-ast2500-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -325,11 +328,6 @@ checkstate ${retcode}
 # EHCI
 runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-ast2600-evb.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-# UHCI
-runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb2:net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # The following tests require qemu 7.1+ and Linux v5.18+
@@ -426,11 +424,6 @@ runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-# UHCI
-runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb2:net=nic aspeed-bmc-ibm-rainier.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # does not instantiate (SPI controller not supported by qemu)
     runkernel aspeed_g5_defconfig rainier-bmc "" \
@@ -449,11 +442,6 @@ checkstate ${retcode}
 # EHCI
 runkernel aspeed_g5_defconfig bonnell-bmc "" \
 	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-ibm-bonnell.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-# UHCI
-runkernel aspeed_g5_defconfig bonnell-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb2:net=nic aspeed-bmc-ibm-bonnell.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig bonnell-bmc "" \
