@@ -28,7 +28,7 @@ notests=""
 
 skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:${notests:+notests:}sd:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
@@ -270,7 +270,7 @@ runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
-	rootfs-armv5.ext2 automatic "::mtd32,0,6,1:net=nic" aspeed-bmc-supermicro-x11spi.dtb
+	rootfs-armv5.sqf automatic "::mtd32,0,6,1:net=nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
@@ -385,7 +385,7 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Test booting from second SPI controller
 runkernel aspeed_g5_defconfig g220a-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::mtd32,0,12,2:net=nic aspeed-bmc-bytedance-g220a.dtb
+	rootfs-armv5.sqf automatic ${notests}::mtd32,0,12,2:net=nic aspeed-bmc-bytedance-g220a.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
