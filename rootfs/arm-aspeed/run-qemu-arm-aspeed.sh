@@ -32,7 +32,7 @@ skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_510="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
@@ -210,37 +210,37 @@ if [ ${runall} -eq 1 ]; then
     # Activate not-my-problem field and disable lockdep debugging to avoid
     # warning noise.
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.btrfs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.btrfs automatic nolockdep:fstest::sd2,b300:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.f2fs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.f2fs automatic nolockdep:fstest::sd2,b300:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.erofs automatic nolockdep:fstest::sd2:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.erofs automatic nolockdep:fstest::sd2,b300:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=exfat aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=exfat aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=gfs2 aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=gfs2 aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=hfs aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=hfs aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=hfs+ aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=hfs+ aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=jfs aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=jfs aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=minix aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=minix aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=nilfs2 aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=nilfs2 aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2:net=nic:fstest=xfs aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic nolockdep:fstest::sd2,b300:net=nic:fstest=xfs aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
 fi
 
@@ -322,8 +322,20 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Run the next test with armv7a root file system.
 # Both are expected to work.
+# ast2600-evb supports an EMMC interface as well as two SDHCI interfaces.
+# Run tests on all of them. Explicitly specify the root file system using
+# its major/minor device number because the association to mmcblkX
+# is not fixed.
 runkernel aspeed_g5_defconfig ast2600-evb "" \
-	rootfs-armv7a.ext2 automatic ${notests}::sd2:net=nic aspeed-ast2600-evb.dtb
+	rootfs-armv7a.ext2 automatic ${notests}::sd0,b300:net=nic aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic ${notests}::sd1,b300:net=nic aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv7a.ext2 automatic ${notests}::sd2,b300:net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # EHCI
