@@ -416,6 +416,10 @@ runkernel multi_v7_defconfig orangepi-pc "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
+	rootfs-armv7a.ext2 automatic ::sata:net=nic sun8i-h3-orangepi-pc.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::sd:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -508,7 +512,10 @@ checkstate ${retcode}
 # See qemu patch 7ea47af390 ("tests/avocado: Make the test_arm_bpim2u_gmac
 # test more reliable") for details. That is hackish, but it works.
 runkernel sunxi_defconfig bpim2u "" \
-	rootfs-armv7a.ext2 automatic "::sd,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
+	rootfs-armv7a.ext2 automatic "::sd0,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
+checkstate ${retcode}
+runkernel sunxi_defconfig bpim2u "" \
+	rootfs-armv7a.ext2 automatic "::sd1,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
 checkstate ${retcode}
 runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::sata:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
@@ -518,7 +525,4 @@ runkernel sunxi_defconfig bpim2u "" \
 	rootfs-armv7a.ext2 automatic "::usb0:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
 checkstate ${retcode}
 
-runkernel sunxi_defconfig bpim2u "" \
-	rootfs-armv7a.ext2 automatic "::sd,b300:net=nic" sun8i-r40-bananapi-m2-ultra.dtb
-checkstate ${retcode}
 exit ${retcode}
