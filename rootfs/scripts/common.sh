@@ -734,9 +734,11 @@ __common_mmccmd()
     sd[0-9])	# sd drive at index [0-9]
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=${fixup#sd}"
 	;;
-    sd,*)	# sd followed by root device name
-	extra_params+=" -drive file=${rootfs},format=raw,if=sd"
-	rootdev="${fixup#sd,}"
+    sd,*|sd[0-9],*)	# sd with or without index, followed by root device name
+	local device="${fixup%,*}"
+	local devindex="${device#sd}"
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd${devindex:+,index=${devindex}}"
+	rootdev="${fixup#*,}"
 	;;
     *)
 	;;
