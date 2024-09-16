@@ -1560,6 +1560,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
 	enable_config "${fragment}" CONFIG_VCAP_KUNIT_TEST
 
+	# crashes in mctp_i2c_get_adapter()
+	# enable_config "${fragment}" CONFIG_MCTP_SERIAL_TEST
+
 	# damon
 	# limit to testing branch until problems are fixed in mainline kernel.
 	if is_enabled CONFIG_MMU && ( is_testing || [[ "${runall}" -ge 2 ]] ); then
