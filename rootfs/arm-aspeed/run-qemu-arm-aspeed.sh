@@ -32,10 +32,15 @@ skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd0,b300:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd1,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_510="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd0,b300:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd1,b300:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_515="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
