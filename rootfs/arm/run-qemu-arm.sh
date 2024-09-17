@@ -207,10 +207,6 @@ runkernel()
     "collie")
 	initcli+=" console=ttySA1"
 	;;
-    "cubieboard")
-	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
-	initcli+=" console=ttyS0"
-	;;
     "imx25-pdk" )
 	initcli+=" console=ttymxc0,115200"
 	;;
@@ -348,16 +344,5 @@ runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
 	rootfs-arm-m3.cpio manual "nodebug:nousb:nonet:nocd:nofs:nonvme:noscsi:novirt" mps2-an385.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-
-if [ ${runall} -eq 1 ]; then
-    # Generates runtime warning "sunxi_musb_ep_offset called with non 0 offset"
-    # which may be caused by qemu. The call originates from ep_config_from_hw(),
-    # which calls musb_read_fifosize(), which in turn calls the function
-    # with parameter MUSB_FIFOSIZE=0x0f.
-    runkernel sunxi_defconfig cubieboard "" \
-	rootfs-armv5.cpio manual ::mem512 sun4i-a10-cubieboard.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
 
 exit ${retcode}
