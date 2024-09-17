@@ -91,7 +91,7 @@ runkernel()
 	${extra_params} \
 	--append "earlycon=uart8250,io,0x3f8,9600n8 ${initcli} mem=256M console=ttyS0" \
 	-nographic \
-	-d unimp,guest_errors
+	-d guest_errors
 
     return $?
 }
