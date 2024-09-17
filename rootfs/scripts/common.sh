@@ -896,6 +896,11 @@ __common_netcmd()
 	# preinstalled network device which needs to be instantiated
 	extra_params+=" -nic user"
 	;;
+    nic,*)
+	# preinstalled network device which needs to be instantiated
+	# Parameter includes NIC model
+	extra_params+=" -nic user,model=${netdev#nic,}"
+	;;
     usb*)
 	if [[ "${__have_usb_param}" -eq 0 ]]; then
 	    extra_params+=" -usb"
