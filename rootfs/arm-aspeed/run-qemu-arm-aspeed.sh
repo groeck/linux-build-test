@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_V91_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
@@ -348,6 +348,11 @@ runkernel aspeed_g5_defconfig ast2600-evb "" \
 	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-ast2600-evb.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
+# UHCI, through USB hub
+runkernel aspeed_g5_defconfig ast2600-evb "" \
+	rootfs-armv5.ext2 automatic ${notests}::usb-hub1:net=nic aspeed-ast2600-evb.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
 # The following tests require qemu 7.1+ and Linux v5.18+
 # Boot from 1st SPI controller (fmc)
 runkernel aspeed_g5_defconfig ast2600-evb "" \
@@ -440,6 +445,11 @@ checkstate ${retcode}
 # EHCI
 runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-ibm-rainier.dtb
+retcode=$((${retcode} + $?))
+checkstate ${retcode}
+# UHCI, through USB hub
+runkernel aspeed_g5_defconfig rainier-bmc "" \
+	rootfs-armv5.ext2 automatic ${notests}::usb-hub1:net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
