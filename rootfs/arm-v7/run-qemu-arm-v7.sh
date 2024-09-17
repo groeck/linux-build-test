@@ -23,14 +23,14 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 PATH=${PATH_ARM}:${PATH}
 
 skip_419="arm:bpim2u:sunxi_defconfig:sata:net=nic \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1 \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
 	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net=default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default"
-skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
-skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5 \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1"
+skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac"
+skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac"
 
 patch_defconfig()
 {
@@ -374,8 +374,14 @@ runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.cpio manual ::mem512:net=default sun4i-a10-cubieboard.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
+# EHCI
 runkernel multi_v7_defconfig cubieboard "" \
 	rootfs-armv5.ext2 manual ::usb0:mem512:net=default sun4i-a10-cubieboard.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+# OHCI through USB hub on 2nd USB port
+runkernel multi_v7_defconfig cubieboard "" \
+	rootfs-armv5.ext2 manual ::usb-hub1:mem512:net=default sun4i-a10-cubieboard.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig cubieboard "" \
@@ -389,6 +395,13 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig raspi2b "" \
 	rootfs-armv7a.ext2 manual "::sd:net=usb" bcm2836-rpi-2-b.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
+# OHCI
+# Note: Linux always instantiates a USB 1.1 hub on top of the single-port
+# DWC2 USB port. It appears that raspi2 does not support USB 2.0.
+runkernel multi_v7_defconfig raspi2b "" \
+	rootfs-armv7a.ext2 manual "::usb0:nonet" bcm2836-rpi-2-b.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
@@ -428,7 +441,7 @@ runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::usb0:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
-# OHCI
+# OHCI (assumes that there is no companion interface in qemu)
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::usb4:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
@@ -442,15 +455,15 @@ checkstate ${retcode}
 # doesn't support it).
 
 runkernel multi_v7_defconfig npcm750-evb "" \
-	rootfs-armv5.cpio automatic npcm nuvoton-npcm750-evb.dtb
+	rootfs-armv5.cpio automatic npcm::net=nic,npcm-gmac nuvoton-npcm750-evb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig npcm750-evb "" \
-	rootfs-armv5.sqf automatic npcm::mtd32,6,5 nuvoton-npcm750-evb.dtb
+	rootfs-armv5.sqf automatic npcm::mtd32,6,5:net=nic,npcm-gmac nuvoton-npcm750-evb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig npcm750-evb "" \
-	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm750-evb.dtb
+	rootfs-armv5.ext2 automatic npcm::usb0.1:net=nic,npcm-gmac nuvoton-npcm750-evb.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
