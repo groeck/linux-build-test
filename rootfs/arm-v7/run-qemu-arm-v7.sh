@@ -429,10 +429,6 @@ runkernel multi_v7_defconfig orangepi-pc "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig orangepi-pc "" \
-	rootfs-armv7a.ext2 automatic ::sata:net=nic sun8i-h3-orangepi-pc.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.ext2 automatic ::sd:net=nic sun8i-h3-orangepi-pc.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
