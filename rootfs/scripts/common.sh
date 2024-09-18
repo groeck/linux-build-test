@@ -485,6 +485,8 @@ __common_usbcmd()
     local fixup="$1"
     local rootfs="$2"
     local bus
+    local port
+    local version
 
     if [[ "${__have_usb_param}" -eq 0 ]]; then
 	extra_params+=" -usb"
@@ -524,24 +526,34 @@ __common_usbcmd()
 	extra_params+=" -device usb-storage,drive=d0,bus=usb-bus.${bus%.*},port=${bus#*.}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
-    "usb-hub")
-	extra_params+=" -device usb-hub,bus=usb-bus.0,port=2"
-	extra_params+=" -device usb-storage,bus=usb-bus.0,port=2.1,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    usb-hub[0-9])
-	# Same as "usb-hub", but with explicit bus number
-	# The above must not be in quotes to enable pattern matching
-	extra_params+=" -device usb-hub,bus=usb-bus.${fixup#usb-hub},port=2"
-	extra_params+=" -device usb-storage,bus=usb-bus.${fixup#usb-hub},port=2.1,drive=d0"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    usb-hub[0-9].[0-9])
-	# Same as "usb-hub", but with explicit bus and port number
-	# The above must not be in quotes to enable pattern matching
+    usb-hub*)
+	# Syntax:
+	#	usb-hub[<bus>[.<port>]][,<version>]
+	# where the valid range for <bus> and <port> is {0, 9}, and the valid
+	# range for <version> is {1, 2}.
+	# The code below does not validate the syntax. Bad parameters will
+	# have unexpected consequences.
 	bus="${fixup#usb-hub}"
-	extra_params+=" -device usb-hub,bus=usb-bus.${bus%.*},port=${bus#*.}"
-	extra_params+=" -device usb-storage,bus=usb-bus.${bus%.*},port=${bus#*.}.1,drive=d0"
+	# split out USB version if provided
+	version=""
+	if [[ "${bus}" == *,[1-2] ]]; then
+	    version="${bus#*,}"
+	    bus="${bus%,*}"
+	fi
+	# If there is no explicit bus number, use bus 0
+	if [[ -z "${bus}" ]]; then
+	    bus="0"
+	fi
+	# If there is no explicit port number, use port 2
+	if [[ "${bus}" == [0-9].[0-9] ]]; then
+	    port="${bus#*.}"
+	    bus="${bus%.*}"
+	else
+	    port=2
+	fi
+	extra_params+=" -device usb-hub,bus=usb-bus.${bus},port=${port}${version:+,usb_version=${version}}"
+	# Attach to USB hub port 1
+	extra_params+=" -device usb-storage,bus=usb-bus.${bus},port=${port}.1,drive=d0"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "usb-uas-ehci")
