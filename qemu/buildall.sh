@@ -120,10 +120,10 @@ build_one()
 	dobuild_common v8.1.5-local v8.1 "--disable-hax"
 	;;
     "v8.2")
-	dobuild_common v8.2.6-local v8.2 ""
+	dobuild_common v8.2.7-local v8.2 ""
 	;;
     "v9.0")
-	dobuild_common v9.0.2-local v9.0 ""
+	dobuild_common v9.0.3-local v9.0 ""
 	;;
     "v9.1")
 	dobuild_common v9.1.0-local v9.1 "--disable-strip --extra-cflags=-g"
