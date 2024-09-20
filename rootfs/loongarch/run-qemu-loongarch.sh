@@ -109,9 +109,9 @@ checkstate ${retcode}
 if [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
     # Note: tpm needs qemu v9.1+ and Linux kernel v6.6+
     runkernel defconfig virt rootfs.cpio "${nodebug}::tpm-tis-device:efi:net=default"
-    retcode=$?
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
-checkstate ${retcode}
 runkernel defconfig virt rootfs.ext2 "${nodebug}::efi:nvme:net=default"
 retcode=$((retcode + $?))
 checkstate ${retcode}
