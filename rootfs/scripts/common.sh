@@ -1580,9 +1580,8 @@ __setup_fragment()
 	# crashes in mctp_i2c_get_adapter()
 	# enable_config "${fragment}" CONFIG_MCTP_SERIAL_TEST
 
-	# damon
-	# limit to testing branch until problems are fixed in mainline kernel.
-	if is_enabled CONFIG_MMU && ( is_testing || [[ "${runall}" -ge 2 ]] ); then
+	# damon fails on non-MMU systems
+	if is_enabled CONFIG_MMU; then
 	    enable_config "${fragment}" CONFIG_DAMON CONFIG_DAMON_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_SYSFS CONFIG_DAMON_SYSFS_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_VADDR CONFIG_DAMON_PADDR
@@ -1683,8 +1682,10 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
-	if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
-	    # slub unit tests fail in v5.15.y and older kernels.
+	if [[ "${runall}" -ge 2 ]] && \
+	   [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+	    # slub unit tests fail in v5.15.y and older kernels,
+	    # and generate warning backtraces starting with v6.12.
 	    enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
 	fi
 
