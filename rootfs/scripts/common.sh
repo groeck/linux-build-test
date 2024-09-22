@@ -1477,6 +1477,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SECURITY_YAMA
 	enable_config "${fragment}" CONFIG_SECURITY_LOADPIN
 	enable_config "${fragment}" CONFIG_SECURITY_SAFESETID
+	enable_config "${fragment}" CONFIG_SECURITY_IPE
+	enable_config "${fragment}" CONFIG_SECURITY_IPE_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_BPF_LSM
 	set_config "${fragment}" CONFIG_LSM "landlock,lockdown,yama,loadpin,safesetid,bpf"
     fi
