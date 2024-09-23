@@ -60,6 +60,7 @@ runkernel()
     local waitlist=("Rebooting" "Boot successful")
     local build="${ARCH}:${mach}:${cpu}:${defconfig}"
     local diskcmd=""
+    local console
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -78,23 +79,22 @@ runkernel()
 	return 1
     fi
 
-    rootfs="$(rootfsname ${rootfs})"
-    if [[ "${rootfs}" == *cpio ]]; then
-	if [[ "${mach}" = "q800" ]]; then
-	    diskcmd="-initrd ${rootfs}"
-	fi
-    else
-	initcli+=" root=/dev/sda rw"
-	diskcmd="-snapshot -drive file=${rootfs},format=raw"
-    fi
+    case ${mach} in
+    "virt")
+	initcli+=" console=ttyGF"
+	;;
+    *)
+	initcli+=" console=ttyS0,115200"
+	;;
+    esac
 
     execute manual waitlist[@] \
       ${QEMU} -M ${mach} \
 	-kernel vmlinux -cpu ${cpu} \
 	-no-reboot -nographic -monitor none \
 	-audio none \
-	${diskcmd} \
-	-append "${initcli} console=ttyS0,115200"
+	${extra_params} \
+	-append "${initcli}"
 
     return $?
 }
@@ -108,10 +108,19 @@ checkstate ${retcode}
 runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.ext2
+runkernel q800 m68040 mac_defconfig "nofs:scsi:net=default" rootfs-68040.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel q800 m68040 mac_defconfig "nofs:net=default" rootfs-68040.cramfs
+runkernel q800 m68040 mac_defconfig "nofs:scsi:net=default" rootfs-68040.cramfs
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel virt m68040 virt_defconfig "nofs:net=virtio-net-device" rootfs-68040.cpio
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel virt m68040 virt_defconfig "nofs:net=virtio-net-device:scsi[virtio]" rootfs-68040.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel virt m68040 virt_defconfig "nofs:net=virtio-net-device:virtio-blk" rootfs-68040.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
