@@ -1570,10 +1570,15 @@ __setup_fragment()
 	# tests can not be disabled if it is set. That means we have to explicitly
 	# disable it and manually select all applicable tests.
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
-	enable_config "${fragment}" CONFIG_KUNIT CONFIG_PM_QOS_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_KUNIT
+
+	# CONFIG_KUNIT_TEST now (as of v6.12-rc) also generates a mandatory
+	# backtrace. Disable it explicitly.
+	disable_config "${fragment}" CONFIG_KUNIT_TEST
 	# Explicitly disable KUNIT_FAULT_TEST to avoid BUG() messages
 	disable_config "${fragment}" CONFIG_KUNIT_FAULT_TEST
+
+	enable_config "${fragment}" CONFIG_PM_QOS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
