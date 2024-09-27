@@ -1572,9 +1572,16 @@ __setup_fragment()
 	disable_config "${fragment}" CONFIG_KUNIT_ALL_TESTS
 	enable_config "${fragment}" CONFIG_KUNIT
 
-	# CONFIG_KUNIT_TEST now (as of v6.12-rc) also generates a mandatory
-	# backtrace. Disable it explicitly.
-	disable_config "${fragment}" CONFIG_KUNIT_TEST
+	if [[ "${runall}" -ge 2 ]]; then
+	    enable_config "${fragment}" CONFIG_KUNIT_TEST
+	else
+	    # CONFIG_KUNIT_TEST now (as of v6.12-rc) also generates a mandatory
+	    # backtrace. Disable it explicitly.
+	    # Note that the warning avoidance patch set doesn't work because
+	    # the sysfs code doesn't call WARN() but dump_stack() directly.
+	    # See sysfs_warn_dup() for details.
+	    disable_config "${fragment}" CONFIG_KUNIT_TEST
+	fi
 	# Explicitly disable KUNIT_FAULT_TEST to avoid BUG() messages
 	disable_config "${fragment}" CONFIG_KUNIT_FAULT_TEST
 
@@ -1620,6 +1627,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXEC_KUNIT_TEST CONFIG_BINFMT_ELF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_OHCI_SERDES_TEST
+
+	# New in v6.12
+	enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
@@ -1689,10 +1699,16 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
-	if [[ "${runall}" -ge 2 ]] && \
+	if [[ ${linux_version_code} -lt $(kernel_version 6 11) ]] && \
 	   [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
-	    # slub unit tests fail in v5.15.y and older kernels,
-	    # and generate warning backtraces starting with v6.12.
+	    # slub unit tests fail in v5.15.y and older kernels.
+	    # It also generates warning backtraces and results in
+	    # boot stalls starting with v6.12. Problem is that
+	    # kunit_run_all_tests() is called too early, prior to
+	    # RCU initialization, but the unit test depends on it.
+	    # Result is that running slub kunit tests during boot
+	    # (CONFIG_KUNIT=y and CONFIG_SLUB_KUNIT_TEST=y) is no
+	    # longer supported, at least not for the time being.
 	    enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
 	fi
 
