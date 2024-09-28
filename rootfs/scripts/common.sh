@@ -1594,8 +1594,8 @@ __setup_fragment()
 	# crashes in mctp_i2c_get_adapter()
 	# enable_config "${fragment}" CONFIG_MCTP_SERIAL_TEST
 
-	# damon fails on non-MMU systems
-	if is_enabled CONFIG_MMU; then
+	# damon fails on non-MMU systems and up to 6.11
+	if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]] && is_enabled CONFIG_MMU; then
 	    enable_config "${fragment}" CONFIG_DAMON CONFIG_DAMON_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_SYSFS CONFIG_DAMON_SYSFS_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_VADDR CONFIG_DAMON_PADDR
@@ -1607,16 +1607,13 @@ __setup_fragment()
 	# New in v6.9
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_GTS_KUNIT_TEST
-	# Fails if there is no devicetree file, making the test pointless (e.g. arm64)
-	# # of_dtb_root_node_found_by_path: EXPECTATION FAILED at drivers/of/of_test.c:18
-	# Expected np is not null, but is
-	# # of_dtb_root_node_found_by_path: pass:0 fail:1 skip:0 total:1
-	# not ok 1 of_dtb_root_node_found_by_path
-	# # of_dtb_root_node_populates_of_root: EXPECTATION FAILED at drivers/of/of_test.c:28
-	# Expected of_root is not null, but is
-	# # of_dtb_root_node_populates_of_root: pass:0 fail:1 skip:0 total:1
-	# not ok 2 of_dtb_root_node_populates_of_root
-	# enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
+
+	if ! is_enabled CONFIG_ARM64 || [[ "${runall}" -ge 1 ]]; then
+	    # Fails if there is no devicetree root (e.g. arm64 with efi boots)
+	    enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
+	    # New in v6.12; same problem
+	    enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
+	fi
 
 	# New in v6.10
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_PACKET_SERDES_TEST
@@ -1627,9 +1624,6 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXEC_KUNIT_TEST CONFIG_BINFMT_ELF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_OHCI_SERDES_TEST
-
-	# New in v6.12
-	enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
@@ -1699,6 +1693,7 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
+	# FIXME update to 6.12 after v6.12-rc1 has been released
 	if [[ ${linux_version_code} -lt $(kernel_version 6 11) ]] && \
 	   [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
 	    # slub unit tests fail in v5.15.y and older kernels.
@@ -1718,8 +1713,12 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STRING_HELPERS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FORTIFY_KUNIT_TEST
 
-	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]]; then
+	# FIXME update to 6.12 after v6.12-rc1 has been released
+	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]] && \
+	   ( [[ ${linux_version_code} -lt $(kernel_version 6 11) ]] || ! is_enabled CONFIG_ARM64 ); then
 	    # Clock unit tests result in backtraces in v6.6.y and older.
+	    # On top of that, test failures are seen in v6.12+ when booting
+	    # arm64 images through efi.
 	    # Disable to avoid warning backtrace noise.
 	    enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
