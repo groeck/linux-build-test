@@ -1672,7 +1672,12 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_TEST_BPF
 	enable_config "${fragment}" CONFIG_TEST_BLACKHOLE_DEV
 	enable_config "${fragment}" CONFIG_MMC_SDHCI_OF_ASPEED_TEST
-	enable_config "${fragment}" CONFIG_TEST_IOV_ITER
+
+	if ! is_enabled CONFIG_OPENRISC; then
+	    # crashes in iov_kunit_copy_from_xarray(),
+	    # most likely due to an architecture problem
+	    enable_config "${fragment}" CONFIG_TEST_IOV_ITER
+	fi
 
 	enable_config "${fragment}" CONFIG_CROS_KUNIT_EC_PROTO_TEST
 	enable_config "${fragment}" CONFIG_RATIONAL_KUNIT_TEST
