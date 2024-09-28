@@ -41,6 +41,9 @@ patch_defconfig()
 
     enable_config ${defconfig} CONFIG_BCACHEFS_FS
 
+    # Enable support for clock selftests
+    enable_config ${defconfig} CONFIG_COMMON_CLK
+
     # Enable TPM testing
     echo "CONFIG_TCG_TPM=y" >> ${defconfig}
     echo "CONFIG_TCG_TIS=y" >> ${defconfig}
