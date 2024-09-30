@@ -1698,11 +1698,10 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
-	# FIXME update to 6.12 after v6.12-rc1 has been released
-	if [[ ${linux_version_code} -lt $(kernel_version 6 11) ]] && \
+	if [[ ${linux_version_code} -lt $(kernel_version 6 12) ]] && \
 	   [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
 	    # slub unit tests fail in v5.15.y and older kernels.
-	    # It also generates warning backtraces and results in
+	    # It also triggers warning backtraces and results in
 	    # boot stalls starting with v6.12. Problem is that
 	    # kunit_run_all_tests() is called too early, prior to
 	    # RCU initialization, but the unit test depends on it.
@@ -1718,14 +1717,14 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STRING_HELPERS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FORTIFY_KUNIT_TEST
 
-	# FIXME update to 6.12 after v6.12-rc1 has been released
-	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]] && \
-	   ( [[ ${linux_version_code} -lt $(kernel_version 6 11) ]] || ! is_enabled CONFIG_ARM64 ); then
-	    # Clock unit tests result in backtraces in v6.6.y and older.
-	    # On top of that, test failures are seen in v6.12+ when booting
-	    # arm64 images through efi.
-	    # Disable to avoid warning backtrace noise.
-	    enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	# Clock unit tests trigger backtraces in v6.6.y and older.
+	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]]; then
+	    if [[ ${linux_version_code} -lt $(kernel_version 6 12) ]] || ! is_enabled CONFIG_ARM64; then
+		# Test failures are seen in v6.12+ when booting arm64 images
+		# through efi because OF is now mandatory if enabled in the
+		# build.
+		enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	    fi
 	    enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
 	    # clock gate unit tests fail on some systems in v6.6 and older
 	    # kernels. See upstream commit 75357829cc8e ("clk: Fix clk gate
