@@ -1724,14 +1724,14 @@ __setup_fragment()
 		# through efi because OF is now mandatory if enabled in the
 		# build.
 		enable_config "${fragment}" CONFIG_CLK_KUNIT_TEST
+	        # new in v6.12; fails on arm64 for the same reason
+	        enable_config "${fragment}" CONFIG_CLK_FIXED_RATE_KUNIT_TEST
 	    fi
 	    enable_config "${fragment}" CONFIG_CLK_FD_KUNIT_TEST
 	    # clock gate unit tests fail on some systems in v6.6 and older
 	    # kernels. See upstream commit 75357829cc8e ("clk: Fix clk gate
 	    # kunit test on big-endian CPUs").
 	    enable_config "${fragment}" CONFIG_CLK_GATE_KUNIT_TEST
-	    # new in v6.12
-	    enable_config "${fragment}" CONFIG_CLK_FIXED_RATE_KUNIT_TEST
 	fi
 
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
