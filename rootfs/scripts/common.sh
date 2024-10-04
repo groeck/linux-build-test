@@ -1698,16 +1698,8 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_MAC80211_KUNIT_TEST
 	fi
 
-	if [[ ${linux_version_code} -lt $(kernel_version 6 12) ]] && \
-	   [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+	if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
 	    # slub unit tests fail in v5.15.y and older kernels.
-	    # It also triggers warning backtraces and results in
-	    # boot stalls starting with v6.12. Problem is that
-	    # kunit_run_all_tests() is called too early, prior to
-	    # RCU initialization, but the unit test depends on it.
-	    # Result is that running slub kunit tests during boot
-	    # (CONFIG_KUNIT=y and CONFIG_SLUB_KUNIT_TEST=y) is no
-	    # longer supported, at least not for the time being.
 	    enable_config "${fragment}" CONFIG_SLUB_KUNIT_TEST
 	fi
 
