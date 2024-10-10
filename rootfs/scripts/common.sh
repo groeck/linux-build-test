@@ -1608,7 +1608,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SCSI_LIB_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IIO_GTS_KUNIT_TEST
 
-	if ! is_enabled CONFIG_ARM64 || [[ "${runall}" -ge 1 ]]; then
+	if ! is_enabled CONFIG_ARM64 || is_testing || [[ "${runall}" -ge 1 ]]; then
 	    # Fails if there is no devicetree root (e.g. arm64 with efi boots)
 	    enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
 	    # New in v6.12; same problem
@@ -1711,7 +1711,7 @@ __setup_fragment()
 
 	# Clock unit tests trigger backtraces in v6.6.y and older.
 	if [[ ${linux_version_code} -ge $(kernel_version 6 7) ]]; then
-	    if [[ ${linux_version_code} -lt $(kernel_version 6 12) ]] || ! is_enabled CONFIG_ARM64; then
+	    if [[ ${linux_version_code} -lt $(kernel_version 6 12) ]] || is_testing || ! is_enabled CONFIG_ARM64; then
 		# Test failures are seen in v6.12+ when booting arm64 images
 		# through efi because OF is now mandatory if enabled in the
 		# build.
