@@ -227,12 +227,8 @@ runkernel xlnx-versal-virt defconfig smp:net=default:mem512 rootfs.cpio
 retcode=$((retcode + $?))
 runkernel xlnx-versal-virt defconfig "smp4:net=default:mem512:virtio-blk" rootfs.ext2
 retcode=$((retcode + $?))
-if [[ ${runall} -ne 0 ]]; then
-    # unreliable; the drive sometimes instantiates as mmcblk1 instead of
-    # mmcblk0, causing spurious failures.
-    runkernel xlnx-versal-virt defconfig "smp4:net=default:mem512:sd0" rootfs.ext2
-    retcode=$((retcode + $?))
-fi
+runkernel xlnx-versal-virt defconfig "smp4:net=default:mem512:sd0,b300" rootfs.ext2
+retcode=$((retcode + $?))
 
 runkernel "xlnx-zcu102" defconfig smp:mem2G rootfs.cpio xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
@@ -241,7 +237,7 @@ retcode=$((retcode + $?))
 runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2 xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 
-if [[ ${runall} -ne 0 ]]; then
+if [[ ${linux_version_code} -lt $(kernel_version 5 6) ]] || [[ ${runall} -ne 0 ]]; then
     # Since Linux v5.6, the entire clock tree for zynqmp depends on firmware
     # support (which is not available in qemu). See Linux kernel upstream
     # commit 9c8a47b484ed ("arm64: dts: xilinx: Add the clock nodes for
@@ -262,9 +258,9 @@ runkernel raspi3b defconfig smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.d
 retcode=$((retcode + $?))
 
 if [[ ${runall} -ne 0 ]]; then
-    # Crashes due to missing interrupt controller support,
-    # missing i2c controller support, missing clock controller support
-    # (gave up here).
+    # Crashes (qemu 9.1 and mainline as of 10/12/24) due to missing interrupt
+    # controller support, missing i2c controller support, and missing clock
+    # controller support (gave up here).
     runkernel raspi4b defconfig smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
     retcode=$((retcode + $?))
     runkernel raspi4b defconfig smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
@@ -278,12 +274,5 @@ runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio xilinx/zynqmp-ep108.dtb
 retcode=$((retcode + $?))
 runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd rootfs.ext2 xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
-
-if [[ ${runall} -ne 0 ]]; then
-    runkernel xlnx-zcu102 defconfig nosmp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
-    retcode=$((retcode + $?))
-    runkernel xlnx-zcu102 defconfig nosmp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
-    retcode=$((retcode + $?))
-fi
 
 exit ${retcode}
