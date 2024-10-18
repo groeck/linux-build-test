@@ -366,7 +366,7 @@ do
 		dumplog 100 "${LOG}"
 		continue
 	    fi
-	    make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC_PERF}" NO_LIBTRACEEVENT=1 NO_BPF_SKEL=1 "${cmd[$i]}" >/dev/null 2>${LOG}
+	    make ARCH=${ARCH} O=${BUILDDIR} CC="${GCC_PERF}" NO_BPF_SKEL=1 "${cmd[$i]}" >/dev/null 2>${LOG}
 	    rv=$?
 	    if [ ${rv} -ne 0 ]; then
 		    echo "failed"
