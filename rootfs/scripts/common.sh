@@ -975,6 +975,7 @@ __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
+    local fwname
 
     case "${fixup}" in
     tpm*)
@@ -1011,18 +1012,25 @@ __common_fixup()
     smp[1-9])
 	extra_params+=" -smp ${fixup#smp}"
 	;;
-    efi|efi64)
-	case "${ARCH}" in
-	"arm64")
-	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-aarch64.fd"
-	    ;;
-	"loongarch")
-	    extra_params+=" -bios ${__basedir}/firmware/QEMU_EFI-loongarch64.fd"
-	    ;;
-	*)
-	    extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-64.fd"
-	    ;;
-	esac
+    efi*|efi64*)
+        if [[ "${fixup}" == *=* ]]; then
+	    fwname="${fixup#*=}"
+	else
+	    case "${ARCH}" in
+	    "arm64")
+		fwname="QEMU_EFI-aarch64.fd"
+		;;
+	    "loongarch")
+		fwname="QEMU_EFI-loongarch64.fd"
+		;;
+	    *)
+		fwname="OVMF-pure-efi-64.fd"
+		;;
+	    esac
+	fi
+	if [[ -n "${fwname}" ]]; then
+	    extra_params+=" -bios ${__basedir}/firmware/${fwname}"
+	fi
 	;;
     efi32)
 	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-32.fd"
@@ -1626,6 +1634,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_EXEC_KUNIT_TEST CONFIG_BINFMT_ELF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_OHCI_SERDES_TEST
+
+	# Planned for 6.13 (linux-next)
+	# May require CONFIG_UNICODE
+	enable_config "${fragment}" CONFIG_UNICODE_NORMALIZATION_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
