@@ -5,6 +5,38 @@ README in the qemu directory describes distribution.
 
 ----
 
+Update to Ubuntu 24.04:
+
+python 2.7 is no longer available. Install from debian.
+
+- Add /etc/apt/sources.list.d/bullseye.list:
+
+deb http://deb.debian.org/debian bullseye main
+deb http://deb.debian.org/debian bullseye-updates main
+deb http://security.debian.org bullseye-security main
+
+- Install python2
+
+- Disable /etc/apt/sources.list.d/bullseye.list, for example by renaming it.
+  Important: This step is necessary to avoid polluting the system with old
+  versions of various tools.
+
+Preferred (test): Install debian pacgate directly from packages/ subdirectory.
+
+Other:
+
+- Re-install clang
+- Install llvm-dev
+- Install libcapstone-dev
+- Install libtraceevent-dev
+- (Re-)install g++
+- Remove libstdc++-10-dev if installed
+- Install libstdc++-11-dev libstdc++-11-dev:i386 (for perf)
+- Install libstdc++-13-dev:i386 and possibly libstdc++-13-dev if not installed with g++
+- symlink /usr/lib/x86_64-linux-gnu/libaio.so.1t64 to /usr/lib/x86_64-linux-gnu/libaio.so.1
+----
+
+
 Packages to install (Debian/Ubuntu):
 
 automake
