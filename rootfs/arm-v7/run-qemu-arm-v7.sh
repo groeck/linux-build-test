@@ -25,12 +25,15 @@ PATH=${PATH_ARM}:${PATH}
 skip_419="arm:bpim2u:sunxi_defconfig:sata:net=nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac \
 	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net=default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac"
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac"
+	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
+	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac"
 
 patch_defconfig()
 {
