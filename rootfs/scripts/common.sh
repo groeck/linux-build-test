@@ -1980,6 +1980,20 @@ __cached_config=""
 __cached_results=0
 __cached_reason=""
 
+__do_cache_result()
+{
+    local rv="$1"
+
+    if [[ "${rv}" -eq 1 ]]; then
+	__cached_reason="failed (config)"
+    else
+	__cached_reason="skipped"
+    fi
+    echo "${__cached_reason}"
+    __cached_results="${rv}"
+    __dosetup_rc="${rv}"
+}
+
 dosetup()
 {
     local rv
@@ -2060,23 +2074,19 @@ dosetup()
     if [ -n "${fixups}" ]; then
 	# dummy call to initialize .config
 	__setup_config "${defconfig}" "" "${fixup:-${fixups}}"
+	rv=$?
+	if [[ ${rv} -ne 0 ]]; then
+	    __do_cache_result "${rv}"
+	    return ${rv}
+	fi
 	fragment="$(__mktemp /tmp/fragment.XXXXX)"
 	__setup_fragment "${fragment}" "${fixups}"
     fi
 
     __setup_config "${defconfig}" "${fragment}" "${fixup:-${fixups}}"
     rv=$?
-    if [ ${rv} -ne 0 ]
-    then
-	if [ ${rv} -eq 1 ]
-	then
-	    __cached_reason="failed (config)"
-	else
-	    __cached_reason="skipped"
-	fi
-	echo "${__cached_reason}"
-	__cached_results=${rv}
-	__dosetup_rc=${rv}
+    if [[ ${rv} -ne 0 ]]; then
+	__do_cache_result "${rv}"
 	return ${rv}
     fi
 
