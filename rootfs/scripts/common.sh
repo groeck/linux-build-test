@@ -1015,6 +1015,8 @@ __common_fixup()
     efi*|efi64*)
         if [[ "${fixup}" == *=* ]]; then
 	    fwname="${fixup#*=}"
+	elif [[ "${fixup}" == "efi32" ]]; then
+	    fwname="OVMF-pure-efi-32.fd"
 	else
 	    case "${ARCH}" in
 	    "arm64")
@@ -1031,9 +1033,6 @@ __common_fixup()
 	if [[ -n "${fwname}" ]]; then
 	    extra_params+=" -bios ${__basedir}/firmware/${fwname}"
 	fi
-	;;
-    efi32)
-	extra_params+=" -bios ${__basedir}/firmware/OVMF-pure-efi-32.fd"
 	;;
     mem*)
 	extra_params+=" -m ${fixup#mem}"
