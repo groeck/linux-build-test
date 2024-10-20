@@ -126,8 +126,8 @@ build_one()
 	dobuild_common v9.0.3-local v9.0 ""
 	;;
     "v9.1")
-	dobuild_common v9.1.0-local v9.1 "--disable-strip --extra-cflags=-g"
-	# dobuild_common v9.1.0-local v9.1-debug \
+	dobuild_common v9.1.1-local v9.1 "--disable-strip --extra-cflags=-g"
+	# dobuild_common v9.1.1-local v9.1-debug \
 	#	"--enable-debug --disable-strip --extra-cflags=-g"
 	;;
     "master")
