@@ -1668,7 +1668,13 @@ __setup_fragment()
 
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
 	# Oddity: We have to disable the following option to enable the tests
-	disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+            # crypto selftests run for a long time in older kernel branches,
+	    # at least on some architectures such as parisc, to the point where
+	    # random test timeouts are observed. It is not wot worth trying to
+	    # track down the problem.
+	    disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	fi
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
 	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST
 	enable_config "${fragment}" CONFIG_PCI_EPF_TEST CONFIG_PCI_ENDPOINT_TEST
