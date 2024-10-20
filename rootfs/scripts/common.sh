@@ -115,6 +115,7 @@ ___testbuild=0	# test build, run tests but abort after first failure
 _log_abort=0	# abort after warnings / backtraces
 _log_always=0	# log always
 _log_all=0	# log everything, not just part of the log
+_print_runtime=0 # print qemu runtime
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -210,12 +211,12 @@ parse_args()
 	__log_always=0
 	__log_all=0
 	___testbuild=0
-	verbose=0
+	__print_runtime=0
 	extracli=""
 
 	__set_qemu_builddir_default
 
-	while getopts abBde:KlLnNr:tTvW opt; do
+	while getopts abBde:KlLnNr:tTWx opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
@@ -223,20 +224,20 @@ parse_args()
 	d)	dodebug=$((dodebug + 1));;
 	e)	extracli=${OPTARG};;
 	K)	nokallsyms=1;;
+	l)	__log_always=1;;
+	L)	__log_all=1;;
 	n)	__set_qemu_builddir_static; nobuild=1;;
 	N)	__set_qemu_builddir_static;;
-	t)	__testbuild=1;___testbuild=1;__retries=0;;
-	T)	___testbuild=1;__retries=0;;
 	r)	__retries=${OPTARG}
 		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
 		    echo "Bad number of retries: ${__retries}"
 		    exit 1
 		fi
 		;;
-	v)	verbose=1;;
+	t)	__testbuild=1;___testbuild=1;__retries=0;;
+	T)	___testbuild=1;__retries=0;;
 	W)	__log_abort=1;;
-	l)	__log_always=1;;
-	L)	__log_all=1;;
+	x)	__print_runtime=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
 	done
@@ -2160,6 +2161,8 @@ dowait()
     local dolog
     local fsize=0
     local fsize_tmp
+    local starttime
+    local endtime
 
     # Give the process some time to start
     sleep 2
@@ -2169,6 +2172,8 @@ dowait()
 	echo " failed (missing log file)"
 	return 1
     fi
+
+    starttime="$(date +%s)"
 
     while true
     do
@@ -2230,6 +2235,8 @@ dowait()
 	st=$((st + ${LOOPTIME}))
 	echo -n .
     done
+
+    endtime="$(date +%s)"
 
     # Sometimes qemu exits immediately after a crash and the above code
     # does not catch it. Catch it here, with exceptions as noted.
@@ -2378,7 +2385,7 @@ dowait()
     if [[ ${report} -ne 0 || ${retcode} -eq 0 ]]; then
 	echo " ${msg}"
 
-	if [[ ${dolog} -ne 0 || ${verbose} -ne 0 ]]; then
+	if [[ ${dolog} -ne 0 ]]; then
 	    # Empty lines are irrelevant / don't add value.
 	    # First replace sequences of <cr> with a single <newline>
 	    sed -i 's/\r\+/\n/g'  "${logfile}"
@@ -2399,6 +2406,10 @@ dowait()
 	if [[ ${dolog} -ne 0 && ${__log_abort} -ne 0 ]]; then
 	    retcode=1
 	fi
+    fi
+
+    if [[ "${__print_runtime}" -ne 0 ]]; then
+        echo "qemu runtime: $((endtime - starttime)) seconds"
     fi
 
     return ${retcode}
