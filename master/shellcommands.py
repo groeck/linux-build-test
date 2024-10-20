@@ -313,14 +313,12 @@ class QemuBuildCommand(RefShellCommand):
                 result = FAILURE
             else:
                 result = WARNINGS
+        elif c.numPassed == 0:
+            self.build.result = SKIPPED
+            result = SKIPPED
+        elif c.tracebacks:
+            result = WARNINGS
         else:
-            if c.numPassed == 0:
-                self.build.result = SKIPPED
-                result = SKIPPED
-            else:
-                if c.tracebacks:
-                    result = WARNINGS
-                else:
-                    result = SUCCESS
+            result = SUCCESS
 
         return result
