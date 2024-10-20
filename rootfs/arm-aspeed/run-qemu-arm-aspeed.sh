@@ -28,16 +28,22 @@ notests=""
 
 skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2500-evb:aspeed_g5_defconfig:${notests:+notests:}sd:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic"
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1,2:net=nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1,2:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd0,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd1,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic"
 skip_510="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic \
+	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1,2:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd0,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd1,b300:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
@@ -50,7 +56,8 @@ skip_515="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic 
 	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128:net=nic \
 	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128,0,8,1:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic"
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
+	arm:rainier-bmc:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic"
 skip_61="arm:bletchley-bmc:aspeed_g5_defconfig:${notests:+notests:}mmc:net=nic \
 	arm:bletchley-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic"
 
