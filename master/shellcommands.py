@@ -14,7 +14,7 @@ skipped = re.compile('Building (\S+):(\S+) \.\.\. failed \(\S+\)')
 current_qemu = re.compile('Building ([^:\s]+):([^:\s]+):(\S+) \.+ running [\.R]+')
 passed_qemu = re.compile('Building (\S+):(\S+) \.+ running [\.R]+ passed$')
 failed_qemu = re.compile('Building (\S+):(\S+) .*?failed.*$')
-skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped$')
+skipped_qemu = re.compile('Building (\S+):(\S+) \.+ skipped.*$')
 
 kunit_result = re.compile('(?:\[ *\d+\.\d+\](?:\[ *T\d+\])? +)?# ([^:]+): pass:(\d+) fail:(\d+) skip:(\d+) total:\d+$')
 
@@ -307,7 +307,6 @@ class QemuBuildCommand(RefShellCommand):
 	return self.getText2(cmd, results)
 
     def evaluateCommand(self, cmd):
-        result = RefShellCommand.evaluateCommand(self, cmd)
         c = self.counter
         if c.numFailed > 0:
             if c.numPassed == 0:
@@ -318,7 +317,10 @@ class QemuBuildCommand(RefShellCommand):
             if c.numPassed == 0:
                 self.build.result = SKIPPED
                 result = SKIPPED
-            if c.tracebacks and result == SUCCESS:
-                result = WARNINGS
+            else:
+                if c.tracebacks:
+                    result = WARNINGS
+                else:
+                    result = SUCCESS
 
         return result
