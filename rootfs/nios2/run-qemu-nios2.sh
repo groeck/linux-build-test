@@ -10,7 +10,7 @@ shift $((OPTIND - 1))
 machine=$1
 config=$2
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-nios2}
+QEMU=${QEMU:-${QEMU_V90_BIN}/qemu-system-nios2}
 
 PREFIX=nios2-linux-
 ARCH=nios2
