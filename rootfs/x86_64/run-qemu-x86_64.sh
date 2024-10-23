@@ -185,9 +185,6 @@ checkstate ${retcode}
 runkernel defconfig smp:net=virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig smp:net=virtio-net-old:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
 
 runkernel defconfig smp2:tpm-crb:net=usb-ohci:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
 retcode=$((retcode + $?))
@@ -218,9 +215,6 @@ runkernel defconfig smp2:net=i82562:efi:mem1G Opteron_G1 q35 rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net=usb:efi32:mem2G:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel defconfig smp:net=usb:efi32:mem2G:scsi[virtio-pci-old] Opteron_G2 pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig smp2:net=i82559a:mem4G:virtio-pci core2duo q35 rootfs.ext2
