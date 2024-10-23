@@ -454,9 +454,6 @@ __common_scsicmd()
     "scsi[virtio-pci]")
 	device="virtio-scsi-pci"
 	;;
-    "scsi[virtio-pci-old]")
-	device="virtio-scsi-pci,disable-modern=on"
-	;;
     "scsi[virtio-ccw]")
 	# s390 only
 	device="virtio-scsi-ccw,devno=fe.0.0001"
@@ -599,11 +596,6 @@ __common_virtcmd()
     "virtio-pci")
 	__pcibridge_new_port
 	extra_params+=" -device virtio-blk-pci,drive=d0${__pcibus_ref}"
-	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
-	;;
-    "virtio-pci-old")
-	__pcibridge_new_port
-	extra_params+=" -device virtio-blk-pci,disable-modern=on,drive=d0${__pcibus_ref}"
 	extra_params+=" -drive file=${rootfs},if=none,id=d0,format=raw"
 	;;
     "virtio")
@@ -942,9 +934,6 @@ __common_netcmd()
 	;;
     "virtio-net"|"virtio-net-pci"|"virtio-net-device")
 	extra_params+=" -device ${netdev},netdev=net0${__pcibus_ref} -netdev user,id=net0"
-	;;
-    "virtio-net-old"|"virtio-net-pci-old")
-	extra_params+=" -device ${netdev%%-old},disable-modern=on,netdev=net0${__pcibus_ref} -netdev user,id=net0"
 	;;
     *)
 	__pcibridge_new_port
