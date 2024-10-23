@@ -181,10 +181,6 @@ runkernel pseries_defconfig big::net=i82559a:sdhci-mmc pseries POWER9 hvc0 vmlin
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig big::net=virtio-net-old:nvme pseries POWER9 hvc0 vmlinux \
-	rootfs.ext2.gz auto
-retcode=$((retcode + $?))
-checkstate ${retcode}
 runkernel pseries_defconfig big::net=tulip:sata-sii3112 pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
@@ -217,10 +213,6 @@ runkernel pseries_defconfig little::net=e1000e:sata-sii3112 pseries POWER8 hvc0 
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel pseries_defconfig little::net=virtio-net:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
-	rootfs-el.ext2.gz auto
-retcode=$((retcode + $?))
-checkstate ${retcode}
-runkernel pseries_defconfig little::net=virtio-net-old:scsi[MEGASAS] pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
