@@ -189,10 +189,6 @@ runkernel pseries_defconfig big::net=e1000:virtio-pci pseries POWER9 hvc0 vmlinu
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig big::net=e1000:virtio-pci-old pseries POWER9 hvc0 vmlinux \
-	rootfs.ext2.gz auto
-retcode=$((retcode + $?))
-checkstate ${retcode}
 
 # Multi-core boot with little endian images is unstable and may either hang
 # or take forever.
