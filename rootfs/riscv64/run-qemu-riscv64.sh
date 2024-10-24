@@ -10,8 +10,7 @@ shift $((OPTIND - 1))
 _mach="$1"
 _fixup="$2"
 
-# sd-card boot for sifive_u is broken in qemu v9.1
-QEMU=${QEMU:-${QEMU_V90_BIN}/qemu-system-riscv64}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-riscv64}
 PREFIX=riscv64-linux-
 ARCH=riscv
 PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv64-linux/bin"
