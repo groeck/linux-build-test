@@ -56,6 +56,7 @@ skip_419="x86_64:tools/perf i386:tools/perf riscv32:allmodconfig riscv:allmodcon
 skip_54="x86_64:tools/perf i386:tools/perf riscv32:allmodconfig riscv:allmodconfig csky:allmodconfig parisc64:allnoconfig"
 skip_510="x86_64:tools/perf i386:tools/perf csky:allmodconfig parisc64:allnoconfig"
 skip_515="x86_64:tools/perf i386:tools/perf"
+skip_61="x86_64:tools/perf i386:tools/perf"
 
 # fixups
 
