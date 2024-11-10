@@ -1591,9 +1591,9 @@ __setup_fragment()
 	# crashes in mctp_i2c_get_adapter()
 	# enable_config "${fragment}" CONFIG_MCTP_SERIAL_TEST
 
-	# damon fails on non-MMU systems, up to 6.11, and on 32-bit systems.
+	# damon tests fail on non-MMU systems and up to 6.11
 	if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]] && \
-		is_enabled CONFIG_MMU && ( is_enabled CONFIG_64BIT || is_testing ); then
+		is_enabled CONFIG_MMU; then
 	    enable_config "${fragment}" CONFIG_DAMON CONFIG_DAMON_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_SYSFS CONFIG_DAMON_SYSFS_KUNIT_TEST
 	    enable_config "${fragment}" CONFIG_DAMON_VADDR CONFIG_DAMON_PADDR
