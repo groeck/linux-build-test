@@ -1374,6 +1374,14 @@ is_testing()
     return 1
 }
 
+is_testing_or_version()
+{
+    if is_testing || [[ ${linux_version_code} -ge $(kernel_version $1 $2) ]]; then
+	return 0
+    fi
+    return 1
+}
+
 __setup_fragment()
 {
     local fragment="$1"
@@ -1526,7 +1534,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_DEBUG_NOTIFIERS CONFIG_DEBUG_PLIST
 
 	# loongarch crashes if CONFIG_KFENCE is enabled
-	if is_testing || ! is_enabled CONFIG_LOONGARCH; then
+	if is_testing_or_version 6 12 || ! is_enabled CONFIG_LOONGARCH; then
 	    enable_config "${fragment}" CONFIG_DEBUG_SG
 	fi
 
@@ -1810,7 +1818,7 @@ __setup_fragment()
 	# enable_config "${fragment}" CONFIG_RBTREE_TEST CONFIG_INTERVAL_TREE_TEST
 	# enable_config "${fragment}" CONFIG_GLOB_SELFTEST
 
-	if is_testing || [[ "${runall}" -ge 2 ]]; then
+	if is_testing_or_version 6 12 || [[ "${runall}" -ge 2 ]]; then
 	    # RTC library unit tests are slow but not marked as such
 	    # (as of v6.8, v6.9-rc4).
 	    enable_config "${fragment}" CONFIG_RTC_LIB_KUNIT_TEST
@@ -1826,8 +1834,7 @@ __setup_fragment()
 	# hangs with soft lockup (arm, microblaze) and/or reports RCU stalls
 	# (mips). Even if not hanging or stalling, it takes a long time to run
 	# on older kernels.
-	if is_testing || [[ "${runall}" -ge 2 ]] || \
-		[[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
+	if is_testing_or_version 6 6 || [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST
 	fi
 	#
@@ -1840,7 +1847,7 @@ __setup_fragment()
 	# triggers tracebacks, runs for a long time
 	# enable_config "${fragment}" CONFIG_KFENCE_KUNIT_TEST
 
-	if is_testing || [[ "${runall}" -ge 1 ]]; then
+	if is_testing_or_version 6 12 || [[ "${runall}" -ge 1 ]]; then
 	    enable_config "${fragment}" CONFIG_NETDEV_ADDR_LIST_TEST
 	fi
 
