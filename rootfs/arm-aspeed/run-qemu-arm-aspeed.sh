@@ -183,7 +183,7 @@ runkernel()
     kernel="arch/arm/boot/zImage"
     case "${bmach}" in
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
-    "witherspoon-bmc" | "g220a-bmc" | "tacoma-bmc" | \
+    "witherspoon-bmc" | "g220a-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | \
     "quanta-q71l-bmc" | "fp5280g2-bmc" | \
     "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
@@ -426,32 +426,6 @@ runkernel aspeed_g5_defconfig g220a-bmc "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-opp-tacoma.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-if [[ ${linux_version_code} -ge $(kernel_version 6 9) ]]; then
-    # The necessary compatible "tcg,tpm-tis-i2c" is only available in v6.9+.
-    runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.cpio automatic \
-	${notests}::tpm-tis-i2c,bus=aspeed.i2c.bus.1,address=0x2e:net=nic \
-	aspeed-bmc-opp-tacoma.dtb
-    retcode=$((${retcode} + $?))
-    checkstate ${retcode}
-fi
-runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::mmc:net=nic aspeed-bmc-opp-tacoma.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig tacoma-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-opp-tacoma.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel aspeed_g5_defconfig rainier-bmc "" \
-	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-ibm-rainier.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
 runkernel aspeed_g5_defconfig rainier-bmc "" \
 	rootfs-armv5.ext2 automatic ${notests}::mmc:net=nic aspeed-bmc-ibm-rainier.dtb
 retcode=$((${retcode} + $?))
