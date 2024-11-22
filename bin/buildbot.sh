@@ -13,7 +13,7 @@ cleanup()
 # Clean up /tmp/ when starting buildbot to avoid unnecessary build
 # failures due to disk space problems.
 if [[ "$1" = "start" ]]; then
-    cleanup desktop mars jupiter saturn server
+    cleanup desktop mars jupiter saturn server neptune
 fi
 
 rootdir="/opt/buildbot"

@@ -22,3 +22,4 @@ doit desktop $1
 doit mars $1
 doit jupiter $1
 doit saturn $1
+doit neptune $1

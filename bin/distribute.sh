@@ -10,8 +10,8 @@ fi
 base=/opt/buildbot
 kbase=/opt/kernel
 
-SYSTEMS="saturn.roeck-us.net desktop jupiter mars hyperion titan"
-SYSTEMS="saturn desktop jupiter mars"
+# SYSTEMS="saturn.roeck-us.net desktop jupiter mars neptune hyperion titan"
+SYSTEMS="saturn desktop jupiter mars neptune"
 
 for system in ${SYSTEMS}
 do
