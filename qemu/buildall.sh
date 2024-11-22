@@ -123,10 +123,10 @@ build_one()
 	dobuild_common v8.2.7-local v8.2 ""
 	;;
     "v9.0")
-	dobuild_common v9.0.3-local v9.0 ""
+	dobuild_common v9.0.4-local v9.0 ""
 	;;
     "v9.1")
-	dobuild_common v9.1.1-local v9.1 ""
+	dobuild_common v9.1.2-local v9.1 ""
 	;;
     "v9.2")
 	dobuild_common v9.2.0-local v9.2 "--disable-strip --extra-cflags=-g"
