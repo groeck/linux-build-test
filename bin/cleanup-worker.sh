@@ -1,9 +1,9 @@
 #!/bin/bash
 
 basedir="$(cd $(dirname $0); pwd)"
-slavedir="${basedir}/../slave"
+wdir="${basedir}/../worker"
 
-cd "${slavedir}" || exit 1
+cd "${wdir}" || exit 1
 
 for x in */build; do
     echo "Cleaning $x:"
