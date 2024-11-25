@@ -25,6 +25,7 @@ master/next*
 master/master*
 master/testing
 master/gitpoller-workdir/
+master/__pycache__/
 master/*.log*
 master/queue-workdir*/
 master/staging-workdir/
