@@ -16,10 +16,14 @@ doit()
 	ssh -t $1 /opt/buildbot/bin/install-gcc.sh $(basename $2)
 }
 
-sudo tar xf $1 -C /opt/kernel
+sys="$(uname -n | cut -f1 -d.)"
+progdir="$(dirname "$0")"
 
-doit desktop $1
-doit mars $1
-doit jupiter $1
-doit saturn $1
-doit neptune $1
+workers="$(cd "${progdir}/../master"; python3 -c "from config import workers; print(' '.join(workers))")"
+for worker in ${workers}; do
+    if [[ "${worker}" == "${sys}" ]]; then
+	sudo tar xf $1 -C /opt/kernel
+    else
+	doit ${worker} $1
+    fi
+done
