@@ -13,7 +13,12 @@ cleanup()
 # Clean up /tmp/ when starting buildbot to avoid unnecessary build
 # failures due to disk space problems.
 if [[ "$1" = "start" ]]; then
-    cleanup desktop mars jupiter saturn server neptune
+    (
+     progdir="$(dirname "$0")"
+     cd "${progdir}/../master" || exit 1
+     workers="$(python3 -c "from config import workers; print(' '.join(workers))")"
+     cleanup ${workers}
+    )
 fi
 
 rootdir="/opt/buildbot"
