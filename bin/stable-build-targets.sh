@@ -19,7 +19,8 @@ cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-s
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
 cmd_loongarch=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig)
+cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig \
+	virt_defconfig atari_defconfig amiga_defconfig multi_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
 cmd_microblaze=(defconfig allnoconfig tinyconfig)
