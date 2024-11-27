@@ -467,35 +467,35 @@ retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig quanta-gsj "" \
-	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-gsj.dtb
+	rootfs-armv5.cpio automatic npcm::net=nic,npcm-gmac nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
-	rootfs-armv5.ext2 automatic npcm::mtd32 nuvoton-npcm730-gsj.dtb
+	rootfs-armv5.ext2 automatic npcm::mtd32:net=nic,npcm-gmac nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig quanta-gsj "" \
-	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-gsj.dtb
+	rootfs-armv5.ext2 automatic npcm::usb0.1:net=nic,npcm-gmac nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
 runkernel multi_v7_defconfig kudo-bmc "" \
-	rootfs-armv5.cpio automatic npcm nuvoton-npcm730-kudo.dtb
+	rootfs-armv5.cpio automatic npcm::net=nic,npcm-gmac nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 if [ ${runall} -eq 1 ]; then
     # kernel support for sdhci missing in upstream kernel (as of v6.3-rc1)
     runkernel multi_v7_defconfig kudo-bmc "" \
-	rootfs-armv5.ext2 automatic npcm::sd nuvoton-npcm730-kudo.dtb
+	rootfs-armv5.ext2 automatic npcm::sd:net=nic,npcm-gmac nuvoton-npcm730-kudo.dtb
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
 runkernel multi_v7_defconfig kudo-bmc "" \
-	rootfs-armv7a.cramfs automatic npcm::mtd64,8,3 nuvoton-npcm730-kudo.dtb
+	rootfs-armv7a.cramfs automatic npcm::mtd64,8,3:net=nic,npcm-gmac nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel multi_v7_defconfig kudo-bmc "" \
-	rootfs-armv5.ext2 automatic npcm::usb0.1 nuvoton-npcm730-kudo.dtb
+	rootfs-armv5.ext2 automatic npcm::usb0.1:net=nic,npcm-gmac nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
