@@ -7,7 +7,6 @@ basedir=$(cd $(dirname $0); pwd)
 # default compiler version
 CV11_4="11.4.0-2.40"
 CV11="11.5.0-2.40"
-CV12_242="12.4.0-2.42"
 CV12="12.4.0-2.40"
 CV13="13.3.0-2.42"
 
@@ -85,7 +84,7 @@ branch=$(git branch | cut -f2 -d' ')
 # Limit file size to ~3.5 GB to prevent log file sizes from getting
 # out of control while at the same time supporting large images
 # (x86_64/allyesconfig: above 1GB).
-ulimit -f $((3500*1024))
+ulimit -f $((4000*1024))
 
 configcmd="olddefconfig"
 
