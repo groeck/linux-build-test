@@ -50,6 +50,7 @@ runkernel()
 	return 1
     fi
 
+    initcli+=" console=ttyS0 earlycon"
     execute manual waitlist[@] \
 	${QEMU} -cpu or1200 -M or1k-sim \
 	    ${initcli:+--append "${initcli}"} \
