@@ -88,14 +88,6 @@ fixup_xtensa=("s/# CONFIG_LD_NO_RELAX is not set/CONFIG_LD_NO_RELAX=y/"
 
 # We don't ever want to be in the business of arguing about frame sizes,
 # so disable frame size warnings/errors completely.
-# Plugins need gcc 14.1, 13.3, or 12.4 to work on some architectures.
-# See https://gcc.gnu.org/r14-3331 for details affecting looongarch,
-# but other architectures are affected as well. Disable plugin support
-# entirely since it only has limited if any value for test builds.
-# Disable CONFIG_RANDSTRUCT because it results in random build failures
-# which are difficult to track down, for example on s390.
-fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/"
-	"s/CONFIG_GCC_PLUGINS=y/CONFIG_GCC_PLUGINS=n/"
-	"s/CONFIG_RANDSTRUCT=y/CONFIG_RANDSTRUCT=n/"
-	"s/CONFIG_RANDSTRUCT_FULL=y/CONFIG_RANDSTRUCT_NONE=y/"
-	)
+# Note that gcc plugin support is assumed to be disabled in the compiler.
+# Otherwise build failures are likely to be observed.
+fixup_common=("s/CONFIG_FRAME_WARN=.*/CONFIG_FRAME_WARN=0/")
