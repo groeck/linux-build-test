@@ -1,4 +1,3 @@
-aboriginal
 bin/swtpm_bios
 bin/swtpm_ioctl
 bin/swtpm_localca
@@ -37,14 +36,10 @@ crosstool-ng
 or1k
 qemu
 qemu-install
-buildroot
-buildall
 sparse
 buildbot
 smatch
 swtpm
-u-boot
-rootfs.new
 include
 lib
 share
