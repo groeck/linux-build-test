@@ -1,4 +1,4 @@
-workers = ['server', 'saturn', 'desktop', 'jupiter', 'mars', 'neptune']
+workers = ['server', 'saturn', 'desktop', 'jupiter', 'mars', 'neptune', 'norwich-1']
 
 releases = ['4.19',
 	'5.4', '5.10', '5.15',
