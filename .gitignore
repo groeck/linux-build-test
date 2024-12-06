@@ -34,7 +34,6 @@ master/twistd.pid
 master/*.pyc
 crosstool-ng
 or1k
-qemu
 qemu-install
 sparse
 buildbot
