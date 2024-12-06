@@ -23,7 +23,7 @@ else
 fi
 
 if [[ "$(dirname $f)" != "${TOOLCHAIN_DIR}" ]]; then
-    sudo mv "$f" "${TOOLCHAIN_DIR}"
+    mv "$f" "${TOOLCHAIN_DIR}"
 fi
 
 basedir="/opt/kernel"
@@ -31,7 +31,7 @@ tdir="${basedir}/${tfile}"
 
 if [[ "$1" != "${tfile}" ]] && [[ -n "${tfile}" ]] && [[ -d "${tdir}" ]]; then
 	echo "Toolchain directory ${tdir} exists and will be removed prior to re-installation."
-	sudo rm -rI "${tdir}"
+	rm -rf "${tdir}"
 fi
 
-sudo tar xf "${TOOLCHAIN_DIR}/$(basename $f)" -C "${basedir}"
+tar xf "${TOOLCHAIN_DIR}/$(basename $f)" -C "${basedir}"
