@@ -39,14 +39,6 @@ runkernel()
     local fixup=$3
     local rootfs=$4
     local waitlist=("reboot: Restarting system" "Boot successful" "SeaBIOS wants SYSTEM RESET")
-
-    # pcnet tests need v5.4 or later kernels. On older kernels,
-    # the pcnet driver does not clear its rx buffer ring
-    # which causes random qemu hiccups.
-    if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-        fixup="$(echo ${fixup} | sed -e 's/net=pcnet/net=rtl8139/')"
-    fi
-
     local build="${ARCH}:${machine}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then

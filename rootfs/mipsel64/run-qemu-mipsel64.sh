@@ -140,13 +140,6 @@ runkernel()
 
 build_reference "${PREFIX}gcc" "${QEMU}"
 
-# erofs is only supported in v5.4 and later
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    erofs="erofs"
-else
-    erofs="ext2"
-fi
-
 # With malta_defconfig, btrfs only works with v6.1 and later and otherwise
 # fails to run init
 if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
@@ -220,13 +213,13 @@ retcode=$((retcode + $?))
 # Network interfaces don't instantiate.
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.${erofs} notests:nonet:smp:ide
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.erofs notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
-runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.${erofs} notests:nonet:smp:ide
+runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.erofs notests:nonet:smp:ide
 retcode=$((retcode + $?))
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))

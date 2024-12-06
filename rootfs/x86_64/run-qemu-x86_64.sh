@@ -123,13 +123,6 @@ else
     exfat=""
 fi
 
-# erofs is only supported in v5.4 and later
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    erofs="erofs"
-else
-    erofs="ext2"
-fi
-
 # gfs2 needs v5.15 or later
 if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     gfs2=":fstest=gfs2"
@@ -166,7 +159,7 @@ checkstate ${retcode}
 runkernel defconfig smp:tpm-tis:net=pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig "smp2:tpm-tis:net=rtl8139:efi:mem4G:sdhci-mmc" Skylake-Client q35 "rootfs.${erofs}"
+runkernel defconfig "smp2:tpm-tis:net=rtl8139:efi:mem4G:sdhci-mmc" Skylake-Client q35 "rootfs.erofs"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 

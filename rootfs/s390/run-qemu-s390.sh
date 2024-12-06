@@ -9,12 +9,7 @@ shift $((OPTIND - 1))
 
 _fixup=$1
 
-# Kernels older than v5.4 do not support prno-trng
-if [[ ${linux_version_code} -lt $(kernel_version 5 4) ]]; then
-    cpu="qemu,prno-trng=off"
-else
-    cpu="qemu"
-fi
+cpu="qemu"
 
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-s390x}
 
@@ -87,13 +82,6 @@ runkernel()
 
 build_reference "${PREFIX}gcc" "${QEMU}"
 
-# erofs is not supported in older kernels
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    erofs="erofs"
-else
-    erofs="ext2"
-fi
-
 # exfat is not supported in v5.4 and older
 if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
     exfat=":fstest=exfat"
@@ -128,7 +116,7 @@ checkstate ${retcode}
 runkernel defconfig nolocktests:scsi[virtio-pci]:net=usb-xhci:fstest=hfs rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nolocktests:usb-xhci:net=e1000e "rootfs.${erofs}"
+runkernel defconfig nolocktests:usb-xhci:net=e1000e "rootfs.erofs"
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nolocktests:usb-uas-xhci:net=usb-xhci:fstest=xfs rootfs.ext2

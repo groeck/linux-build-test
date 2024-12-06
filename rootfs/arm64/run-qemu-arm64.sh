@@ -141,13 +141,6 @@ else
     exfat=""
 fi
 
-# erofs is not supported in v4.19 and older
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    erofs="erofs"
-else
-    erofs="ext2"
-fi
-
 # gfs2 needs v5.15 or later
 if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     gfs2=":fstest=gfs2"
@@ -175,7 +168,7 @@ runkernel virt defconfig smp:net=tulip:efi:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp2:net=virtio-net:mem512:nvme${exfat}" rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.${erofs}"
+runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.erofs"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.f2fs"
 retcode=$((retcode + $?))

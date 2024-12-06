@@ -132,13 +132,6 @@ else
 	f2fs="ext2"
 fi
 
-# erofs is not supported in older kernels
-if [[ ${linux_version_code} -ge $(kernel_version 5 4) ]]; then
-    erofs="erofs"
-else
-    erofs="ext2"
-fi
-
 # kown net test failures:
 #	i82551, usb-net= i82557a, i82557b
 
@@ -189,7 +182,7 @@ runkernel virt defconfig smp:net=i82559er:mem512:virtio-blk rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net=tulip:mem512:nvme rootfs.btrfs
 retcode=$((retcode + $?))
-runkernel virt defconfig smp4:net=virtio-net:mem512:sdhci-mmc "rootfs.${erofs}"
+runkernel virt defconfig smp4:net=virtio-net:mem512:sdhci-mmc "rootfs.erofs"
 retcode=$((retcode + $?))
 runkernel virt defconfig "smp6:net=i82558b:mem512:scsi[DC395]" "rootfs.${f2fs}"
 retcode=$((retcode + $?))
