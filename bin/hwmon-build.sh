@@ -6,7 +6,7 @@ ERR=/tmp/error.$$
 
 BRANCH=$(git branch | egrep "^\*" | cut -f2 -d' ')
 
-CV="11.4.0-2.40-nolibc"
+CV="gcc-11.4.0-2.40-nolibc"
 
 PATH_X86=/opt/kernel/${CV}/x86_64-linux/bin
 PATH_ARM=/opt/kernel/${CV}/arm-linux-gnueabi/bin
