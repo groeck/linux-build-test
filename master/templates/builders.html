@@ -544,7 +544,7 @@
 <h1>Source verification</h1>
 
 <table border=1>
-{% for b in builders if b.name in ('hwmon', 'hwmon-next') -%}
+{% for b in builders if b.name in ('hwmon', 'hwmon-next', 'testing') -%}
   <tr>
   <td class="box"><b><a href="{{ b.link }}">{{ b.name|e }}</a></b></td>
   <td>
@@ -567,7 +567,7 @@
 </table>
 
 <br>
-<h1> imports </h1>
+<h1> Imports </h1>
 
 <table>
 <tr>
