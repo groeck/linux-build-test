@@ -16,9 +16,6 @@ PREFIX=xtensa-linux-
 ARCH=xtensa
 PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
 PATH_XTENSA_DE212=/opt/kernel/xtensa/gcc-6.4.0-de212/bin
-PATH_XTENSA_TOOLS=/opt/buildbot/bin/xtensa
-
-PATH=${PATH_XTENSA_TOOLS}:${PATH}
 
 patch_defconfig()
 {
