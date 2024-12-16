@@ -2,6 +2,12 @@ bin/swtpm_bios
 bin/swtpm_ioctl
 bin/swtpm_localca
 bin/swtpm_setup
+bin/c2xml
+bin/cgcc
+bin/semind
+bin/sparse-llvm
+bin/sparsec
+bin/test-inspect
 cache
 etc
 libtpms
