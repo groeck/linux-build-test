@@ -1633,9 +1633,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_SELF_ID_SEQUENCE_HELPER_TEST
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_OHCI_SERDES_TEST
 
-	# Planned for 6.13 (linux-next)
-	# May require CONFIG_UNICODE
-	enable_config "${fragment}" CONFIG_UNICODE_NORMALIZATION_KUNIT_TEST
+	# New in 6.13
+	enable_config "${fragment}" CONFIG_UTIL_MACROS_KUNIT
+	enable_config "${fragment}" CONFIG_CRC16_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
