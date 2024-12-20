@@ -20,6 +20,8 @@ PATH=${PATH}:${PATH_ARM64}
 patch_defconfig()
 {
     local defconfig=$1
+    local fixups=${2//:/ }
+    local fixup
 
     # File system support
     enable_config "${defconfig}" CONFIG_EROFS_FS
@@ -49,6 +51,16 @@ patch_defconfig()
 
     # For TPM testing
     enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
+
+    for fixup in ${fixups}; do
+	case "${fixup}" in
+	pagesize*)
+	    enable_config "${defconfig}" "CONFIG_ARM64_${fixup##pagesize}K_PAGES"
+	    ;;
+	*)
+	    ;;
+	esac
+    done
 }
 
 runkernel()
@@ -257,6 +269,33 @@ if [[ ${runall} -ne 0 ]]; then
     runkernel raspi4b defconfig smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
     retcode=$((retcode + $?))
     runkernel raspi4b defconfig smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
+    retcode=$((retcode + $?))
+fi
+
+if [[ ${runall} -ne 0 ]]; then
+    # The following all fail to boot. Something seems to be missing/bad in the configuration.
+    runkernel raspi3b defconfig pagesize16:smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((retcode + $?))
+    runkernel raspi3b defconfig pagesize16:smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((retcode + $?))
+    runkernel raspi3b defconfig pagesize16:smp4:mem1G:sd rootfs.btrfs broadcom/bcm2837-rpi-3-b.dtb
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize16:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize16:smp6:net=pcnet:mem1024:virtio:fstest=minix rootfs.ext2
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize16:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize16:smp:net=tulip:efi:mem1024:virtio-blk rootfs.f2fs
+    retcode=$((retcode + $?))
+
+    runkernel virt defconfig pagesize64:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize64:smp6:net=pcnet:mem1024:virtio:fstest=minix rootfs.ext2
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize64:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
+    retcode=$((retcode + $?))
+    runkernel virt defconfig pagesize64:smp:net=tulip:efi:mem1024:virtio-blk rootfs.f2fs
     retcode=$((retcode + $?))
 fi
 
