@@ -1635,7 +1635,10 @@ __setup_fragment()
 
 	# New in 6.13
 	enable_config "${fragment}" CONFIG_UTIL_MACROS_KUNIT
-	enable_config "${fragment}" CONFIG_CRC16_KUNIT_TEST
+	if ! is_enabled CONFIG_OPENRISC || [[ "${runall}" -ge 2 ]]; then
+	    # causes boot failure (no console output, not even with earlycon) on openrisc
+	    enable_config "${fragment}" CONFIG_CRC16_KUNIT_TEST
+	fi
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
