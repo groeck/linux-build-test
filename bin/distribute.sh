@@ -24,6 +24,7 @@ for worker in ${workers}; do
 	fi
 	if ! rsync -l --delete --timeout=15 -r ${base}/bin ${base}/rootfs ${base}/share \
 		${base}/.git \
+		${base}/virtualenv \
 		${base}/lib ${base}/include ${base}/kconfig ${base}/qemu-install \
 		${worker}:${base}; then
 		echo "failed"
