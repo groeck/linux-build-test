@@ -2206,7 +2206,7 @@ dowait()
 	    fi
 	fi
 
-	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
+	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault\|BUG: spinlock recursion" ${logfile}; then
 	    # x86 has the habit of crashing in restart once in a while.
 	    # Try to ignore it.
 	    if ! grep -a -q -e "^machine restart" ${logfile}; then
@@ -2247,7 +2247,7 @@ dowait()
     # Sometimes qemu exits immediately after a crash and the above code
     # does not catch it. Catch it here, with exceptions as noted.
     if [[ ${retcode} -eq 0 ]]; then
-	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault" ${logfile}; then
+	if grep -a -q -e "Oops: \|Kernel panic\|Internal error:\|segfault\|BUG: spinlock recursion" ${logfile}; then
 	    if [[ "${ARCH}" == "xtensa" ]]; then
 		# xtensa images may crash during reboot; reason unknown.
 		# It may be because its reboot handler jumps directly to
@@ -2349,6 +2349,9 @@ dowait()
 	dolog=1
     fi
     if grep -a -q "stack backtrace" ${logfile}; then
+	dolog=1
+    fi
+    if grep -a -q "Backtrace:" ${logfile}; then
 	dolog=1
     fi
     if grep -a -q "Call Trace" ${logfile}; then
