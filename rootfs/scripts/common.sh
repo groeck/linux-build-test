@@ -1521,7 +1521,13 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_SLAB_FREELIST_HARDENED
 	fi
 
-	enable_config "${fragment}" CONFIG_SLUB_DEBUG CONFIG_SLUB_DEBUG_ON
+	if ! is_enabled CONFIG_PARISC || ! is_enabled CONFIG_64BIT; then
+	    # Random crashes when running the parisc C3700 emulation in v6.13+,
+	    # possibly associated with unwind called from set_track_prepare().
+	    enable_config "${fragment}" CONFIG_SLUB_DEBUG CONFIG_SLUB_DEBUG_ON
+	else
+	    disable_config "${fragment}" CONFIG_SLUB_DEBUG
+	fi
 	enable_config "${fragment}" CONFIG_EXPERT CONFIG_DEBUG_KERNEL CONFIG_LOCK_DEBUGGING_SUPPORT
 	enable_config "${fragment}" CONFIG_DEBUG_RT_MUTEXES CONFIG_DEBUG_SPINLOCK CONFIG_DEBUG_MUTEXES
 
@@ -1538,7 +1544,10 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_DEBUG_SG
 	fi
 
-	enable_config "${fragment}" CONFIG_KFENCE
+	if ! is_enabled CONFIG_PARISC || ! is_enabled CONFIG_64BIT; then
+	    # Random crashes when running the parisc C3700 emulation in v6.13+,
+	    enable_config "${fragment}" CONFIG_KFENCE
+	fi
 	enable_config "${fragment}" CONFIG_DEBUG_INFO_DWARF5
 
 	if [[ "${nodebugobj}" -eq 0 ]]; then
