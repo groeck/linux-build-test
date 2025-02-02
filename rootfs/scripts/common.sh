@@ -116,6 +116,7 @@ _log_abort=0	# abort after warnings / backtraces
 _log_always=0	# log always
 _log_all=0	# log everything, not just part of the log
 _print_runtime=0 # print qemu runtime
+__quick=0	# quick run, do not execute unit tests
 
 # We run multiple builds at a time
 # maxload=$(($(nproc) * 3 / 2))
@@ -211,12 +212,13 @@ parse_args()
 	__log_always=0
 	__log_all=0
 	___testbuild=0
+	__quick=0
 	__print_runtime=0
 	extracli=""
 
 	__set_qemu_builddir_default
 
-	while getopts abBde:KlLnNr:tTWx opt; do
+	while getopts abBde:KlLnNqr:tTWx opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
@@ -228,6 +230,7 @@ parse_args()
 	L)	__log_all=1;;
 	n)	__set_qemu_builddir_static; nobuild=1;;
 	N)	__set_qemu_builddir_static;;
+	q)	__quick=1;;
 	r)	__retries=${OPTARG}
 		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
 		    echo "Bad number of retries: ${__retries}"
@@ -1044,7 +1047,11 @@ __common_fixups()
     __init_disk "${fixups}"
     __init_rootdev
 
-    initcli="${config_initcli} kunit.stats_enabled=2 kunit.filter=speed>slow"
+    if [[ "${__quick}" -eq 0 ]]; then
+	initcli="${config_initcli} kunit.stats_enabled=2 kunit.filter=speed>slow"
+    else
+	initcli="${config_initcli} kunit.enable=0"
+    fi
     extra_params="-snapshot -audio none"
     __have_usb_param=0
     __do_network_test=0
