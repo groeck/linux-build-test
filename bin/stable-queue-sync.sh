@@ -6,11 +6,12 @@ echo "$(date): running"
 
 # The current directory is the stable-queue git tree
 
-if [ $# -gt 0 ]
-then
-	releases=($*)
+if [ $# -gt 0 ]; then
+	releases="$*"
 else
-	releases=(4.19 5.4 5.10 5.15 6.1 6.6 6.12 6.13)
+	pushd "$(dirname "$0")/../master" >/dev/null 2>&1
+	releases="$(python3 -c "from config import releases; print(' '.join(releases))")"
+	popd >/dev/null
 fi
 
 do_import()
@@ -76,8 +77,7 @@ if [[ -e .git/gc.log ]]; then
 fi
 
 rv=0
-for rel in ${releases[*]}
-do
+for rel in ${releases}; do
 	do_import ${rel}
 	rv=$((rv + $?))
 done
