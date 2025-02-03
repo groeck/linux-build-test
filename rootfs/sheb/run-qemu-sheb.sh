@@ -13,11 +13,7 @@ PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
 
-skip_419="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
-skip_54="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
-skip_510="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
-skip_515="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
-skip_61="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:rootfs"
+skip_614="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:ext2"
 
 PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
 
@@ -48,13 +44,14 @@ runkernel()
     local fixup=$2
     local rootfs=$3
     local waitlist=("Restarting system" "Boot successful" "Requesting system reboot")
-    local build="${DISPARCH}:${defconfig}"
+    local build="${DISPARCH}:${defconfig}:${fixup}"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
     else
 	build+=":${rootfs##*.}"
     fi
+    build="${build/::/:}"
 
     if ! match_params "${_fixup}@${fixup}"; then
 	echo "Skipping ${build} ... "
@@ -94,6 +91,11 @@ retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2
 retcode=$((retcode + $?))
 
+# Needs non-upstream version of qemu to fix sm501 and usb-ohci endianness
+# bugs.
+runkernel rts7751r2dplus_defconfig usb rootfs.ext2
+retcode=$((retcode + $?))
+
 if [[ ${runall} -ne 0 ]]; then
     # The following are most likely PCI bus endianness translation issues.
     #
@@ -108,10 +110,6 @@ if [[ ${runall} -ne 0 ]]; then
     # nvme 0000:00:01.0: enabling device (0000 -> 0002)
     # nvme nvme0: Minimum device page size 1048576 too large for host (4096)
     runkernel rts7751r2dplus_defconfig nvme rootfs.ext2
-    retcode=$((retcode + $?))
-    # sm501 sm501: incorrect device id a0000105
-    # sm501: probe of sm501 failed with error -22
-    runkernel rts7751r2dplus_defconfig usb rootfs.ext2
     retcode=$((retcode + $?))
     # xhci_hcd 0000:00:01.0: can't setup: -12
     # xhci_hcd 0000:00:01.0: USB bus 1 deregistered
