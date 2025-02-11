@@ -235,6 +235,7 @@ runkernel defconfig "smp4:net=${netdev}:mem2G:scsi[53C895A]" EPYC-Rome q35 rootf
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
+# Run some tests tests with CONFIG_PREEMPT enabled
 runkernel defconfig preempt:smp4:net=ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -247,6 +248,24 @@ checkstate ${retcode}
 runkernel defconfig preempt:smp6:net=i82550:mem512:ata:fstest=minix KnightsMill q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
+
+if [[ ${runall} -ne 0 ]]; then
+    # Repeat the same tests with CONFIG_PREEMPT_RT enabled
+    # As of v6.14-rc2, experiences "sleeping function called" backtrace
+    # from networking code.
+    runkernel defconfig rt:smp4:net=ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig "rt:smp8:net=i82557a:mem4G:nvme${gfs2}" Icelake-Server q35 rootfs.btrfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp2:net=i82558b:efi32:mem1G:sdhci-mmc Skylake-Client-IBRS q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp6:net=i82550:mem512:ata:fstest=minix KnightsMill q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 
 runkernel defconfig nosmp:net=e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
 retcode=$((retcode + $?))
