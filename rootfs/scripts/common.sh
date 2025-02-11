@@ -1408,7 +1408,6 @@ __setup_fragment()
     local notests="${__testbuild}"
     local nousb=0
     local novirt=0
-    local preempt=0
     local nonet=0
 
     rm -f "${fragment}"
@@ -1416,7 +1415,13 @@ __setup_fragment()
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
-	"nosmp")
+	preempt)
+	    enable_config "${fragment}" CONFIG_PREEMPT
+	    ;;
+	rt)
+	    enable_config "${fragment}" CONFIG_PREEMPT_RT
+	    ;;
+	nosmp)
 	    disable_config "${fragment}" CONFIG_SMP
 	    ;;
 	smp*)
@@ -1451,7 +1456,6 @@ __setup_fragment()
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
 	nonet) nonet=1;;
-	preempt) preempt=1 ;;
 	*)
 	    ;;
 	esac
@@ -1952,10 +1956,6 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_MISC_FILESYSTEMS CONFIG_SQUASHFS CONFIG_SQUASHFS_XATTR
 	enable_config "${fragment}" CONFIG_SQUASHFS_ZLIB CONFIG_SQUASHFS_4K_DEVBLK_SIZE
 	enable_config "${fragment}" CONFIG_EXT3_FS
-    fi
-
-    if [[ "${preempt}" -eq 1 ]]; then
-	enable_config "${fragment}" CONFIG_PREEMPT
     fi
 }
 
