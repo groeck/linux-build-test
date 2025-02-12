@@ -65,7 +65,7 @@ runkernel()
     local mach=$4
     local rootfs=$5
     local drive
-    local waitlist=("machine restart" "Restarting" "Boot successful" "Rebooting")
+    local waitlist=("machine restart" "Boot successful" "Rebooting")
     local pbuild="${ARCH}:${mach}:${cpu}:${defconfig}:${fixup}"
     local build="${mach}:${cpu}:${fixup}"
     local config="${defconfig}:${fixup//smp*/smp}"
@@ -249,10 +249,49 @@ runkernel defconfig preempt:smp6:net=i82550:mem512:ata:fstest=minix KnightsMill 
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-if [[ ${runall} -ne 0 ]]; then
-    # Repeat the same tests with CONFIG_PREEMPT_RT enabled
-    # As of v6.14-rc2, experiences "sleeping function called" backtrace
-    # from networking code.
+if [[ ${linux_version_code} -ge $(kernel_version 6 14) ]]; then
+    # Repeat tests with CONFIG_PREEMPT_RT enabled.
+    # Only try with the latest kernel to avoid reporting RT related issues
+    # in older releases.
+    runkernel defconfig rt:smp2:tpm-crb:net=usb-ohci:efi:mem1G:scsi[53C810] Westmere-IBRS q35 rootfs.iso
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:net=virtio-net:mem512:scsi[AM53C974] Nehalem q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:tpm-crb:net=tulip:mem256:scsi[DC395] EPYC-Milan q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:net=e1000:mem256:ata:fstest=xfs Broadwell-noTSX q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:net=e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp4:net=ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp8:net=ne2k_pci:mem1G:usb-hub SandyBridge q35 "rootfs.f2fs"
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:tpm-tis:net=pcnet:mem2G:usb-uas Haswell q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp:pci-bridge:net=usb-uhci:mem4G:scsi[FUSION] EPYC pc rootfs.btrfs
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp2:net=i82559a:mem4G:virtio-pci core2duo q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp2:net=e1000-82545em:efi:mem8G:scsi[MEGASAS] EPYC-IBPB q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig rt:smp4:net=i82559c:efi32:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+    runkernel defconfig "rt:smp4:net=${netdev}:mem2G:scsi[53C895A]" EPYC-Rome q35 rootfs-x86.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel defconfig rt:smp4:net=ne2k_pci:efi:mem2G:virtio Icelake-Server q35 rootfs.iso
     retcode=$((retcode + $?))
     checkstate ${retcode}
