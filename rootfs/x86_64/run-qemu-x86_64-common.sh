@@ -117,7 +117,7 @@ build_reference "${PREFIX}gcc" "${QEMU}"
 __runkernel_common()
 {
     local prefix="$1"
-    local retcode
+    local retcode=0
 
     # exfat is not supported in v5.4 and older
     if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
