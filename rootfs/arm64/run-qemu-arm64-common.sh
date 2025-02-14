@@ -157,12 +157,17 @@ __runkernel_common()
     local exfat=""
     local minix=":fstest=minix"
     local i82557a="i82557a"
+    local i82557b="i82557b"
+    local tpm=":tpm-tis-device"
 
-    # Some tests are known to fail in big endian mode
+    # Some tests are known to fail in big endian mode.
+    # Skip or replace.
     if [[ "${prefix}" == *be* ]]; then
 	efi=""
 	minix=""
-        i82557a="i82557b"
+	tpm=""
+	i82557a="i82558a"
+	i82557b="i82558b"
     fi
 
     # exfat is not supported in v5.4 and older
@@ -174,7 +179,7 @@ __runkernel_common()
 
     runkernel virt defconfig ${prefix}smp:net=e1000:mem512 rootfs.cpio
     retcode=$?
-    runkernel virt defconfig ${prefix}smp2:tpm-tis-device:net=e1000e:${efi}mem512:usb-xhci rootfs.ext2
+    runkernel virt defconfig ${prefix}smp2:${tpm}net=e1000e:${efi}mem512:usb-xhci rootfs.ext2
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=i82801:mem512:usb-ehci" rootfs.ext2
     retcode=$((retcode + $?))
@@ -194,7 +199,7 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp6:net=${i82557a}:mem512:scsi[DC395]" "rootfs.f2fs"
     retcode=$((retcode + $?))
-    runkernel virt defconfig "${prefix}smp8:net=i82557b:${efi}mem512:scsi[AM53C974]" rootfs.btrfs
+    runkernel virt defconfig "${prefix}smp8:net=${i82557b}:${efi}mem512:scsi[AM53C974]" rootfs.btrfs
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=i82558b:mem512:scsi[MEGASAS]:fstest=hfs" rootfs.ext2
     retcode=$((retcode + $?))
@@ -272,9 +277,9 @@ __runkernel_common()
     runkernel raspi3b defconfig ${prefix}smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((retcode + $?))
     if [[ "${prefix}" != *be* ]]; then
-        # possible endianness problem in mmc driver
-        runkernel raspi3b defconfig ${prefix}smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
-        retcode=$((retcode + $?))
+	# possible endianness problem in mmc driver
+	runkernel raspi3b defconfig ${prefix}smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+	retcode=$((retcode + $?))
     fi
 
     if [[ ${runall} -ne 0 ]]; then
