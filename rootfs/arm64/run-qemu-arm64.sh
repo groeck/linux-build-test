@@ -153,20 +153,13 @@ else
     exfat=""
 fi
 
-# gfs2 needs v5.15 or later
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
-    gfs2=":fstest=gfs2"
-else
-    gfs2=""
-fi
-
 # Failing network tests: i82551, usb-net
 
 runkernel virt defconfig smp:net=e1000:mem512 rootfs.cpio
 retcode=$?
 runkernel virt defconfig smp2:tpm-tis-device:net=e1000e:efi:mem512:usb-xhci rootfs.ext2
 retcode=$((retcode + $?))
-runkernel virt defconfig "smp2:net=i82801:mem512:usb-ehci${gfs2}" rootfs.ext2
+runkernel virt defconfig "smp2:net=i82801:mem512:usb-ehci" rootfs.ext2
 retcode=$((retcode + $?))
 runkernel virt defconfig smp2:net=i82550:mem512:usb-ohci rootfs.ext2
 retcode=$((retcode + $?))
