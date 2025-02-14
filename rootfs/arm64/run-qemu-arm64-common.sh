@@ -153,19 +153,28 @@ __runkernel_common()
 {
     local prefix="$1"
     local retcode=0
+    local efi="efi:"
+    local exfat=""
+    local minix=":fstest=minix"
+    local i82557a="i82557a"
+
+    # Some tests are known to fail in big endian mode
+    if [[ "${prefix}" == *be* ]]; then
+	efi=""
+	minix=""
+        i82557a="i82557b"
+    fi
 
     # exfat is not supported in v5.4 and older
     if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-        exfat=":fstest=exfat"
-    else
-        exfat=""
+	exfat=":fstest=exfat"
     fi
-    
+
     # Failing network tests: i82551, usb-net
-    
+
     runkernel virt defconfig ${prefix}smp:net=e1000:mem512 rootfs.cpio
     retcode=$?
-    runkernel virt defconfig ${prefix}smp2:tpm-tis-device:net=e1000e:efi:mem512:usb-xhci rootfs.ext2
+    runkernel virt defconfig ${prefix}smp2:tpm-tis-device:net=e1000e:${efi}mem512:usb-xhci rootfs.ext2
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=i82801:mem512:usb-ehci" rootfs.ext2
     retcode=$((retcode + $?))
@@ -173,19 +182,19 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel virt defconfig ${prefix}smp4:net=ne2k_pci:mem512:usb-uas-xhci rootfs.btrfs
     retcode=$((retcode + $?))
-    runkernel virt defconfig ${prefix}smp6:net=pcnet:mem512:virtio:fstest=minix rootfs.ext2
+    runkernel virt defconfig "${prefix}smp6:net=pcnet:mem512:virtio${minix}" rootfs.ext2
     retcode=$((retcode + $?))
     runkernel virt defconfig ${prefix}smp8:net=rtl8139:mem512:virtio-pci rootfs.ext2
     retcode=$((retcode + $?))
-    runkernel virt defconfig ${prefix}smp:net=tulip:efi:mem512:virtio-blk rootfs.ext2
+    runkernel virt defconfig ${prefix}smp:net=tulip:${efi}mem512:virtio-blk rootfs.ext2
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=virtio-net:mem512:nvme${exfat}" rootfs.btrfs
     retcode=$((retcode + $?))
     runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:sdhci-mmc "rootfs.erofs"
     retcode=$((retcode + $?))
-    runkernel virt defconfig "${prefix}smp6:net=i82557a:mem512:scsi[DC395]" "rootfs.f2fs"
+    runkernel virt defconfig "${prefix}smp6:net=${i82557a}:mem512:scsi[DC395]" "rootfs.f2fs"
     retcode=$((retcode + $?))
-    runkernel virt defconfig "${prefix}smp8:net=i82557b:efi:mem512:scsi[AM53C974]" rootfs.btrfs
+    runkernel virt defconfig "${prefix}smp8:net=i82557b:${efi}mem512:scsi[AM53C974]" rootfs.btrfs
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=i82558b:mem512:scsi[MEGASAS]:fstest=hfs" rootfs.ext2
     retcode=$((retcode + $?))
@@ -199,105 +208,110 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel virt defconfig "${prefix}smp2:net=usb-ohci:mem512:scsi[virtio]" rootfs.ext2
     retcode=$((retcode + $?))
-    
+
     # file system tests
     if [[ ${runall} -ne 0 ]]; then
-        # Run all file system tests, even those known to fail
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.btrfs"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.erofs"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.f2fs"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=exfat "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=gfs2 "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=hfs "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=hfs+ "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=jfs "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=minix "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=nilfs2 "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=xfs "rootfs.ext2"
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=bcachefs "rootfs.ext2"
-        retcode=$((retcode + $?))
+	# Run all file system tests, even those known to fail
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.btrfs"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.erofs"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme "rootfs.f2fs"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=exfat "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=gfs2 "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=hfs "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=hfs+ "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=jfs "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=minix "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=nilfs2 "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=xfs "rootfs.ext2"
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}smp4:net=e1000:mem512:nvme:fstest=bcachefs "rootfs.ext2"
+	retcode=$((retcode + $?))
     fi
-    
-    runkernel xlnx-versal-virt defconfig ${prefix}smp:net=default:mem512 rootfs.cpio
-    retcode=$((retcode + $?))
-    runkernel xlnx-versal-virt defconfig "${prefix}smp4:net=default:mem512:virtio-blk" rootfs.ext2
-    retcode=$((retcode + $?))
-    runkernel xlnx-versal-virt defconfig "${prefix}smp4:net=default:mem512:sd0,b300" rootfs.ext2
-    retcode=$((retcode + $?))
-    
+
+    if [[ "${prefix}" != *be* ]]; then
+	runkernel xlnx-versal-virt defconfig ${prefix}smp:net=default:mem512 rootfs.cpio
+	retcode=$((retcode + $?))
+	runkernel xlnx-versal-virt defconfig "${prefix}smp4:net=default:mem512:virtio-blk" rootfs.ext2
+	retcode=$((retcode + $?))
+	runkernel xlnx-versal-virt defconfig "${prefix}smp4:net=default:mem512:sd0,b300" rootfs.ext2
+	retcode=$((retcode + $?))
+    fi
+
     runkernel "xlnx-zcu102" defconfig ${prefix}smp:mem2G rootfs.cpio xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
     runkernel "xlnx-zcu102" defconfig ${prefix}smp:mem2G:sd rootfs.ext2 xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
     runkernel "xlnx-zcu102" defconfig ${prefix}smp:mem2G:sata rootfs.ext2 xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
-    
+
     if [[ ${linux_version_code} -lt $(kernel_version 5 6) ]] || [[ ${runall} -ne 0 ]]; then
-        # Since Linux v5.6, the entire clock tree for zynqmp depends on firmware
-        # support (which is not available in qemu). See Linux kernel upstream
-        # commit 9c8a47b484ed ("arm64: dts: xilinx: Add the clock nodes for
-        # zynqmp") for details. Without clocks, loading various io drivers
-        # including the serial port driver stalls, and it becomes all but
-        # impossible to use the emulation on any kernel later than v5.5.
-        runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
-        retcode=$((retcode + $?))
-        runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
-        retcode=$((retcode + $?))
-        runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sata rootfs.btrfs xilinx/zynqmp-zcu102-rev1.0.dtb
-        retcode=$((retcode + $?))
+	# Since Linux v5.6, the entire clock tree for zynqmp depends on firmware
+	# support (which is not available in qemu). See Linux kernel upstream
+	# commit 9c8a47b484ed ("arm64: dts: xilinx: Add the clock nodes for
+	# zynqmp") for details. Without clocks, loading various io drivers
+	# including the serial port driver stalls, and it becomes all but
+	# impossible to use the emulation on any kernel later than v5.5.
+	runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
+	retcode=$((retcode + $?))
+	runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
+	retcode=$((retcode + $?))
+	runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sata rootfs.btrfs xilinx/zynqmp-zcu102-rev1.0.dtb
+	retcode=$((retcode + $?))
     fi
-    
+
     runkernel raspi3b defconfig ${prefix}smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
     retcode=$((retcode + $?))
-    runkernel raspi3b defconfig ${prefix}smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
-    retcode=$((retcode + $?))
-    
-    if [[ ${runall} -ne 0 ]]; then
-        # Crashes (qemu 9.1 and mainline as of 10/12/24) due to missing interrupt
-        # controller support, missing i2c controller support, and missing clock
-        # controller support (gave up here).
-        runkernel raspi4b defconfig ${prefix}smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
-        retcode=$((retcode + $?))
-        runkernel raspi4b defconfig ${prefix}smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
+    if [[ "${prefix}" != *be* ]]; then
+        # possible endianness problem in mmc driver
+        runkernel raspi3b defconfig ${prefix}smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
         retcode=$((retcode + $?))
     fi
-    
+
     if [[ ${runall} -ne 0 ]]; then
-        # The following all fail to boot. Something seems to be missing/bad in the configuration.
-        runkernel raspi3b defconfig ${prefix}pagesize16:smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
-        retcode=$((retcode + $?))
-        runkernel raspi3b defconfig ${prefix}pagesize16:smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
-        retcode=$((retcode + $?))
-        runkernel raspi3b defconfig ${prefix}pagesize16:smp4:mem1G:sd rootfs.btrfs broadcom/bcm2837-rpi-3-b.dtb
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize16:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize16:smp6:net=pcnet:mem1024:virtio:fstest=minix rootfs.ext2
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize16:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize16:smp:net=tulip:efi:mem1024:virtio-blk rootfs.f2fs
-        retcode=$((retcode + $?))
-    
-        runkernel virt defconfig ${prefix}pagesize64:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize64:smp6:net=pcnet:mem1024:virtio:fstest=minix rootfs.ext2
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize64:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
-        retcode=$((retcode + $?))
-        runkernel virt defconfig ${prefix}pagesize64:smp:net=tulip:efi:mem1024:virtio-blk rootfs.f2fs
-        retcode=$((retcode + $?))
+	# Crashes (qemu 9.1 and mainline as of 10/12/24) due to missing interrupt
+	# controller support, missing i2c controller support, and missing clock
+	# controller support (gave up here).
+	runkernel raspi4b defconfig ${prefix}smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
+	retcode=$((retcode + $?))
+	runkernel raspi4b defconfig ${prefix}smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
+	retcode=$((retcode + $?))
+    fi
+
+    if [[ ${runall} -ne 0 ]]; then
+	# The following all fail to boot. Something seems to be missing/bad in the configuration.
+	runkernel raspi3b defconfig ${prefix}pagesize16:smp:mem1G rootfs.cpio broadcom/bcm2837-rpi-3-b.dtb
+	retcode=$((retcode + $?))
+	runkernel raspi3b defconfig ${prefix}pagesize16:smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+	retcode=$((retcode + $?))
+	runkernel raspi3b defconfig ${prefix}pagesize16:smp4:mem1G:sd rootfs.btrfs broadcom/bcm2837-rpi-3-b.dtb
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize16:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize16:smp6:net=pcnet:mem1024:virtio${minix} rootfs.ext2
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize16:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize16:smp:net=tulip:${efi}mem1024:virtio-blk rootfs.f2fs
+	retcode=$((retcode + $?))
+
+	runkernel virt defconfig ${prefix}pagesize64:smp4:net=ne2k_pci:mem1024:usb-uas-xhci rootfs.btrfs
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize64:smp6:net=pcnet:mem1024:virtio${minix} rootfs.ext2
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize64:smp8:net=rtl8139:mem1024:virtio-pci:fstest=hfs rootfs.erofs
+	retcode=$((retcode + $?))
+	runkernel virt defconfig ${prefix}pagesize64:smp:net=tulip:${efi}mem1024:virtio-blk rootfs.f2fs
+	retcode=$((retcode + $?))
     fi
 
     return ${retcode}
