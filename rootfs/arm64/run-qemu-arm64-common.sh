@@ -54,6 +54,9 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
+	be)
+	    enable_config "${defconfig}" CONFIG_CPU_BIG_ENDIAN
+	    ;;
 	pagesize*)
 	    enable_config "${defconfig}" "CONFIG_ARM64_${fixup##pagesize}K_PAGES"
 	    ;;
