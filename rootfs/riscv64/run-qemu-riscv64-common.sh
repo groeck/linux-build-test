@@ -60,7 +60,7 @@ runkernel()
     local defconfig=$3
     local fixup=$4
     local rootfs=$5
-    local waitlist=("Power down" "Boot successful" "Requesting system poweroff")
+    local waitlist=("Poweroff" "Boot successful" "Requesting system poweroff")
     local build="${ARCH}:${mach}${cpu:+:${cpu}}:${defconfig}${fixup:+:${fixup}}"
 
     if [[ "${rootfs}" == *cpio ]]; then
