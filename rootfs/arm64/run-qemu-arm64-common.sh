@@ -158,7 +158,7 @@ __runkernel_common()
     local minix=":fstest=minix"
     local i82557a="i82557a"
     local i82557b="i82557b"
-    local tpm=":tpm-tis-device"
+    local tpm="tpm-tis-device:"
 
     # Some tests are known to fail in big endian mode.
     # Skip or replace.
