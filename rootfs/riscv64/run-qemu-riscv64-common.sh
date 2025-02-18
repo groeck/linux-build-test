@@ -114,6 +114,10 @@ runkernel()
 	;;
     esac
 
+    if [[ "${wait}" == "manual" ]]; then
+	waitlist=("Power down" "Boot successful" "Requesting system poweroff")
+    fi
+
     execute "${wait}" waitlist[@] \
       ${QEMU} -M "${mach}" ${cpu:+-cpu ${cpu}} -m "${memsize}" -no-reboot \
 	-kernel "${KERNEL}" \
