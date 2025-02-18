@@ -538,9 +538,6 @@
   </tr>
 </table>
 
-{% set imports = [ "master-updates", "stable-updates",
-		] -%}
-
 <br>
 <h1>Source verification</h1>
 
@@ -565,36 +562,6 @@
   </td>
   </tr>
 {% endfor -%}
-</table>
-
-<br>
-<h1> Imports </h1>
-
-<table>
-<tr>
-{% for b in builders if b.name in imports -%}
-  <td>
-  <table>
-  <tr>
-  {% if b.build_css_class -%}
-    <td class="LastBuild box {{ b.build_css_class }}">
-          <a href="{{ b.build_url }}">{{ b.build_label }}</a>
-	  <br/>{{b.name}}
-          <br/> {{ b.build_text|replace('build successful', 'successful') }}
-    </td>
-  {% else -%}
-    <td class="LastBuild box skipped">{{b.name}} <br/> no build</td>
-  {% endif -%}
-  </tr>
-  <tr>
-          {{ box(**b.current_box) }}
-  </tr>
-  </table>
-  </td>
-{% else -%}
-  <td class="LastBuild box skipped">no build</td>
-{% endfor -%}
-</tr>
 </table>
 
 <br>
