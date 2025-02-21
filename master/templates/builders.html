@@ -35,7 +35,9 @@
 			"hwmon", "hwmon-next",
 			"watchdog-next", "testing" ] -%}
 
-{% set hwmon_releases = [ "master", "hwmon", "hwmon-next",
+{% set upstream_releases = [ "master" ] -%}
+
+{% set hwmon_releases = [ "hwmon", "hwmon-next",
 			"watchdog-next", "testing" ] -%}
 
 {% set exists = [] -%}
@@ -59,7 +61,9 @@
   {% set rel_var = rel|regex_replace('[-.]','_') -%}
   var buildText_{{rel_var}} = [
   {% for arch in arches -%}
-    {% if rel in hwmon_releases -%}
+    {% if rel in upstream_releases -%}
+	{% set bname = "upstream-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
@@ -86,7 +90,9 @@
 
   var buildFailures_{{rel_var}} = [
   {% for arch in arches -%}
-    {% if rel in hwmon_releases -%}
+    {% if rel in upstream_releases -%}
+	{% set bname = "upstream-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
@@ -350,7 +356,9 @@
   <tr>
   <td class="box"><b>{{ arch }}</b></a></td>
   {% for rel in releases -%}
-    {% if rel in hwmon_releases -%}
+    {% if rel in upstream_releases -%}
+	{% set bname = "upstream-" ~ arch ~ "-" ~ rel -%}
+    {% elif rel in hwmon_releases -%}
 	{% set bname = "hwmon-" ~ arch ~ "-" ~ rel -%}
     {% elif rel in [ "mmotm" ] -%}
 	{% set bname = "mmotm-" ~ arch ~ "-" ~ rel -%}
