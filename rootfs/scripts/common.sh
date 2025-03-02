@@ -1660,6 +1660,12 @@ __setup_fragment()
 	    enable_config "${fragment}" CONFIG_CRC16_KUNIT_TEST
 	fi
 
+	# New in v6.14
+	# Fails with -EINVAL
+	# enable_config "${fragment}" CONFIG_FW_CS_DSP_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CRC_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_INT_SQRT_KUNIT_TEST
+
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_USERCOPY_KUNIT_TEST
