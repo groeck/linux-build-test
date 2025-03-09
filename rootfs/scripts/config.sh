@@ -9,7 +9,7 @@ QEMU_V91_BIN=${QEMU_INSTALL}/v9.1/bin
 QEMU_V92_BIN=${QEMU_INSTALL}/v9.2/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
-QEMU_BIN=${QEMU_V91_BIN}
+QEMU_BIN=${QEMU_V92_BIN}
 
 # default compiler
 DEFAULT_CC9="gcc-9.5.0-2.37-nolibc"
