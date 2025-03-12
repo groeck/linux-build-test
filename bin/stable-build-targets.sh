@@ -5,6 +5,7 @@ cmd_arcv2=(defconfig allnoconfig tinyconfig axs103_defconfig \
 cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	omap2plus_defconfig imx_v6_v7_defconfig ep93xx_defconfig \
 	ixp4xx_defconfig u8500_defconfig multi_v5_defconfig omap1_defconfig \
+	multi_v7_lpae_defconfig \
 	footbridge_defconfig davinci_all_defconfig \
 	axm55xx_defconfig mxs_defconfig keystone_defconfig imxrt_defconfig \
 	vexpress_defconfig imx_v4_v5_defconfig at91_dt_defconfig \
