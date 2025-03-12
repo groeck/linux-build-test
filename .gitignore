@@ -20,12 +20,14 @@ slave/master*
 slave/mmotm*
 slave/next*
 slave/testing
+slave/upstream-master
 master/qemu*
 master/twistd*.log*
 master/hwmon*
-master/mmotm*
+master/main-workdir
 master/watchdog*
 master/stable*
+master/upstream*
 master/next*
 master/master*
 master/testing
