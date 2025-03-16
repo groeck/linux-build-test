@@ -10,6 +10,7 @@ machine=$1
 option=$2
 config=$3
 
+QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -51,6 +52,20 @@ patch_defconfig()
 
     # For TPM testing
     enable_config "${defconfig}" CONFIG_TCG_TPM CONFIG_TCG_TIS
+
+    # Needed for Nuvoton boards
+    enable_config "${defconfig}" CONFIG_COMMON_CLK_NPCM8XX
+    enable_config "${defconfig}" CONFIG_PINCTRL_NPCM8XX
+    enable_config "${defconfig}" CONFIG_I2C_NPCM
+    enable_config "${defconfig}" CONFIG_SPI_NPCM_FIU
+    enable_config "${defconfig}" CONFIG_SPI_NPCM_PSPI
+    enable_config "${defconfig}" CONFIG_MMC_SDHCI_NPCM
+    enable_config "${defconfig}" CONFIG_GPIO_NPCM_SGPIO
+
+    enable_config "${defconfig}" CONFIG_CLK_RASPBERRYPI
+    enable_config "${defconfig}" CONFIG_ARM_RASPBERRYPI_CPUFREQ
+
+    enable_config "${defconfig}" CONFIG_DYNAMIC_DEBUG
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -118,12 +133,19 @@ runkernel()
 	extra_params+=" -cpu cortex-a57"
 	waitflag="manual"
 	;;
+    "npcm845-evb")
+	QEMU="${QEMU_MASTER}"
+	initcli+=" console=ttyS0,115200"
+	initcli+=" earlycon=uart8250,mmio32,0xf0000000,115200n8"
+	waitflag="manual"
+	;;
     "raspi3b")
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
 	;;
     "raspi4b")
+	QEMU="${QEMU_MASTER}"
 	initcli+=" earlycon console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
@@ -271,6 +293,16 @@ __runkernel_common()
 	runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
 	retcode=$((retcode + $?))
 	runkernel xlnx-zcu102 defconfig ${prefix}smp:mem2G:sata rootfs.btrfs xilinx/zynqmp-zcu102-rev1.0.dtb
+	retcode=$((retcode + $?))
+    fi
+
+    if [[ ${runall} -ne 0 ]]; then
+	# hangs in boot
+	#    platform f000901c.watchdog: deferred probe pending: (reason unknown)
+	#    platform f0000000.serial: deferred probe pending: of_serial: failed to get clock
+	runkernel npcm845-evb defconfig ${prefix}smp:mem1G rootfs.cpio nuvoton/nuvoton-npcm845-evb.dtb
+	retcode=$((retcode + $?))
+	runkernel npcm845-evb defconfig ${prefix}smp:mtd32:mem1G rootfs.ext2 nuvoton/nuvoton-npcm845-evb.dtb
 	retcode=$((retcode + $?))
     fi
 
