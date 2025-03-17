@@ -50,6 +50,7 @@ patch_defconfig()
     echo "CONFIG_DEVTMPFS=y" >> ${defconfig}
     echo "CONFIG_DEVTMPFS_MOUNT=y" >> ${defconfig}
     echo "CONFIG_BLK_DEV_INITRD=y" >> ${defconfig}
+    echo "CONFIG_DYNAMIC_DEBUG=y" >> ${defconfig}
 
     echo "CONFIG_CRAMFS=y" >> ${defconfig}
 
