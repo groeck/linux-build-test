@@ -67,6 +67,11 @@ __set_qemu_builddir_static()
     __set_qemu_builddir "${__qemu_builddir_static}"
 }
 
+__set_qemu_builddir_named()
+{
+    __set_qemu_builddir "$1"
+}
+
 __cleanup()
 {
     rv=$?
@@ -218,7 +223,7 @@ parse_args()
 
 	__set_qemu_builddir_default
 
-	while getopts abBde:KlLnNqr:tTWx opt; do
+	while getopts abBde:KlLnNo:O:qr:tTWx opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
@@ -230,6 +235,8 @@ parse_args()
 	L)	__log_all=1;;
 	n)	__set_qemu_builddir_static; nobuild=1;;
 	N)	__set_qemu_builddir_static;;
+	o)	__set_qemu_builddir_named "${OPTARG}"; nobuild=1;;
+	O)	__set_qemu_builddir_named "${OPTARG}";;
 	q)	__quick=1;;
 	r)	__retries=${OPTARG}
 		if [[ -z "${__retries}" || -n ${__retries//[0-9]/} ]]; then
