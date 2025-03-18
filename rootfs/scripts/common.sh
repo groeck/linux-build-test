@@ -206,24 +206,22 @@ checkstate()
 # The caller has to execute "shift $((OPTIND - 1).
 parse_args()
 {
-	nobuild=0
-	bugverbose=0
-	nobugverbose=0
-	nokallsyms=0
-	dodebug=0
-	runall=0
-	__testbuild=0
-	__log_abort=0
-	__log_always=0
-	__log_all=0
-	___testbuild=0
-	__quick=0
-	__print_runtime=0
-	extracli=""
+    nobuild=0
+    bugverbose=0
+    nobugverbose=0
+    nokallsyms=0
+    dodebug=0
+    runall=0
+    __testbuild=0
+    __log_abort=0
+    __log_always=0
+    __log_all=0
+    ___testbuild=0
+    __quick=0
+    __print_runtime=0
+    extracli=""
 
-	__set_qemu_builddir_default
-
-	while getopts abBde:KlLnNo:O:qr:tTWx opt; do
+    while getopts abBde:KlLnNo:O:qr:tTWx opt; do
 	case ${opt} in
 	a)	runall="$((runall + 1))";;
 	b)	bugverbose=1;;
@@ -250,7 +248,11 @@ parse_args()
 	x)	__print_runtime=1;;
 	*)	echo "Bad option ${opt}"; exit 1;;
 	esac
-	done
+    done
+
+    if [[ -z "${qemu_builddir}" ]]; then
+	__set_qemu_builddir_default
+    fi
 }
 
 pcibus_set_root()
@@ -2100,10 +2102,6 @@ dosetup()
     __cached_reason=""
 
     doclean ${ARCH}
-
-    if [[ -z "${qemu_builddir}" ]]; then
-	__set_qemu_builddir_default
-    fi
 
     mkdir -p "${qemu_builddir}"
 
