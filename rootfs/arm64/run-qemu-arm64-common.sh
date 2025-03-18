@@ -10,7 +10,7 @@ machine=$1
 option=$2
 config=$3
 
-QEMU_MASTER=${QEMU:-${QEMU_MASTER_BIN}/qemu-system-aarch64}
+QEMU_V100=${QEMU:-${QEMU_V100_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -134,7 +134,7 @@ runkernel()
 	waitflag="manual"
 	;;
     "npcm845-evb")
-	QEMU="${QEMU_MASTER}"
+	QEMU="${QEMU_V100}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0000000,115200n8"
 	waitflag="manual"
@@ -145,7 +145,7 @@ runkernel()
 	waitflag="manual"
 	;;
     "raspi4b")
-	QEMU="${QEMU_MASTER}"
+	QEMU="${QEMU_V100}"
 	initcli+=" earlycon console=ttyS1,115200"
 	extra_params+=" -serial null"
 	waitflag="manual"
