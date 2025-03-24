@@ -62,8 +62,13 @@ patch_defconfig()
     enable_config "${defconfig}" CONFIG_MMC_SDHCI_NPCM
     enable_config "${defconfig}" CONFIG_GPIO_NPCM_SGPIO
 
+    # Raspberry
     enable_config "${defconfig}" CONFIG_CLK_RASPBERRYPI
     enable_config "${defconfig}" CONFIG_ARM_RASPBERRYPI_CPUFREQ
+
+    # i.MX 8
+    enable_config "${defconfig}" CONFIG_SPI_IMX
+    enable_config "${defconfig}" CONFIG_DWMAC_IMX8
 
     enable_config "${defconfig}" CONFIG_DYNAMIC_DEBUG
 
@@ -90,6 +95,7 @@ runkernel()
     local dtb=$5
     local waitlist=("Restarting system" "Boot successful" "Rebooting")
     local build="${mach}:${defconfig}:${fixup}"
+    local waitflag="manual"
 
     if [[ "${rootfs}" == *cpio ]]; then
 	build+=":initrd"
@@ -123,32 +129,33 @@ runkernel()
     fi
 
     case ${mach} in
+    "imx8mp-evk")
+	QEMU="${QEMU_V100}"
+	initcli+=" console=ttymxc1 earlycon"
+	extra_params+=" -serial null"
+	waitflag="automatic"
+	;;
     "virt")
 	initcli+=" earlycon=pl011,0x9000000 console=ttyAMA0"
 	extra_params+=" -cpu cortex-a57"
-	waitflag="manual"
 	;;
     "xlnx-versal-virt")
 	initcli+=" earlycon=pl011,0xff000000 console=ttyAMA0"
 	extra_params+=" -cpu cortex-a57"
-	waitflag="manual"
 	;;
     "npcm845-evb")
 	QEMU="${QEMU_V100}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0000000,115200n8"
-	waitflag="manual"
 	;;
     "raspi3b")
 	initcli+=" earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200"
 	extra_params+=" -serial null"
-	waitflag="manual"
 	;;
     "raspi4b")
 	QEMU="${QEMU_V100}"
 	initcli+=" earlycon console=ttyS1,115200"
 	extra_params+=" -serial null"
-	waitflag="manual"
 	;;
     "xlnx-zcu102")
 	initcli+=" earlycon=cdns,mmio,0xFF000000,115200n8 console=ttyPS0"
@@ -311,6 +318,14 @@ __runkernel_common()
     if [[ "${prefix}" != *be* ]]; then
 	# possible endianness problem in mmc driver
 	runkernel raspi3b defconfig ${prefix}smp4:mem1G:sd rootfs.ext2 broadcom/bcm2837-rpi-3-b.dtb
+	retcode=$((retcode + $?))
+    fi
+
+    if [[ ${runall} -ne 0 ]]; then
+	# Needs modified devicetree file (see local qemu 10.0 hacks)
+	# and more testing before release. Should support SHDCI, USB,
+	# and PCI interfaces.
+	runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G rootfs.cpio freescale/imx8mp-evk.dtb
 	retcode=$((retcode + $?))
     fi
 
