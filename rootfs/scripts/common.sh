@@ -699,6 +699,7 @@ __common_mmccmd()
     local rootdev="/dev/mmcblk0"
     local fsize="$(stat --format="%s" "${rootfs}")"
     local bits="$(__bits_set ${fsize})"
+    local bus
 
     if [[ "${bits}" -ne 1 && "${__run_fstest}" -ne 1 ]]; then
 	# ssd/mmc drive size must be an exponent of 2
@@ -750,6 +751,11 @@ __common_mmccmd()
 	;;
     sd[0-9])	# sd drive at index [0-9]
 	extra_params+=" -drive file=${rootfs},format=raw,if=sd,index=${fixup#sd}"
+	;;
+    sdb[0-9])	# sd drive at bus [0-9]
+	bus="${fixup#sdb}"
+	extra_params+=" -drive file=${rootfs},format=raw,if=sd,bus=${bus}"
+	rootdev="/dev/mmcblk${bus}"
 	;;
     sd,*|sd[0-9],*)	# sd with or without index, followed by root device name
 	local device="${fixup%,*}"
