@@ -321,12 +321,22 @@ __runkernel_common()
 	retcode=$((retcode + $?))
     fi
 
+    # imx8mp-evk should support SHDCI, USB, and PCI interfaces.
+    runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:net=default rootfs.cpio freescale/imx8mp-evk.dtb
+    retcode=$((retcode + $?))
+    runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:sdb2:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+    retcode=$((retcode + $?))
     if [[ ${runall} -ne 0 ]]; then
-	# Needs modified devicetree file (see local qemu 10.0 hacks)
-	# and more testing before release. Should support SHDCI, USB,
-	# and PCI interfaces.
-	runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G rootfs.cpio freescale/imx8mp-evk.dtb
-	retcode=$((retcode + $?))
+        # USB device does not instantiate
+        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+        retcode=$((retcode + $?))
+        # PCI interface access attempts result in hung task hang during boot
+        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+        retcode=$((retcode + $?))
+        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
+        retcode=$((retcode + $?))
+        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:scsi[53C810]:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+        retcode=$((retcode + $?))
     fi
 
     if [[ ${runall} -ne 0 ]]; then
