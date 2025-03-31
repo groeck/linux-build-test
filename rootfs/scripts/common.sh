@@ -1501,8 +1501,11 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SECURITY
 	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR
 	enable_config "${fragment}" CONFIG_SECURITY_APPARMOR_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
-	enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
+	if [[ "${runall}" -ge 1 ]]; then
+	    # Now triggers warning tracebacks.
+	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK
+	    enable_config "${fragment}" CONFIG_SECURITY_LANDLOCK_KUNIT_TEST
+	fi
 	enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM
 	enable_config "${fragment}" CONFIG_SECURITY_LOCKDOWN_LSM_EARLY
 	enable_config "${fragment}" CONFIG_SECURITY_YAMA
