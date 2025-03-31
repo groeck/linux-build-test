@@ -155,77 +155,112 @@ if [[ ${runall} -ne 0 ]]; then
     # Run all file system tests, even those known to fail
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs fstest:ps4:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.erofs fstest:ps4:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.f2fs fstest:ps4:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.btrfs fstest:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.erofs fstest:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.f2fs fstest:r1:smp:ide:net=e1000
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=exfat
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=gfs2
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=hfs
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=hfs+
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=jfs
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=minix
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=nilfs2
     retcode=$((retcode + $?))
+    checkstate ${retcode}
     runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 fstest:r1:smp:ide:net=e1000:fstest=xfs
     retcode=$((retcode + $?))
+    checkstate ${retcode}
 fi
 
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:nosmp:ide:net=e1000
 retcode=$?
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.cpio r1:smp:net=pcnet
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.squashfs r1:smp:net=pcnet:flash4,1,1
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:ide:net=i82550
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:ide:net=i82558a
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-xhci:net=usb-ohci
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:usb-ehci:net=ne2k_pci
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.ext2 r1:smp:usb-uas-xhci:net=rtl8139
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:sdhci-mmc:net=i82801
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.${btrfs} r1:smp:net=pcnet:nvme
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n32.${btrfs} r1:smp:scsi[DC395]:net=virtio-net
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.ext2 r1:smp:scsi[FUSION]:net=tulip
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel malta_defconfig malta rootfs.mipsel64r1_n64.iso r1:smp:scsi[53C895A]:net=i82559er
 retcode=$((retcode + $?))
+checkstate ${retcode}
 # Image fails to boot with tests enabled
 # Network interfaces don't instantiate.
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.erofs notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n32.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.ext2 notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.erofs notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.f2fs notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.btrfs notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel 64r6el_defconfig boston rootfs.mipsel64r6_n64.iso notests:nonet:smp:ide
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 exit ${retcode}
