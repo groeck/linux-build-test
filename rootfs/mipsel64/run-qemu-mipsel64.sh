@@ -7,8 +7,9 @@ dir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-config=$1
-variant=$2
+machine=$1
+config=$2
+variant=$3
 
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-mips64el}"
 
@@ -29,6 +30,7 @@ patch_defconfig()
 
     enable_config "${defconfig}" CONFIG_F2FS_FS
     enable_config ${defconfig} CONFIG_EROFS_FS
+    enable_config ${defconfig} CONFIG_DYNAMIC_DEBUG
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
@@ -97,7 +99,7 @@ runkernel()
 	build+=":${rootfs##*.}"
     fi
 
-    if ! match_params "${config}@${defconfig}" "${variant}@${fixup}"; then
+    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${variant}@${fixup}"; then
 	echo "Skipping ${build} ... "
 	return 0
     fi
