@@ -69,6 +69,8 @@ patch_defconfig()
     # i.MX 8
     enable_config "${defconfig}" CONFIG_SPI_IMX
     enable_config "${defconfig}" CONFIG_DWMAC_IMX8
+    enable_config "${defconfig}" CONFIG_PHY_FSL_IMX8MQ_USB
+    enable_config "${defconfig}" CONFIG_INTERCONNECT_IMX8MQ
 
     enable_config "${defconfig}" CONFIG_DYNAMIC_DEBUG
 
@@ -337,6 +339,7 @@ __runkernel_common()
         # PCI interface access attempts result in hung task hang during boot
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
         retcode=$((retcode + $?))
+	# PCI devices hang in probe or error out
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
         retcode=$((retcode + $?))
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:scsi[53C810]:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
