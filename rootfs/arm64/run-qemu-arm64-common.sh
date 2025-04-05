@@ -332,14 +332,12 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:virtio:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
     retcode=$((retcode + $?))
+    runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+    retcode=$((retcode + $?))
     if [[ ${runall} -ne 0 ]]; then
-        # USB device does not instantiate. USB accesses result in hung task.
-        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
-        retcode=$((retcode + $?))
         # PCI interface access attempts result in hung task hang during boot
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
         retcode=$((retcode + $?))
-	# PCI devices hang in probe or error out
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
         retcode=$((retcode + $?))
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:scsi[53C810]:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
