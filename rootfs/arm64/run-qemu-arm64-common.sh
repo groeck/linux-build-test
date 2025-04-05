@@ -68,7 +68,10 @@ patch_defconfig()
 
     # i.MX 8
     enable_config "${defconfig}" CONFIG_SPI_IMX
+    enable_config "${defconfig}" CONFIG_STMMAC_ETH
+    enable_config "${defconfig}" CONFIG_STMMAC_PLATFORM
     enable_config "${defconfig}" CONFIG_DWMAC_IMX8
+    disable_config "${defconfig}" CONFIG_TYPEC
     enable_config "${defconfig}" CONFIG_PHY_FSL_IMX8MQ_USB
     enable_config "${defconfig}" CONFIG_INTERCONNECT_IMX8MQ
 
