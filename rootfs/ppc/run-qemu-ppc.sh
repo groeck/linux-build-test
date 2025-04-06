@@ -40,6 +40,10 @@ patch_defconfig()
     disable_config ${defconfig} CONFIG_PPC_WERROR
     enable_config ${defconfig} CONFIG_PPC_DISABLE_WERROR
 
+    # Fails to build due to missing MODULE_DESCRIPTION starting
+    # with v6.15. Not used, don't bother fixing.
+    disable_config ${defconfig} CONFIG_MAC_FLOPPY
+
     for fixup in ${fixups}; do
 	case "${fixup}" in
 	"fstest")
