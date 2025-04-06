@@ -1789,13 +1789,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_RPCSEC_GSS_KRB5_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_FIREWIRE_KUNIT_UAPI_TEST CONFIG_FIREWIRE_KUNIT_DEVICE_ATTRIBUTE_TEST
-	# starting with v6.15-rc1, CONFIG_FPGA_KUNIT_TESTS no longer build
-	# due to missing MODULE_DESCRIPTION which is now mandatory.
-	if [[ ${linux_version_code} -ge $(kernel_version 6 14) ]]; then
-	    disable_config "${fragment}" CONFIG_FPGA_KUNIT_TESTS
-	else
-	    enable_config "${fragment}" CONFIG_FPGA_KUNIT_TESTS
-	fi
+	enable_config "${fragment}" CONFIG_FPGA_KUNIT_TESTS
 
 	if ( ! is_enabled CONFIG_ARM && ! is_enabled CONFIG_ARM64 && \
 		! is_enabled CONFIG_LOONGARCH && ! is_enabled CONFIG_PPC64 ) \
