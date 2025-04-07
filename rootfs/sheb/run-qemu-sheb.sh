@@ -14,6 +14,7 @@ ARCH=sh
 DISPARCH=sheb
 
 skip_614="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:ext2"
+skip_615="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:ext2"
 
 PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
 
