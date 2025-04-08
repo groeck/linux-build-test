@@ -276,6 +276,13 @@ runkernel imx_v6_v7_defconfig mcimx7d-sabre "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
+# A second Ethernet interface can be enabled with something like
+#	-netdev user,id=net0 -netdev hubport,hubid=0,id=h1,netdev=net0 \
+#	-netdev hubport,hubid=0,id=h2 -net nic,netdev=h2 \
+#	-netdev hubport,hubid=0,id=h3 -device virtio-net-pci,netdev=h3
+# added to the command line.
+# Note that the virtual PCIe device is only instantiated in qemu v10.0.
+
 runkernel imx_v6_v7_defconfig sabrelite "" \
 	rootfs-armv5.cpio manual nodrm::mem256:net=default imx6dl-sabrelite.dtb
 retcode=$((retcode + $?))
