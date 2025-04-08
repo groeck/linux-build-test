@@ -26,7 +26,7 @@ skip_419="arm:bpim2u:sunxi_defconfig:sata:net=nic \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac \
-	arm:sabrelite:multi_v7_defconfig:mtd2:mem256:net=default \
+	arm:sabrelite,spi-model=sst25vf032b:multi_v7_defconfig:mtd4:mem256:net=default \
 	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
@@ -83,6 +83,7 @@ patch_defconfig()
 
     # Enable SPI controller for sabrelite and other IMX boards
     enable_config ${defconfig} CONFIG_SPI_IMX
+    enable_config ${defconfig} CONFIG_IMX_SDMA
 
     # KFENCE results in useless warnings
     disable_config "${defconfig}" CONFIG_KFENCE
@@ -207,7 +208,7 @@ runkernel()
 	initcli+=" earlycon=pl011,0x3f201000"
 	initcli+=" console=ttyAMA0"
 	;;
-    "sabrelite" | "mcimx6ul-evk")
+    sabrelite* | "mcimx6ul-evk")
 	initcli+=" earlycon=ec_imx6q,mmio,0x21e8000,115200n8"
 	initcli+=" console=ttymxc1,115200"
 	extra_params+=" -display none -serial null"
@@ -280,16 +281,10 @@ runkernel imx_v6_v7_defconfig sabrelite "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # Flash size is 2 MB. Latest root file system is larger than that,
-    # so we can't really support that unless reducing root file system
-    # size which isn't worth it. Maybe we can figure out how to attach
-    # a different flash at some point.
-    runkernel imx_v6_v7_defconfig sabrelite "" \
-	rootfs-armv5.sqf manual nodrm::mtd2:mem256:net=default imx6dl-sabrelite.dtb
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-fi
+runkernel imx_v6_v7_defconfig "sabrelite,spi-model=sst25vf032b" "" \
+	rootfs-armv5.sqf manual nodrm::mtd4:mem256:net=default imx6dl-sabrelite.dtb
+retcode=$((retcode + $?))
+checkstate ${retcode}
 
 # For sabrelite, the instatiated mmc device index is linux kernel release
 # specific. See upstream kernel patch fa2d0aa96941 ("mmc: core: Allow
