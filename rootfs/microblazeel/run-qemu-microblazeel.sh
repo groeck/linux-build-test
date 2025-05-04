@@ -12,8 +12,12 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblazeel}
 PREFIX=microblazeel-linux-
 ARCH=microblaze
 
-# Images built with gcc 10.x/11.x fail to boot
-PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC9}/microblazeel-linux/bin"
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+    PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC}/microblazeel-linux/bin"
+else
+    # Images built with gcc 10.x+ fail to boot with older kernels
+    PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC9}/microblazeel-linux/bin"
+fi
 
 PATH="${PATH_MICROBLAZE}:${PATH}"
 
@@ -65,12 +69,15 @@ retcode=0
 runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
 		"nolocktests:net=default" ttyUL0 rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel qemu_microblazeel_defconfig petalogix-s3adsp1800 \
 		"nolocktests:flash16:net=default" ttyUL0 rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 \
 		"nolocktests" ttyS0 rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel qemu_microblazeel_ml605_defconfig petalogix-ml605 \
 		"nolocktests:flash32,11776K,5" ttyS0 rootfs.ext2
 retcode=$((retcode + $?))
