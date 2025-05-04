@@ -15,7 +15,7 @@ ARCH=microblaze
 if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC}/microblaze-linux/bin"
 else
-    # Images built with gcc 11.x+ fail to boot with old kernels
+    # Images built with gcc 10.x+ fail to boot with old kernels
     PATH_MICROBLAZE="/opt/kernel/${DEFAULT_CC9}/microblaze-linux/bin"
 fi
 
