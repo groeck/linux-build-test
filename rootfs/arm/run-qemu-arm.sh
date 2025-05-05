@@ -17,7 +17,6 @@ boot=$5
 ARCH=arm
 
 PREFIX_A="arm-linux-gnueabi-"
-PREFIX_M3="arm-linux-"
 
 # integratorcp may crash in kmalloc_trace() when using gcc 10+.
 # This is seen in v5.4.y. The problem was fixed in v5.10+ with commit
@@ -30,10 +29,8 @@ PREFIX_M3="arm-linux-"
 #  intcp_init_early from start_kernel+0x58/0x604
 #  start_kernel from 0x0
 PATH_ARM="/opt/kernel/${DEFAULT_CC9}/arm-linux-gnueabi/bin"
-# Cortex-M3 (thumb) needs binutils 2.28 or earlier
-PATH_ARM_M3=/opt/kernel/arm-m3/gcc-7.3.0/bin
 
-PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
+PATH=${PATH_ARM}:${PATH}
 
 patch_defconfig()
 {
@@ -147,9 +144,6 @@ runkernel()
     local build="${ARCH}:${mach}:${defconfig}${fixup:+:${fixup}}"
     local pbuild="${build}${dtb:+:${dtb%.dtb}}"
     local PREFIX="${PREFIX_A}"
-    if [[ "${cpu}" = "cortex-m3" ]]; then
-	PREFIX="${PREFIX_M3}"
-    fi
 
     local _boot
     if [[ "${rootfs}" == *cpio ]]; then
@@ -337,11 +331,6 @@ runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic "nonet:nocd:nofs
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt::flash32,26,3"
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel mps2_defconfig "mps2-an385" "cortex-m3" \
-	rootfs-arm-m3.cpio manual "nodebug:nousb:nonet:nocd:nofs:nonvme:noscsi:novirt" mps2-an385.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
