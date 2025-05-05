@@ -180,12 +180,9 @@ make INSTALL_PREFIX=/opt/buildbot install
 ---
 xtensa:
 
-Same as above; buildroot 2014.08-rc3 is recommended.
+Same as above; buildroot 2025.02.1 is known to work.
 
 Use qemu_xtensa_lx60_defconfig as starting base. Also enable
-	BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
-	BR2_TOOLCHAIN_BUILDROOT_INET_IPV6=y
-	BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
 	BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
 
 Build commands:
@@ -194,8 +191,8 @@ Build commands:
 	make toolchain
 	cd output
 	mkdir xtensa
-	mv host xtensa/gcc-4.8.3-dc232b
-	tar czf /tmp/x86_64-gcc-4.8.3-dc232b-uclibc_xtensa-linux.tar.gz xtensa
+	mv host xtensa/gcc-13.3.0-dc233c
+	tar czf /tmp/x86_64-gcc-13.3.0-dc233c-uclibc_xtensa-linux.tar.gz xtensa
 
 gcc 4.6.3 from kernel.org is not recommended and may fail randomly
 with 'jump target out of range' errors. Also, it won't let you run
