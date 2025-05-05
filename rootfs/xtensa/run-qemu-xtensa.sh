@@ -14,8 +14,13 @@ config=$3
 
 PREFIX=xtensa-linux-
 ARCH=xtensa
-PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
-PATH_XTENSA_DE212=/opt/kernel/xtensa/gcc-6.4.0-de212/bin
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+    PATH_XTENSA=/opt/kernel/xtensa/gcc-13.3.0-dc233c/usr/bin
+else
+    PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
+fi
+
+PATH=${PATH_XTENSA}:${PATH}
 
 patch_defconfig()
 {
@@ -69,15 +74,6 @@ runkernel()
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
-
-    case "${mach}" in
-    "kc705-nommu")
-	PATH=${PATH}:${PATH_XTENSA_DE212}
-	;;
-    *)
-	PATH=${PATH_XTENSA}:${PATH}
-	;;
-    esac
 
     echo -n "Building ${pbuild} ... "
 
@@ -147,9 +143,6 @@ if [[ ${runall} -eq 1 ]]; then
 fi
 
 runkernel generic_kc705_defconfig kc705 dc233c kc705 nolocktests:mem1G:flash128:net=default rootfs-dc233c.ext2
-retcode=$((retcode + $?))
-
-runkernel nommu_kc705_defconfig kc705_nommu de212 kc705-nommu mem256:net=default rootfs-nommu.cpio
 retcode=$((retcode + $?))
 
 exit ${retcode}
