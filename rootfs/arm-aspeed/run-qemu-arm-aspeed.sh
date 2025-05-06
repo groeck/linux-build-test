@@ -6,7 +6,7 @@ progdir=$(cd $(dirname $0); pwd)
 parse_args "$@"
 shift $((OPTIND - 1))
 
-QEMU=${QEMU:-${QEMU_V91_BIN}/qemu-system-arm}
+QEMU=${QEMU:-${QEMU_BIN}/qemu-system-arm}
 
 machine=$1
 config=$2
