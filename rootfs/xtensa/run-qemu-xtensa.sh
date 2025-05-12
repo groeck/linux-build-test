@@ -14,7 +14,7 @@ config=$3
 
 PREFIX=xtensa-linux-
 ARCH=xtensa
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     PATH_XTENSA=/opt/kernel/xtensa/gcc-13.3.0-dc233c/usr/bin
 else
     PATH_XTENSA=/opt/kernel/xtensa/gcc-6.3.0-dc233c/usr/bin
