@@ -12,7 +12,7 @@ ulimit -f $((3000 * 1024))
 
 __logfiles=$(mktemp "/tmp/logfiles.XXXXXX")
 __progdir="$(cd $(dirname $0); pwd)"
-__basedir="${__progdir}/.."
+__basedir="$(dirname "${__progdir}")"
 __swtpmdir=$(mktemp -d "/tmp/mytpmXXXXX")
 __swtpmsock="${__swtpmdir}/swtpm-sock"
 __swtpmpidfile="${__swtpmdir}/pid"
@@ -1021,25 +1021,40 @@ __common_fixup()
 	extra_params+=" -smp ${fixup#smp}"
 	;;
     efi*|efi64*)
-        if [[ "${fixup}" == *=* ]]; then
+	fwdir=""
+	if [[ "${fixup}" == *=* ]]; then
+	    fwdir="${__basedir}/firmware"
 	    fwname="${fixup#*=}"
 	elif [[ "${fixup}" == "efi32" ]]; then
-	    fwname="OVMF-pure-efi-32.fd"
+	    case "${ARCH}" in
+	    "arm")
+		fwname="edk2-arm-code.fd"
+		;;
+	    "i386" | "x86_64")
+		fwdir="${__basedir}/firmware"
+	        fwname="OVMF-pure-efi-32.fd"
+		;;
+	    *)
+		;;
+	    esac
 	else
 	    case "${ARCH}" in
 	    "arm64")
-		fwname="QEMU_EFI-aarch64.fd"
+		fwname="edk2-aarch64-code.fd"
 		;;
 	    "loongarch")
-		fwname="QEMU_EFI-loongarch64.fd"
+		fwname="edk2-loongarch64-code.fd"
+		;;
+	    "x86_64")
+		fwdir="${__basedir}/firmware"
+		fwname="OVMF-pure-efi-64.fd"
 		;;
 	    *)
-		fwname="OVMF-pure-efi-64.fd"
 		;;
 	    esac
 	fi
 	if [[ -n "${fwname}" ]]; then
-	    extra_params+=" -bios ${__basedir}/firmware/${fwname}"
+	    extra_params+=" -bios ${fwdir}/${fwname}"
 	fi
 	;;
     mem*)
