@@ -77,7 +77,7 @@ __cleanup()
     rv=$?
 
     if [[ -s "${__logfiles}" ]]; then
-	rm -f $(cat "${__logfiles}")
+	cat "${__logfiles}" | xargs rm -f
     fi
     rm -f "${__logfiles}"
 
