@@ -8,7 +8,8 @@ basedir=$(cd $(dirname $0); pwd)
 CV11_4="11.4.0-2.40"
 CV11="11.5.0-2.40"
 CV12="12.4.0-2.40"
-CV13="13.3.0-2.42"
+CV13="13.4.0-2.44"
+CV14="14.3.0-2.44"
 
 # See if we can build with gcc 13.x for recent kernel branches.
 # Branch specific findings:
