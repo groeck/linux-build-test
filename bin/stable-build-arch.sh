@@ -5,9 +5,10 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/build-macros.sh
 
 # default compiler version
-CV11_4="11.4.0-2.40"
 CV11="11.5.0-2.40"
+CV11_4="11.4.0-2.40"
 CV12="12.4.0-2.40"
+CV13_4_243="13.4.0-2.43"
 CV13="13.4.0-2.44"
 CV14="14.3.0-2.44"
 
@@ -16,23 +17,39 @@ CV14="14.3.0-2.44"
 # -v5.15.y
 #   - xtensa images fail to build with gcc 13.x due to missing
 #     __umulsidi3 symbol
+#     (fixed with gcc 13.4 and/or v5.15.185, so try again)
 # - v5.10.y
-#   - parisc images don't build with gcc 13.x/binutils 2.42
+#   - parisc images don't build with gcc 13.x/binutils 2.42/2.44
 # - v5.4.y
 #   - ppc32:allmodconfig fails to build with gcc 12.x
 #
 # Based on those findings,
-# - use gcc 13.x for v6.1.y and later
-# - use gcc 12.x for v5.15.y and v5.10.y
+# - use gcc 13.x for v5.15.y and later
+# - use gcc 12.x for v5.10.y
 # - use gcc 11.x for v4.19.y and v5.4.y
 #
-if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+# Target specific definitions:
+# - h8300 support was dropped in gcc 12.x and gcc 11.5
+#   It is available again in 13.x and 14.x, but don't bother since
+#   the architecture was removed from upstream Linux after 5.15.
+# - binutils dropped support for nios2 in binutils 2.44
+# - nds32 fails to build with gcc 13.x / binutils 2.42 (5.15.y)
+#   Just use gcc 11.x since it was removed from upstream Linux
+#   after 5.15.
+#
+if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     CV="${CV13}"
+    CV_NIOS2="${CV13_4_243}"
 elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
     CV="${CV12}"
+    CV_NIOS2="${CV}"
 else
     CV="${CV11}"
+    CV_NIOS2="${CV}"
 fi
+
+CV_H8300="${CV11_4}"
+CV_NDS32="${CV11}"
 
 # gcc version to use for building perf
 GCC_PERF="gcc-11"
@@ -43,15 +60,13 @@ PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
-# h8300 support was dropped in gcc 12.x and gcc 11.5
-PATH_H8300=/opt/kernel/gcc-${CV11_4}-nolibc/h8300-linux/bin
+PATH_H8300=/opt/kernel/gcc-${CV_H8300}-nolibc/h8300-linux/bin
 PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-# nds32 fails to build with gcc 13.x / binutils 2.42 (5.15.y)
-PATH_NDS32=/opt/kernel/gcc-${CV11}-nolibc/nds32le-linux/bin
-PATH_NIOS2=/opt/kernel/gcc-${CV}-nolibc/nios2-linux/bin
+PATH_NDS32=/opt/kernel/gcc-${CV_NDS32}-nolibc/nds32le-linux/bin
+PATH_NIOS2=/opt/kernel/gcc-${CV_NIOS2}-nolibc/nios2-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
 PATH_PARISC64=/opt/kernel/gcc-${CV}-nolibc/hppa64-linux/bin
