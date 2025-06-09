@@ -214,6 +214,18 @@ runkernel()
 
 build_reference "${PREFIX}gcc" "${QEMU}"
 
+flash_model_256=""
+flash_model_512=""
+if [[ ${linux_version_code} -ge $(kernel_version 6 16) ]]; then
+    # Qemu support for Macronix mx25l25635e and similar chips is broken
+    # after v6.15 due to changes in upstream chip identification code.
+    # See upstream commit 947c86e481a027e ("mtd: spi-nor: macronix:
+    # Drop the redundant flash info fields") for details.
+    # Select Micron flash chips instead.
+    flash_model_256=",fmc-model=n25q256a13,spi-model=n25q256a13"
+    flash_model_512=",fmc-model=n25q512a13,spi-model=n25q512a13"
+fi
+
 if [ ${runall} -eq 1 ]; then
     # run all file system tests
     # As of v6.4/v6.5/v6.6-rc1, the Ethernet interface driver on ast2500
@@ -280,11 +292,14 @@ runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
 	rootfs-armv5.cpio automatic "::net=nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
+# Qemu support for Macronix mx25l25635e is broken after v6.15 due to changes in
+# upstream chip identification code. See upstream commit 947c86e481a027e ("mtd:
+# spi-nor: macronix: Drop the redundant flash info fields") for details.
+runkernel aspeed_g5_defconfig "supermicro-x11spi-bmc${flash_model_256}" "" \
 	rootfs-armv5.ext2 automatic "::mtd32:net=nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel aspeed_g5_defconfig supermicro-x11spi-bmc "" \
+runkernel aspeed_g5_defconfig "supermicro-x11spi-bmc${flash_model_256}" "" \
 	rootfs-armv5.sqf automatic "::mtd32,0,6,1:net=nic" aspeed-bmc-supermicro-x11spi.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
@@ -369,12 +384,12 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # The following tests require qemu 7.1+ and Linux v5.18+
 # Boot from 1st SPI controller (fmc)
-runkernel aspeed_g5_defconfig ast2600-evb "" \
+runkernel aspeed_g5_defconfig "ast2600-evb${flash_model_512}" "" \
 	rootfs-armv7a.ext2 automatic ${notests}::mtd64:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 # Boot from 2nd SPI controller
-runkernel aspeed_g5_defconfig ast2600-evb "" \
+runkernel aspeed_g5_defconfig "ast2600-evb${flash_model_512}" "" \
 	rootfs-armv7a.ext2 automatic ${notests}::mtd64,0,6,1:net=nic aspeed-ast2600-evb.dtb
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
