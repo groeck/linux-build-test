@@ -8,7 +8,8 @@ shift $((OPTIND - 1))
 
 machine=$1
 
-QEMU=${QEMU:-${QEMU_BIN}/qemu-system-microblaze}
+# petalogix-ml605 no longer works in qemu v10.0
+QEMU=${QEMU:-${QEMU_V92_BIN}/qemu-system-microblaze}
 PREFIX=microblaze-linux-
 ARCH=microblaze
 
