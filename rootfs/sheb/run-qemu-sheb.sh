@@ -13,9 +13,6 @@ PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
 
-skip_614="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:ext2"
-skip_615="sheb:rts7751r2dplus_defconfig:flash16,2304K,3:ext2"
-
 PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
 
 PATH=${PATH_SH}:${PATH}
@@ -30,9 +27,6 @@ patch_defconfig()
     sed -i -e '/CONFIG_CMDLINE/d' ${defconfig}
     # enable CMDLINE_FROM_BOOTLOADER instead if it exists (v6.10+)
     enable_config ${defconfig} CONFIG_CMDLINE_FROM_BOOTLOADER
-
-    # Enable MTD_BLOCK to be able to boot from flash
-    enable_config ${defconfig} CONFIG_MTD_BLOCK
 
     # Build a big endian image
     disable_config ${defconfig} CONFIG_CPU_LITTLE_ENDIAN
@@ -87,9 +81,6 @@ retcode=0
 runkernel rts7751r2dplus_defconfig "" rootfs.cpio
 retcode=$((retcode + $?))
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2
-retcode=$((retcode + $?))
-
-runkernel rts7751r2dplus_defconfig flash16,2304K,3 rootfs.ext2
 retcode=$((retcode + $?))
 
 # Needs non-upstream version of qemu to fix sm501 and usb-ohci endianness
