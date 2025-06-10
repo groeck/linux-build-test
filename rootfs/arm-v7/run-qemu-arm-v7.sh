@@ -120,6 +120,7 @@ runkernel()
 {
     local defconfig=$1
     local mach=$2
+    local bmach="${mach%%,*}"	# basic machine, without machine options
     local cpu=$3
     local rootfs=$4
     local mode=$5
@@ -144,7 +145,7 @@ runkernel()
     pbuild="${pbuild//+(:)/:}"
     build="${build//+(:)/:}"
 
-    if ! match_params "${machine}@${mach}" "${config}@${defconfig}" "${options}@${fixup}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
+    if ! match_params "${machine}@${bmach}" "${config}@${defconfig}" "${options}@${fixup}" "${devtree}@${ddtb}" "${boot}@${_boot}"; then
 	echo "Skipping ${pbuild} ... "
 	return 0
     fi
@@ -180,7 +181,7 @@ runkernel()
     rootfs="$(rootfsname ${rootfs})"
 
     kernel="arch/arm/boot/zImage"
-    case ${mach} in
+    case ${bmach} in
     "bpim2u")
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1c28000,115200n8"
@@ -473,7 +474,7 @@ runkernel multi_v7_defconfig quanta-gsj "" \
 	rootfs-armv5.cpio automatic npcm::net=nic,npcm-gmac nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel multi_v7_defconfig quanta-gsj "" \
+runkernel multi_v7_defconfig quanta-gsj,spi-model=n25q256a13 "" \
 	rootfs-armv5.ext2 automatic npcm::mtd32:net=nic,npcm-gmac nuvoton-npcm730-gsj.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -493,7 +494,7 @@ if [ ${runall} -eq 1 ]; then
     retcode=$((retcode + $?))
     checkstate ${retcode}
 fi
-runkernel multi_v7_defconfig kudo-bmc "" \
+runkernel multi_v7_defconfig kudo-bmc,spi-model=n25q512a13 "" \
 	rootfs-armv7a.cramfs automatic npcm::mtd64,8,3:net=nic,npcm-gmac nuvoton-npcm730-kudo.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
