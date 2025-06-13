@@ -983,7 +983,6 @@ __common_fixup()
 {
     local fixup="${1}"
     local rootfs="${2}"
-    local fwname
 
     case "${fixup}" in
     tpm*)
@@ -1021,7 +1020,9 @@ __common_fixup()
 	extra_params+=" -smp ${fixup#smp}"
 	;;
     efi*|efi64*)
-	fwdir=""
+	local fwname=""
+	local fwdata=""
+	local fwdir="${QEMU_DATA}"
 	if [[ "${fixup}" == *=* ]]; then
 	    fwdir="${__basedir}/firmware"
 	    fwname="${fixup#*=}"
@@ -1029,10 +1030,13 @@ __common_fixup()
 	    case "${ARCH}" in
 	    "arm")
 		fwname="edk2-arm-code.fd"
+	        fwdata="edk2-arm-vars.fd"
 		;;
 	    "i386" | "x86_64")
-		fwdir="${__basedir}/firmware"
-	        fwname="OVMF-pure-efi-32.fd"
+	        fwname="edk2-i386-code.fd"
+	        fwdata="edk2-i386-vars.fd"
+		# fwdir="${__basedir}/firmware"
+	        # fwname="OVMF-pure-efi-32.fd"
 		;;
 	    *)
 		;;
@@ -1041,20 +1045,31 @@ __common_fixup()
 	    case "${ARCH}" in
 	    "arm64")
 		fwname="edk2-aarch64-code.fd"
+	        fwdata="edk2-arm-vars.fd"
 		;;
 	    "loongarch")
 		fwname="edk2-loongarch64-code.fd"
+	        fwdata="edk2-loongarch64-vars.fd"
+		;;
+	    "riscv")
+	        fwname="edk2-riscv-code.fd"
+	        fwdata="edk2-riscv-vars.fd"
 		;;
 	    "x86_64")
-		fwdir="${__basedir}/firmware"
-		fwname="OVMF-pure-efi-64.fd"
+		# fwdir="${__basedir}/firmware"
+		# fwname="OVMF-pure-efi-64.fd"
+	        fwname="edk2-x86_64-code.fd"
+	        fwdata="edk2-i386-vars.fd"
 		;;
 	    *)
 		;;
 	    esac
 	fi
-	if [[ -n "${fwname}" ]]; then
-	    extra_params+=" -bios ${fwdir}/${fwname}"
+	if [[ -n "${fwdata}" ]]; then
+	    extra_params+=" -drive if=pflash,format=raw,file=${fwdir}/${fwname},readonly=on"
+	    extra_params+=" -drive if=pflash,format=raw,file=${fwdir}/${fwdata},snapshot=on"
+	elif [[ -n "${fwname}" ]]; then
+	    extra_params+=" -bios ${fwdir:+${fwdir}/}${fwname}"
 	fi
 	;;
     mem*)

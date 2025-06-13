@@ -12,6 +12,8 @@ QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
 QEMU_BIN=${QEMU_V100_BIN}
 
+QEMU_DATA=${QEMU_BIN}/../share/qemu
+
 # default compiler
 DEFAULT_CC9="gcc-9.5.0-2.37-nolibc"
 DEFAULT_CC11="gcc-11.5.0-2.40-nolibc"
