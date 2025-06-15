@@ -1035,8 +1035,6 @@ __common_fixup()
 	    "i386" | "x86_64")
 	        fwname="edk2-i386-code.fd"
 	        fwdata="edk2-i386-vars.fd"
-		# fwdir="${__basedir}/firmware"
-	        # fwname="OVMF-pure-efi-32.fd"
 		;;
 	    *)
 		;;
@@ -1056,8 +1054,6 @@ __common_fixup()
 	        fwdata="edk2-riscv-vars.fd"
 		;;
 	    "x86_64")
-		# fwdir="${__basedir}/firmware"
-		# fwname="OVMF-pure-efi-64.fd"
 	        fwname="edk2-x86_64-code.fd"
 	        fwdata="edk2-i386-vars.fd"
 		;;
