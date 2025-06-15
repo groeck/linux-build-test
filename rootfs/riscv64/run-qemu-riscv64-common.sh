@@ -145,6 +145,9 @@ __runkernel_common()
     runkernel virt "" defconfig "${prefix}net=e1000" rootfs.cpio
     retcode=$((retcode + $?))
     checkstate ${retcode}
+    runkernel virt "" defconfig "${prefix}efi:net=e1000" rootfs.cpio
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
     if [[ "${runall}" -ne 0 ]]; then
 	runkernel virt "rv64,zbb=no" defconfig "${prefix}net=ne2k_pci" rootfs.cpio
 	retcode=$((retcode + $?))
