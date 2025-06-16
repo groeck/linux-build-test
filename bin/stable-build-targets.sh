@@ -16,7 +16,6 @@ cmd_arm=(allmodconfig allnoconfig tinyconfig \
 	pxa910_defconfig clps711x_defconfig)
 cmd_arm64=(allnoconfig tinyconfig defconfig allmodconfig)
 cmd_csky=(defconfig allnoconfig tinyconfig allmodconfig)
-cmd_h8300=(allnoconfig tinyconfig edosk2674_defconfig h8300h-sim_defconfig h8s-sim_defconfig)
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
 cmd_loongarch=(defconfig allnoconfig tinyconfig allmodconfig)
@@ -25,10 +24,11 @@ cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig \
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
 cmd_microblaze=(defconfig allnoconfig tinyconfig)
-cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig bcm47xx_defconfig bcm63xx_defconfig \
-	ath79_defconfig ar7_defconfig loongson2k_defconfig mtx1_defconfig db1xxx_defconfig \
-	cavium_octeon_defconfig malta_defconfig rt305x_defconfig)
-cmd_nds32=(defconfig allnoconfig tinyconfig allmodconfig)
+cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig \
+	ath79_defconfig bcm47xx_defconfig bcm63xx_defconfig \
+	cavium_octeon_defconfig db1xxx_defconfig loongson2k_defconfig \
+	jazz_defconfig malta_defconfig mtx1_defconfig \
+	rm200_defconfig rt305x_defconfig)
 # nios2 allmodconfig: "Internal error in nios2_align" (binutils)
 cmd_nios2=(allnoconfig tinyconfig 3c120_defconfig)
 cmd_openrisc=(defconfig allnoconfig tinyconfig allmodconfig)
@@ -44,8 +44,10 @@ cmd_riscv32=(defconfig allnoconfig tinyconfig allmodconfig \
 cmd_riscv64=(defconfig allnoconfig tinyconfig allmodconfig nommu_k210_sdcard_defconfig \
 	nommu_virt_defconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
-cmd_sh=(defconfig allnoconfig tinyconfig dreamcast_defconfig microdev_defconfig \
-	shx3_defconfig se7619_defconfig)
+cmd_sh=(defconfig allnoconfig tinyconfig \
+	dreamcast_defconfig polaris_defconfig \
+	se7619_defconfig sh7785lcr_defconfig sh7785lcr_32bit_defconfig \
+	shx3_defconfig)
 cmd_sparc32=(defconfig allnoconfig tinyconfig)
 cmd_sparc64=(allmodconfig defconfig allnoconfig tinyconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)

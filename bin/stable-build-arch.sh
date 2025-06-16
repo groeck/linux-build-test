@@ -29,15 +29,12 @@ CV14="14.3.0-2.44"
 # - use gcc 11.x for v4.19.y and v5.4.y
 #
 # Target specific definitions:
-# - h8300 support was dropped in gcc 12.x and gcc 11.5
-#   It is available again in 13.x and 14.x, but don't bother since
-#   the architecture was removed from upstream Linux after 5.15.
 # - binutils dropped support for nios2 in binutils 2.44
-# - nds32 fails to build with gcc 13.x / binutils 2.42 (5.15.y)
-#   Just use gcc 11.x since it was removed from upstream Linux
-#   after 5.15.
 #
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+if [[ ${linux_version_code} -ge $(kernel_version 6 15) ]]; then
+    CV="${CV14}"
+    CV_NIOS2="${CV13_4_243}"
+elif [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     CV="${CV13}"
     CV_NIOS2="${CV13_4_243}"
 elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
@@ -48,9 +45,6 @@ else
     CV_NIOS2="${CV}"
 fi
 
-CV_H8300="${CV11_4}"
-CV_NDS32="${CV11}"
-
 # gcc version to use for building perf
 GCC_PERF="gcc-11"
 
@@ -60,12 +54,10 @@ PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
 PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
 PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
-PATH_H8300=/opt/kernel/gcc-${CV_H8300}-nolibc/h8300-linux/bin
 PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
 PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
-PATH_NDS32=/opt/kernel/gcc-${CV_NDS32}-nolibc/nds32le-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV_NIOS2}-nolibc/nios2-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
 PATH_PARISC=/opt/kernel/gcc-${CV}-nolibc/hppa-linux/bin
@@ -167,11 +159,6 @@ case ${ARCH} in
 	PREFIX="csky-linux-"
 	PATH=${PATH_CSKY}:${PATH}
 	;;
-    h8300)
-	cmd=(${cmd_h8300[*]})
-	PREFIX="h8300-linux-"
-	PATH=${PATH_H8300}:${PATH}
-	;;
     hexagon)
 	cmd=(${cmd_hexagon[*]})
 	PATH=${PATH_LLVM}:${PATH}
@@ -209,11 +196,6 @@ case ${ARCH} in
 	cmd=(${cmd_mips[*]});
 	PREFIX="mips64-linux-"
 	PATH=${PATH_MIPS}:${PATH}
-	;;
-    nds32)
-	cmd=(${cmd_nds32[*]})
-	PREFIX="nds32le-linux-"
-	PATH=${PATH_NDS32}:${PATH}
 	;;
     nios2)
 	cmd=(${cmd_nios2[*]})
