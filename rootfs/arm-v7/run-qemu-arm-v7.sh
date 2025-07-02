@@ -219,7 +219,7 @@ runkernel()
 	initcli+=" console=ttymxc0,115200"
 	extra_params+=" -display none"
 	;;
-    "highbank" | "virt" | \
+    "virt" | \
     "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
 	initcli+=" console=ttyAMA0,115200"
 	;;
@@ -427,14 +427,10 @@ runkernel multi_v7_defconfig virt "" \
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-if [ ${runall} -eq 1 ]; then
-    # highbank boots with updated (local version of) qemu,
-    # but generates warnings to the console due to ignored SMC calls.
-    runkernel multi_v7_defconfig highbank cortex-a9 \
-	rootfs-armv5.cpio auto ::mem2G highbank.dtb
-    retcode=$((retcode + $?))
-    checkstate ${retcode}
-fi
+runkernel multi_v7_defconfig virt "" \
+	rootfs-armv7a.ext2 auto "::tpm-tis-device:efi32:virtio-blk:mem512:net=virtio-net-device"
+retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel multi_v7_defconfig orangepi-pc "" \
 	rootfs-armv7a.cpio automatic "::net=nic" sun8i-h3-orangepi-pc.dtb
