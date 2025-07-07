@@ -18,23 +18,26 @@ CV14="14.3.0-2.44"
 #   - xtensa images fail to build with gcc 13.x due to missing
 #     __umulsidi3 symbol
 #     (fixed with gcc 13.4 and/or v5.15.185, so try again)
+#     (seen again with 5.15.186, so stick with gcc 12)
 # - v5.10.y
 #   - parisc images don't build with gcc 13.x/binutils 2.42/2.44
 # - v5.4.y
 #   - ppc32:allmodconfig fails to build with gcc 12.x
 #
 # Based on those findings,
-# - use gcc 13.x for v5.15.y and later
-# - use gcc 12.x for v5.10.y
-# - use gcc 11.x for v4.19.y and v5.4.y
+# - use gcc 14.x for v6.12.y and later
+# - use gcc 13.x for v6.1.y and v6.6.y
+# - use gcc 12.x for v5.10.y and v5.15.y
+# - use gcc 11.x for v5.4.y
+# - For nios2, the latest supported compiler version is gcc 13.4 with binutils 2.43
 #
 # Target specific definitions:
 # - binutils dropped support for nios2 in binutils 2.44
 #
-if [[ ${linux_version_code} -ge $(kernel_version 6 15) ]]; then
+if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]]; then
     CV="${CV14}"
     CV_NIOS2="${CV13_4_243}"
-elif [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+elif [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     CV="${CV13}"
     CV_NIOS2="${CV13_4_243}"
 elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
