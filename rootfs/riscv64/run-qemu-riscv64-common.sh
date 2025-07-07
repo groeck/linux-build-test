@@ -17,8 +17,9 @@ PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv64-linux/bin"
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_54="riscv:virt:rv64,zbb=no:defconfig:net=virtio-net-device:usb-ohci:rootfs \
-	riscv:sifive_u:defconfig:mtd32:net=default:rootfs"
+skip_515="riscv:virt:defconfig:efi:net=e1000:initrd"
+skip_61="riscv:virt:defconfig:efi:net=e1000:initrd"
+skip_66="riscv:virt:defconfig:efi:net=e1000:initrd"
 
 patch_defconfig()
 {
