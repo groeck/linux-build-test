@@ -96,15 +96,14 @@ build_reference "${PREFIX}gcc" "${QEMU}"
 
 __runkernel_common()
 {
-    local prefix="$1:"
+    local prefix="$1"
 
     if [[ ${linux_version_code} -le $(kernel_version 6 1) && "${runall}" -eq 0 ]]; then
 	# nodebug to reduce boot time
-	nodebug="nodebug:"
+	prefix+="${prefix:+:}nodebug"
 	# lock tests result in traceback, sometimes hang with endless
 	# traceback at do_vint+0x80/0xb4
-	nodebug+="nolocktests:"
-	prefix+="${nodebug}"
+	prefix+=":nolocktests"
     fi
 
     runkernel defconfig virt rootfs.cpio "${prefix}::efi:net=default"
@@ -112,23 +111,23 @@ __runkernel_common()
     checkstate ${retcode}
     if [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
 	# Note: tpm needs qemu v9.1+ and Linux kernel v6.6+
-	runkernel defconfig virt rootfs.cpio "${prefix}:tpm-tis-device:efi:net=default"
+	runkernel defconfig virt rootfs.cpio "${prefix}::tpm-tis-device:efi:net=default"
 	retcode=$((retcode + $?))
 	checkstate ${retcode}
     fi
-    runkernel defconfig virt rootfs.ext2 "${prefix}:efi:nvme:net=default"
+    runkernel defconfig virt rootfs.ext2 "${prefix}::efi:nvme:net=default"
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig virt rootfs.ext2 "${prefix}:efi:usb-xhci:net=default"
+    runkernel defconfig virt rootfs.ext2 "${prefix}::efi:usb-xhci:net=default"
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig virt rootfs.btrfs "${prefix}:efi:scsi[FUSION]:net=default"
+    runkernel defconfig virt rootfs.btrfs "${prefix}::efi:scsi[FUSION]:net=default"
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig virt rootfs.ext2 "${prefix}:efi:scsi[MEGASAS]:net=default:fstest=xfs"
+    runkernel defconfig virt rootfs.ext2 "${prefix}::efi:scsi[MEGASAS]:net=default:fstest=xfs"
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig virt rootfs.squashfs "${prefix}:efi:sdhci-mmc:net=default"
+    runkernel defconfig virt rootfs.squashfs "${prefix}::efi:sdhci-mmc:net=default"
     retcode=$((retcode + $?))
     
     return ${retcode}
