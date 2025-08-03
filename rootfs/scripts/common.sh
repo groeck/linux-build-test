@@ -1450,6 +1450,7 @@ __setup_fragment()
     local nousb=0
     local novirt=0
     local nonet=0
+    local nocrypto=0
 
     rm -f "${fragment}"
     touch "${fragment}"
@@ -1497,6 +1498,7 @@ __setup_fragment()
 	nousb) nousb=1 ;;
 	novirt) novirt=1 ;;
 	nonet) nonet=1;;
+	nocrypto) nocrypto=1;;
 	*)
 	    ;;
 	esac
@@ -1658,6 +1660,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SYSCTL_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
+	# disable_config "${fragment}" CONFIG_EXT4_KUNIT_TESTS
+
 	enable_config "${fragment}" CONFIG_VCAP_KUNIT_TEST
 
 	# crashes in mctp_i2c_get_adapter()
@@ -1738,13 +1742,18 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_STACKINIT_KUNIT_TEST
 
 	enable_config "${fragment}" CONFIG_LIST_HARDENED CONFIG_DEBUG_LIST
-	# Oddity: We have to disable the following option to enable the tests
-	if [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
+	if [[ "${nocrypto}" -eq 0 ]] && [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
             # crypto selftests run for a long time in older kernel branches,
 	    # at least on some architectures such as parisc, to the point where
 	    # random test timeouts are observed. It is not wot worth trying to
 	    # track down the problem.
+	    # Oddity: We have to disable the following option to enable the tests
+	    # prior to v6.16.
 	    disable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	    enable_config "${fragment}" CONFIG_CRYPTO_SELFTESTS
+	else
+	    enable_config "${fragment}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+	    disable_config "${fragment}" CONFIG_CRYPTO_SELFTESTS
 	fi
 	enable_config "${fragment}" CONFIG_DEBUG_NMI_SELFTEST CONFIG_DEBUG_RODATA_TEST
 	enable_config "${fragment}" CONFIG_DEBUG_TLBFLUSH CONFIG_DMATEST
