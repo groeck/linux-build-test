@@ -110,10 +110,6 @@ patch_defconfig()
 	    # crashes the kernel when running mcimx6ul-evk.
 	    disable_config "${defconfig}" CONFIG_DRM_MXSFB CONFIG_DRM_IMX
 	    ;;
-	nocrypto)
-	    # Broken (hangs) for some platforms
-	    enable_config "${defconfig}" CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-	    ;;
 	realview_eb)
 	    # Older versions of realview config files need additional CPU support.
 	    enable_config "${defconfig}" CONFIG_REALVIEW_EB_A9MP CONFIG_REALVIEW_EB_ARM11MP_REVB
