@@ -1714,6 +1714,26 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_CRC_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_INT_SQRT_KUNIT_TEST
 
+	# New in v6.15
+	enable_config "${fragment}" CONFIG_CORESIGHT_KUNIT_TESTS
+	enable_config "${fragment}" CONFIG_LEDS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_IBMVETH_KUNIT_TEST
+	# We explicitly disable RANDSTRUCT, so don't enable testing it.
+	# enable_config "${fragment}" CONFIG_RANDSTRUCT_KUNIT_TEST
+
+	# New in v6.16
+	enable_config "${fragment}" CONFIG_INTEL_PMT_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SEQ_BUF_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_RATELIMIT_KUNIT_TEST
+
+	if is_enabled CONFIG_IRQ_DOMAIN; then
+	    # CONFIG_IRQ_KUNIT_TEST depends on IRQ_DOMAIN which is not
+	    # supported on all architectures. The dependency is not spelled
+	    # out and not easy to describe since "imply SMP" triggers
+	    # a circular dependency loop.
+	    enable_config "${fragment}" CONFIG_IRQ_KUNIT_TEST
+	fi
+
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_USERCOPY_KUNIT_TEST
