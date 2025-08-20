@@ -1726,7 +1726,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SEQ_BUF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_RATELIMIT_KUNIT_TEST
 
-	if is_enabled CONFIG_IRQ_DOMAIN; then
+	if is_testing || is_enabled CONFIG_IRQ_DOMAIN; then
 	    # CONFIG_IRQ_KUNIT_TEST depends on IRQ_DOMAIN which is not
 	    # supported on all architectures. The dependency is not spelled
 	    # out and not easy to describe since "imply SMP" triggers
