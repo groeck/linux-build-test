@@ -339,6 +339,8 @@ __runkernel_common()
     retcode=$((retcode + $?))
     if [[ ${runall} -ne 0 ]]; then
         # PCI interface access attempts result in hung task hang during boot
+        runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb:net=e1000 rootfs.ext2 freescale/imx8mp-evk.dtb
+        retcode=$((retcode + $?))
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
         retcode=$((retcode + $?))
         runkernel imx8mp-evk defconfig ${prefix}smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
