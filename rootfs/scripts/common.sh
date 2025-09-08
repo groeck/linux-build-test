@@ -111,7 +111,7 @@ trap __cleanup ${signals}
 # Common variables used for waiting
 
 LOOPTIME=5	# Wait time before checking status
-MAXTIME=180	# Maximum wait time for qemu session to complete
+MAXTIME=300	# Maximum wait time for qemu session to complete
 MAXSTIME=60	# Maximum wait time for qemu session to generate output
 __retries=1	# Default number of retries
 
