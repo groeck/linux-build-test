@@ -18,7 +18,7 @@ cmd_arm64=(allnoconfig tinyconfig defconfig allmodconfig)
 cmd_csky=(defconfig allnoconfig tinyconfig allmodconfig)
 cmd_hexagon=(defconfig allnoconfig tinyconfig)
 cmd_i386=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
-cmd_loongarch=(defconfig allnoconfig tinyconfig allmodconfig)
+cmd_loongarch=(defconfig allnoconfig tinyconfig)
 cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig \
 	virt_defconfig atari_defconfig amiga_defconfig multi_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
