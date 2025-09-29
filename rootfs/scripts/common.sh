@@ -187,7 +187,9 @@ kernel_version()
 # Current Linux kernel version
 linux_version_code="$(kernel_version $(git describe --match 'v*' | cut -f1 -d- | sed -e 's/\./ /g' | sed -e 's/v//'))"
 
-if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
+if [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
+    DEFAULT_CC="${DEFAULT_CC14}"
+elif [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     DEFAULT_CC="${DEFAULT_CC13}"
 elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
     DEFAULT_CC="${DEFAULT_CC12}"
@@ -1731,7 +1733,10 @@ __setup_fragment()
 	    # supported on all architectures. The dependency is not spelled
 	    # out and not easy to describe since "imply SMP" triggers
 	    # a circular dependency loop.
-	    enable_config "${fragment}" CONFIG_IRQ_KUNIT_TEST
+	    if [[ ${linux_version_code} -ge $(kernel_version 6 18) ]]; then
+		# Triggers lots of unit test failures in 6.17.
+		enable_config "${fragment}" CONFIG_IRQ_KUNIT_TEST
+	    fi
 	fi
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)

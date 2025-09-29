@@ -8,6 +8,7 @@ QEMU_V90_BIN=${QEMU_INSTALL}/v9.0/bin
 QEMU_V91_BIN=${QEMU_INSTALL}/v9.1/bin
 QEMU_V92_BIN=${QEMU_INSTALL}/v9.2/bin
 QEMU_V100_BIN=${QEMU_INSTALL}/v10.0/bin
+QEMU_V101_BIN=${QEMU_INSTALL}/v10.1/bin
 QEMU_MASTER_BIN=${QEMU_INSTALL}/master/bin
 
 QEMU_BIN=${QEMU_V100_BIN}
@@ -15,7 +16,9 @@ QEMU_BIN=${QEMU_V100_BIN}
 QEMU_DATA=${QEMU_BIN}/../share/qemu
 
 # default compiler
+# Microblaze needs gcc 9.x
 DEFAULT_CC9="gcc-9.5.0-2.37-nolibc"
+# gcc 11.x is needed for linux 5.4.y
 DEFAULT_CC11="gcc-11.5.0-2.40-nolibc"
 # gcc 12.4-2.42 fails (assembler errors) for parisc
 DEFAULT_CC12="gcc-12.4.0-2.40-nolibc"
