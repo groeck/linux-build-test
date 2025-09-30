@@ -1720,6 +1720,13 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_CORESIGHT_KUNIT_TESTS
 	enable_config "${fragment}" CONFIG_LEDS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IBMVETH_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_PRINTF_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_SCANF_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_KFIFO_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_INT_POW_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_INT_LOG_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_GCD_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_BLACKHOLE_DEV_KUNIT_TEST
 	# We explicitly disable RANDSTRUCT, so don't enable testing it.
 	# enable_config "${fragment}" CONFIG_RANDSTRUCT_KUNIT_TEST
 
@@ -1738,6 +1745,9 @@ __setup_fragment()
 		enable_config "${fragment}" CONFIG_IRQ_KUNIT_TEST
 	    fi
 	fi
+
+	# New in v6.18
+	enable_config "${fragment}" CONFIG_FFS_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
