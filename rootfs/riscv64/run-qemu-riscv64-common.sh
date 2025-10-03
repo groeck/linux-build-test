@@ -17,8 +17,12 @@ PATH_RISCV="/opt/kernel/${DEFAULT_CC}/riscv64-linux/bin"
 
 PATH=${PATH}:${PATH_RISCV}
 
-skip_515="riscv:virt:defconfig:efi:net=e1000:initrd"
-skip_61="riscv:virt:defconfig:efi:net=e1000:initrd"
+skip_515="riscv:virt:defconfig:efi:net=e1000:initrd \
+        riscv:microchip-icicle-kit:defconfig:initrd \
+        riscv:microchip-icicle-kit:defconfig:sd:rootfs"
+skip_61="riscv:virt:defconfig:efi:net=e1000:initrd \
+	riscv:microchip-icicle-kit:defconfig:initrd \
+        riscv:microchip-icicle-kit:defconfig:sd:rootfs"
 skip_66="riscv:virt:defconfig:efi:net=e1000:initrd"
 
 patch_defconfig()
@@ -227,17 +231,13 @@ __runkernel_common()
     retcode=$((retcode + $?))
     checkstate ${retcode}
     
-    if [[ ${runall} -ne 0 ]]; then
-	# Needs qemu v7.0+, generates warning backtraces
-	# clk_ahb: Zero divisor and CLK_DIVIDER_ALLOW_ZERO not set
-	# clk_rtcref: Zero divisor and CLK_DIVIDER_ALLOW_ZERO not set
-	# Ethernet interface fails to instantiate
-	# macb 20112000.ethernet eth0: Could not attach PHY (-22)
-	runkernel microchip-icicle-kit "" defconfig "${prefix}net=default" rootfs.cpio
-	retcode=$((retcode + $?))
-	runkernel microchip-icicle-kit "" defconfig "${prefix}sd:net=default" rootfs.ext2
-	retcode=$((retcode + $?))
-    fi
+    # Ethernet interface fails to instantiate
+    # macb 20110000.ethernet eth0: Could not attach PHY (-19)
+    # macb 20112000.ethernet eth0: Could not attach PHY (-22)
+    runkernel microchip-icicle-kit "" defconfig "${prefix}" rootfs.cpio
+    retcode=$((retcode + $?))
+    runkernel microchip-icicle-kit "" defconfig "${prefix}sd" rootfs.ext2
+    retcode=$((retcode + $?))
 
     return ${retcode}
 }
