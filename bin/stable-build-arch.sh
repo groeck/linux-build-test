@@ -23,6 +23,7 @@ CV14="14.3.0-2.44"
 #   - parisc images don't build with gcc 13.x/binutils 2.42/2.44
 # - v5.4.y
 #   - ppc32:allmodconfig fails to build with gcc 12.x
+#     Error: External symbol 'memset' referenced from prom_init.
 #
 # Based on those findings,
 # - use gcc 14.x for v6.12.y and later
