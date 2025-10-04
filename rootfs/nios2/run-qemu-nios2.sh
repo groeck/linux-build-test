@@ -16,7 +16,7 @@ QEMU=${QEMU:-${QEMU_V90_BIN}/qemu-system-nios2}
 PREFIX=nios2-linux-
 ARCH=nios2
 rootfs=rootfs.cpio
-PATH_NIOS2="/opt/kernel/${DEFAULT_CC}/nios2-linux/bin"
+PATH_NIOS2="/opt/kernel/${DEFAULT_CC13}/nios2-linux/bin"
 
 PATH=${PATH_NIOS2}:${PATH}
 
