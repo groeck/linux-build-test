@@ -12,7 +12,9 @@ QEMU=${QEMU:-${QEMU_BIN}/qemu-system-m68k}
 
 PREFIX=m68k-linux-
 ARCH=m68k
-PATH_M68K="/opt/kernel/${DEFAULT_CC}/m68k-linux/bin"
+
+# Images crash with gcc 14.3.
+PATH_M68K="/opt/kernel/${DEFAULT_CC13}/m68k-linux/bin"
 
 PATH=${PATH_M68K}:${PATH}
 
