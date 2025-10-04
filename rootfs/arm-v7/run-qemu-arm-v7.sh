@@ -22,15 +22,12 @@ PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
-skip_419="arm:bpim2u:sunxi_defconfig:sata:net=nic \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac \
-	arm:sabrelite,spi-model=sst25vf032b:multi_v7_defconfig:mtd4:mem256:net=default \
-	arm:vexpress-a9:multi_v7_defconfig:nolocktests:flash64:mem128:net=default"
 skip_54="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
-	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac"
+	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac \
+	arm:orangepi-pc:multi_v7_defconfig:net=nic \
+	arm:orangepi-pc:multi_v7_defconfig:usb0:net=nic \
+	arm:orangepi-pc:multi_v7_defconfig:usb4:net=nic"
 skip_510="arm:npcm750-evb:multi_v7_defconfig:npcm:mtd32,6,5:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:usb0.1:net=nic,npcm-gmac \
 	arm:npcm750-evb:multi_v7_defconfig:npcm:net=nic,npcm-gmac"
