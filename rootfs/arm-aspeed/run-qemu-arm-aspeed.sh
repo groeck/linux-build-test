@@ -26,11 +26,6 @@ PATH=${PATH_ARM}:${PATH_ARM_M3}:${PATH}
 # notests="notests"
 notests=""
 
-skip_419="arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
-	arm:ast2500-evb:aspeed_g5_defconfig:${notests:+notests:}sd:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic \
-	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb-hub1,2:net=nic"
 skip_54="arm:palmetto-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:quanta-q71l-bmc:aspeed_g4_defconfig:mtd32:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
