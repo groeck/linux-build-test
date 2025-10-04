@@ -1724,7 +1724,8 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_SCANF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_KFIFO_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_INT_POW_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_INT_LOG_KUNIT_TEST
+	# Triggers warning backtraces
+	# enable_config "${fragment}" CONFIG_INT_LOG_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_GCD_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_BLACKHOLE_DEV_KUNIT_TEST
 	# We explicitly disable RANDSTRUCT, so don't enable testing it.
