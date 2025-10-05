@@ -23,7 +23,6 @@ cmd_m68k=(defconfig allmodconfig allnoconfig tinyconfig sun3_defconfig \
 	virt_defconfig atari_defconfig amiga_defconfig multi_defconfig)
 cmd_m68k_nommu=(m5272c3_defconfig m5307c3_defconfig m5249evb_defconfig \
 	m5407c3_defconfig m5475evb_defconfig)
-cmd_microblaze=(defconfig allnoconfig tinyconfig)
 cmd_mips=(defconfig allmodconfig allnoconfig tinyconfig \
 	ath79_defconfig bcm47xx_defconfig bcm63xx_defconfig \
 	cavium_octeon_defconfig db1xxx_defconfig loongson2k_defconfig \

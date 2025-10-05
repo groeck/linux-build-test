@@ -200,19 +200,6 @@ the qemu target. Note that you _must_ use the same toolchain for both
 kernel and rootfs builds.
 
 ---
-Microblaze
-
-[ tested with tip of buildroot tree as of 8/23/2014 ]
-Big endian, gcc 4.9.1, glibc 2.19, binutils 2.24
-4.4 kernel headers
-
-	make toolchain
-	cd output
-	mkdir microblaze
-	mv host microblaze/gcc-4.9.1
-	tar czf /tmp/x86_64-gcc-4.9.1-glibc_microblaze-linux.tar.gz microblaze
-
----
 qemu
 
 Local patches are required. See groeck/qemu repository at kernel.org.

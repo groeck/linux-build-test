@@ -1750,7 +1750,7 @@ __setup_fragment()
 	# New in v6.18
 	enable_config "${fragment}" CONFIG_FFS_KUNIT_TEST
 
-	# Fails on arm, loongarch, mips, nios2, microblaze, sparc32 (as of v6.11-rc2)
+	# Fails on arm, loongarch, mips, nios2, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_USERCOPY_KUNIT_TEST
 	fi
@@ -1949,8 +1949,8 @@ __setup_fragment()
 	# hangs without output
 	# enable_config "${fragment}" CONFIG_TEST_MAPLE_TREE
 	#
-	# hangs with soft lockup (arm, microblaze) and/or reports RCU stalls
-	# (mips). Even if not hanging or stalling, it takes a long time to run
+	# hangs with soft lockup (arm) and/or reports RCU stalls mips).
+	# Even if not hanging or stalling, it takes a long time to run
 	# on older kernels.
 	if is_testing_or_version 6 6 || [[ "${runall}" -ge 2 ]]; then
 	    enable_config "${fragment}" CONFIG_TIME_KUNIT_TEST

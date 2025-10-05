@@ -60,7 +60,6 @@ PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
-PATH_MICROBLAZE=/opt/kernel/gcc-${CV}-nolibc/microblaze-linux/bin
 PATH_MIPS=/opt/kernel/gcc-${CV}-nolibc/mips64-linux/bin
 PATH_NIOS2=/opt/kernel/gcc-${CV_NIOS2}-nolibc/nios2-linux/bin
 PATH_OPENRISC=/opt/kernel/gcc-${CV}-nolibc/or1k-linux/bin
@@ -191,11 +190,6 @@ case ${ARCH} in
 	PATH=${PATH_M68}:${PATH}
 	ARCH=m68k
         ;;
-    microblaze)
-	cmd=(${cmd_microblaze[*]})
-	PREFIX="microblaze-linux-"
-	PATH=${PATH_MICROBLAZE}:${PATH}
-	;;
     mips)
 	cmd=(${cmd_mips[*]});
 	PREFIX="mips64-linux-"
