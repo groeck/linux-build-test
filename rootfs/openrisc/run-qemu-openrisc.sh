@@ -41,10 +41,6 @@ runkernel()
     echo -n "Building ${ARCH}:or1200:${defconfig} ... "
 
     fixup="nolockup"
-    if [[ ${linux_version_code} -lt $(kernel_version 5 0) ]]; then
-	# We don't run network tests, so don't enable them
-	fixup+=":nonet"
-    fi
 
     if ! dosetup -F "${fixup}" "${rootfs}" "${defconfig}"; then
 	return 1
