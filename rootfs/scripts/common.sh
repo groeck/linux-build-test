@@ -2051,6 +2051,7 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_MISC_FILESYSTEMS CONFIG_SQUASHFS CONFIG_SQUASHFS_XATTR
 	enable_config "${fragment}" CONFIG_SQUASHFS_ZLIB CONFIG_SQUASHFS_4K_DEVBLK_SIZE
 	enable_config "${fragment}" CONFIG_EXT3_FS
+	enable_config "${fragment}" CONFIG_EXT4_FS
     fi
 }
 
