@@ -80,13 +80,16 @@ retcode=0
 
 runkernel rts7751r2dplus_defconfig "" rootfs.cpio
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig ata rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 # Needs non-upstream version of qemu to fix sm501 and usb-ohci endianness
 # bugs.
 runkernel rts7751r2dplus_defconfig usb rootfs.ext2
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # The following are most likely PCI bus endianness translation issues.
