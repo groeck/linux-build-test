@@ -10,7 +10,6 @@ machine=$1
 option=$2
 config=$3
 
-QEMU_V100=${QEMU:-${QEMU_V100_BIN}/qemu-system-aarch64}
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-aarch64}
 PREFIX=aarch64-linux-
 ARCH=arm64
@@ -132,7 +131,6 @@ runkernel()
 
     case ${mach} in
     "imx8mp-evk")
-	QEMU="${QEMU_V100}"
 	initcli+=" console=ttymxc1 earlycon"
 	extra_params+=" -serial null"
 	waitflag="automatic"
@@ -146,7 +144,6 @@ runkernel()
 	extra_params+=" -cpu cortex-a57"
 	;;
     "npcm845-evb")
-	QEMU="${QEMU_V100}"
 	initcli+=" console=ttyS0,115200"
 	initcli+=" earlycon=uart8250,mmio32,0xf0000000,115200n8"
 	;;
@@ -155,7 +152,6 @@ runkernel()
 	extra_params+=" -serial null"
 	;;
     "raspi4b")
-	QEMU="${QEMU_V100}"
 	initcli+=" earlycon console=ttyS1,115200"
 	extra_params+=" -serial null"
 	;;
@@ -287,12 +283,10 @@ __runkernel_common()
 	retcode=$((retcode + $?))
     fi
 
+    runkernel npcm845-evb defconfig smp:mem1G rootfs.cpio nuvoton/nuvoton-npcm845-evb.dtb
+    retcode=$((retcode + $?))
     if [[ ${runall} -ne 0 ]]; then
-	# hangs in boot
-	#    platform f000901c.watchdog: deferred probe pending: (reason unknown)
-	#    platform f0000000.serial: deferred probe pending: of_serial: failed to get clock
-	runkernel npcm845-evb defconfig smp:mem1G rootfs.cpio nuvoton/nuvoton-npcm845-evb.dtb
-	retcode=$((retcode + $?))
+	# The flash interface is not listed in dts and does not instantiate.
 	runkernel npcm845-evb defconfig smp:mtd32:mem1G rootfs.ext2 nuvoton/nuvoton-npcm845-evb.dtb
 	retcode=$((retcode + $?))
     fi
@@ -314,21 +308,21 @@ __runkernel_common()
     runkernel imx8mp-evk defconfig smp4:mem2G:usb:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
     retcode=$((retcode + $?))
     if [[ ${runall} -ne 0 ]]; then
-        # PCI interface access attempts result in hung task hang during boot
-        runkernel imx8mp-evk defconfig smp4:mem2G:usb:net=e1000 rootfs.ext2 freescale/imx8mp-evk.dtb
-        retcode=$((retcode + $?))
-        runkernel imx8mp-evk defconfig smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
-        retcode=$((retcode + $?))
-        runkernel imx8mp-evk defconfig smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
-        retcode=$((retcode + $?))
-        runkernel imx8mp-evk defconfig smp4:mem2G:scsi[53C810]:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
-        retcode=$((retcode + $?))
+	# PCI interface access attempts result in hung task hang during boot
+	# [still observed with qemu v1`0.0 and 10.1]
+	runkernel imx8mp-evk defconfig smp4:mem2G:usb:net=e1000 rootfs.ext2 freescale/imx8mp-evk.dtb
+	retcode=$((retcode + $?))
+	runkernel imx8mp-evk defconfig smp4:mem2G:usb-xhci:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+	retcode=$((retcode + $?))
+	runkernel imx8mp-evk defconfig smp4:mem2G:nvme:net=default rootfs.btrfs freescale/imx8mp-evk.dtb
+	retcode=$((retcode + $?))
+	runkernel imx8mp-evk defconfig smp4:mem2G:scsi[53C810]:net=default rootfs.ext2 freescale/imx8mp-evk.dtb
+	retcode=$((retcode + $?))
     fi
 
     if [[ ${runall} -ne 0 ]]; then
-	# Crashes (qemu 9.1 and mainline as of 10/12/24) due to missing interrupt
-	# controller support, missing i2c controller support, and missing clock
-	# controller support (gave up here).
+	# With qemu 10.0 and 10.1 needs manual input (keypress) during boot and
+	# otherwise stalls.
 	runkernel raspi4b defconfig smp:mem2G rootfs.cpio broadcom/bcm2711-rpi-4-b.dtb
 	retcode=$((retcode + $?))
 	runkernel raspi4b defconfig smp4:mem2G:sd rootfs.ext2 broadcom/bcm2711-rpi-4-b.dtb
