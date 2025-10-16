@@ -13,7 +13,8 @@ PREFIX=sh4eb-linux-
 ARCH=sh
 DISPARCH=sheb
 
-PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4eb-linux/bin
+# Builds with gcc 14.3 die with Linux 6.18-rc1 .
+PATH_SH=/opt/kernel/${DEFAULT_CC13}/sh4eb-linux/bin
 
 PATH=${PATH_SH}:${PATH}
 
