@@ -49,11 +49,11 @@ skip_515="arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64:net=nic 
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}mtd64,0,6,1:net=nic \
 	arm:ast2600-evb:aspeed_g5_defconfig:${notests:+notests:}sd2,b300:net=nic \
 	arm:g220a-bmc:aspeed_g5_defconfig:${notests:+notests:}mtd32,0,12,2:net=nic \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests} \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}sd2 \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128 \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128,0,8,1 \
-	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1 \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}sd2:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}mem1G:mtd128,0,8,1:net=nic \
+	arm:fuji-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic \
 	arm:rainier-bmc:aspeed_g5_defconfig:${notests:+notests:}usb-hub1:net=nic"
 skip_61="arm:bletchley-bmc:aspeed_g5_defconfig:${notests:+notests:}mmc:net=nic \
 	arm:bletchley-bmc:aspeed_g5_defconfig:${notests:+notests:}usb1:net=nic"
@@ -389,29 +389,27 @@ runkernel aspeed_g5_defconfig "ast2600-evb${flash_model_512}" "" \
     retcode=$((${retcode} + $?))
     checkstate ${retcode}
 
-# No network testing on fuji-bmc: The network interface has been disabled
-# in the upstream kernel in v6.18.
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.cpio automatic "${notests}" aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic "${notests}::sd2" aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::sd2:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic "${notests}::usb1" aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::usb1:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 # Default memory size (2G) prevents SPI device instantiation,
 # so limit memory size to 1G
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.ext2 automatic "${notests}::mem1G:mtd128" aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.ext2 automatic ${notests}::mem1G:mtd128:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
 runkernel aspeed_g5_defconfig fuji-bmc "" \
-	rootfs-armv5.f2fs automatic ${notests}::mem1G:mtd128,0,8,1 aspeed-bmc-facebook-fuji.dtb
+	rootfs-armv5.f2fs automatic ${notests}::mem1G:mtd128,0,8,1:net=nic aspeed-bmc-facebook-fuji.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
