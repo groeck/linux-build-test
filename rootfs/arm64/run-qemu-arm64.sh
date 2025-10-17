@@ -17,7 +17,11 @@ skip_61="imx8mp-evk:defconfig:smp4:mem2G:net=default:initrd \
 	imx8mp-evk:defconfig:smp4:mem2G:sdb2:net=default:ext2 \
 	imx8mp-evk:defconfig:smp4:mem2G:virtio-pci:net=default:ext2 \
 	imx8mp-evk:defconfig:smp4:mem2G:virtio:net=default:ext2 \
-	imx8mp-evk:defconfig:smp4:mem2G:usb:net=default:ext2"
+	imx8mp-evk:defconfig:smp4:mem2G:usb:net=default:ext2 \
+	npcm845-evb:defconfig:smp:mem1G:initrd"
+skip_66="npcm845-evb:defconfig:smp:mem1G:initrd"
+skip_612="npcm845-evb:defconfig:smp:mem1G:initrd"
+skip_617="npcm845-evb:defconfig:smp:mem1G:initrd"
 
 __runkernel_common ""
 retcode=$?
