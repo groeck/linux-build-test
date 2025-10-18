@@ -934,19 +934,19 @@ __common_netcmd()
 	case "${netdev}" in
 	"usb-xhci")
 	    __load_usb_xhci
-	    extra_params+=" -device usb-net,bus=xhci.0,netdev=net0 -netdev user,id=net0"
+	    extra_params+=" -device usb-net,bus=xhci.0,netdev=net0,mac=40:42:00:12:34:56 -netdev user,id=net0"
 	    ;;
 	"usb")
-	    extra_params+=" -device usb-net,netdev=net0 -netdev user,id=net0"
+	    extra_params+=" -device usb-net,netdev=net0,mac=40:42:00:12:34:56 -netdev user,id=net0"
 	    ;;
 	"usb-ohci")
 	    __load_usb_ohci
-	    extra_params+=" -device usb-net,bus=ohci.0,netdev=net0 -netdev user,id=net0"
+	    extra_params+=" -device usb-net,bus=ohci.0,netdev=net0,mac=40:42:00:12:34:56 -netdev user,id=net0"
 	    ;;
 	"usb-uhci")
 	    __pcibridge_new_port
 	    extra_params+=" -device piix4-usb-uhci,id=uhci_net${__pcibus_ref}"
-	    extra_params+=" -device usb-net,bus=uhci_net.0,netdev=net0 -netdev user,id=net0"
+	    extra_params+=" -device usb-net,bus=uhci_net.0,netdev=net0,mac=40:42:00:12:34:56 -netdev user,id=net0"
 	    ;;
 	*)
 	    ;;
