@@ -1687,10 +1687,14 @@ __setup_fragment()
 	if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]] || \
 		! is_enabled CONFIG_ARM64 || [[ "${runall}" -ge 1 ]]; then
 	    # Fails if there is no devicetree root (e.g. arm64 with efi boots)
-	    # Fixed in v6.12+.
-	    enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
-	    # New in v6.12
-	    enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
+	    # Fixed for arm64 in v6.12+.
+	    # Introduced for riscv in v6.18+.
+	    if [[ ${linux_version_code} -lt $(kernel_version 6 18) ]] || \
+	          ! is_enabled CONFIG_RISCV || [[ "${runall}" -ge 1 ]]; then
+	        enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
+	        # New in v6.12
+	        enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
+	    fi
 	fi
 
 	# New in v6.10
