@@ -101,6 +101,9 @@ checkstate ${retcode}
 runkernel B160L generic-32bit_defconfig ::net=virtio-net:nvme rootfs.ext4
 retcode=$((retcode + $?))
 checkstate ${retcode}
+runkernel B160L generic-32bit_defconfig ::net=nic,lasi:nvme rootfs.ext4
+retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel B160L generic-32bit_defconfig ::net=usb-ohci:sata-cmd646 rootfs.btrfs
 retcode=$((retcode + $?))
 checkstate ${retcode}
