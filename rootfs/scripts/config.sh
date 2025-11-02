@@ -25,5 +25,6 @@ DEFAULT_CC12="gcc-12.4.0-2.40-nolibc"
 # nios2 is no longer supported in binutils 2.44
 DEFAULT_CC13="gcc-13.4.0-2.43-nolibc"
 DEFAULT_CC14="gcc-14.3.0-2.44-nolibc"
+DEFAULT_CC15="gcc-15.2.0-2.45-nolibc"
 
 config_initcli="panic=-1"
