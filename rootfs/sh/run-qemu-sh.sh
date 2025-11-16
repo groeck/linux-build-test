@@ -18,7 +18,7 @@ ARCH=sh
 
 errlog="/tmp/err-sh.log"
 
-PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4-linux/bin
+PATH_SH=/opt/kernel/${DEFAULT_CC13}/sh4-linux/bin
 
 PATH=${PATH_SH}:${PATH}
 
@@ -93,39 +93,55 @@ build_reference "${PREFIX}gcc" "${QEMU}"
 retcode=0
 runkernel rts7751r2dplus_defconfig "net=rtl8139" rootfs.cpio.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig flash16,2304K,3:net=usb-ohci rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig ata:net=virtio-net rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig sdhci-mmc:net=i82801 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig nvme:net=tulip rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel rts7751r2dplus_defconfig usb:net=i82550 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig usb-hub:net=rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel rts7751r2dplus_defconfig usb-ohci:net=i82557a rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig usb-ehci:net=i82562 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig usb-xhci:net=rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig usb-uas-ehci:net=rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig usb-uas-xhci:net=rtl8139 rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 runkernel rts7751r2dplus_defconfig "scsi[53C810]:net=rtl8139" rootfs.ext2.gz
 retcode=$((${retcode} + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig "scsi[53C895A]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig "scsi[DC395]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 runkernel rts7751r2dplus_defconfig "scsi[AM53C974]:net=rtl8139" rootfs.ext2.gz
 retcode=$((retcode + $?))
+checkstate ${retcode}
 
 if [[ ${runall} -ne 0 ]]; then
     # Hang after "megaraid_sas 0000:00:01.0: Waiting for FW to come to ready state"
