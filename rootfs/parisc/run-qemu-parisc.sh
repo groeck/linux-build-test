@@ -134,9 +134,16 @@ checkstate ${retcode}
 runkernel 715 generic-32bit_defconfig ::net=nic,lasi rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel 715 generic-32bit_defconfig ::net=nic,lasi:scsi rootfs.ext2
-retcode=$((retcode + $?))
-checkstate ${retcode}
+if [[ ${runall} -ne 0 ]]; then
+    # Unstable: Crashes with qemu v10.2-rc1
+    # Example:
+    #  do_page_fault() command='init' type=26 address=0xf89a50dc in libc-2.32.so[72cf7,f8828000+17d000]
+    #  trap #26: Data memory access rights trap, vm_start = 0xf89a5000, vm_end = 0xf89a7000
+    #  Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+    runkernel 715 generic-32bit_defconfig ::net=nic,lasi:scsi rootfs.ext2
+    retcode=$((retcode + $?))
+    checkstate ${retcode}
+fi
 
 if [[ ${runall} -ne 0 ]]; then
     # Random crashes in sym_evaluate_dp(), called from sym_compute_residual()
