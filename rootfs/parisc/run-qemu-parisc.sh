@@ -56,6 +56,14 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
+    case "${machine}" in
+    "715")
+	QEMU="${QEMU_V102_BIN}/qemu-system-hppa"
+	;;
+    *)
+	;;
+    esac
+
     if ! dosetup -c "${config}${fixup%::*}" -F "${fixup}" "${rootfs}" "${config}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
@@ -117,6 +125,16 @@ runkernel B160L generic-32bit_defconfig "::net=rtl8139:scsi[DC395]" rootfs.ext4
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel B160L generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.btrfs
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+# The 715 machine does not have a USB or PCI bus, so testing is limited
+# to network and SCSI interfaces.
+# Note: The 715 machine is supported in qemu v10.2 or later.
+runkernel 715 generic-32bit_defconfig ::net=nic,lasi rootfs.cpio
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel 715 generic-32bit_defconfig ::net=nic,lasi:scsi rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
