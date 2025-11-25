@@ -1723,7 +1723,8 @@ __setup_fragment()
 	# New in v6.15
 	enable_config "${fragment}" CONFIG_CORESIGHT_KUNIT_TESTS
 	enable_config "${fragment}" CONFIG_LEDS_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_IBMVETH_KUNIT_TEST
+	# triggers warning backtraces on purpose
+	# enable_config "${fragment}" CONFIG_IBMVETH_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_PRINTF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_SCANF_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_KFIFO_KUNIT_TEST
