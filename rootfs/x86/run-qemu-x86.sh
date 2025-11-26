@@ -11,7 +11,6 @@ _mach=$1
 _cpu=$2
 _variant=$3
 
-# Note: Upstream qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-i386}
 ARCH=i386
 
@@ -138,16 +137,16 @@ checkstate ${retcode}
 runkernel defconfig smp:pci-bridge:scsi[MEGASAS2]:net=e1000 EPYC-IBPB q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig smp:efi32:scsi[FUSION]:net=usb Opteron_G5 q35 rootfs.squashfs
+runkernel defconfig smp:efi32:scsi[FUSION]:net=usb EPYC-Genoa q35 rootfs.squashfs
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel defconfig smp:net=i82557a phenom pc rootfs.cpio
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig smp:efi32:net=i82558a Opteron_G1 q35 rootfs.cpio
+runkernel defconfig smp:efi32:net=i82558a EPYC-Milan q35 rootfs.cpio
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig smp:ata:net=i82559a Opteron_G2 pc rootfs.ext2
+runkernel defconfig smp:ata:net=i82559a GraniteRapids pc rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel defconfig smp:efi32:usb:net=i82559er core2duo q35 rootfs.ext2
@@ -165,10 +164,10 @@ checkstate ${retcode}
 runkernel defconfig pae:smp:nvme:net=i82562 pentium3 q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:usb:net=e1000 Opteron_G3 pc rootfs.ext2
+runkernel defconfig nosmp:usb:net=e1000 SierraForest pc rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:efi32:ata:net=pcnet Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:efi32:ata:net=pcnet Snowridge q35 rootfs.ext2
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:ata:net=rtl8139 n270 q35 rootfs.ext2
