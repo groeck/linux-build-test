@@ -11,7 +11,6 @@ machine="$1"
 cputype="$2"
 options="$3"
 
-# Note: Upstream qemu v6.1 and later fail for Opteron_G4 and Opteron_G5
 QEMU="${QEMU:-${QEMU_BIN}/qemu-system-x86_64}"
 ARCH=x86_64
 
@@ -192,22 +191,22 @@ __runkernel_common()
     runkernel defconfig ${prefix}smp2:net=e1000-82545em:efi:mem8G:scsi[MEGASAS] EPYC-IBPB q35 rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig ${prefix}smp4:net=i82559c:efi32:mem256:scsi[MEGASAS2] Opteron_G5 q35 rootfs.ext2
+    runkernel defconfig ${prefix}smp4:net=i82559c:efi32:mem256:scsi[MEGASAS2] EPYC-Genoa q35 rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig ${prefix}smp4:net=i82559c:mem256:scsi[MEGASAS2]:fstest=jfs Opteron_G5 q35 rootfs.ext2
+    runkernel defconfig ${prefix}smp4:net=i82559c:mem256:scsi[MEGASAS2]:fstest=jfs Icelake-Server q35 rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig ${prefix}smp4:net=i82559c:mem256:scsi[MEGASAS2] Opteron_G5 pc rootfs.ext2
+    runkernel defconfig ${prefix}smp4:net=i82559c:mem256:scsi[MEGASAS2] EPYC-Turin pc rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
     runkernel defconfig ${prefix}smp:net=i82559er:mem512 phenom pc rootfs.cpio
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig ${prefix}smp2:net=i82562:efi:mem1G Opteron_G1 q35 rootfs.cpio
+    runkernel defconfig ${prefix}smp2:net=i82562:efi:mem1G GraniteRapids q35 rootfs.cpio
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig ${prefix}smp:net=usb:efi32:mem2G:scsi[virtio-pci] Opteron_G2 pc rootfs.ext2
+    runkernel defconfig ${prefix}smp:net=usb:efi32:mem2G:scsi[virtio-pci] ClearwaterForest pc rootfs.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
     runkernel defconfig ${prefix}smp2:net=i82559a:mem4G:virtio-pci core2duo q35 rootfs.ext2

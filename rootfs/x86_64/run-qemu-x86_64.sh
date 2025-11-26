@@ -22,10 +22,10 @@ runkernel defconfig preempt:smp6:net=i82550:mem512:ata:fstest=minix KnightsMill 
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-runkernel defconfig nosmp:net=e1000:mem1G:usb Opteron_G3 pc rootfs.ext2
+runkernel defconfig nosmp:net=e1000:mem1G:usb SierraForest pc rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel defconfig nosmp:net=ne2k_pci:efi:mem512:ata:fstest=hfs+ Opteron_G4 q35 rootfs.ext2
+runkernel defconfig nosmp:net=ne2k_pci:efi:mem512:ata:fstest=hfs+ Snowridge q35 rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel defconfig nosmp:net=pcnet:efi32:mem2G:ata Haswell-noTSX-IBRS q35 rootfs.ext2
