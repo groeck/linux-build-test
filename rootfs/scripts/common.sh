@@ -1689,8 +1689,9 @@ __setup_fragment()
 	    # Fails if there is no devicetree root (e.g. arm64 with efi boots)
 	    # Fixed for arm64 in v6.12+.
 	    # Introduced for riscv in v6.18+.
-	    if [[ ${linux_version_code} -lt $(kernel_version 6 18) ]] || \
-	          ! is_enabled CONFIG_RISCV || [[ "${runall}" -ge 1 ]]; then
+	    # Backported for riscv to v6.12+, so just stop testing it for
+	    # riscv entirely.
+	    if ! is_enabled CONFIG_RISCV || [[ "${runall}" -ge 1 ]]; then
 	        enable_config "${fragment}" CONFIG_OF_KUNIT_TEST
 	        # New in v6.12
 	        enable_config "${fragment}" CONFIG_OF_OVERLAY_KUNIT_TEST
@@ -1754,6 +1755,9 @@ __setup_fragment()
 
 	# New in v6.18
 	enable_config "${fragment}" CONFIG_FFS_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_PRINTK_RINGBUFFER_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_PM_RUNTIME_KUNIT_TEST
+	enable_config "${fragment}" CONFIG_CRASH_DUMP_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, sparc32 (as of v6.11-rc2)
 	if [[ "${runall}" -ge 2 ]]; then
