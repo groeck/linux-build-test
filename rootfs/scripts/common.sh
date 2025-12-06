@@ -191,10 +191,8 @@ if [[ ${linux_version_code} -ge $(kernel_version 6 6) ]]; then
     DEFAULT_CC="${DEFAULT_CC14}"
 elif [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
     DEFAULT_CC="${DEFAULT_CC13}"
-elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    DEFAULT_CC="${DEFAULT_CC12}"
 else
-    DEFAULT_CC="${DEFAULT_CC11}"
+    DEFAULT_CC="${DEFAULT_CC12}"
 fi
 
 checkstate()
@@ -988,16 +986,12 @@ __common_fixup()
 
     case "${fixup}" in
     tpm*)
-	if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-	    # Skip tpm tests for earlier kernels because the TPM version
-	    # file is missing there but the root file system expects it.
-	    __do_tpm_test=1
-	    # the QEMU TPM device name depends on the architecture.
-	    # Assume the calling code provides the correct device.
-	    extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
-	    extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
-	    extra_params+=" -device ${fixup},tpmdev=tpm0"
-	fi
+	__do_tpm_test=1
+	# the QEMU TPM device name depends on the architecture.
+	# Assume the calling code provides the correct device.
+	extra_params+=" -chardev socket,id=chrtpm,path=${__swtpmsock}"
+	extra_params+=" -tpmdev emulator,id=tpm0,chardev=chrtpm"
+	extra_params+=" -device ${fixup},tpmdev=tpm0"
 	;;
     "pci-bridge")
 	# Instantiate a new PCI bridge. Instantiate subsequent PCI devices
