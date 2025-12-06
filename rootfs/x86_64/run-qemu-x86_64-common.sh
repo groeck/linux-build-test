@@ -118,13 +118,6 @@ __runkernel_common()
     local prefix="$1"
     local retcode=0
 
-    # exfat is not supported in v5.4 and older
-    if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-	exfat=":fstest=exfat"
-    else
-	exfat=""
-    fi
-
     # gfs2 needs v5.15 or later
     if [[ ${linux_version_code} -ge $(kernel_version 5 15) ]]; then
 	gfs2=":fstest=gfs2"
@@ -146,7 +139,7 @@ __runkernel_common()
     runkernel defconfig ${prefix}smp:net=e1000e:mem256:ata Cascadelake-Server q35 rootfs.iso
     retcode=$((retcode + $?))
     checkstate ${retcode}
-    runkernel defconfig "${prefix}smp2:net=i82801:efi:mem512:nvme${exfat}" IvyBridge q35 rootfs.btrfs
+    runkernel defconfig "${prefix}smp2:net=i82801:efi:mem512:nvme:fstest=exfat" IvyBridge q35 rootfs.btrfs
     retcode=$((retcode + $?))
     checkstate ${retcode}
     runkernel defconfig ${prefix}smp4:net=ne2k_pci:efi32:mem1G:usb:fstest=nilfs2 SandyBridge q35 rootfs.squashfs
@@ -223,14 +216,7 @@ __runkernel_common()
     retcode=$((retcode + $?))
     checkstate ${retcode}
 
-    # igb needs kernel version 5.10 or later
-    if [[ ${linux_version_code} -lt $(kernel_version 5 10) ]]; then
-	netdev="e1000"
-    else
-	netdev="igb"
-    fi
-
-    runkernel defconfig "${prefix}smp4:net=${netdev}:mem2G:scsi[53C895A]" EPYC-Rome q35 rootfs-x86.ext2
+    runkernel defconfig "${prefix}smp4:net=igb:mem2G:scsi[53C895A]" EPYC-Rome q35 rootfs-x86.ext2
     retcode=$((retcode + $?))
     checkstate ${retcode}
 
