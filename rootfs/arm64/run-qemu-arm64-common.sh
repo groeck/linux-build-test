@@ -179,12 +179,6 @@ build_reference "${PREFIX}gcc" "${QEMU}"
 __runkernel_common()
 {
     local retcode=0
-    local exfat=""
-
-    # exfat is not supported in v5.4 and older
-    if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-	exfat=":fstest=exfat"
-    fi
 
     # Failing network tests: i82551, usb-net
 
@@ -204,7 +198,7 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel virt defconfig smp:net=tulip:efi:mem512:virtio-blk rootfs.ext2
     retcode=$((retcode + $?))
-    runkernel virt defconfig "smp2:net=virtio-net:mem512:nvme${exfat}" rootfs.btrfs
+    runkernel virt defconfig "smp2:net=virtio-net:mem512:nvme:fstest=exfat" rootfs.btrfs
     retcode=$((retcode + $?))
     runkernel virt defconfig smp4:net=e1000:mem512:sdhci-mmc "rootfs.erofs"
     retcode=$((retcode + $?))
@@ -267,21 +261,6 @@ __runkernel_common()
     retcode=$((retcode + $?))
     runkernel "xlnx-zcu102" defconfig smp:mem2G:sata rootfs.ext2 xilinx/zynqmp-ep108.dtb
     retcode=$((retcode + $?))
-
-    if [[ ${linux_version_code} -lt $(kernel_version 5 6) ]] || [[ ${runall} -ne 0 ]]; then
-	# Since Linux v5.6, the entire clock tree for zynqmp depends on firmware
-	# support (which is not available in qemu). See Linux kernel upstream
-	# commit 9c8a47b484ed ("arm64: dts: xilinx: Add the clock nodes for
-	# zynqmp") for details. Without clocks, loading various io drivers
-	# including the serial port driver stalls, and it becomes all but
-	# impossible to use the emulation on any kernel later than v5.5.
-	runkernel xlnx-zcu102 defconfig smp:mem2G rootfs.cpio xilinx/zynqmp-zcu102-rev1.0.dtb
-	retcode=$((retcode + $?))
-	runkernel xlnx-zcu102 defconfig smp:mem2G:sd1 rootfs.ext2 xilinx/zynqmp-zcu102-rev1.0.dtb
-	retcode=$((retcode + $?))
-	runkernel xlnx-zcu102 defconfig smp:mem2G:sata rootfs.btrfs xilinx/zynqmp-zcu102-rev1.0.dtb
-	retcode=$((retcode + $?))
-    fi
 
     runkernel npcm845-evb defconfig smp:mem1G rootfs.cpio nuvoton/nuvoton-npcm845-evb.dtb
     retcode=$((retcode + $?))
