@@ -5,8 +5,6 @@ basedir=$(cd $(dirname $0); pwd)
 . ${basedir}/build-macros.sh
 
 # default compiler version
-CV11="11.5.0-2.40"
-CV11_4="11.4.0-2.40"
 CV12="12.4.0-2.40"
 CV13_4_243="13.4.0-2.43"
 CV13="13.4.0-2.44"
@@ -21,15 +19,11 @@ CV14="14.3.0-2.44"
 #     (seen again with 5.15.186, so stick with gcc 12)
 # - v5.10.y
 #   - parisc images don't build with gcc 13.x/binutils 2.42/2.44
-# - v5.4.y
-#   - ppc32:allmodconfig fails to build with gcc 12.x
-#     Error: External symbol 'memset' referenced from prom_init.
 #
 # Based on those findings,
 # - use gcc 14.x for v6.12.y and later
 # - use gcc 13.x for v6.1.y and v6.6.y
 # - use gcc 12.x for v5.10.y and v5.15.y
-# - use gcc 11.x for v5.4.y
 # - For nios2, the latest supported compiler version is gcc 13.4 with binutils 2.43
 #
 # Target specific definitions:
@@ -41,11 +35,8 @@ if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]]; then
 elif [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     CV="${CV13}"
     CV_NIOS2="${CV13_4_243}"
-elif [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    CV="${CV12}"
-    CV_NIOS2="${CV}"
 else
-    CV="${CV11}"
+    CV="${CV12}"
     CV_NIOS2="${CV}"
 fi
 
