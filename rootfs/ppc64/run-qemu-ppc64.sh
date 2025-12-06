@@ -24,15 +24,6 @@ PATH_PPC="/opt/kernel/${DEFAULT_CC}/powerpc64-linux/bin"
 PATH=${PATH_PPC}:${PATH}
 dir=$(cd $(dirname $0); pwd)
 
-skip_54="ppce500:corenet64_smp_defconfig:e5500:net=eTSEC:sdhci-mmc:rootfs"
-
-# We are (currently) testing TPM version 2. TPM version 2 support for pseries
-# was only added after 5.4.
-tpm=""
-if [[ ${linux_version_code} -ge $(kernel_version 5 10) ]]; then
-    tpm="tpm-spapr:"
-fi
-
 patch_defconfig()
 {
     local defconfig=$1
@@ -168,7 +159,7 @@ runkernel pseries_defconfig big::smp2:net=pcnet pseries POWER8 hvc0 vmlinux \
 	rootfs.cpio.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig big::${tpm}net=rtl8139:scsi pseries POWER9 hvc0 vmlinux \
+runkernel pseries_defconfig big::tpm-spapr:net=rtl8139:scsi pseries POWER9 hvc0 vmlinux \
 	rootfs.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
@@ -195,7 +186,7 @@ runkernel pseries_defconfig little::net=rtl8139 pseries POWER9 hvc0 vmlinux \
 	rootfs-el.cpio.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
-runkernel pseries_defconfig little::${tpm}net=e1000:scsi pseries POWER8 hvc0 vmlinux \
+runkernel pseries_defconfig little::tpm-spapr:net=e1000:scsi pseries POWER8 hvc0 vmlinux \
 	rootfs-el.ext2.gz auto
 retcode=$((retcode + $?))
 checkstate ${retcode}
