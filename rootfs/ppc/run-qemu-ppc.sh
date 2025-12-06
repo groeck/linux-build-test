@@ -26,8 +26,6 @@ ARCH=powerpc
 
 PATH=${PATH_PPC}:${PATH}
 
-skip_54="ppce500:corenet32_smp_defconfig:e500:net=eTSEC:sdhci-mmc:ext2"
-
 patch_defconfig()
 {
     local defconfig=$1
