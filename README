@@ -7,6 +7,17 @@ README in the qemu directory describes distribution.
 
 Update to Ubuntu 24.04:
 
+
+IMPORTANT:
+    Before doing anything else, fix up /etc/service if it is not a symlink.
+    - If /etc/service contains symlinks, replicate them in
+      /etc/runit/runsvdir/current/. Most likely that will be "git-daemon".
+      Create a symlink:
+      /etc/runit/runsvdir/current/git-daemon -> /etc/sv/git-daemon
+    - Rename /etc/service, for example to /etc/service.old
+    - Create a symlink:
+      /etc/service -> /etc/runit/runsvdir/current
+
 python 2.7 is no longer available. Install from debian.
 
 - Add /etc/apt/sources.list.d/bullseye.list:
@@ -30,7 +41,7 @@ deb http://security.debian.org bullseye-security main
   Important: This step is necessary to avoid polluting the system with old
   versions of various tools.
 
-Preferred (test): Install debian pacgate directly from packages/ subdirectory.
+Preferred (test): Install debian packages directly from packages/ subdirectory.
 
 Other:
 
