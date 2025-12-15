@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ARCH=$1
-BRACNH=$2
+BRANCH=$2
 BUILDDIR=$3
 
 basedir=$(cd $(dirname $0); pwd)
