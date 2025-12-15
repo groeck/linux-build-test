@@ -1750,7 +1750,10 @@ __setup_fragment()
 	# New in v6.18
 	enable_config "${fragment}" CONFIG_FFS_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_PRINTK_RINGBUFFER_KUNIT_TEST
-	enable_config "${fragment}" CONFIG_PM_RUNTIME_KUNIT_TEST
+	if [[ ${linux_version_code} -gt $(kernel_version 6 18) ]]; then
+	    # The test is broken in 6.18.
+	    enable_config "${fragment}" CONFIG_PM_RUNTIME_KUNIT_TEST
+	fi
 	enable_config "${fragment}" CONFIG_CRASH_DUMP_KUNIT_TEST
 
 	# Fails on arm, loongarch, mips, nios2, sparc32 (as of v6.11-rc2)
