@@ -8,8 +8,6 @@ shift $((OPTIND - 1))
 
 _fixup="$1"
 
-# Kernels are unstable (crash randomly) with upstream qemu v7.2.
-# Requires local qemu build with offending patch reverted.
 QEMU=${QEMU:-${QEMU_BIN}/qemu-system-sh4}
 
 
@@ -18,7 +16,7 @@ ARCH=sh
 
 errlog="/tmp/err-sh.log"
 
-PATH_SH=/opt/kernel/${DEFAULT_CC13}/sh4-linux/bin
+PATH_SH=/opt/kernel/${DEFAULT_CC}/sh4-linux/bin
 
 PATH=${PATH_SH}:${PATH}
 
@@ -35,6 +33,17 @@ patch_defconfig()
 
     # Enable MTD_BLOCK to be able to boot from flash
     enable_config ${defconfig} CONFIG_MTD_BLOCK
+
+    # Disable code that isn't tested to reduce image size.
+    disable_config ${defconfig} CONFIG_HID
+    disable_config ${defconfig} CONFIG_SOUND
+    disable_config ${defconfig} CONFIG_SND
+    disable_config ${defconfig} CONFIG_MSDOS_FS
+    disable_config ${defconfig} CONFIG_VFAT_FS
+    disable_config ${defconfig} CONFIG_MINIX_FS
+    disable_config ${defconfig} CONFIG_DAMON
+    disable_config ${defconfig} CONFIG_WIRELESS
+    disable_config ${defconfig} CONFIG_WLAN
 }
 
 runkernel()
