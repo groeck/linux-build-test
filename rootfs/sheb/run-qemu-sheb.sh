@@ -31,6 +31,17 @@ patch_defconfig()
     # Build a big endian image
     disable_config ${defconfig} CONFIG_CPU_LITTLE_ENDIAN
     enable_config ${defconfig} CONFIG_CPU_BIG_ENDIAN
+
+    # Disable code that isn't tested to reduce image size.
+    disable_config ${defconfig} CONFIG_HID
+    disable_config ${defconfig} CONFIG_SOUND
+    disable_config ${defconfig} CONFIG_SND
+    disable_config ${defconfig} CONFIG_MSDOS_FS
+    disable_config ${defconfig} CONFIG_VFAT_FS
+    disable_config ${defconfig} CONFIG_MINIX_FS
+    disable_config ${defconfig} CONFIG_DAMON
+    disable_config ${defconfig} CONFIG_WIRELESS
+    disable_config ${defconfig} CONFIG_WLAN
 }
 
 runkernel()
