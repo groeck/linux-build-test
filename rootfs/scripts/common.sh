@@ -1776,8 +1776,9 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_HID_KUNIT_TEST
 	enable_config "${fragment}" CONFIG_IS_SIGNED_TYPE_KUNIT_TEST
 
-	if ! is_enabled CONFIG_ARCH_MPS2 || [[ "${runall}" -ge 2 ]]; then
-	    # Unaligned IPv6 checksum tests cause a crash with CONFIG_ARCH_MPS2
+	if ! is_enabled CONFIG_SUPERH || [[ "${runall}" -ge 2 ]]; then
+	    # Unaligned IPv6 checksum tests may cause an emulator abort with
+	    # CONFIG_SUPERH in v6.19.
 	    enable_config "${fragment}" CONFIG_CHECKSUM_KUNIT
 	fi
 
