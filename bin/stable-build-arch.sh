@@ -388,13 +388,6 @@ do
 	    done
 	fi
 
-	# Always disable CONFIG_WERROR.
-	# Commit 3fe617ccafd6 ("Enable '-Werror' by default for all kernel
-	# builds") enables -Werror for all builds, causing a large number
-	# of failures for both compile and boot test images. This hides real
-	# compile and boot failures and thus isn't useful for this testbed.
-	# Disable it.
-
 	# Run branch specific initialization if necessary
 	if [ -n "${BRANCH}" -a -x "${basedir}/branches/${BRANCH}/setup.sh" ]
 	then
