@@ -45,7 +45,7 @@ cmd_riscv64=(defconfig allnoconfig tinyconfig allmodconfig nommu_k210_sdcard_def
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
 cmd_sh=(defconfig \
 	dreamcast_defconfig polaris_defconfig \
-	r7780mp_defconfig rsk7269_defconfig rts7751r2dplus_defconfig \
+	r7780mp_defconfig rts7751r2dplus_defconfig \
 	sh7785lcr_defconfig sh7785lcr_32bit_defconfig \
 	shx3_defconfig sh7724_generic_defconfig \
 	titan_defconfig urquell_defconfig )
