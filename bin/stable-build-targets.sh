@@ -43,10 +43,12 @@ cmd_riscv32=(defconfig allnoconfig tinyconfig allmodconfig \
 cmd_riscv64=(defconfig allnoconfig tinyconfig allmodconfig nommu_k210_sdcard_defconfig \
 	nommu_virt_defconfig)
 cmd_s390=(defconfig allmodconfig allnoconfig tinyconfig debug_defconfig)
-cmd_sh=(defconfig allnoconfig tinyconfig \
+cmd_sh=(defconfig \
 	dreamcast_defconfig polaris_defconfig \
-	se7619_defconfig sh7785lcr_defconfig sh7785lcr_32bit_defconfig \
-	shx3_defconfig)
+	r7780mp_defconfig rsk7269_defconfig rts7751r2dplus_defconfig \
+	sh7785lcr_defconfig sh7785lcr_32bit_defconfig \
+	shx3_defconfig sh7724_generic_defconfig \
+	titan_defconfig urquell_defconfig )
 cmd_sparc32=(defconfig allnoconfig tinyconfig)
 cmd_sparc64=(allmodconfig defconfig allnoconfig tinyconfig)
 cmd_x86_64=(defconfig allyesconfig allmodconfig allnoconfig tinyconfig tools/perf)
