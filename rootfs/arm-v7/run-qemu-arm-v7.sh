@@ -211,7 +211,7 @@ runkernel()
 	extra_params+=" -display none"
 	;;
     "virt" | \
-    "vexpress-a9" | "vexpress-a15" | "vexpress-a15-a7")
+    "vexpress-a9" | "vexpress-a15")
 	initcli+=" console=ttyAMA0,115200"
 	;;
     "xilinx-zynq-a9")
@@ -332,12 +332,6 @@ checkstate ${retcode}
 runkernel multi_v7_defconfig vexpress-a15 "" \
 	rootfs-armv7a.ext2 auto nolocktests::sd:mem128:net=default \
 	vexpress-v2p-ca15-tc1.dtb
-retcode=$((retcode + $?))
-checkstate ${retcode}
-# Local qemu v2.7+ has minimal support for vexpress-a15-a7
-runkernel multi_v7_defconfig vexpress-a15-a7 "" \
-	rootfs-armv7a.ext2 auto nolocktests::sd:mem256:net=default \
-	vexpress-v2p-ca15_a7.dtb
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
