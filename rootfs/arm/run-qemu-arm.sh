@@ -78,9 +78,6 @@ patch_defconfig()
 
     for fixup in ${fixups}; do
 	case "${fixup}" in
-	nofdt)
-	    disable_config "${defconfig}" CONFIG_MACH_PXA27X_DT CONFIG_MACH_PXA3XX_DT
-	    ;;
 	aeabi)
 	    enable_config "${defconfig}" CONFIG_AEABI
 	    ;;
@@ -99,16 +96,6 @@ patch_defconfig()
 	    # For imx25, disable NAND (not supported as of qemu 2.5, causes
 	    # a runtime warning).
 	    disable_config "${defconfig}" CONFIG_MTD_NAND_MXC
-	    ;;
-	nodrm)
-	    # qemu does not support CONFIG_DRM_IMX. This starts to fail
-	    # with commit 5f2f911578fb (drm/imx: atomic phase 3 step 1:
-	    # Use atomic configuration), ie since v4.8. Impact is long boot delay
-	    # (kernel needs 70+ seconds to boot) and several kernel tracebacks
-	    # in drm code.
-	    # It also does not support CONFIG_DRM_MXSFB; trying to enable it
-	    # crashes the kernel when running mcimx6ul-evk.
-	    disable_config "${defconfig}" CONFIG_DRM_MXSFB CONFIG_DRM_IMX
 	    ;;
 	realview_eb)
 	    # Older versions of realview config files need additional CPU support.
@@ -188,14 +175,6 @@ runkernel()
 
     kernel="arch/arm/boot/zImage"
     case ${mach} in
-    "sx1")
-	initcli+=" console=ttyS0,115200 earlycon=uart8250,mmio32,0xfffb0000,115200n8"
-	;;
-    "mps2-an385")
-	extra_params+=" -bios ${progdir}/mps2-boot.axf"
-	initcli+=" earlycon"
-	kernel="vmlinux"
-	;;
     "collie")
 	initcli+=" console=ttySA1"
 	;;
@@ -318,17 +297,6 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.cramfs automatic ::mem128:sd:net=default integratorcp.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-# Limit configuration options to avoid running out of memory
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.cpio automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt"
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.ext2 automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt::sd"
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel qemu_sx1_defconfig sx1 "" rootfs-armv4.sqf automatic "nonet:nocd:nofs:nonvme:noscsi:novirt:nofdt::flash32,26,3"
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
