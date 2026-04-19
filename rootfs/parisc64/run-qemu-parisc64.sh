@@ -56,6 +56,14 @@ runkernel()
 
     echo -n "Building ${build} ... "
 
+    case "${machine}" in
+    "A400")
+	QEMU="${QEMU_V110_BIN}/qemu-system-hppa"
+	;;
+    *)
+	;;
+    esac
+
     if ! dosetup -c "${config}${fixup%::*}" -F "${fixup}" "${rootfs}" "${config}"; then
 	if [[ __dosetup_rc -eq 2 ]]; then
 	    return 0
@@ -200,6 +208,29 @@ runkernel C3700 generic-64bit_defconfig ::smp6:net=tulip:usb-uas-ehci rootfs.ext
 retcode=$((retcode + $?))
 checkstate ${retcode}
 runkernel C3700 generic-64bit_defconfig ::smp4:net=rtl8139:usb-uas-xhci rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+
+# A400 requires qemu v11.0 or later.
+# Notes:
+# - pcnet, tulip and lasi network interfaces fail.
+# - SCSI[DC395] fails with timeout
+runkernel A400 generic-64bit_defconfig ::net=rtl8139 rootfs.cpio
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel A400 generic-64bit_defconfig ::net=rtl8139:usb-xhci rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel A400 generic-64bit_defconfig "::net=rtl8139:scsi[53C895A]" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel A400 generic-64bit_defconfig "::smp4:net=usb-xhci:usb-xhci" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel A400 generic-64bit_defconfig "::smp4:net=virtio-net:usb-uas-ehci" rootfs.ext2
+retcode=$((retcode + $?))
+checkstate ${retcode}
+runkernel A400 generic-64bit_defconfig ::smp6:net=i82801:usb-uas-ehci rootfs.ext2
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
