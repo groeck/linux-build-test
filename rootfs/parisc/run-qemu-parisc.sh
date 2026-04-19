@@ -58,7 +58,8 @@ runkernel()
 
     case "${machine}" in
     "715")
-	QEMU="${QEMU_V102_BIN}/qemu-system-hppa"
+	# 10.2 is now default. 11.0(-rc4) is not better.
+	# QEMU="${QEMU_V102_BIN}/qemu-system-hppa"
 	;;
     *)
 	;;
@@ -128,14 +129,14 @@ runkernel B160L generic-32bit_defconfig "::net=tulip:scsi[AM53C974]" rootfs.btrf
 retcode=$((retcode + $?))
 checkstate ${retcode}
 
-# The 715 machine does not have a USB or PCI bus, so testing is limited
-# to network and SCSI interfaces.
+# HP 715 is a 32-bit system. It does not have a USB or PCI bus, so testing
+# is limited to network and SCSI interfaces.
 # Note: The 715 machine is supported in qemu v10.2 or later.
 runkernel 715 generic-32bit_defconfig ::net=nic,lasi rootfs.cpio
 retcode=$((retcode + $?))
 checkstate ${retcode}
 if [[ ${runall} -ne 0 ]]; then
-    # Unstable: Crashes with qemu v10.2-rc1
+    # Unstable: Crashes with qemu v10.2 and v11.0-rc4
     # Example:
     #  do_page_fault() command='init' type=26 address=0xf89a50dc in libc-2.32.so[72cf7,f8828000+17d000]
     #  trap #26: Data memory access rights trap, vm_start = 0xf89a5000, vm_end = 0xf89a7000
