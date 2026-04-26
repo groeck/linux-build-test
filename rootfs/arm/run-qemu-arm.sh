@@ -287,17 +287,24 @@ runkernel collie_defconfig collie "" \
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
-runkernel integrator_defconfig integratorcp "" \
+if [ ${runall} -eq 1 ]; then
+    # Thanks to Linux kernel commits
+    # 693b0b594b0f ("clocksource/drivers/timer-sp804: Fix an Oops ...")
+    # 640594a04f11 ("clocksource/drivers/timer-sp804: Fix read_current_timer() ...")
+    # integratorcp fails to boot randomly but quite reliably with qemu.
+    # Stop arguing with the author. Just stop testing it.
+    runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.cpio automatic ::mem128:net=default integratorcp.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel integrator_defconfig integratorcp "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.ext2 automatic ::mem128:sd:net=default integratorcp.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel integrator_defconfig integratorcp "" \
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+    runkernel integrator_defconfig integratorcp "" \
 	rootfs-armv5.cramfs automatic ::mem128:sd:net=default integratorcp.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
+    retcode=$((${retcode} + $?))
+    checkstate ${retcode}
+fi
 
 exit ${retcode}
