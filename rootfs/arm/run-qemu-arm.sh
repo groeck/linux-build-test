@@ -18,20 +18,7 @@ ARCH=arm
 
 PREFIX="arm-linux-gnueabi-"
 
-# integratorcp may crash in kmalloc_trace() when using gcc 10+.
-# This is seen in v5.4.y. The problem was fixed in v5.10+ with commit
-# d25e37d89dd2 ("tracepoint: Optimize using static_call()"), but is
-# seen again with the mainline kernel (v6.7-rc) and gcc-11.4.
-# It is also seen with gcc 13.3 and various kernel branches (tested
-# 6.15, 6.12). Call trace is
-#  kmalloc_trace from of_syscon_register+0x58/0x2bc
-#  of_syscon_register from device_node_get_regmap+0x84/0x94
-#  device_node_get_regmap from intcp_init_early+0xc/0x40
-#  intcp_init_early from start_kernel+0x58/0x604
-#  start_kernel from 0x0
-# The problem is actually a kernel problem. Use gcc 9.x until it has
-# been fixed.
-PATH_ARM="/opt/kernel/${DEFAULT_CC9}/arm-linux-gnueabi/bin"
+PATH_ARM="/opt/kernel/${DEFAULT_CC}/arm-linux-gnueabi/bin"
 
 PATH=${PATH_ARM}:${PATH}
 
