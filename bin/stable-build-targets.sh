@@ -58,8 +58,8 @@ cmd_um=(defconfig)
 # builds to skip
 
 skip_510="x86_64:tools/perf i386:tools/perf csky:allmodconfig parisc64:allnoconfig"
-skip_515="x86_64:tools/perf i386:tools/perf arm:allmodconfig"
-skip_61="x86_64:tools/perf i386:tools/perf"
+skip_515="x86_64:tools/perf i386:tools/perf arm:allmodconfig arm:ixp4xx_defconfig"
+skip_61="x86_64:tools/perf i386:tools/perf arm:ixp4xx_defconfig"
 
 # fixups
 
