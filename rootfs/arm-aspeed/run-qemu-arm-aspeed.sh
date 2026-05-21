@@ -171,7 +171,7 @@ runkernel()
     "witherspoon-bmc" | "g220a-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | \
     "quanta-q71l-bmc" | \
-    "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
+    "ast2600-evb" | \
     "bletchley-bmc")
 	initcli+=" console=ttyS4,115200"
 	initcli+=" earlycon=uart8250,mmio32,0x1e784000,115200n8"
@@ -480,20 +480,6 @@ checkstate ${retcode}
 # to 1G.
 runkernel aspeed_g5_defconfig bletchley-bmc,fmc-model=mt25qu02g,spi-model=mt25qu02g "" \
 	rootfs-armv5.f2fs automatic ${notests}::mem1G:mtd256:net=nic aspeed-bmc-facebook-bletchley.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::mtd64:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-# Also test booting from second SPI controller
-runkernel aspeed_g5_defconfig qcom-dc-scm-v1-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::mtd64,0,12,2:net=nic aspeed-bmc-qcom-dc-scm-v1.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
