@@ -170,7 +170,7 @@ runkernel()
     "ast2500-evb" | "palmetto-bmc" | "romulus-bmc" | \
     "witherspoon-bmc" | "g220a-bmc" | \
     "supermicro-x11spi-bmc" | "rainier-bmc" | \
-    "quanta-q71l-bmc" | "fp5280g2-bmc" | \
+    "quanta-q71l-bmc" | \
     "qcom-dc-scm-v1-bmc" | "ast2600-evb" | \
     "bletchley-bmc")
 	initcli+=" console=ttyS4,115200"
@@ -295,15 +295,6 @@ retcode=$((${retcode} + $?))
 checkstate ${retcode}
 runkernel aspeed_g5_defconfig witherspoon-bmc "" \
 	rootfs-armv5.ext2 automatic ${notests}::mtd32:net=nic aspeed-bmc-opp-witherspoon.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-
-runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
-	rootfs-armv5.cpio automatic ${notests}::net=nic aspeed-bmc-inspur-fp5280g2.dtb
-retcode=$((${retcode} + $?))
-checkstate ${retcode}
-runkernel aspeed_g5_defconfig fp5280g2-bmc "" \
-	rootfs-armv5.ext2 automatic ${notests}::mtd64:net=nic aspeed-bmc-inspur-fp5280g2.dtb
 retcode=$((${retcode} + $?))
 checkstate ${retcode}
 
