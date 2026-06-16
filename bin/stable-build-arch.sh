@@ -155,7 +155,7 @@ case ${ARCH} in
 	;;
     hexagon)
 	cmd=(${cmd_hexagon[*]})
-	PATH=${PATH_LLVM}:${PATH}
+	# PATH=${PATH_LLVM}:${PATH}
 	CCMD="clang"
 	EXTRA_CMD="CC=clang LLVM=1 LLVM_IAS=1"
 	;;
