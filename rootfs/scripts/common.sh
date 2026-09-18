@@ -1817,9 +1817,10 @@ __setup_fragment()
 	enable_config "${fragment}" CONFIG_TEST_BLACKHOLE_DEV
 	enable_config "${fragment}" CONFIG_MMC_SDHCI_OF_ASPEED_TEST
 
-	if ! is_enabled CONFIG_OPENRISC; then
-	    # crashes in iov_kunit_copy_from_xarray(),
+	if ! is_enabled CONFIG_OPENRISC && ! is_enabled CONFIG_ALPHA; then
+	    # openrisc crashes in iov_kunit_copy_from_xarray(),
 	    # most likely due to an architecture problem
+	    # alpha stalls with soft lockups starting with 7.1.
 	    enable_config "${fragment}" CONFIG_TEST_IOV_ITER
 	fi
 
