@@ -7,8 +7,11 @@ basedir=$(cd $(dirname $0); pwd)
 # default compiler version
 CV12="12.4.0-2.40"
 CV13_4_243="13.4.0-2.43"
-CV13="13.4.0-2.44"
-CV14="14.3.0-2.44"
+CV13="13.5.0-2.47"
+CV14="14.4.0-2.47"
+CV14_3_244="14.3.0-2.44"
+CV15="15.3.0-2.47"
+CV16="16.2.0-2.47"
 
 # See if we can build with gcc 13.x for recent kernel branches.
 # Branch specific findings:
@@ -28,15 +31,25 @@ CV14="14.3.0-2.44"
 #
 # Target specific definitions:
 # - binutils dropped support for nios2 in binutils 2.44
+# - arc and arcv2 need binutils 2.44 or older (newer versions trigger assembler errors)
+# - gcc 16.2 failed to build s390. Use gcc 15.x for now.
+# - gcc 16.2 triggers new build failures. Stick with gcc 15.x for now.
 #
-if [[ ${linux_version_code} -ge $(kernel_version 6 12) ]]; then
+if [[ ${linux_version_code} -ge $(kernel_version 7 2) ]]; then
+    CV="${CV15}"
+    CV_ARC="${CV14_3_244}"
+    CV_NIOS2="${CV13_4_243}"
+elif [[ ${linux_version_code} -ge $(kernel_version 6 12) ]]; then
     CV="${CV14}"
+    CV_ARC="${CV14_3_244}"
     CV_NIOS2="${CV13_4_243}"
 elif [[ ${linux_version_code} -ge $(kernel_version 6 1) ]]; then
     CV="${CV13}"
+    CV_ARC="${CV13_4_243}"
     CV_NIOS2="${CV13_4_243}"
 else
     CV="${CV12}"
+    CV_ARC="${CV}"
     CV_NIOS2="${CV}"
 fi
 
@@ -46,8 +59,8 @@ GCC_PERF="gcc-11"
 PATH_ALPHA=/opt/kernel/gcc-${CV}-nolibc/alpha-linux/bin
 PATH_ARM=/opt/kernel/gcc-${CV}-nolibc/arm-linux-gnueabi/bin
 PATH_ARM64=/opt/kernel/gcc-${CV}-nolibc/aarch64-linux/bin
-PATH_ARC=/opt/kernel/gcc-${CV}-nolibc/arc-linux/bin
-PATH_ARCV2=/opt/kernel/gcc-${CV}-nolibc/arcv2-linux/bin
+PATH_ARC=/opt/kernel/gcc-${CV_ARC}-nolibc/arc-linux/bin
+PATH_ARCV2=/opt/kernel/gcc-${CV_ARC}-nolibc/arcv2-linux/bin
 PATH_CSKY=/opt/kernel/gcc-${CV}-nolibc/csky-linux/bin
 PATH_LOONGARCH=/opt/kernel/gcc-${CV}-nolibc/loongarch64-linux-gnu/bin
 PATH_M68=/opt/kernel/gcc-${CV}-nolibc/m68k-linux/bin
